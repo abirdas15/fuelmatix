@@ -291,463 +291,464 @@
                     <h4>Description</h4>
                     <h4>Total</h4>
                 </li>
-                <li v-for="heads in accHeads">
-                    <a href="#" @contextmenu="rightClick($event)" class="accordion-btn"><span><img
-                        src="images/arrow-svg.svg" alt=""/>
-                        Assets</span><span>Assets</span><span>8364983</span></a>
-                    <ul class="accordion">
-                        <li>
-                            <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg" alt=""/>
-                                Banks</span><span> Banks</span><span>3543759</span></a>
-                            <ul class="accordion">
-                                <li>
-                                    <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg"
-                                                                                 alt=""/>
-                                        Exim Bank</span><span>Exim Bank</span><span>4754843</span></a>
-                                    <ul class="accordion">
-                                        <li>
-                                            <a href="./table.html"
-                                               target="_blank"><span>text</span><span>desc</span><span>3437347</span></a>
-                                        </li>
-                                    </ul>
-                                </li>
-                            </ul>
-                        </li>
-                        <li>
-                            <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg" alt=""/>
-                                Cash</span><span>Cash</span><span>836854</span></a>
-                            <ul class="accordion">
-                                <li>
-                                    <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg"
-                                                                                 alt=""/>
-                                        Mehedi Cashier</span><span>Mehedi Cashier</span><span>47423456</span></a>
-                                    <ul class="accordion">
-                                        <li>
-                                            <a href="./table.html"
-                                               target="_blank"><span>text</span><span>desc</span><span>4743467</span></a>
-                                        </li>
-                                    </ul>
-                                </li>
-                            </ul>
-                        </li>
-                        <li>
-                            <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg" alt=""/>
-                                Fuel Stock</span><span>Fuel Stock</span><span>3543759</span></a>
-                            <ul class="accordion">
-                                <li>
-                                    <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg"
-                                                                                 alt=""/>
-                                        Octane</span><span>Octane</span><span>4754843</span></a>
-                                    <ul class="accordion">
-                                        <li>
-                                            <a href="./table.html"
-                                               target="_blank"><span>text</span><span>desc</span><span>3437347</span></a>
-                                        </li>
-                                    </ul>
-                                </li>
-                            </ul>
-                        </li>
-                        <li>
-                            <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg" alt=""/>
-                                A/C Receivable</span><span>A/C Receivable</span><span>836854</span></a>
-                            <ul class="accordion">
-                                <li>
-                                    <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg"
-                                                                                 alt=""/>
-                                        Beximco</span><span>Beximco</span><span>47423456</span></a>
-                                    <ul class="accordion">
-                                        <li>
-                                            <a href="./table.html"
-                                               target="_blank"><span>text</span><span>desc</span><span>4743467</span></a>
-                                        </li>
-                                    </ul>
-                                </li>
-                            </ul>
-                        </li>
-                    </ul>
-                </li>
-                <li>
-                    <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg" alt=""/>
-                        Equity</span><span>Equity</span><span>893595</span></a>
-                    <ul class="accordion">
-                        <li>
-                            <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg" alt=""/>
-                                Earnigs</span><span>Equity Earnigs</span><span>426264</span></a>
-                            <ul class="accordion">
-                                <li>
-                                    <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg"
-                                                                                 alt=""/>
-                                        Bohddarhat</span><span>Bohddarhat</span><span>4754843</span></a>
-                                    <ul class="accordion">
-                                        <li>
-                                            <a href="./table.html"
-                                               target="_blank"><span>text</span><span>desc</span><span>3437347</span></a>
-                                        </li>
-                                    </ul>
-                                </li>
-                            </ul>
-                        </li>
-                        <li>
-                            <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg" alt=""/>
-                                Noakhali</span><span>Noakhali</span><span>836854</span></a>
-                            <ul class="accordion">
-                                <li>
-                                    <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg"
-                                                                                 alt=""/>
-                                        Shahriar (Manager)</span><span>Shahriar (Manager)</span><span>47423456</span></a>
-                                    <ul class="accordion">
-                                        <li>
-                                            <a href="./table.html"
-                                               target="_blank"><span>text</span><span>desc</span><span>4743467</span></a>
-                                        </li>
-                                    </ul>
-                                </li>
-                            </ul>
-                        </li>
-                    </ul>
-                </li>
-                <li>
-                    <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg" alt=""/>
-                        Liabilities</span><span>Liabilities</span><span>74578245</span></a>
-                    <ul class="accordion">
-                        <li>
-                            <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg" alt=""/>
-                                Vendors</span><span>Vendors</span><span>5346663</span></a>
-                            <ul class="accordion">
-                                <li>
-                                    <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg"
-                                                                                 alt=""/>
-                                        Banani</span><span>Banani</span><span>23545687</span></a>
-                                    <ul class="accordion">
-                                        <li>
-                                            <a href="./table.html"
-                                               target="_blank"><span>text</span><span>desc</span><span>3437347</span></a>
-                                        </li>
-                                    </ul>
-                                </li>
-                            </ul>
-                        </li>
-                        <li>
-                            <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg" alt=""/>
-                                A/C Payables</span><span>A/C Payables</span><span>836854</span></a>
-                            <ul class="accordion">
-                                <li>
-                                    <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg"
-                                                                                 alt=""/>
-                                        Shahriar (Manager)</span><span>Shahriar (Manager)</span><span>47423456</span></a>
-                                    <ul class="accordion">
-                                        <li>
-                                            <a href="./table.html"
-                                               target="_blank"><span>text</span><span>desc</span><span>4743467</span></a>
-                                        </li>
-                                    </ul>
-                                </li>
-                            </ul>
-                        </li>
-                        <li>
-                            <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg" alt=""/>
-                                Loans</span><span>Loans</span><span>3543759</span></a>
-                            <ul class="accordion">
-                                <li>
-                                    <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg"
-                                                                                 alt=""/>
-                                        Bohddarhat</span><span>Bohddarhat</span><span>4754843</span></a>
-                                    <ul class="accordion">
-                                        <li>
-                                            <a href="./table.html"
-                                               target="_blank"><span>text</span><span>desc</span><span>3437347</span></a>
-                                        </li>
-                                    </ul>
-                                </li>
-                            </ul>
-                        </li>
-                        <li>
-                            <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg" alt=""/>
-                                Noakhali</span><span>Noakhali</span><span>836854</span></a>
-                            <ul class="accordion">
-                                <li>
-                                    <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg"
-                                                                                 alt=""/>
-                                        Shahriar (Manager)</span><span>Shahriar (Manager)</span><span>47423456</span></a>
-                                    <ul class="accordion">
-                                        <li>
-                                            <a href="./table.html"
-                                               target="_blank"><span>text</span><span>desc</span><span>4743467</span></a>
-                                        </li>
-                                    </ul>
-                                </li>
-                            </ul>
-                        </li>
-                    </ul>
-                </li>
-                <li>
-                    <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg" alt=""/>
-                        Expenses</span><span>Expenses</span><span>57634572</span></a>
-                    <ul class="accordion">
-                        <li>
-                            <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg" alt=""/>
-                                Inventory</span><span>Inventory</span><span>626724</span></a>
-                            <ul class="accordion">
-                                <li>
-                                    <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg"
-                                                                                 alt=""/>
-                                        Jessore</span><span>Jessore</span><span>345784</span></a>
-                                    <ul class="accordion">
-                                        <li>
-                                            <a href="./table.html"
-                                               target="_blank"><span>text</span><span>desc</span><span>78484</span></a>
-                                        </li>
-                                    </ul>
-                                </li>
-                            </ul>
-                        </li>
-                        <li>
-                            <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg" alt=""/>
-                                Salary</span><span>Salary</span><span>836854</span></a>
-                            <ul class="accordion">
-                                <li>
-                                    <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg"
-                                                                                 alt=""/>
-                                        Shahriar (Manager)</span><span>Shahriar (Manager)</span><span>47423456</span></a>
-                                    <ul class="accordion">
-                                        <li>
-                                            <a href="./table.html"
-                                               target="_blank"><span>text</span><span>desc</span><span>4743467</span></a>
-                                        </li>
-                                    </ul>
-                                </li>
-                            </ul>
-                        </li>
-                    </ul>
-                </li>
-                <li>
-                    <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg" alt=""/>
-                        Assets</span><span>Assets</span><span>8364983</span></a>
-                    <ul class="accordion">
-                        <li>
-                            <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg" alt=""/>
-                                Loans</span><span>Loans</span><span>3543759</span></a>
-                            <ul class="accordion">
-                                <li>
-                                    <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg"
-                                                                                 alt=""/>
-                                        Bohddarhat</span><span>Bohddarhat</span><span>4754843</span></a>
-                                    <ul class="accordion">
-                                        <li>
-                                            <a href="./table.html"
-                                               target="_blank"><span>text</span><span>desc</span><span>3437347</span></a>
-                                        </li>
-                                    </ul>
-                                </li>
-                            </ul>
-                        </li>
-                        <li>
-                            <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg" alt=""/>
-                                Noakhali</span><span>Noakhali</span><span>836854</span></a>
-                            <ul class="accordion">
-                                <li>
-                                    <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg"
-                                                                                 alt=""/>
-                                        Shahriar (Manager)</span><span>Shahriar (Manager)</span><span>47423456</span></a>
-                                    <ul class="accordion">
-                                        <li>
-                                            <a href="./table.html"
-                                               target="_blank"><span>text</span><span>desc</span><span>4743467</span></a>
-                                        </li>
-                                    </ul>
-                                </li>
-                            </ul>
-                        </li>
-                        <li>
-                            <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg" alt=""/>
-                                Loans</span><span>Loans</span><span>3543759</span></a>
-                            <ul class="accordion">
-                                <li>
-                                    <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg"
-                                                                                 alt=""/>
-                                        Bohddarhat</span><span>Bohddarhat</span><span>4754843</span></a>
-                                    <ul class="accordion">
-                                        <li>
-                                            <a href="./table.html"
-                                               target="_blank"><span>text</span><span>desc</span><span>3437347</span></a>
-                                        </li>
-                                    </ul>
-                                </li>
-                            </ul>
-                        </li>
-                        <li>
-                            <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg" alt=""/>
-                                Noakhali</span><span>Noakhali</span><span>836854</span></a>
-                            <ul class="accordion">
-                                <li>
-                                    <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg"
-                                                                                 alt=""/>
-                                        Shahriar (Manager)</span><span>Shahriar (Manager)</span><span>47423456</span></a>
-                                    <ul class="accordion">
-                                        <li>
-                                            <a href="./table.html"
-                                               target="_blank"><span>text</span><span>desc</span><span>4743467</span></a>
-                                        </li>
-                                    </ul>
-                                </li>
-                            </ul>
-                        </li>
-                    </ul>
-                </li>
-                <li>
-                    <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg" alt=""/>
-                        Equity</span><span>Equity</span><span>893595</span></a>
-                    <ul class="accordion">
-                        <li>
-                            <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg" alt=""/>
-                                Loans</span><span>Loans</span><span>426264</span></a>
-                            <ul class="accordion">
-                                <li>
-                                    <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg"
-                                                                                 alt=""/>
-                                        Bohddarhat</span><span>Bohddarhat</span><span>4754843</span></a>
-                                    <ul class="accordion">
-                                        <li>
-                                            <a href="./table.html"
-                                               target="_blank"><span>text</span><span>desc</span><span>3437347</span></a>
-                                        </li>
-                                    </ul>
-                                </li>
-                            </ul>
-                        </li>
-                        <li>
-                            <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg" alt=""/>
-                                Noakhali</span><span>Noakhali</span><span>836854</span></a>
-                            <ul class="accordion">
-                                <li>
-                                    <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg"
-                                                                                 alt=""/>
-                                        Shahriar (Manager)</span><span>Shahriar (Manager)</span><span>47423456</span></a>
-                                    <ul class="accordion">
-                                        <li>
-                                            <a href="./table.html"
-                                               target="_blank"><span>text</span><span>desc</span><span>4743467</span></a>
-                                        </li>
-                                    </ul>
-                                </li>
-                            </ul>
-                        </li>
-                    </ul>
-                </li>
-                <li>
-                    <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg" alt=""/>
-                        Liabilities</span><span>Liabilities</span><span>74578245</span></a>
-                    <ul class="accordion">
-                        <li>
-                            <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg" alt=""/>
-                                Vendors</span><span>Vendors</span><span>5346663</span></a>
-                            <ul class="accordion">
-                                <li>
-                                    <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg"
-                                                                                 alt=""/>
-                                        Banani</span><span>Banani</span><span>23545687</span></a>
-                                    <ul class="accordion">
-                                        <li>
-                                            <a href="./table.html"
-                                               target="_blank"><span>text</span><span>desc</span><span>3437347</span></a>
-                                        </li>
-                                    </ul>
-                                </li>
-                            </ul>
-                        </li>
-                        <li>
-                            <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg" alt=""/>
-                                A/C Payables</span><span>A/C Payables</span><span>836854</span></a>
-                            <ul class="accordion">
-                                <li>
-                                    <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg"
-                                                                                 alt=""/>
-                                        Shahriar (Manager)</span><span>Shahriar (Manager)</span><span>47423456</span></a>
-                                    <ul class="accordion">
-                                        <li>
-                                            <a href="./table.html"
-                                               target="_blank"><span>text</span><span>desc</span><span>4743467</span></a>
-                                        </li>
-                                    </ul>
-                                </li>
-                            </ul>
-                        </li>
-                        <li>
-                            <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg" alt=""/>
-                                Loans</span><span>Loans</span><span>3543759</span></a>
-                            <ul class="accordion">
-                                <li>
-                                    <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg"
-                                                                                 alt=""/>
-                                        Bohddarhat</span><span>Bohddarhat</span><span>4754843</span></a>
-                                    <ul class="accordion">
-                                        <li>
-                                            <a href="./table.html"
-                                               target="_blank"><span>text</span><span>desc</span><span>3437347</span></a>
-                                        </li>
-                                    </ul>
-                                </li>
-                            </ul>
-                        </li>
-                        <li>
-                            <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg" alt=""/>
-                                Noakhali</span><span>Noakhali</span><span>836854</span></a>
-                            <ul class="accordion">
-                                <li>
-                                    <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg"
-                                                                                 alt=""/>
-                                        Shahriar (Manager)</span><span>Shahriar (Manager)</span><span>47423456</span></a>
-                                    <ul class="accordion">
-                                        <li>
-                                            <a href="./table.html"
-                                               target="_blank"><span>text</span><span>desc</span><span>4743467</span></a>
-                                        </li>
-                                    </ul>
-                                </li>
-                            </ul>
-                        </li>
-                    </ul>
-                </li>
-                <li>
-                    <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg" alt=""/>
-                        Expenses</span><span>Expenses</span><span>57634572</span></a>
-                    <ul class="accordion">
-                        <li>
-                            <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg" alt=""/>
-                                Inventory</span><span>Inventory</span><span>626724</span></a>
-                            <ul class="accordion">
-                                <li>
-                                    <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg"
-                                                                                 alt=""/>
-                                        Jessore</span><span>Jessore</span><span>345784</span></a>
-                                    <ul class="accordion">
-                                        <li>
-                                            <a href="./table.html"
-                                               target="_blank"><span>text</span><span>desc</span><span>78484</span></a>
-                                        </li>
-                                    </ul>
-                                </li>
-                            </ul>
-                        </li>
-                        <li>
-                            <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg" alt=""/>
-                                Salary</span><span>Salary</span><span>836854</span></a>
-                            <ul class="accordion">
-                                <li>
-                                    <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg"
-                                                                                 alt=""/>
-                                        Shahriar (Manager)</span><span>Shahriar (Manager)</span><span>47423456</span></a>
-                                    <ul class="accordion">
-                                        <li>
-                                            <a href="./table.html"
-                                               target="_blank"><span>text</span><span>desc</span><span>4743467</span></a>
-                                        </li>
-                                    </ul>
-                                </li>
-                            </ul>
-                        </li>
-                    </ul>
-                </li>
+                <TreeNode v-for="heads in accHeads" :key="heads.id" :node="heads" />
+<!--                <li v-for="heads in accHeads">-->
+<!--                    <a href="#" @contextmenu="rightClick($event)" class="accordion-btn"><span><img-->
+<!--                        src="images/arrow-svg.svg" alt=""/>-->
+<!--                        Assets</span><span>Assets</span><span>8364983</span></a>-->
+<!--                    <ul class="accordion">-->
+<!--                        <li>-->
+<!--                            <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg" alt=""/>-->
+<!--                                Banks</span><span> Banks</span><span>3543759</span></a>-->
+<!--                            <ul class="accordion">-->
+<!--                                <li>-->
+<!--                                    <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg"-->
+<!--                                                                                 alt=""/>-->
+<!--                                        Exim Bank</span><span>Exim Bank</span><span>4754843</span></a>-->
+<!--                                    <ul class="accordion">-->
+<!--                                        <li>-->
+<!--                                            <a href="./table.html"-->
+<!--                                               target="_blank"><span>text</span><span>desc</span><span>3437347</span></a>-->
+<!--                                        </li>-->
+<!--                                    </ul>-->
+<!--                                </li>-->
+<!--                            </ul>-->
+<!--                        </li>-->
+<!--                        <li>-->
+<!--                            <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg" alt=""/>-->
+<!--                                Cash</span><span>Cash</span><span>836854</span></a>-->
+<!--                            <ul class="accordion">-->
+<!--                                <li>-->
+<!--                                    <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg"-->
+<!--                                                                                 alt=""/>-->
+<!--                                        Mehedi Cashier</span><span>Mehedi Cashier</span><span>47423456</span></a>-->
+<!--                                    <ul class="accordion">-->
+<!--                                        <li>-->
+<!--                                            <a href="./table.html"-->
+<!--                                               target="_blank"><span>text</span><span>desc</span><span>4743467</span></a>-->
+<!--                                        </li>-->
+<!--                                    </ul>-->
+<!--                                </li>-->
+<!--                            </ul>-->
+<!--                        </li>-->
+<!--                        <li>-->
+<!--                            <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg" alt=""/>-->
+<!--                                Fuel Stock</span><span>Fuel Stock</span><span>3543759</span></a>-->
+<!--                            <ul class="accordion">-->
+<!--                                <li>-->
+<!--                                    <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg"-->
+<!--                                                                                 alt=""/>-->
+<!--                                        Octane</span><span>Octane</span><span>4754843</span></a>-->
+<!--                                    <ul class="accordion">-->
+<!--                                        <li>-->
+<!--                                            <a href="./table.html"-->
+<!--                                               target="_blank"><span>text</span><span>desc</span><span>3437347</span></a>-->
+<!--                                        </li>-->
+<!--                                    </ul>-->
+<!--                                </li>-->
+<!--                            </ul>-->
+<!--                        </li>-->
+<!--                        <li>-->
+<!--                            <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg" alt=""/>-->
+<!--                                A/C Receivable</span><span>A/C Receivable</span><span>836854</span></a>-->
+<!--                            <ul class="accordion">-->
+<!--                                <li>-->
+<!--                                    <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg"-->
+<!--                                                                                 alt=""/>-->
+<!--                                        Beximco</span><span>Beximco</span><span>47423456</span></a>-->
+<!--                                    <ul class="accordion">-->
+<!--                                        <li>-->
+<!--                                            <a href="./table.html"-->
+<!--                                               target="_blank"><span>text</span><span>desc</span><span>4743467</span></a>-->
+<!--                                        </li>-->
+<!--                                    </ul>-->
+<!--                                </li>-->
+<!--                            </ul>-->
+<!--                        </li>-->
+<!--                    </ul>-->
+<!--                </li>-->
+<!--                <li>-->
+<!--                    <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg" alt=""/>-->
+<!--                        Equity</span><span>Equity</span><span>893595</span></a>-->
+<!--                    <ul class="accordion">-->
+<!--                        <li>-->
+<!--                            <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg" alt=""/>-->
+<!--                                Earnigs</span><span>Equity Earnigs</span><span>426264</span></a>-->
+<!--                            <ul class="accordion">-->
+<!--                                <li>-->
+<!--                                    <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg"-->
+<!--                                                                                 alt=""/>-->
+<!--                                        Bohddarhat</span><span>Bohddarhat</span><span>4754843</span></a>-->
+<!--                                    <ul class="accordion">-->
+<!--                                        <li>-->
+<!--                                            <a href="./table.html"-->
+<!--                                               target="_blank"><span>text</span><span>desc</span><span>3437347</span></a>-->
+<!--                                        </li>-->
+<!--                                    </ul>-->
+<!--                                </li>-->
+<!--                            </ul>-->
+<!--                        </li>-->
+<!--                        <li>-->
+<!--                            <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg" alt=""/>-->
+<!--                                Noakhali</span><span>Noakhali</span><span>836854</span></a>-->
+<!--                            <ul class="accordion">-->
+<!--                                <li>-->
+<!--                                    <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg"-->
+<!--                                                                                 alt=""/>-->
+<!--                                        Shahriar (Manager)</span><span>Shahriar (Manager)</span><span>47423456</span></a>-->
+<!--                                    <ul class="accordion">-->
+<!--                                        <li>-->
+<!--                                            <a href="./table.html"-->
+<!--                                               target="_blank"><span>text</span><span>desc</span><span>4743467</span></a>-->
+<!--                                        </li>-->
+<!--                                    </ul>-->
+<!--                                </li>-->
+<!--                            </ul>-->
+<!--                        </li>-->
+<!--                    </ul>-->
+<!--                </li>-->
+<!--                <li>-->
+<!--                    <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg" alt=""/>-->
+<!--                        Liabilities</span><span>Liabilities</span><span>74578245</span></a>-->
+<!--                    <ul class="accordion">-->
+<!--                        <li>-->
+<!--                            <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg" alt=""/>-->
+<!--                                Vendors</span><span>Vendors</span><span>5346663</span></a>-->
+<!--                            <ul class="accordion">-->
+<!--                                <li>-->
+<!--                                    <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg"-->
+<!--                                                                                 alt=""/>-->
+<!--                                        Banani</span><span>Banani</span><span>23545687</span></a>-->
+<!--                                    <ul class="accordion">-->
+<!--                                        <li>-->
+<!--                                            <a href="./table.html"-->
+<!--                                               target="_blank"><span>text</span><span>desc</span><span>3437347</span></a>-->
+<!--                                        </li>-->
+<!--                                    </ul>-->
+<!--                                </li>-->
+<!--                            </ul>-->
+<!--                        </li>-->
+<!--                        <li>-->
+<!--                            <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg" alt=""/>-->
+<!--                                A/C Payables</span><span>A/C Payables</span><span>836854</span></a>-->
+<!--                            <ul class="accordion">-->
+<!--                                <li>-->
+<!--                                    <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg"-->
+<!--                                                                                 alt=""/>-->
+<!--                                        Shahriar (Manager)</span><span>Shahriar (Manager)</span><span>47423456</span></a>-->
+<!--                                    <ul class="accordion">-->
+<!--                                        <li>-->
+<!--                                            <a href="./table.html"-->
+<!--                                               target="_blank"><span>text</span><span>desc</span><span>4743467</span></a>-->
+<!--                                        </li>-->
+<!--                                    </ul>-->
+<!--                                </li>-->
+<!--                            </ul>-->
+<!--                        </li>-->
+<!--                        <li>-->
+<!--                            <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg" alt=""/>-->
+<!--                                Loans</span><span>Loans</span><span>3543759</span></a>-->
+<!--                            <ul class="accordion">-->
+<!--                                <li>-->
+<!--                                    <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg"-->
+<!--                                                                                 alt=""/>-->
+<!--                                        Bohddarhat</span><span>Bohddarhat</span><span>4754843</span></a>-->
+<!--                                    <ul class="accordion">-->
+<!--                                        <li>-->
+<!--                                            <a href="./table.html"-->
+<!--                                               target="_blank"><span>text</span><span>desc</span><span>3437347</span></a>-->
+<!--                                        </li>-->
+<!--                                    </ul>-->
+<!--                                </li>-->
+<!--                            </ul>-->
+<!--                        </li>-->
+<!--                        <li>-->
+<!--                            <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg" alt=""/>-->
+<!--                                Noakhali</span><span>Noakhali</span><span>836854</span></a>-->
+<!--                            <ul class="accordion">-->
+<!--                                <li>-->
+<!--                                    <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg"-->
+<!--                                                                                 alt=""/>-->
+<!--                                        Shahriar (Manager)</span><span>Shahriar (Manager)</span><span>47423456</span></a>-->
+<!--                                    <ul class="accordion">-->
+<!--                                        <li>-->
+<!--                                            <a href="./table.html"-->
+<!--                                               target="_blank"><span>text</span><span>desc</span><span>4743467</span></a>-->
+<!--                                        </li>-->
+<!--                                    </ul>-->
+<!--                                </li>-->
+<!--                            </ul>-->
+<!--                        </li>-->
+<!--                    </ul>-->
+<!--                </li>-->
+<!--                <li>-->
+<!--                    <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg" alt=""/>-->
+<!--                        Expenses</span><span>Expenses</span><span>57634572</span></a>-->
+<!--                    <ul class="accordion">-->
+<!--                        <li>-->
+<!--                            <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg" alt=""/>-->
+<!--                                Inventory</span><span>Inventory</span><span>626724</span></a>-->
+<!--                            <ul class="accordion">-->
+<!--                                <li>-->
+<!--                                    <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg"-->
+<!--                                                                                 alt=""/>-->
+<!--                                        Jessore</span><span>Jessore</span><span>345784</span></a>-->
+<!--                                    <ul class="accordion">-->
+<!--                                        <li>-->
+<!--                                            <a href="./table.html"-->
+<!--                                               target="_blank"><span>text</span><span>desc</span><span>78484</span></a>-->
+<!--                                        </li>-->
+<!--                                    </ul>-->
+<!--                                </li>-->
+<!--                            </ul>-->
+<!--                        </li>-->
+<!--                        <li>-->
+<!--                            <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg" alt=""/>-->
+<!--                                Salary</span><span>Salary</span><span>836854</span></a>-->
+<!--                            <ul class="accordion">-->
+<!--                                <li>-->
+<!--                                    <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg"-->
+<!--                                                                                 alt=""/>-->
+<!--                                        Shahriar (Manager)</span><span>Shahriar (Manager)</span><span>47423456</span></a>-->
+<!--                                    <ul class="accordion">-->
+<!--                                        <li>-->
+<!--                                            <a href="./table.html"-->
+<!--                                               target="_blank"><span>text</span><span>desc</span><span>4743467</span></a>-->
+<!--                                        </li>-->
+<!--                                    </ul>-->
+<!--                                </li>-->
+<!--                            </ul>-->
+<!--                        </li>-->
+<!--                    </ul>-->
+<!--                </li>-->
+<!--                <li>-->
+<!--                    <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg" alt=""/>-->
+<!--                        Assets</span><span>Assets</span><span>8364983</span></a>-->
+<!--                    <ul class="accordion">-->
+<!--                        <li>-->
+<!--                            <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg" alt=""/>-->
+<!--                                Loans</span><span>Loans</span><span>3543759</span></a>-->
+<!--                            <ul class="accordion">-->
+<!--                                <li>-->
+<!--                                    <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg"-->
+<!--                                                                                 alt=""/>-->
+<!--                                        Bohddarhat</span><span>Bohddarhat</span><span>4754843</span></a>-->
+<!--                                    <ul class="accordion">-->
+<!--                                        <li>-->
+<!--                                            <a href="./table.html"-->
+<!--                                               target="_blank"><span>text</span><span>desc</span><span>3437347</span></a>-->
+<!--                                        </li>-->
+<!--                                    </ul>-->
+<!--                                </li>-->
+<!--                            </ul>-->
+<!--                        </li>-->
+<!--                        <li>-->
+<!--                            <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg" alt=""/>-->
+<!--                                Noakhali</span><span>Noakhali</span><span>836854</span></a>-->
+<!--                            <ul class="accordion">-->
+<!--                                <li>-->
+<!--                                    <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg"-->
+<!--                                                                                 alt=""/>-->
+<!--                                        Shahriar (Manager)</span><span>Shahriar (Manager)</span><span>47423456</span></a>-->
+<!--                                    <ul class="accordion">-->
+<!--                                        <li>-->
+<!--                                            <a href="./table.html"-->
+<!--                                               target="_blank"><span>text</span><span>desc</span><span>4743467</span></a>-->
+<!--                                        </li>-->
+<!--                                    </ul>-->
+<!--                                </li>-->
+<!--                            </ul>-->
+<!--                        </li>-->
+<!--                        <li>-->
+<!--                            <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg" alt=""/>-->
+<!--                                Loans</span><span>Loans</span><span>3543759</span></a>-->
+<!--                            <ul class="accordion">-->
+<!--                                <li>-->
+<!--                                    <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg"-->
+<!--                                                                                 alt=""/>-->
+<!--                                        Bohddarhat</span><span>Bohddarhat</span><span>4754843</span></a>-->
+<!--                                    <ul class="accordion">-->
+<!--                                        <li>-->
+<!--                                            <a href="./table.html"-->
+<!--                                               target="_blank"><span>text</span><span>desc</span><span>3437347</span></a>-->
+<!--                                        </li>-->
+<!--                                    </ul>-->
+<!--                                </li>-->
+<!--                            </ul>-->
+<!--                        </li>-->
+<!--                        <li>-->
+<!--                            <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg" alt=""/>-->
+<!--                                Noakhali</span><span>Noakhali</span><span>836854</span></a>-->
+<!--                            <ul class="accordion">-->
+<!--                                <li>-->
+<!--                                    <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg"-->
+<!--                                                                                 alt=""/>-->
+<!--                                        Shahriar (Manager)</span><span>Shahriar (Manager)</span><span>47423456</span></a>-->
+<!--                                    <ul class="accordion">-->
+<!--                                        <li>-->
+<!--                                            <a href="./table.html"-->
+<!--                                               target="_blank"><span>text</span><span>desc</span><span>4743467</span></a>-->
+<!--                                        </li>-->
+<!--                                    </ul>-->
+<!--                                </li>-->
+<!--                            </ul>-->
+<!--                        </li>-->
+<!--                    </ul>-->
+<!--                </li>-->
+<!--                <li>-->
+<!--                    <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg" alt=""/>-->
+<!--                        Equity</span><span>Equity</span><span>893595</span></a>-->
+<!--                    <ul class="accordion">-->
+<!--                        <li>-->
+<!--                            <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg" alt=""/>-->
+<!--                                Loans</span><span>Loans</span><span>426264</span></a>-->
+<!--                            <ul class="accordion">-->
+<!--                                <li>-->
+<!--                                    <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg"-->
+<!--                                                                                 alt=""/>-->
+<!--                                        Bohddarhat</span><span>Bohddarhat</span><span>4754843</span></a>-->
+<!--                                    <ul class="accordion">-->
+<!--                                        <li>-->
+<!--                                            <a href="./table.html"-->
+<!--                                               target="_blank"><span>text</span><span>desc</span><span>3437347</span></a>-->
+<!--                                        </li>-->
+<!--                                    </ul>-->
+<!--                                </li>-->
+<!--                            </ul>-->
+<!--                        </li>-->
+<!--                        <li>-->
+<!--                            <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg" alt=""/>-->
+<!--                                Noakhali</span><span>Noakhali</span><span>836854</span></a>-->
+<!--                            <ul class="accordion">-->
+<!--                                <li>-->
+<!--                                    <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg"-->
+<!--                                                                                 alt=""/>-->
+<!--                                        Shahriar (Manager)</span><span>Shahriar (Manager)</span><span>47423456</span></a>-->
+<!--                                    <ul class="accordion">-->
+<!--                                        <li>-->
+<!--                                            <a href="./table.html"-->
+<!--                                               target="_blank"><span>text</span><span>desc</span><span>4743467</span></a>-->
+<!--                                        </li>-->
+<!--                                    </ul>-->
+<!--                                </li>-->
+<!--                            </ul>-->
+<!--                        </li>-->
+<!--                    </ul>-->
+<!--                </li>-->
+<!--                <li>-->
+<!--                    <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg" alt=""/>-->
+<!--                        Liabilities</span><span>Liabilities</span><span>74578245</span></a>-->
+<!--                    <ul class="accordion">-->
+<!--                        <li>-->
+<!--                            <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg" alt=""/>-->
+<!--                                Vendors</span><span>Vendors</span><span>5346663</span></a>-->
+<!--                            <ul class="accordion">-->
+<!--                                <li>-->
+<!--                                    <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg"-->
+<!--                                                                                 alt=""/>-->
+<!--                                        Banani</span><span>Banani</span><span>23545687</span></a>-->
+<!--                                    <ul class="accordion">-->
+<!--                                        <li>-->
+<!--                                            <a href="./table.html"-->
+<!--                                               target="_blank"><span>text</span><span>desc</span><span>3437347</span></a>-->
+<!--                                        </li>-->
+<!--                                    </ul>-->
+<!--                                </li>-->
+<!--                            </ul>-->
+<!--                        </li>-->
+<!--                        <li>-->
+<!--                            <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg" alt=""/>-->
+<!--                                A/C Payables</span><span>A/C Payables</span><span>836854</span></a>-->
+<!--                            <ul class="accordion">-->
+<!--                                <li>-->
+<!--                                    <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg"-->
+<!--                                                                                 alt=""/>-->
+<!--                                        Shahriar (Manager)</span><span>Shahriar (Manager)</span><span>47423456</span></a>-->
+<!--                                    <ul class="accordion">-->
+<!--                                        <li>-->
+<!--                                            <a href="./table.html"-->
+<!--                                               target="_blank"><span>text</span><span>desc</span><span>4743467</span></a>-->
+<!--                                        </li>-->
+<!--                                    </ul>-->
+<!--                                </li>-->
+<!--                            </ul>-->
+<!--                        </li>-->
+<!--                        <li>-->
+<!--                            <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg" alt=""/>-->
+<!--                                Loans</span><span>Loans</span><span>3543759</span></a>-->
+<!--                            <ul class="accordion">-->
+<!--                                <li>-->
+<!--                                    <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg"-->
+<!--                                                                                 alt=""/>-->
+<!--                                        Bohddarhat</span><span>Bohddarhat</span><span>4754843</span></a>-->
+<!--                                    <ul class="accordion">-->
+<!--                                        <li>-->
+<!--                                            <a href="./table.html"-->
+<!--                                               target="_blank"><span>text</span><span>desc</span><span>3437347</span></a>-->
+<!--                                        </li>-->
+<!--                                    </ul>-->
+<!--                                </li>-->
+<!--                            </ul>-->
+<!--                        </li>-->
+<!--                        <li>-->
+<!--                            <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg" alt=""/>-->
+<!--                                Noakhali</span><span>Noakhali</span><span>836854</span></a>-->
+<!--                            <ul class="accordion">-->
+<!--                                <li>-->
+<!--                                    <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg"-->
+<!--                                                                                 alt=""/>-->
+<!--                                        Shahriar (Manager)</span><span>Shahriar (Manager)</span><span>47423456</span></a>-->
+<!--                                    <ul class="accordion">-->
+<!--                                        <li>-->
+<!--                                            <a href="./table.html"-->
+<!--                                               target="_blank"><span>text</span><span>desc</span><span>4743467</span></a>-->
+<!--                                        </li>-->
+<!--                                    </ul>-->
+<!--                                </li>-->
+<!--                            </ul>-->
+<!--                        </li>-->
+<!--                    </ul>-->
+<!--                </li>-->
+<!--                <li>-->
+<!--                    <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg" alt=""/>-->
+<!--                        Expenses</span><span>Expenses</span><span>57634572</span></a>-->
+<!--                    <ul class="accordion">-->
+<!--                        <li>-->
+<!--                            <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg" alt=""/>-->
+<!--                                Inventory</span><span>Inventory</span><span>626724</span></a>-->
+<!--                            <ul class="accordion">-->
+<!--                                <li>-->
+<!--                                    <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg"-->
+<!--                                                                                 alt=""/>-->
+<!--                                        Jessore</span><span>Jessore</span><span>345784</span></a>-->
+<!--                                    <ul class="accordion">-->
+<!--                                        <li>-->
+<!--                                            <a href="./table.html"-->
+<!--                                               target="_blank"><span>text</span><span>desc</span><span>78484</span></a>-->
+<!--                                        </li>-->
+<!--                                    </ul>-->
+<!--                                </li>-->
+<!--                            </ul>-->
+<!--                        </li>-->
+<!--                        <li>-->
+<!--                            <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg" alt=""/>-->
+<!--                                Salary</span><span>Salary</span><span>836854</span></a>-->
+<!--                            <ul class="accordion">-->
+<!--                                <li>-->
+<!--                                    <a href="#" class="accordion-btn"><span><img src="/images/arrow-svg.svg"-->
+<!--                                                                                 alt=""/>-->
+<!--                                        Shahriar (Manager)</span><span>Shahriar (Manager)</span><span>47423456</span></a>-->
+<!--                                    <ul class="accordion">-->
+<!--                                        <li>-->
+<!--                                            <a href="./table.html"-->
+<!--                                               target="_blank"><span>text</span><span>desc</span><span>4743467</span></a>-->
+<!--                                        </li>-->
+<!--                                    </ul>-->
+<!--                                </li>-->
+<!--                            </ul>-->
+<!--                        </li>-->
+<!--                    </ul>-->
+<!--                </li>-->
             </ul>
         </div>
     </div>
@@ -756,8 +757,10 @@
 <script>
 import ApiService from "../../Services/ApiService";
 import ApiRoutes from "../../Services/ApiRoutes";
+import TreeNode from "./TreeNode";
 
 export default {
+    components: {TreeNode},
     data() {
         return {
             popup: null,
@@ -765,22 +768,6 @@ export default {
         }
     },
     methods: {
-        rightClick: function (e) {
-            e.preventDefault();
-            this.showPopup(e);
-        },
-        showPopup: function (evt) {
-            this.popup.style.left = `${evt.pageX}px`;
-            this.popup.style.top = `${evt.pageY}px`;
-            this.popup.classList.add('active')
-        },
-        hidePopup: function (e) {
-            if (e.target !== this.popup) {
-                if (this.popup.classList.contains('active')) {
-                    this.popup.classList.remove('active')
-                }
-            }
-        },
         getAccountsHead: function () {
             ApiService.POST(ApiRoutes.AccountList, {}, res => {
                 if (parseInt(res.status) === 200) {
@@ -792,63 +779,14 @@ export default {
     created() {
         this.getAccountsHead()
     },
-    mounted() {
-        const accordion = document.querySelector(".accordion");
-        const accordionBtn = document.querySelectorAll(".accordion-btn");
-        this.popup = document.querySelector(".popup-wrapper");
-        const newAccount = document.getElementById('newAccount');
-        const newAccForm = document.querySelector('.new-account-form-wrapper');
-        const cancelBtn = document.querySelector('.cancel-btn');
-        const form = document.querySelector('form');
 
-        // accourdion show and hide
-        accordionBtn.forEach((e) => {
-            e.onclick = function (event) {
-                event.preventDefault();
-                e.nextElementSibling.classList.toggle("open");
-                e.classList.toggle('active');
-            }
-        });
-
-
-        // hide pup function
-        const hidePopup = (e) => {
-
-        };
-
-        // hide the popup when user clicks outside the popup box
-        window.addEventListener('click',  (e) => {
-            this.hidePopup(e);
-            if (e.target == newAccForm && e.target !== form) {
-                newAccForm.classList.remove('active')
-            }
-        })
-
-        // hide the popup when user spin the mouse wheel
-        window.addEventListener('wheel',  (e) =>  {
-            this.hidePopup(e)
-        })
-
-
-        newAccount.onclick = function (e) {
-            hidePopup(e)
-            if (!newAccForm.classList.contains('active')) {
-                newAccForm.classList.add('active')
-            }
-
-        }
-
-        cancelBtn.onclick = function () {
-            newAccForm.classList.remove('active')
-        }
-    },
     destroyed() {
 
     }
 }
 </script>
 
-<style scoped>
+<style>
 
 ul {
     list-style: none;
