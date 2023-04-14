@@ -1,13 +1,13 @@
 <template>
     <div>
         <li>
-            <a href="#"  class="accordion-btn">
+            <a href="#" @contextmenu="rightClick($event)" class="accordion-btn">
                 <span>
                     <img src="images/arrow-svg.svg" alt="" v-if="node.children.length > 0"/>
                     {{ node.name }}
                 </span>
                 <span> {{ node.name }}</span>
-                <span>{{node.balance}}</span>
+                <span>{{node.balance_format }}</span>
             </a>
             <ul class="accordion" v-if="node.children.length > 0">
                 <TreeNode v-for="heads in node.children" :key="heads.id" :node="heads" />

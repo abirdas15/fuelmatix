@@ -11,6 +11,10 @@ class AccountHead extends Model
     protected $table = 'account_heads';
     public $timestamps = false;
 
+    protected $appends = [
+        'balance_format'
+    ];
+
     public function grandchildren()
     {
         return $this->hasMany(self::class, 'parent_id');
@@ -18,5 +22,12 @@ class AccountHead extends Model
     public function children()
     {
         return $this->grandchildren()->select('id', 'parent_id', 'name', 'balance')->with('children');
+    }
+    public function getBalanceFormatAttribute()
+    {
+        if ($this->balance != null) {
+            return number_format($this->balance, 2);
+        }
+        return '0.00';
     }
 }

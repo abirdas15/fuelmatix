@@ -13,7 +13,6 @@
                     </ul>
                 </div>
             </div>
-
             <div class="new-account-form-wrapper">
                 <form>
                     <div class="input-wrapper">

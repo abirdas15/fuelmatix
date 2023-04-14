@@ -3412,13 +3412,18 @@ var render = function render() {
     staticClass: "accordion-btn",
     attrs: {
       href: "#"
+    },
+    on: {
+      contextmenu: function contextmenu($event) {
+        return _vm.rightClick($event);
+      }
     }
   }, [_c("span", [_vm.node.children.length > 0 ? _c("img", {
     attrs: {
       src: "images/arrow-svg.svg",
       alt: ""
     }
-  }) : _vm._e(), _vm._v("\n                " + _vm._s(_vm.node.name) + "\n            ")]), _vm._v(" "), _c("span", [_vm._v(" " + _vm._s(_vm.node.name))]), _vm._v(" "), _c("span", [_vm._v(_vm._s(_vm.node.balance))])]), _vm._v(" "), _vm.node.children.length > 0 ? _c("ul", {
+  }) : _vm._e(), _vm._v("\n                " + _vm._s(_vm.node.name) + "\n            ")]), _vm._v(" "), _c("span", [_vm._v(" " + _vm._s(_vm.node.name))]), _vm._v(" "), _c("span", [_vm._v(_vm._s(_vm.node.balance_format))])]), _vm._v(" "), _vm.node.children.length > 0 ? _c("ul", {
     staticClass: "accordion"
   }, _vm._l(_vm.node.children, function (heads) {
     return _c("TreeNode", {
@@ -35844,7 +35849,7 @@ var app = new vue__WEBPACK_IMPORTED_MODULE_1___default.a({
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! E:\xampp8\htdocs\projects\fuelmatix\resources\js\app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! D:\xampp7.4\htdocs\fuelmatix\resources\js\app.js */"./resources/js/app.js");
 
 
 /***/ })
