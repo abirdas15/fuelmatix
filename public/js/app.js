@@ -1912,6 +1912,88 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/Pages/Accounts/Accounts.vue?vue&type=script&lang=js&":
+/*!***********************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/Pages/Accounts/Accounts.vue?vue&type=script&lang=js& ***!
+  \***********************************************************************************************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony default export */ __webpack_exports__["default"] = ({
+  data: function data() {
+    return {
+      popup: null
+    };
+  },
+  methods: {
+    rightClick: function rightClick(e) {
+      e.preventDefault();
+      this.showPopup(e);
+    },
+    showPopup: function showPopup(evt) {
+      this.popup.style.left = "".concat(evt.pageX, "px");
+      this.popup.style.top = "".concat(evt.pageY, "px");
+      this.popup.classList.add('active');
+    },
+    hidePopup: function hidePopup(e) {
+      if (e.target !== this.popup) {
+        if (this.popup.classList.contains('active')) {
+          this.popup.classList.remove('active');
+        }
+      }
+    }
+  },
+  mounted: function mounted() {
+    var _this = this;
+    var accordion = document.querySelector(".accordion");
+    var accordionBtn = document.querySelectorAll(".accordion-btn");
+    this.popup = document.querySelector(".popup-wrapper");
+    var newAccount = document.getElementById('newAccount');
+    var newAccForm = document.querySelector('.new-account-form-wrapper');
+    var cancelBtn = document.querySelector('.cancel-btn');
+    var form = document.querySelector('form');
+
+    // accourdion show and hide
+    accordionBtn.forEach(function (e) {
+      e.onclick = function (event) {
+        event.preventDefault();
+        e.nextElementSibling.classList.toggle("open");
+        e.classList.toggle('active');
+      };
+    });
+
+    // hide pup function
+    var hidePopup = function hidePopup(e) {};
+
+    // hide the popup when user clicks outside the popup box
+    window.addEventListener('click', function (e) {
+      _this.hidePopup(e);
+      if (e.target == newAccForm && e.target !== form) {
+        newAccForm.classList.remove('active');
+      }
+    });
+
+    // hide the popup when user spin the mouse wheel
+    window.addEventListener('wheel', function (e) {
+      _this.hidePopup(e);
+    });
+    newAccount.onclick = function (e) {
+      hidePopup(e);
+      if (!newAccForm.classList.contains('active')) {
+        newAccForm.classList.add('active');
+      }
+    };
+    cancelBtn.onclick = function () {
+      newAccForm.classList.remove('active');
+    };
+  },
+  destroyed: function destroyed() {}
+});
+
+/***/ }),
+
 /***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/Pages/Auth/Login.vue?vue&type=script&lang=js&":
 /*!****************************************************************************************************************************************************************!*\
   !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/Pages/Auth/Login.vue?vue&type=script&lang=js& ***!
@@ -2143,6 +2225,1948 @@ var render = function render() {
   }, [_c("router-view")], 1);
 };
 var staticRenderFns = [];
+render._withStripped = true;
+
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/Pages/Accounts/Accounts.vue?vue&type=template&id=2ddcca36&scoped=true&":
+/*!*********************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib/loaders/templateLoader.js??ref--6!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/Pages/Accounts/Accounts.vue?vue&type=template&id=2ddcca36&scoped=true& ***!
+  \*********************************************************************************************************************************************************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
+var render = function render() {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "content-body"
+  }, [_c("div", {
+    staticClass: "container-fluid"
+  }, [_vm._m(0), _vm._v(" "), _vm._m(1), _vm._v(" "), _c("ul", {
+    staticClass: "accordion-wrapper"
+  }, [_vm._m(2), _vm._v(" "), _c("li", [_c("a", {
+    staticClass: "accordion-btn",
+    attrs: {
+      href: "#"
+    },
+    on: {
+      contextmenu: function contextmenu($event) {
+        return _vm.rightClick($event);
+      }
+    }
+  }, [_vm._m(3), _c("span", [_vm._v("Assets")]), _c("span", [_vm._v("8364983")])]), _vm._v(" "), _vm._m(4)]), _vm._v(" "), _vm._m(5), _vm._v(" "), _vm._m(6), _vm._v(" "), _vm._m(7), _vm._v(" "), _vm._m(8), _vm._v(" "), _vm._m(9), _vm._v(" "), _vm._m(10), _vm._v(" "), _vm._m(11)])])]);
+};
+var staticRenderFns = [function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "popup-wrapper"
+  }, [_c("div", {
+    staticClass: "popup"
+  }, [_c("ul", [_c("li", [_c("a", {
+    attrs: {
+      href: "#"
+    }
+  }, [_vm._v("New SubAccount")])]), _vm._v(" "), _c("li", [_c("a", {
+    attrs: {
+      href: "#"
+    }
+  }, [_vm._v("Rename")])]), _vm._v(" "), _c("li", [_c("a", {
+    attrs: {
+      href: "#"
+    }
+  }, [_vm._v("New account")])]), _vm._v(" "), _c("li", [_c("a", {
+    attrs: {
+      href: "#"
+    }
+  }, [_vm._v("Edit Account")])]), _vm._v(" "), _c("li", [_c("a", {
+    attrs: {
+      href: "#",
+      id: "newAccount"
+    }
+  }, [_vm._v("New account")])]), _vm._v(" "), _c("li", [_c("a", {
+    attrs: {
+      href: "#"
+    }
+  }, [_vm._v("Delete account")])])])])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "new-account-form-wrapper"
+  }, [_c("form", [_c("div", {
+    staticClass: "input-wrapper"
+  }, [_c("label", {
+    attrs: {
+      "for": "accName"
+    }
+  }, [_vm._v("Account name")]), _vm._v(" "), _c("input", {
+    attrs: {
+      type: "text",
+      id: "accName"
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "input-wrapper"
+  }, [_c("label", {
+    attrs: {
+      "for": "accCode"
+    }
+  }, [_vm._v("Account code")]), _vm._v(" "), _c("input", {
+    attrs: {
+      type: "text",
+      id: "accCode"
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "input-wrapper"
+  }, [_c("label", {
+    staticClass: "desc-label",
+    attrs: {
+      "for": "desc"
+    }
+  }, [_vm._v("Description")]), _vm._v(" "), _c("textarea", {
+    attrs: {
+      name: "",
+      id: "desc",
+      cols: "30",
+      rows: "7"
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "input-wrapper"
+  }, [_c("label", {
+    attrs: {
+      "for": "country"
+    }
+  }, [_vm._v("Set country")]), _vm._v(" "), _c("select", {
+    attrs: {
+      id: "country"
+    }
+  }, [_c("option", {
+    attrs: {
+      value: "  ",
+      selected: ""
+    }
+  }, [_vm._v("Select a country")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "--"
+    }
+  }, [_vm._v("Not Specified")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "AF"
+    }
+  }, [_vm._v("Afghanistan")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "AL"
+    }
+  }, [_vm._v("Albania")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "DZ"
+    }
+  }, [_vm._v("Algeria")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "AS"
+    }
+  }, [_vm._v("American Samoa")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "AD"
+    }
+  }, [_vm._v("Andorra")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "AO"
+    }
+  }, [_vm._v("Angola")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "AI"
+    }
+  }, [_vm._v("Anguilla")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "AQ"
+    }
+  }, [_vm._v("Antarctica")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "AG"
+    }
+  }, [_vm._v("Antigua and Barbuda")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "AR"
+    }
+  }, [_vm._v("Argentina")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "AM"
+    }
+  }, [_vm._v("Armenia")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "AW"
+    }
+  }, [_vm._v("Aruba")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "AU"
+    }
+  }, [_vm._v("Australia")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "AT"
+    }
+  }, [_vm._v("Austria")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "AZ"
+    }
+  }, [_vm._v("Azerbaijan")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "BS"
+    }
+  }, [_vm._v("Bahamas")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "BH"
+    }
+  }, [_vm._v("Bahrain")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "BD"
+    }
+  }, [_vm._v("Bangladesh")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "BB"
+    }
+  }, [_vm._v("Barbados")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "BY"
+    }
+  }, [_vm._v("Belarus")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "BE"
+    }
+  }, [_vm._v("Belgium")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "BZ"
+    }
+  }, [_vm._v("Belize")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "BJ"
+    }
+  }, [_vm._v("Benin")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "BM"
+    }
+  }, [_vm._v("Bermuda")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "BT"
+    }
+  }, [_vm._v("Bhutan")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "BO"
+    }
+  }, [_vm._v("Bolivia")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "BA"
+    }
+  }, [_vm._v("Bosnia and Herzegowina")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "BW"
+    }
+  }, [_vm._v("Botswana")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "BV"
+    }
+  }, [_vm._v("Bouvet Island")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "BR"
+    }
+  }, [_vm._v("Brazil")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "IO"
+    }
+  }, [_vm._v("British Indian Ocean Territory")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "BN"
+    }
+  }, [_vm._v("Brunei Darussalam")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "BG"
+    }
+  }, [_vm._v("Bulgaria")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "BF"
+    }
+  }, [_vm._v("Burkina Faso")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "BI"
+    }
+  }, [_vm._v("Burundi")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "KH"
+    }
+  }, [_vm._v("Cambodia")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "CM"
+    }
+  }, [_vm._v("Cameroon")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "CA"
+    }
+  }, [_vm._v("Canada")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "CV"
+    }
+  }, [_vm._v("Cape Verde")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "KY"
+    }
+  }, [_vm._v("Cayman Islands")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "CF"
+    }
+  }, [_vm._v("Central African Republic")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "TD"
+    }
+  }, [_vm._v("Chad")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "CL"
+    }
+  }, [_vm._v("Chile")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "CN"
+    }
+  }, [_vm._v("China")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "CX"
+    }
+  }, [_vm._v("Christmas Island")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "CC"
+    }
+  }, [_vm._v("Cocos (Keeling) Islands")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "CO"
+    }
+  }, [_vm._v("Colombia")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "KM"
+    }
+  }, [_vm._v("Comoros")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "CG"
+    }
+  }, [_vm._v("Congo")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "CD"
+    }
+  }, [_vm._v("Congo, the Democratic Republic of the")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "CK"
+    }
+  }, [_vm._v("Cook Islands")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "CR"
+    }
+  }, [_vm._v("Costa Rica")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "CI"
+    }
+  }, [_vm._v("Cote d'Ivoire")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "HR"
+    }
+  }, [_vm._v("Croatia (Hrvatska)")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "CU"
+    }
+  }, [_vm._v("Cuba")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "CY"
+    }
+  }, [_vm._v("Cyprus")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "CZ"
+    }
+  }, [_vm._v("Czech Republic")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "DK"
+    }
+  }, [_vm._v("Denmark")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "DJ"
+    }
+  }, [_vm._v("Djibouti")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "DM"
+    }
+  }, [_vm._v("Dominica")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "DO"
+    }
+  }, [_vm._v("Dominican Republic")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "TP"
+    }
+  }, [_vm._v("East Timor")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "EC"
+    }
+  }, [_vm._v("Ecuador")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "EG"
+    }
+  }, [_vm._v("Egypt")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "SV"
+    }
+  }, [_vm._v("El Salvador")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "GQ"
+    }
+  }, [_vm._v("Equatorial Guinea")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "ER"
+    }
+  }, [_vm._v("Eritrea")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "EE"
+    }
+  }, [_vm._v("Estonia")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "ET"
+    }
+  }, [_vm._v("Ethiopia")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "FK"
+    }
+  }, [_vm._v("Falkland Islands (Malvinas)")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "FO"
+    }
+  }, [_vm._v("Faroe Islands")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "FJ"
+    }
+  }, [_vm._v("Fiji")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "FI"
+    }
+  }, [_vm._v("Finland")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "FR"
+    }
+  }, [_vm._v("France")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "FX"
+    }
+  }, [_vm._v("France, Metropolitan")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "GF"
+    }
+  }, [_vm._v("French Guiana")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "PF"
+    }
+  }, [_vm._v("French Polynesia")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "TF"
+    }
+  }, [_vm._v("French Southern Territories")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "GA"
+    }
+  }, [_vm._v("Gabon")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "GM"
+    }
+  }, [_vm._v("Gambia")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "GE"
+    }
+  }, [_vm._v("Georgia")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "DE"
+    }
+  }, [_vm._v("Germany")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "GH"
+    }
+  }, [_vm._v("Ghana")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "GI"
+    }
+  }, [_vm._v("Gibraltar")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "GR"
+    }
+  }, [_vm._v("Greece")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "GL"
+    }
+  }, [_vm._v("Greenland")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "GD"
+    }
+  }, [_vm._v("Grenada")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "GP"
+    }
+  }, [_vm._v("Guadeloupe")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "GU"
+    }
+  }, [_vm._v("Guam")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "GT"
+    }
+  }, [_vm._v("Guatemala")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "GN"
+    }
+  }, [_vm._v("Guinea")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "GW"
+    }
+  }, [_vm._v("Guinea-Bissau")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "GY"
+    }
+  }, [_vm._v("Guyana")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "HT"
+    }
+  }, [_vm._v("Haiti")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "HM"
+    }
+  }, [_vm._v("Heard and Mc Donald Islands")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "VA"
+    }
+  }, [_vm._v("Holy See (Vatican City State)")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "HN"
+    }
+  }, [_vm._v("Honduras")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "HK"
+    }
+  }, [_vm._v("Hong Kong")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "HU"
+    }
+  }, [_vm._v("Hungary")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "IS"
+    }
+  }, [_vm._v("Iceland")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "IN"
+    }
+  }, [_vm._v("India")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "ID"
+    }
+  }, [_vm._v("Indonesia")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "IR"
+    }
+  }, [_vm._v("Iran (Islamic Republic of)")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "IQ"
+    }
+  }, [_vm._v("Iraq")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "IE"
+    }
+  }, [_vm._v("Ireland")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "IL"
+    }
+  }, [_vm._v("Israel")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "IT"
+    }
+  }, [_vm._v("Italy")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "JM"
+    }
+  }, [_vm._v("Jamaica")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "JP"
+    }
+  }, [_vm._v("Japan")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "JO"
+    }
+  }, [_vm._v("Jordan")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "KZ"
+    }
+  }, [_vm._v("Kazakhstan")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "KE"
+    }
+  }, [_vm._v("Kenya")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "KI"
+    }
+  }, [_vm._v("Kiribati")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "KP"
+    }
+  }, [_vm._v("Korea, Democratic People's Republic of")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "KR"
+    }
+  }, [_vm._v("Korea, Republic of")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "KW"
+    }
+  }, [_vm._v("Kuwait")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "KG"
+    }
+  }, [_vm._v("Kyrgyzstan")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "LA"
+    }
+  }, [_vm._v("Lao People's Democratic Republic")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "LV"
+    }
+  }, [_vm._v("Latvia")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "LB"
+    }
+  }, [_vm._v("Lebanon")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "LS"
+    }
+  }, [_vm._v("Lesotho")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "LR"
+    }
+  }, [_vm._v("Liberia")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "LY"
+    }
+  }, [_vm._v("Libyan Arab Jamahiriya")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "LI"
+    }
+  }, [_vm._v("Liechtenstein")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "LT"
+    }
+  }, [_vm._v("Lithuania")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "LU"
+    }
+  }, [_vm._v("Luxembourg")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "MO"
+    }
+  }, [_vm._v("Macau")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "MK"
+    }
+  }, [_vm._v("Macedonia, The Former Yugoslav Republic of")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "MG"
+    }
+  }, [_vm._v("Madagascar")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "MW"
+    }
+  }, [_vm._v("Malawi")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "MY"
+    }
+  }, [_vm._v("Malaysia")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "MV"
+    }
+  }, [_vm._v("Maldives")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "ML"
+    }
+  }, [_vm._v("Mali")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "MT"
+    }
+  }, [_vm._v("Malta")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "MH"
+    }
+  }, [_vm._v("Marshall Islands")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "MQ"
+    }
+  }, [_vm._v("Martinique")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "MR"
+    }
+  }, [_vm._v("Mauritania")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "MU"
+    }
+  }, [_vm._v("Mauritius")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "YT"
+    }
+  }, [_vm._v("Mayotte")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "MX"
+    }
+  }, [_vm._v("Mexico")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "FM"
+    }
+  }, [_vm._v("Micronesia, Federated States of")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "MD"
+    }
+  }, [_vm._v("Moldova, Republic of")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "MC"
+    }
+  }, [_vm._v("Monaco")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "MN"
+    }
+  }, [_vm._v("Mongolia")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "MS"
+    }
+  }, [_vm._v("Montserrat")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "MA"
+    }
+  }, [_vm._v("Morocco")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "MZ"
+    }
+  }, [_vm._v("Mozambique")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "MM"
+    }
+  }, [_vm._v("Myanmar")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "NA"
+    }
+  }, [_vm._v("Namibia")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "NR"
+    }
+  }, [_vm._v("Nauru")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "NP"
+    }
+  }, [_vm._v("Nepal")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "NL"
+    }
+  }, [_vm._v("Netherlands")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "AN"
+    }
+  }, [_vm._v("Netherlands Antilles")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "NC"
+    }
+  }, [_vm._v("New Caledonia")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "NZ"
+    }
+  }, [_vm._v("New Zealand")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "NI"
+    }
+  }, [_vm._v("Nicaragua")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "NE"
+    }
+  }, [_vm._v("Niger")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "NG"
+    }
+  }, [_vm._v("Nigeria")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "NU"
+    }
+  }, [_vm._v("Niue")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "NF"
+    }
+  }, [_vm._v("Norfolk Island")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "MP"
+    }
+  }, [_vm._v("Northern Mariana Islands")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "NO"
+    }
+  }, [_vm._v("Norway")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "OM"
+    }
+  }, [_vm._v("Oman")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "PK"
+    }
+  }, [_vm._v("Pakistan")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "PW"
+    }
+  }, [_vm._v("Palau")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "PA"
+    }
+  }, [_vm._v("Panama")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "PG"
+    }
+  }, [_vm._v("Papua New Guinea")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "PY"
+    }
+  }, [_vm._v("Paraguay")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "PE"
+    }
+  }, [_vm._v("Peru")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "PH"
+    }
+  }, [_vm._v("Philippines")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "PN"
+    }
+  }, [_vm._v("Pitcairn")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "PL"
+    }
+  }, [_vm._v("Poland")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "PT"
+    }
+  }, [_vm._v("Portugal")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "PR"
+    }
+  }, [_vm._v("Puerto Rico")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "QA"
+    }
+  }, [_vm._v("Qatar")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "RE"
+    }
+  }, [_vm._v("Reunion")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "RO"
+    }
+  }, [_vm._v("Romania")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "RU"
+    }
+  }, [_vm._v("Russian Federation")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "RW"
+    }
+  }, [_vm._v("Rwanda")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "KN"
+    }
+  }, [_vm._v("Saint Kitts and Nevis")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "LC"
+    }
+  }, [_vm._v("Saint LUCIA")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "VC"
+    }
+  }, [_vm._v("Saint Vincent and the Grenadines")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "WS"
+    }
+  }, [_vm._v("Samoa")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "SM"
+    }
+  }, [_vm._v("San Marino")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "ST"
+    }
+  }, [_vm._v("Sao Tome and Principe")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "SA"
+    }
+  }, [_vm._v("Saudi Arabia")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "SN"
+    }
+  }, [_vm._v("Senegal")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "SC"
+    }
+  }, [_vm._v("Seychelles")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "SL"
+    }
+  }, [_vm._v("Sierra Leone")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "SG"
+    }
+  }, [_vm._v("Singapore")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "SK"
+    }
+  }, [_vm._v("Slovakia (Slovak Republic)")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "SI"
+    }
+  }, [_vm._v("Slovenia")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "SB"
+    }
+  }, [_vm._v("Solomon Islands")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "SO"
+    }
+  }, [_vm._v("Somalia")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "ZA"
+    }
+  }, [_vm._v("South Africa")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "GS"
+    }
+  }, [_vm._v("South Georgia and the South Sandwich Islands")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "ES"
+    }
+  }, [_vm._v("Spain")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "LK"
+    }
+  }, [_vm._v("Sri Lanka")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "SH"
+    }
+  }, [_vm._v("St. Helena")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "PM"
+    }
+  }, [_vm._v("St. Pierre and Miquelon")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "SD"
+    }
+  }, [_vm._v("Sudan")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "SR"
+    }
+  }, [_vm._v("Suriname")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "SJ"
+    }
+  }, [_vm._v("Svalbard and Jan Mayen Islands")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "SZ"
+    }
+  }, [_vm._v("Swaziland")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "SE"
+    }
+  }, [_vm._v("Sweden")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "CH"
+    }
+  }, [_vm._v("Switzerland")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "SY"
+    }
+  }, [_vm._v("Syrian Arab Republic")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "TW"
+    }
+  }, [_vm._v("Taiwan, Province of China")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "TJ"
+    }
+  }, [_vm._v("Tajikistan")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "TZ"
+    }
+  }, [_vm._v("Tanzania, United Republic of")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "TH"
+    }
+  }, [_vm._v("Thailand")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "TG"
+    }
+  }, [_vm._v("Togo")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "TK"
+    }
+  }, [_vm._v("Tokelau")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "TO"
+    }
+  }, [_vm._v("Tonga")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "TT"
+    }
+  }, [_vm._v("Trinidad and Tobago")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "TN"
+    }
+  }, [_vm._v("Tunisia")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "TR"
+    }
+  }, [_vm._v("Turkey")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "TM"
+    }
+  }, [_vm._v("Turkmenistan")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "TC"
+    }
+  }, [_vm._v("Turks and Caicos Islands")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "TV"
+    }
+  }, [_vm._v("Tuvalu")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "UG"
+    }
+  }, [_vm._v("Uganda")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "UA"
+    }
+  }, [_vm._v("Ukraine")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "AE"
+    }
+  }, [_vm._v("United Arab Emirates")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "GB"
+    }
+  }, [_vm._v("United Kingdom")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "US"
+    }
+  }, [_vm._v("United States")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "UM"
+    }
+  }, [_vm._v("United States Minor Outlying Islands")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "UY"
+    }
+  }, [_vm._v("Uruguay")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "UZ"
+    }
+  }, [_vm._v("Uzbekistan")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "VU"
+    }
+  }, [_vm._v("Vanuatu")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "VE"
+    }
+  }, [_vm._v("Venezuela")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "VN"
+    }
+  }, [_vm._v("Viet Nam")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "VG"
+    }
+  }, [_vm._v("Virgin Islands (British)")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "VI"
+    }
+  }, [_vm._v("Virgin Islands (U.S.)")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "WF"
+    }
+  }, [_vm._v("Wallis and Futuna Islands")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "EH"
+    }
+  }, [_vm._v("Western Sahara")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "YE"
+    }
+  }, [_vm._v("Yemen")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "YU"
+    }
+  }, [_vm._v("Yugoslavia")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "ZM"
+    }
+  }, [_vm._v("Zambia")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "ZW"
+    }
+  }, [_vm._v("Zimbabwe")])])]), _vm._v(" "), _c("div", {
+    staticClass: "input-wrapper"
+  }, [_c("label", {
+    staticClass: "notes-label",
+    attrs: {
+      "for": "notes"
+    }
+  }, [_vm._v("Notes")]), _vm._v(" "), _c("textarea", {
+    attrs: {
+      name: "",
+      id: "notes",
+      cols: "30",
+      rows: "7"
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "btn-wrapper"
+  }, [_c("button", {
+    attrs: {
+      type: "submit"
+    }
+  }, [_vm._v("Ok")]), _vm._v(" "), _c("button", {
+    staticClass: "cancel-btn",
+    attrs: {
+      type: "reset"
+    }
+  }, [_vm._v("Cancel")])])])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("li", {
+    staticClass: "accordion-heading-wrapper"
+  }, [_c("h4", [_vm._v("Account name")]), _vm._v(" "), _c("h4", [_vm._v("Description")]), _vm._v(" "), _c("h4", [_vm._v("Total")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("span", [_c("img", {
+    attrs: {
+      src: "images/arrow-svg.svg",
+      alt: ""
+    }
+  }), _vm._v("\n                    Assets")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("ul", {
+    staticClass: "accordion"
+  }, [_c("li", [_c("a", {
+    staticClass: "accordion-btn",
+    attrs: {
+      href: "#"
+    }
+  }, [_c("span", [_c("img", {
+    attrs: {
+      src: "/images/arrow-svg.svg",
+      alt: ""
+    }
+  }), _vm._v("\n                            Banks")]), _c("span", [_vm._v(" Banks")]), _c("span", [_vm._v("3543759")])]), _vm._v(" "), _c("ul", {
+    staticClass: "accordion"
+  }, [_c("li", [_c("a", {
+    staticClass: "accordion-btn",
+    attrs: {
+      href: "#"
+    }
+  }, [_c("span", [_c("img", {
+    attrs: {
+      src: "/images/arrow-svg.svg",
+      alt: ""
+    }
+  }), _vm._v("\n                                    Exim Bank")]), _c("span", [_vm._v("Exim Bank")]), _c("span", [_vm._v("4754843")])]), _vm._v(" "), _c("ul", {
+    staticClass: "accordion"
+  }, [_c("li", [_c("a", {
+    attrs: {
+      href: "./table.html",
+      target: "_blank"
+    }
+  }, [_c("span", [_vm._v("text")]), _c("span", [_vm._v("desc")]), _c("span", [_vm._v("3437347")])])])])])])]), _vm._v(" "), _c("li", [_c("a", {
+    staticClass: "accordion-btn",
+    attrs: {
+      href: "#"
+    }
+  }, [_c("span", [_c("img", {
+    attrs: {
+      src: "/images/arrow-svg.svg",
+      alt: ""
+    }
+  }), _vm._v("\n                            Cash")]), _c("span", [_vm._v("Cash")]), _c("span", [_vm._v("836854")])]), _vm._v(" "), _c("ul", {
+    staticClass: "accordion"
+  }, [_c("li", [_c("a", {
+    staticClass: "accordion-btn",
+    attrs: {
+      href: "#"
+    }
+  }, [_c("span", [_c("img", {
+    attrs: {
+      src: "/images/arrow-svg.svg",
+      alt: ""
+    }
+  }), _vm._v("\n                                    Mehedi Cashier")]), _c("span", [_vm._v("Mehedi Cashier")]), _c("span", [_vm._v("47423456")])]), _vm._v(" "), _c("ul", {
+    staticClass: "accordion"
+  }, [_c("li", [_c("a", {
+    attrs: {
+      href: "./table.html",
+      target: "_blank"
+    }
+  }, [_c("span", [_vm._v("text")]), _c("span", [_vm._v("desc")]), _c("span", [_vm._v("4743467")])])])])])])]), _vm._v(" "), _c("li", [_c("a", {
+    staticClass: "accordion-btn",
+    attrs: {
+      href: "#"
+    }
+  }, [_c("span", [_c("img", {
+    attrs: {
+      src: "/images/arrow-svg.svg",
+      alt: ""
+    }
+  }), _vm._v("\n                            Fuel Stock")]), _c("span", [_vm._v("Fuel Stock")]), _c("span", [_vm._v("3543759")])]), _vm._v(" "), _c("ul", {
+    staticClass: "accordion"
+  }, [_c("li", [_c("a", {
+    staticClass: "accordion-btn",
+    attrs: {
+      href: "#"
+    }
+  }, [_c("span", [_c("img", {
+    attrs: {
+      src: "/images/arrow-svg.svg",
+      alt: ""
+    }
+  }), _vm._v("\n                                    Octane")]), _c("span", [_vm._v("Octane")]), _c("span", [_vm._v("4754843")])]), _vm._v(" "), _c("ul", {
+    staticClass: "accordion"
+  }, [_c("li", [_c("a", {
+    attrs: {
+      href: "./table.html",
+      target: "_blank"
+    }
+  }, [_c("span", [_vm._v("text")]), _c("span", [_vm._v("desc")]), _c("span", [_vm._v("3437347")])])])])])])]), _vm._v(" "), _c("li", [_c("a", {
+    staticClass: "accordion-btn",
+    attrs: {
+      href: "#"
+    }
+  }, [_c("span", [_c("img", {
+    attrs: {
+      src: "/images/arrow-svg.svg",
+      alt: ""
+    }
+  }), _vm._v("\n                            A/C Receivable")]), _c("span", [_vm._v("A/C Receivable")]), _c("span", [_vm._v("836854")])]), _vm._v(" "), _c("ul", {
+    staticClass: "accordion"
+  }, [_c("li", [_c("a", {
+    staticClass: "accordion-btn",
+    attrs: {
+      href: "#"
+    }
+  }, [_c("span", [_c("img", {
+    attrs: {
+      src: "/images/arrow-svg.svg",
+      alt: ""
+    }
+  }), _vm._v("\n                                    Beximco")]), _c("span", [_vm._v("Beximco")]), _c("span", [_vm._v("47423456")])]), _vm._v(" "), _c("ul", {
+    staticClass: "accordion"
+  }, [_c("li", [_c("a", {
+    attrs: {
+      href: "./table.html",
+      target: "_blank"
+    }
+  }, [_c("span", [_vm._v("text")]), _c("span", [_vm._v("desc")]), _c("span", [_vm._v("4743467")])])])])])])])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("li", [_c("a", {
+    staticClass: "accordion-btn",
+    attrs: {
+      href: "#"
+    }
+  }, [_c("span", [_c("img", {
+    attrs: {
+      src: "/images/arrow-svg.svg",
+      alt: ""
+    }
+  }), _vm._v("\n                    Equity")]), _c("span", [_vm._v("Equity")]), _c("span", [_vm._v("893595")])]), _vm._v(" "), _c("ul", {
+    staticClass: "accordion"
+  }, [_c("li", [_c("a", {
+    staticClass: "accordion-btn",
+    attrs: {
+      href: "#"
+    }
+  }, [_c("span", [_c("img", {
+    attrs: {
+      src: "/images/arrow-svg.svg",
+      alt: ""
+    }
+  }), _vm._v("\n                            Earnigs")]), _c("span", [_vm._v("Equity Earnigs")]), _c("span", [_vm._v("426264")])]), _vm._v(" "), _c("ul", {
+    staticClass: "accordion"
+  }, [_c("li", [_c("a", {
+    staticClass: "accordion-btn",
+    attrs: {
+      href: "#"
+    }
+  }, [_c("span", [_c("img", {
+    attrs: {
+      src: "/images/arrow-svg.svg",
+      alt: ""
+    }
+  }), _vm._v("\n                                    Bohddarhat")]), _c("span", [_vm._v("Bohddarhat")]), _c("span", [_vm._v("4754843")])]), _vm._v(" "), _c("ul", {
+    staticClass: "accordion"
+  }, [_c("li", [_c("a", {
+    attrs: {
+      href: "./table.html",
+      target: "_blank"
+    }
+  }, [_c("span", [_vm._v("text")]), _c("span", [_vm._v("desc")]), _c("span", [_vm._v("3437347")])])])])])])]), _vm._v(" "), _c("li", [_c("a", {
+    staticClass: "accordion-btn",
+    attrs: {
+      href: "#"
+    }
+  }, [_c("span", [_c("img", {
+    attrs: {
+      src: "/images/arrow-svg.svg",
+      alt: ""
+    }
+  }), _vm._v("\n                            Noakhali")]), _c("span", [_vm._v("Noakhali")]), _c("span", [_vm._v("836854")])]), _vm._v(" "), _c("ul", {
+    staticClass: "accordion"
+  }, [_c("li", [_c("a", {
+    staticClass: "accordion-btn",
+    attrs: {
+      href: "#"
+    }
+  }, [_c("span", [_c("img", {
+    attrs: {
+      src: "/images/arrow-svg.svg",
+      alt: ""
+    }
+  }), _vm._v("\n                                    Shahriar (Manager)")]), _c("span", [_vm._v("Shahriar (Manager)")]), _c("span", [_vm._v("47423456")])]), _vm._v(" "), _c("ul", {
+    staticClass: "accordion"
+  }, [_c("li", [_c("a", {
+    attrs: {
+      href: "./table.html",
+      target: "_blank"
+    }
+  }, [_c("span", [_vm._v("text")]), _c("span", [_vm._v("desc")]), _c("span", [_vm._v("4743467")])])])])])])])])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("li", [_c("a", {
+    staticClass: "accordion-btn",
+    attrs: {
+      href: "#"
+    }
+  }, [_c("span", [_c("img", {
+    attrs: {
+      src: "/images/arrow-svg.svg",
+      alt: ""
+    }
+  }), _vm._v("\n                    Liabilities")]), _c("span", [_vm._v("Liabilities")]), _c("span", [_vm._v("74578245")])]), _vm._v(" "), _c("ul", {
+    staticClass: "accordion"
+  }, [_c("li", [_c("a", {
+    staticClass: "accordion-btn",
+    attrs: {
+      href: "#"
+    }
+  }, [_c("span", [_c("img", {
+    attrs: {
+      src: "/images/arrow-svg.svg",
+      alt: ""
+    }
+  }), _vm._v("\n                            Vendors")]), _c("span", [_vm._v("Vendors")]), _c("span", [_vm._v("5346663")])]), _vm._v(" "), _c("ul", {
+    staticClass: "accordion"
+  }, [_c("li", [_c("a", {
+    staticClass: "accordion-btn",
+    attrs: {
+      href: "#"
+    }
+  }, [_c("span", [_c("img", {
+    attrs: {
+      src: "/images/arrow-svg.svg",
+      alt: ""
+    }
+  }), _vm._v("\n                                    Banani")]), _c("span", [_vm._v("Banani")]), _c("span", [_vm._v("23545687")])]), _vm._v(" "), _c("ul", {
+    staticClass: "accordion"
+  }, [_c("li", [_c("a", {
+    attrs: {
+      href: "./table.html",
+      target: "_blank"
+    }
+  }, [_c("span", [_vm._v("text")]), _c("span", [_vm._v("desc")]), _c("span", [_vm._v("3437347")])])])])])])]), _vm._v(" "), _c("li", [_c("a", {
+    staticClass: "accordion-btn",
+    attrs: {
+      href: "#"
+    }
+  }, [_c("span", [_c("img", {
+    attrs: {
+      src: "/images/arrow-svg.svg",
+      alt: ""
+    }
+  }), _vm._v("\n                            A/C Payables")]), _c("span", [_vm._v("A/C Payables")]), _c("span", [_vm._v("836854")])]), _vm._v(" "), _c("ul", {
+    staticClass: "accordion"
+  }, [_c("li", [_c("a", {
+    staticClass: "accordion-btn",
+    attrs: {
+      href: "#"
+    }
+  }, [_c("span", [_c("img", {
+    attrs: {
+      src: "/images/arrow-svg.svg",
+      alt: ""
+    }
+  }), _vm._v("\n                                    Shahriar (Manager)")]), _c("span", [_vm._v("Shahriar (Manager)")]), _c("span", [_vm._v("47423456")])]), _vm._v(" "), _c("ul", {
+    staticClass: "accordion"
+  }, [_c("li", [_c("a", {
+    attrs: {
+      href: "./table.html",
+      target: "_blank"
+    }
+  }, [_c("span", [_vm._v("text")]), _c("span", [_vm._v("desc")]), _c("span", [_vm._v("4743467")])])])])])])]), _vm._v(" "), _c("li", [_c("a", {
+    staticClass: "accordion-btn",
+    attrs: {
+      href: "#"
+    }
+  }, [_c("span", [_c("img", {
+    attrs: {
+      src: "/images/arrow-svg.svg",
+      alt: ""
+    }
+  }), _vm._v("\n                            Loans")]), _c("span", [_vm._v("Loans")]), _c("span", [_vm._v("3543759")])]), _vm._v(" "), _c("ul", {
+    staticClass: "accordion"
+  }, [_c("li", [_c("a", {
+    staticClass: "accordion-btn",
+    attrs: {
+      href: "#"
+    }
+  }, [_c("span", [_c("img", {
+    attrs: {
+      src: "/images/arrow-svg.svg",
+      alt: ""
+    }
+  }), _vm._v("\n                                    Bohddarhat")]), _c("span", [_vm._v("Bohddarhat")]), _c("span", [_vm._v("4754843")])]), _vm._v(" "), _c("ul", {
+    staticClass: "accordion"
+  }, [_c("li", [_c("a", {
+    attrs: {
+      href: "./table.html",
+      target: "_blank"
+    }
+  }, [_c("span", [_vm._v("text")]), _c("span", [_vm._v("desc")]), _c("span", [_vm._v("3437347")])])])])])])]), _vm._v(" "), _c("li", [_c("a", {
+    staticClass: "accordion-btn",
+    attrs: {
+      href: "#"
+    }
+  }, [_c("span", [_c("img", {
+    attrs: {
+      src: "/images/arrow-svg.svg",
+      alt: ""
+    }
+  }), _vm._v("\n                            Noakhali")]), _c("span", [_vm._v("Noakhali")]), _c("span", [_vm._v("836854")])]), _vm._v(" "), _c("ul", {
+    staticClass: "accordion"
+  }, [_c("li", [_c("a", {
+    staticClass: "accordion-btn",
+    attrs: {
+      href: "#"
+    }
+  }, [_c("span", [_c("img", {
+    attrs: {
+      src: "/images/arrow-svg.svg",
+      alt: ""
+    }
+  }), _vm._v("\n                                    Shahriar (Manager)")]), _c("span", [_vm._v("Shahriar (Manager)")]), _c("span", [_vm._v("47423456")])]), _vm._v(" "), _c("ul", {
+    staticClass: "accordion"
+  }, [_c("li", [_c("a", {
+    attrs: {
+      href: "./table.html",
+      target: "_blank"
+    }
+  }, [_c("span", [_vm._v("text")]), _c("span", [_vm._v("desc")]), _c("span", [_vm._v("4743467")])])])])])])])])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("li", [_c("a", {
+    staticClass: "accordion-btn",
+    attrs: {
+      href: "#"
+    }
+  }, [_c("span", [_c("img", {
+    attrs: {
+      src: "/images/arrow-svg.svg",
+      alt: ""
+    }
+  }), _vm._v("\n                    Expenses")]), _c("span", [_vm._v("Expenses")]), _c("span", [_vm._v("57634572")])]), _vm._v(" "), _c("ul", {
+    staticClass: "accordion"
+  }, [_c("li", [_c("a", {
+    staticClass: "accordion-btn",
+    attrs: {
+      href: "#"
+    }
+  }, [_c("span", [_c("img", {
+    attrs: {
+      src: "/images/arrow-svg.svg",
+      alt: ""
+    }
+  }), _vm._v("\n                            Inventory")]), _c("span", [_vm._v("Inventory")]), _c("span", [_vm._v("626724")])]), _vm._v(" "), _c("ul", {
+    staticClass: "accordion"
+  }, [_c("li", [_c("a", {
+    staticClass: "accordion-btn",
+    attrs: {
+      href: "#"
+    }
+  }, [_c("span", [_c("img", {
+    attrs: {
+      src: "/images/arrow-svg.svg",
+      alt: ""
+    }
+  }), _vm._v("\n                                    Jessore")]), _c("span", [_vm._v("Jessore")]), _c("span", [_vm._v("345784")])]), _vm._v(" "), _c("ul", {
+    staticClass: "accordion"
+  }, [_c("li", [_c("a", {
+    attrs: {
+      href: "./table.html",
+      target: "_blank"
+    }
+  }, [_c("span", [_vm._v("text")]), _c("span", [_vm._v("desc")]), _c("span", [_vm._v("78484")])])])])])])]), _vm._v(" "), _c("li", [_c("a", {
+    staticClass: "accordion-btn",
+    attrs: {
+      href: "#"
+    }
+  }, [_c("span", [_c("img", {
+    attrs: {
+      src: "/images/arrow-svg.svg",
+      alt: ""
+    }
+  }), _vm._v("\n                            Salary")]), _c("span", [_vm._v("Salary")]), _c("span", [_vm._v("836854")])]), _vm._v(" "), _c("ul", {
+    staticClass: "accordion"
+  }, [_c("li", [_c("a", {
+    staticClass: "accordion-btn",
+    attrs: {
+      href: "#"
+    }
+  }, [_c("span", [_c("img", {
+    attrs: {
+      src: "/images/arrow-svg.svg",
+      alt: ""
+    }
+  }), _vm._v("\n                                    Shahriar (Manager)")]), _c("span", [_vm._v("Shahriar (Manager)")]), _c("span", [_vm._v("47423456")])]), _vm._v(" "), _c("ul", {
+    staticClass: "accordion"
+  }, [_c("li", [_c("a", {
+    attrs: {
+      href: "./table.html",
+      target: "_blank"
+    }
+  }, [_c("span", [_vm._v("text")]), _c("span", [_vm._v("desc")]), _c("span", [_vm._v("4743467")])])])])])])])])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("li", [_c("a", {
+    staticClass: "accordion-btn",
+    attrs: {
+      href: "#"
+    }
+  }, [_c("span", [_c("img", {
+    attrs: {
+      src: "/images/arrow-svg.svg",
+      alt: ""
+    }
+  }), _vm._v("\n                    Assets")]), _c("span", [_vm._v("Assets")]), _c("span", [_vm._v("8364983")])]), _vm._v(" "), _c("ul", {
+    staticClass: "accordion"
+  }, [_c("li", [_c("a", {
+    staticClass: "accordion-btn",
+    attrs: {
+      href: "#"
+    }
+  }, [_c("span", [_c("img", {
+    attrs: {
+      src: "/images/arrow-svg.svg",
+      alt: ""
+    }
+  }), _vm._v("\n                            Loans")]), _c("span", [_vm._v("Loans")]), _c("span", [_vm._v("3543759")])]), _vm._v(" "), _c("ul", {
+    staticClass: "accordion"
+  }, [_c("li", [_c("a", {
+    staticClass: "accordion-btn",
+    attrs: {
+      href: "#"
+    }
+  }, [_c("span", [_c("img", {
+    attrs: {
+      src: "/images/arrow-svg.svg",
+      alt: ""
+    }
+  }), _vm._v("\n                                    Bohddarhat")]), _c("span", [_vm._v("Bohddarhat")]), _c("span", [_vm._v("4754843")])]), _vm._v(" "), _c("ul", {
+    staticClass: "accordion"
+  }, [_c("li", [_c("a", {
+    attrs: {
+      href: "./table.html",
+      target: "_blank"
+    }
+  }, [_c("span", [_vm._v("text")]), _c("span", [_vm._v("desc")]), _c("span", [_vm._v("3437347")])])])])])])]), _vm._v(" "), _c("li", [_c("a", {
+    staticClass: "accordion-btn",
+    attrs: {
+      href: "#"
+    }
+  }, [_c("span", [_c("img", {
+    attrs: {
+      src: "/images/arrow-svg.svg",
+      alt: ""
+    }
+  }), _vm._v("\n                            Noakhali")]), _c("span", [_vm._v("Noakhali")]), _c("span", [_vm._v("836854")])]), _vm._v(" "), _c("ul", {
+    staticClass: "accordion"
+  }, [_c("li", [_c("a", {
+    staticClass: "accordion-btn",
+    attrs: {
+      href: "#"
+    }
+  }, [_c("span", [_c("img", {
+    attrs: {
+      src: "/images/arrow-svg.svg",
+      alt: ""
+    }
+  }), _vm._v("\n                                    Shahriar (Manager)")]), _c("span", [_vm._v("Shahriar (Manager)")]), _c("span", [_vm._v("47423456")])]), _vm._v(" "), _c("ul", {
+    staticClass: "accordion"
+  }, [_c("li", [_c("a", {
+    attrs: {
+      href: "./table.html",
+      target: "_blank"
+    }
+  }, [_c("span", [_vm._v("text")]), _c("span", [_vm._v("desc")]), _c("span", [_vm._v("4743467")])])])])])])]), _vm._v(" "), _c("li", [_c("a", {
+    staticClass: "accordion-btn",
+    attrs: {
+      href: "#"
+    }
+  }, [_c("span", [_c("img", {
+    attrs: {
+      src: "/images/arrow-svg.svg",
+      alt: ""
+    }
+  }), _vm._v("\n                            Loans")]), _c("span", [_vm._v("Loans")]), _c("span", [_vm._v("3543759")])]), _vm._v(" "), _c("ul", {
+    staticClass: "accordion"
+  }, [_c("li", [_c("a", {
+    staticClass: "accordion-btn",
+    attrs: {
+      href: "#"
+    }
+  }, [_c("span", [_c("img", {
+    attrs: {
+      src: "/images/arrow-svg.svg",
+      alt: ""
+    }
+  }), _vm._v("\n                                    Bohddarhat")]), _c("span", [_vm._v("Bohddarhat")]), _c("span", [_vm._v("4754843")])]), _vm._v(" "), _c("ul", {
+    staticClass: "accordion"
+  }, [_c("li", [_c("a", {
+    attrs: {
+      href: "./table.html",
+      target: "_blank"
+    }
+  }, [_c("span", [_vm._v("text")]), _c("span", [_vm._v("desc")]), _c("span", [_vm._v("3437347")])])])])])])]), _vm._v(" "), _c("li", [_c("a", {
+    staticClass: "accordion-btn",
+    attrs: {
+      href: "#"
+    }
+  }, [_c("span", [_c("img", {
+    attrs: {
+      src: "/images/arrow-svg.svg",
+      alt: ""
+    }
+  }), _vm._v("\n                            Noakhali")]), _c("span", [_vm._v("Noakhali")]), _c("span", [_vm._v("836854")])]), _vm._v(" "), _c("ul", {
+    staticClass: "accordion"
+  }, [_c("li", [_c("a", {
+    staticClass: "accordion-btn",
+    attrs: {
+      href: "#"
+    }
+  }, [_c("span", [_c("img", {
+    attrs: {
+      src: "/images/arrow-svg.svg",
+      alt: ""
+    }
+  }), _vm._v("\n                                    Shahriar (Manager)")]), _c("span", [_vm._v("Shahriar (Manager)")]), _c("span", [_vm._v("47423456")])]), _vm._v(" "), _c("ul", {
+    staticClass: "accordion"
+  }, [_c("li", [_c("a", {
+    attrs: {
+      href: "./table.html",
+      target: "_blank"
+    }
+  }, [_c("span", [_vm._v("text")]), _c("span", [_vm._v("desc")]), _c("span", [_vm._v("4743467")])])])])])])])])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("li", [_c("a", {
+    staticClass: "accordion-btn",
+    attrs: {
+      href: "#"
+    }
+  }, [_c("span", [_c("img", {
+    attrs: {
+      src: "/images/arrow-svg.svg",
+      alt: ""
+    }
+  }), _vm._v("\n                    Equity")]), _c("span", [_vm._v("Equity")]), _c("span", [_vm._v("893595")])]), _vm._v(" "), _c("ul", {
+    staticClass: "accordion"
+  }, [_c("li", [_c("a", {
+    staticClass: "accordion-btn",
+    attrs: {
+      href: "#"
+    }
+  }, [_c("span", [_c("img", {
+    attrs: {
+      src: "/images/arrow-svg.svg",
+      alt: ""
+    }
+  }), _vm._v("\n                            Loans")]), _c("span", [_vm._v("Loans")]), _c("span", [_vm._v("426264")])]), _vm._v(" "), _c("ul", {
+    staticClass: "accordion"
+  }, [_c("li", [_c("a", {
+    staticClass: "accordion-btn",
+    attrs: {
+      href: "#"
+    }
+  }, [_c("span", [_c("img", {
+    attrs: {
+      src: "/images/arrow-svg.svg",
+      alt: ""
+    }
+  }), _vm._v("\n                                    Bohddarhat")]), _c("span", [_vm._v("Bohddarhat")]), _c("span", [_vm._v("4754843")])]), _vm._v(" "), _c("ul", {
+    staticClass: "accordion"
+  }, [_c("li", [_c("a", {
+    attrs: {
+      href: "./table.html",
+      target: "_blank"
+    }
+  }, [_c("span", [_vm._v("text")]), _c("span", [_vm._v("desc")]), _c("span", [_vm._v("3437347")])])])])])])]), _vm._v(" "), _c("li", [_c("a", {
+    staticClass: "accordion-btn",
+    attrs: {
+      href: "#"
+    }
+  }, [_c("span", [_c("img", {
+    attrs: {
+      src: "/images/arrow-svg.svg",
+      alt: ""
+    }
+  }), _vm._v("\n                            Noakhali")]), _c("span", [_vm._v("Noakhali")]), _c("span", [_vm._v("836854")])]), _vm._v(" "), _c("ul", {
+    staticClass: "accordion"
+  }, [_c("li", [_c("a", {
+    staticClass: "accordion-btn",
+    attrs: {
+      href: "#"
+    }
+  }, [_c("span", [_c("img", {
+    attrs: {
+      src: "/images/arrow-svg.svg",
+      alt: ""
+    }
+  }), _vm._v("\n                                    Shahriar (Manager)")]), _c("span", [_vm._v("Shahriar (Manager)")]), _c("span", [_vm._v("47423456")])]), _vm._v(" "), _c("ul", {
+    staticClass: "accordion"
+  }, [_c("li", [_c("a", {
+    attrs: {
+      href: "./table.html",
+      target: "_blank"
+    }
+  }, [_c("span", [_vm._v("text")]), _c("span", [_vm._v("desc")]), _c("span", [_vm._v("4743467")])])])])])])])])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("li", [_c("a", {
+    staticClass: "accordion-btn",
+    attrs: {
+      href: "#"
+    }
+  }, [_c("span", [_c("img", {
+    attrs: {
+      src: "/images/arrow-svg.svg",
+      alt: ""
+    }
+  }), _vm._v("\n                    Liabilities")]), _c("span", [_vm._v("Liabilities")]), _c("span", [_vm._v("74578245")])]), _vm._v(" "), _c("ul", {
+    staticClass: "accordion"
+  }, [_c("li", [_c("a", {
+    staticClass: "accordion-btn",
+    attrs: {
+      href: "#"
+    }
+  }, [_c("span", [_c("img", {
+    attrs: {
+      src: "/images/arrow-svg.svg",
+      alt: ""
+    }
+  }), _vm._v("\n                            Vendors")]), _c("span", [_vm._v("Vendors")]), _c("span", [_vm._v("5346663")])]), _vm._v(" "), _c("ul", {
+    staticClass: "accordion"
+  }, [_c("li", [_c("a", {
+    staticClass: "accordion-btn",
+    attrs: {
+      href: "#"
+    }
+  }, [_c("span", [_c("img", {
+    attrs: {
+      src: "/images/arrow-svg.svg",
+      alt: ""
+    }
+  }), _vm._v("\n                                    Banani")]), _c("span", [_vm._v("Banani")]), _c("span", [_vm._v("23545687")])]), _vm._v(" "), _c("ul", {
+    staticClass: "accordion"
+  }, [_c("li", [_c("a", {
+    attrs: {
+      href: "./table.html",
+      target: "_blank"
+    }
+  }, [_c("span", [_vm._v("text")]), _c("span", [_vm._v("desc")]), _c("span", [_vm._v("3437347")])])])])])])]), _vm._v(" "), _c("li", [_c("a", {
+    staticClass: "accordion-btn",
+    attrs: {
+      href: "#"
+    }
+  }, [_c("span", [_c("img", {
+    attrs: {
+      src: "/images/arrow-svg.svg",
+      alt: ""
+    }
+  }), _vm._v("\n                            A/C Payables")]), _c("span", [_vm._v("A/C Payables")]), _c("span", [_vm._v("836854")])]), _vm._v(" "), _c("ul", {
+    staticClass: "accordion"
+  }, [_c("li", [_c("a", {
+    staticClass: "accordion-btn",
+    attrs: {
+      href: "#"
+    }
+  }, [_c("span", [_c("img", {
+    attrs: {
+      src: "/images/arrow-svg.svg",
+      alt: ""
+    }
+  }), _vm._v("\n                                    Shahriar (Manager)")]), _c("span", [_vm._v("Shahriar (Manager)")]), _c("span", [_vm._v("47423456")])]), _vm._v(" "), _c("ul", {
+    staticClass: "accordion"
+  }, [_c("li", [_c("a", {
+    attrs: {
+      href: "./table.html",
+      target: "_blank"
+    }
+  }, [_c("span", [_vm._v("text")]), _c("span", [_vm._v("desc")]), _c("span", [_vm._v("4743467")])])])])])])]), _vm._v(" "), _c("li", [_c("a", {
+    staticClass: "accordion-btn",
+    attrs: {
+      href: "#"
+    }
+  }, [_c("span", [_c("img", {
+    attrs: {
+      src: "/images/arrow-svg.svg",
+      alt: ""
+    }
+  }), _vm._v("\n                            Loans")]), _c("span", [_vm._v("Loans")]), _c("span", [_vm._v("3543759")])]), _vm._v(" "), _c("ul", {
+    staticClass: "accordion"
+  }, [_c("li", [_c("a", {
+    staticClass: "accordion-btn",
+    attrs: {
+      href: "#"
+    }
+  }, [_c("span", [_c("img", {
+    attrs: {
+      src: "/images/arrow-svg.svg",
+      alt: ""
+    }
+  }), _vm._v("\n                                    Bohddarhat")]), _c("span", [_vm._v("Bohddarhat")]), _c("span", [_vm._v("4754843")])]), _vm._v(" "), _c("ul", {
+    staticClass: "accordion"
+  }, [_c("li", [_c("a", {
+    attrs: {
+      href: "./table.html",
+      target: "_blank"
+    }
+  }, [_c("span", [_vm._v("text")]), _c("span", [_vm._v("desc")]), _c("span", [_vm._v("3437347")])])])])])])]), _vm._v(" "), _c("li", [_c("a", {
+    staticClass: "accordion-btn",
+    attrs: {
+      href: "#"
+    }
+  }, [_c("span", [_c("img", {
+    attrs: {
+      src: "/images/arrow-svg.svg",
+      alt: ""
+    }
+  }), _vm._v("\n                            Noakhali")]), _c("span", [_vm._v("Noakhali")]), _c("span", [_vm._v("836854")])]), _vm._v(" "), _c("ul", {
+    staticClass: "accordion"
+  }, [_c("li", [_c("a", {
+    staticClass: "accordion-btn",
+    attrs: {
+      href: "#"
+    }
+  }, [_c("span", [_c("img", {
+    attrs: {
+      src: "/images/arrow-svg.svg",
+      alt: ""
+    }
+  }), _vm._v("\n                                    Shahriar (Manager)")]), _c("span", [_vm._v("Shahriar (Manager)")]), _c("span", [_vm._v("47423456")])]), _vm._v(" "), _c("ul", {
+    staticClass: "accordion"
+  }, [_c("li", [_c("a", {
+    attrs: {
+      href: "./table.html",
+      target: "_blank"
+    }
+  }, [_c("span", [_vm._v("text")]), _c("span", [_vm._v("desc")]), _c("span", [_vm._v("4743467")])])])])])])])])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("li", [_c("a", {
+    staticClass: "accordion-btn",
+    attrs: {
+      href: "#"
+    }
+  }, [_c("span", [_c("img", {
+    attrs: {
+      src: "/images/arrow-svg.svg",
+      alt: ""
+    }
+  }), _vm._v("\n                    Expenses")]), _c("span", [_vm._v("Expenses")]), _c("span", [_vm._v("57634572")])]), _vm._v(" "), _c("ul", {
+    staticClass: "accordion"
+  }, [_c("li", [_c("a", {
+    staticClass: "accordion-btn",
+    attrs: {
+      href: "#"
+    }
+  }, [_c("span", [_c("img", {
+    attrs: {
+      src: "/images/arrow-svg.svg",
+      alt: ""
+    }
+  }), _vm._v("\n                            Inventory")]), _c("span", [_vm._v("Inventory")]), _c("span", [_vm._v("626724")])]), _vm._v(" "), _c("ul", {
+    staticClass: "accordion"
+  }, [_c("li", [_c("a", {
+    staticClass: "accordion-btn",
+    attrs: {
+      href: "#"
+    }
+  }, [_c("span", [_c("img", {
+    attrs: {
+      src: "/images/arrow-svg.svg",
+      alt: ""
+    }
+  }), _vm._v("\n                                    Jessore")]), _c("span", [_vm._v("Jessore")]), _c("span", [_vm._v("345784")])]), _vm._v(" "), _c("ul", {
+    staticClass: "accordion"
+  }, [_c("li", [_c("a", {
+    attrs: {
+      href: "./table.html",
+      target: "_blank"
+    }
+  }, [_c("span", [_vm._v("text")]), _c("span", [_vm._v("desc")]), _c("span", [_vm._v("78484")])])])])])])]), _vm._v(" "), _c("li", [_c("a", {
+    staticClass: "accordion-btn",
+    attrs: {
+      href: "#"
+    }
+  }, [_c("span", [_c("img", {
+    attrs: {
+      src: "/images/arrow-svg.svg",
+      alt: ""
+    }
+  }), _vm._v("\n                            Salary")]), _c("span", [_vm._v("Salary")]), _c("span", [_vm._v("836854")])]), _vm._v(" "), _c("ul", {
+    staticClass: "accordion"
+  }, [_c("li", [_c("a", {
+    staticClass: "accordion-btn",
+    attrs: {
+      href: "#"
+    }
+  }, [_c("span", [_c("img", {
+    attrs: {
+      src: "/images/arrow-svg.svg",
+      alt: ""
+    }
+  }), _vm._v("\n                                    Shahriar (Manager)")]), _c("span", [_vm._v("Shahriar (Manager)")]), _c("span", [_vm._v("47423456")])]), _vm._v(" "), _c("ul", {
+    staticClass: "accordion"
+  }, [_c("li", [_c("a", {
+    attrs: {
+      href: "./table.html",
+      target: "_blank"
+    }
+  }, [_c("span", [_vm._v("text")]), _c("span", [_vm._v("desc")]), _c("span", [_vm._v("4743467")])])])])])])])])]);
+}];
 render._withStripped = true;
 
 
@@ -4187,8 +6211,526 @@ render._withStripped = true;
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
-var render = function render() {};
-var staticRenderFns = [];
+var render = function render() {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "dlabnav"
+  }, [_c("div", {
+    staticClass: "dlabnav-scroll"
+  }, [_c("ul", {
+    staticClass: "metismenu",
+    attrs: {
+      id: "menu"
+    }
+  }, [_c("li", {
+    staticStyle: {
+      "text-align": "center"
+    }
+  }, [_c("router-link", {
+    staticClass: "sidemenu-item",
+    attrs: {
+      to: {
+        name: "Dashboard"
+      },
+      "aria-expanded": "false"
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-home me-0 icon-style"
+  }), _vm._v(" "), _c("p", {
+    staticClass: "nav-text"
+  }, [_vm._v("Dashboard")])])], 1), _vm._v(" "), _vm._m(0), _vm._v(" "), _vm._m(1), _vm._v(" "), _vm._m(2), _vm._v(" "), _vm._m(3), _vm._v(" "), _vm._m(4), _vm._v(" "), _vm._m(5), _vm._v(" "), _vm._m(6), _vm._v(" "), _vm._m(7), _vm._v(" "), _vm._m(8), _vm._v(" "), _vm._m(9), _vm._v(" "), _vm._m(10), _vm._v(" "), _vm._m(11), _vm._v(" "), _vm._m(12), _vm._v(" "), _c("li", {
+    staticStyle: {
+      "text-align": "center"
+    }
+  }, [_c("router-link", {
+    staticClass: "sidemenu-item px-4",
+    attrs: {
+      to: {
+        name: "Accounts"
+      },
+      "aria-expanded": "false"
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-money icon-style"
+  }), _vm._v(" "), _c("span", {
+    staticClass: "nav-text"
+  }, [_vm._v("Accounting")])])], 1)])])]);
+};
+var staticRenderFns = [function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("li", {
+    staticStyle: {
+      "text-align": "center"
+    }
+  }, [_c("a", {
+    staticClass: "has-arrow sidemenu-item px-4",
+    attrs: {
+      href: "javascript:void(0)",
+      "aria-expanded": "false"
+    }
+  }, [_c("i", {
+    staticClass: "fa-solid fa-cart-shopping icon-style me-0",
+    attrs: {
+      "aria-hidden": "true"
+    }
+  }), _vm._v(" "), _c("span", {
+    staticClass: "nav-text"
+  }, [_vm._v("Sales")])]), _vm._v(" "), _c("ul", {
+    attrs: {
+      "aria-expanded": "false"
+    }
+  }, [_c("li", [_c("a", {
+    staticClass: "sudo-ele-none px-4 font-w500",
+    attrs: {
+      href: "./shiftSaleStart.html"
+    }
+  }, [_vm._v("Shift Sale")])]), _vm._v(" "), _c("li", [_c("a", {
+    staticClass: "sudo-ele-none px-4 font-w500",
+    attrs: {
+      href: "./sale.html"
+    }
+  }, [_vm._v("Sale")])]), _vm._v(" "), _c("li", [_c("a", {
+    staticClass: "sudo-ele-none px-4 font-w500",
+    attrs: {
+      href: "./salesHistroy.html"
+    }
+  }, [_vm._v("Sale Histroy")])]), _vm._v(" "), _c("li", [_c("a", {
+    staticClass: "sudo-ele-none px-4 font-w500",
+    attrs: {
+      href: "./#"
+    }
+  }, [_vm._v("Item Sale")])]), _vm._v(" "), _c("li", [_c("a", {
+    staticClass: "sudo-ele-none px-4 font-w500",
+    attrs: {
+      href: "./#"
+    }
+  }, [_vm._v("Bill")])]), _vm._v(" "), _c("li", [_c("a", {
+    staticClass: "sudo-ele-none px-4 font-w500",
+    attrs: {
+      href: "./creditSaleDetailEntry.html"
+    }
+  }, [_vm._v("Credit Sale\n                            Detail Entry")])])])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("li", {
+    staticStyle: {
+      "text-align": "center"
+    }
+  }, [_c("a", {
+    staticClass: "has-arrow sidemenu-item px-4",
+    attrs: {
+      href: "javascript:void(0)",
+      "aria-expanded": "false"
+    }
+  }, [_c("i", {
+    staticClass: "fa-solid fa-gas-pump icon-style me-0",
+    attrs: {
+      "aria-hidden": "true"
+    }
+  }), _vm._v(" "), _c("span", {
+    staticClass: "nav-text"
+  }, [_vm._v("Fule")])]), _vm._v(" "), _c("ul", {
+    attrs: {
+      "aria-expanded": "false"
+    }
+  }, [_c("li", [_c("a", {
+    staticClass: "sudo-ele-none px-4 font-w500",
+    attrs: {
+      href: "./tankRefill.html"
+    }
+  }, [_vm._v("Refill")])]), _vm._v(" "), _c("li", [_c("a", {
+    staticClass: "sudo-ele-none px-4 font-w500",
+    attrs: {
+      href: "./tankRefillHistory.html"
+    }
+  }, [_vm._v("Tank Refill\n                            History")])]), _vm._v(" "), _c("li", [_c("a", {
+    staticClass: "sudo-ele-none px-4 font-w500",
+    attrs: {
+      href: "./fuelRefillVoucher.html"
+    }
+  }, [_vm._v("Fuel Refill\n                            Voucher")])]), _vm._v(" "), _c("li", [_c("a", {
+    staticClass: "sudo-ele-none px-4 font-w500",
+    attrs: {
+      href: "./refillHistroyDetails.html"
+    }
+  }, [_vm._v("Refill Histroy\n                            Details")])]), _vm._v(" "), _c("li", [_c("a", {
+    staticClass: "sudo-ele-none px-4 font-w500",
+    attrs: {
+      href: "./nozzleReading.html"
+    }
+  }, [_vm._v("Nozzle Reading")])]), _vm._v(" "), _c("li", [_c("a", {
+    staticClass: "sudo-ele-none px-4 font-w500",
+    attrs: {
+      href: "./tankReading.html"
+    }
+  }, [_vm._v("Tank Reading")])]), _vm._v(" "), _c("li", [_c("a", {
+    staticClass: "sudo-ele-none px-4 font-w500",
+    attrs: {
+      href: "./tankReadingHistory.html"
+    }
+  }, [_vm._v("Tank Reading\n                            History")])])])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("li", {
+    staticStyle: {
+      "text-align": "center"
+    }
+  }, [_c("a", {
+    staticClass: "has-arrow sidemenu-item px-4",
+    attrs: {
+      href: "javascript:void()",
+      "aria-expanded": "false"
+    }
+  }, [_c("i", {
+    staticClass: "fa-regular fa-money-bill-1 icon-style me-0"
+  }), _vm._v(" "), _c("span", {
+    staticClass: "nav-text"
+  }, [_vm._v("Payment ")])]), _vm._v(" "), _c("ul", {
+    attrs: {
+      "aria-expanded": "false"
+    }
+  }, [_c("li", [_c("a", {
+    staticClass: "sudo-ele-none px-4 font-w500",
+    attrs: {
+      href: "./#"
+    }
+  }, [_vm._v("Vendors")])])])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("li", {
+    staticStyle: {
+      "text-align": "center"
+    }
+  }, [_c("a", {
+    staticClass: "has-arrow sidemenu-item px-4",
+    attrs: {
+      href: "javascript:void()",
+      "aria-expanded": "false"
+    }
+  }, [_c("i", {
+    staticClass: "fa-solid fa-building-columns icon-style me-0"
+  }), _vm._v(" "), _c("span", {
+    staticClass: "nav-text"
+  }, [_vm._v("Banks")])]), _vm._v(" "), _c("ul", {
+    attrs: {
+      "aria-expanded": "false"
+    }
+  }, [_c("li", [_c("a", {
+    staticClass: "sudo-ele-none px-4 font-w500",
+    attrs: {
+      href: "./#"
+    }
+  }, [_vm._v("Bnaks ")])]), _vm._v(" "), _c("li", [_c("a", {
+    staticClass: "sudo-ele-none px-4 font-w500",
+    attrs: {
+      href: "./#"
+    }
+  }, [_vm._v("Personal Accounts")])]), _vm._v(" "), _c("li", [_c("a", {
+    staticClass: "sudo-ele-none px-4 font-w500",
+    attrs: {
+      href: "./#"
+    }
+  }, [_vm._v("Transfer")])]), _vm._v(" "), _c("li", [_c("a", {
+    staticClass: "sudo-ele-none px-4 font-w500",
+    attrs: {
+      href: "./#"
+    }
+  }, [_vm._v("Transaction")])])])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("li", {
+    staticStyle: {
+      "text-align": "center"
+    }
+  }, [_c("a", {
+    staticClass: "has-arrow sidemenu-item px-4",
+    attrs: {
+      href: "javascript:void()",
+      "aria-expanded": "false"
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-users icon-style me-0"
+  }), _vm._v(" "), _c("span", {
+    staticClass: "nav-text"
+  }, [_vm._v("Field")])]), _vm._v(" "), _c("ul", {
+    attrs: {
+      "aria-expanded": "false"
+    }
+  }, [_c("li", [_c("a", {
+    staticClass: "sudo-ele-none px-4 font-w500",
+    attrs: {
+      href: "./Field1.html"
+    }
+  }, [_vm._v("Field-1")])]), _vm._v(" "), _c("li", [_c("a", {
+    staticClass: "sudo-ele-none px-4 font-w500",
+    attrs: {
+      href: "./Field217.html"
+    }
+  }, [_vm._v("Field-217")])]), _vm._v(" "), _c("li", [_c("a", {
+    staticClass: "sudo-ele-none px-4 font-w500",
+    attrs: {
+      href: "./card.html"
+    }
+  }, [_vm._v("Shopping caed")])]), _vm._v(" "), _c("li", [_c("a", {
+    staticClass: "sudo-ele-none px-4 font-w500",
+    attrs: {
+      href: "./cashierBalance.html"
+    }
+  }, [_vm._v("Cashier balance")])]), _vm._v(" "), _c("li", [_c("a", {
+    staticClass: "sudo-ele-none px-4 font-w500",
+    attrs: {
+      href: "./reading.html"
+    }
+  }, [_vm._v("Reading")])]), _vm._v(" "), _c("li", [_c("a", {
+    staticClass: "sudo-ele-none px-4 font-w500",
+    attrs: {
+      href: "./createHeads.html"
+    }
+  }, [_vm._v("Create Heads")])]), _vm._v(" "), _c("li", [_c("a", {
+    staticClass: "sudo-ele-none px-4 font-w500",
+    attrs: {
+      href: "./#"
+    }
+  }, [_vm._v("Transaction")])])])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("li", {
+    staticStyle: {
+      "text-align": "center"
+    }
+  }, [_c("a", {
+    staticClass: "has-arrow sidemenu-item px-4",
+    attrs: {
+      href: "javascript:void()",
+      "aria-expanded": "false"
+    }
+  }, [_c("i", {
+    staticClass: "fa-solid fa-money-bill icon-style me-0"
+  }), _vm._v(" "), _c("span", {
+    staticClass: "nav-text"
+  }, [_vm._v("Expenses")])]), _vm._v(" "), _c("ul", {
+    attrs: {
+      "aria-expanded": "false"
+    }
+  }, [_c("li", [_c("a", {
+    staticClass: "sudo-ele-none px-4 font-w500",
+    attrs: {
+      href: "./expense.html"
+    }
+  }, [_vm._v("Expense")])]), _vm._v(" "), _c("li", [_c("a", {
+    staticClass: "sudo-ele-none px-4 font-w500",
+    attrs: {
+      href: "./#"
+    }
+  }, [_vm._v("Salary Expense")])]), _vm._v(" "), _c("li", [_c("a", {
+    staticClass: "sudo-ele-none px-4 font-w500",
+    attrs: {
+      href: "./#"
+    }
+  }, [_vm._v("Machine Expense")])]), _vm._v(" "), _c("li", [_c("a", {
+    staticClass: "sudo-ele-none px-4 font-w500",
+    attrs: {
+      href: "./#"
+    }
+  }, [_vm._v("Mics Expense")])])])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("li", {
+    staticStyle: {
+      "text-align": "center"
+    }
+  }, [_c("a", {
+    staticClass: "sidemenu-item px-4",
+    attrs: {
+      href: "#",
+      "aria-expanded": "false"
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-phone icon-style me-0"
+  }), _vm._v(" "), _c("span", {
+    staticClass: "nav-text"
+  }, [_vm._v("Vendors")])])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("li", {
+    staticStyle: {
+      "text-align": "center"
+    }
+  }, [_c("a", {
+    staticClass: "sidemenu-item px-4",
+    attrs: {
+      href: "#",
+      "aria-expanded": "false"
+    }
+  }, [_c("i", {
+    staticClass: "fa-solid fa-user icon-style me-0"
+  }), _vm._v(" "), _c("span", {
+    staticClass: "nav-text"
+  }, [_vm._v("Human")])])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("li", {
+    staticStyle: {
+      "text-align": "center"
+    }
+  }, [_c("a", {
+    staticClass: "sidemenu-item px-4",
+    attrs: {
+      href: "#",
+      "aria-expanded": "false"
+    }
+  }, [_c("i", {
+    staticClass: "fa-solid fa-users icon-style me-0"
+  }), _vm._v(" "), _c("span", {
+    staticClass: "nav-text"
+  }, [_vm._v("Customers")])])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("li", {
+    staticStyle: {
+      "text-align": "center"
+    }
+  }, [_c("a", {
+    staticClass: "has-arrow sidemenu-item px-4",
+    attrs: {
+      href: "javascript:void()",
+      "aria-expanded": "false"
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-users icon-style me-0"
+  }), _vm._v(" "), _c("span", {
+    staticClass: "nav-text"
+  }, [_vm._v("Setup")])]), _vm._v(" "), _c("ul", {
+    attrs: {
+      "aria-expanded": "false"
+    }
+  }, [_c("li", [_c("a", {
+    staticClass: "sudo-ele-none px-4 font-w500",
+    attrs: {
+      href: "./tank&NozzleSetup.html"
+    }
+  }, [_vm._v("Pump & Nozzle\n                            Setup")])]), _vm._v(" "), _c("li", [_c("a", {
+    staticClass: "sudo-ele-none px-4 font-w500",
+    attrs: {
+      href: "./tank.html"
+    }
+  }, [_vm._v("Tank Setup")])]), _vm._v(" "), _c("li", [_c("a", {
+    staticClass: "sudo-ele-none px-4 font-w500",
+    attrs: {
+      href: "./creditCompanySetup.html"
+    }
+  }, [_vm._v("Credit Company\n                            Setup ")])]), _vm._v(" "), _c("li", [_c("a", {
+    staticClass: "sudo-ele-none px-4 font-w500",
+    attrs: {
+      href: "./posSetup.html"
+    }
+  }, [_vm._v("Pos Setup")])]), _vm._v(" "), _c("li", [_c("a", {
+    staticClass: "sudo-ele-none px-4 font-w500",
+    attrs: {
+      href: "./#"
+    }
+  }, [_vm._v("Products")])]), _vm._v(" "), _c("li", [_c("a", {
+    staticClass: "sudo-ele-none px-4 font-w500",
+    attrs: {
+      href: "./#"
+    }
+  }, [_vm._v("Sekkubg Price")])])])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("li", {
+    staticStyle: {
+      "text-align": "center"
+    }
+  }, [_c("a", {
+    staticClass: "has-arrow sidemenu-item px-4",
+    attrs: {
+      href: "javascript:void()",
+      "aria-expanded": "false"
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-users icon-style me-0"
+  }), _vm._v(" "), _c("span", {
+    staticClass: "nav-text"
+  }, [_vm._v("Report")])]), _vm._v(" "), _c("ul", {
+    attrs: {
+      "aria-expanded": "false"
+    }
+  }, [_c("li", [_c("a", {
+    staticClass: "sudo-ele-none px-4 font-w500",
+    attrs: {
+      href: "./#"
+    }
+  }, [_vm._v("General")])]), _vm._v(" "), _c("li", [_c("a", {
+    staticClass: "sudo-ele-none px-4 font-w500",
+    attrs: {
+      href: "./#"
+    }
+  }, [_vm._v("Income Statement")])]), _vm._v(" "), _c("li", [_c("a", {
+    staticClass: "sudo-ele-none px-4 font-w500",
+    attrs: {
+      href: "./#"
+    }
+  }, [_vm._v("Porfit & Loss")])]), _vm._v(" "), _c("li", [_c("a", {
+    staticClass: "sudo-ele-none px-4 font-w500",
+    attrs: {
+      href: "./#"
+    }
+  }, [_vm._v("A/C Receivable")])]), _vm._v(" "), _c("li", [_c("a", {
+    staticClass: "sudo-ele-none px-4 font-w500",
+    attrs: {
+      href: "./#"
+    }
+  }, [_vm._v("A/C Payable")])])])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("li", {
+    staticStyle: {
+      "text-align": "center"
+    }
+  }, [_c("a", {
+    staticClass: "sidemenu-item px-4",
+    attrs: {
+      href: "salesReport.html",
+      "aria-expanded": "false"
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-user-cog icon-style me-0"
+  }), _vm._v(" "), _c("span", {
+    staticClass: "nav-text"
+  }, [_vm._v("Sale Report")])])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("li", {
+    staticStyle: {
+      "text-align": "center"
+    }
+  }, [_c("a", {
+    staticClass: "sidemenu-item px-4",
+    attrs: {
+      href: "#",
+      "aria-expanded": "false"
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-user-cog icon-style"
+  }), _vm._v(" "), _c("span", {
+    staticClass: "nav-text"
+  }, [_vm._v("consumption Report")])])]);
+}];
+render._withStripped = true;
 
 
 /***/ }),
@@ -4244,6 +6786,25 @@ exports = module.exports = __webpack_require__(/*! ../../css-loader/lib/css-base
 
 // module
 exports.push([module.i, "@keyframes fadeOut{from{opacity:1}to{opacity:0}}.fadeOut{animation-name:fadeOut}@keyframes fadeInDown{from{opacity:0;transform:translate3d(0, -100%, 0)}to{opacity:1;transform:none}}.fadeInDown{animation-name:fadeInDown}@keyframes fadeInUp{from{opacity:0;transform:translate3d(0, 100%, 0)}to{opacity:1;transform:none}}.fadeInUp{animation-name:fadeInUp}.fade-enter-active,.fade-leave-active{transition:opacity 150ms ease-out}.fade-enter,.fade-leave-to{opacity:0}.v-notices{position:fixed;display:flex;top:0;bottom:0;left:0;right:0;padding:2em;overflow:hidden;z-index:1052;pointer-events:none}.v-notices .v-toast{display:inline-flex;align-items:center;animation-duration:150ms;margin:.5em 0;box-shadow:0 1px 4px rgba(0,0,0,.12),0 0 6px rgba(0,0,0,.04);border-radius:.25em;pointer-events:auto;opacity:.92;color:#fff;min-height:3em;cursor:pointer}.v-notices .v-toast .v-toast-text{margin:0;padding:.5em 1em;word-break:break-word}.v-notices .v-toast .v-toast-icon{display:none}.v-notices .v-toast-success{background-color:#28a745}.v-notices .v-toast-info{background-color:#17a2b8}.v-notices .v-toast-warning{background-color:#ffc107}.v-notices .v-toast-error{background-color:#dc3545}.v-notices .v-toast-default{background-color:#343a40}.v-notices .v-toast.is-top,.v-notices .v-toast.is-bottom{align-self:center}.v-notices .v-toast.is-top-right,.v-notices .v-toast.is-bottom-right{align-self:flex-end}.v-notices .v-toast.is-top-left,.v-notices .v-toast.is-bottom-left{align-self:flex-start}.v-notices.is-top{flex-direction:column}.v-notices.is-bottom{flex-direction:column-reverse}.v-notices.is-custom-parent{position:absolute}@media screen and (max-width: 768px){.v-notices{padding:0;position:fixed !important}}\n", ""]);
+
+// exports
+
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/index.js?!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/Pages/Accounts/Accounts.vue?vue&type=style&index=0&id=2ddcca36&scoped=true&lang=css&":
+/*!******************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader??ref--5-1!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src??ref--5-2!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/Pages/Accounts/Accounts.vue?vue&type=style&index=0&id=2ddcca36&scoped=true&lang=css& ***!
+  \******************************************************************************************************************************************************************************************************************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(/*! ../../../../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(false);
+// imports
+
+
+// module
+exports.push([module.i, "\nul[data-v-2ddcca36] {\n    list-style: none;\n}\na[data-v-2ddcca36] {\n    text-decoration: none;\n    color: #000;\n    font-weight: 400;\n}\n\n\n/* main content start here  */\n\n\n/* popup area start  */\n.popup-wrapper[data-v-2ddcca36] {\n    display: block;\n    position: absolute;\n    background: #fff;\n    box-shadow: 0px 0px 4px #00000047;\n    z-index: 9;\n    display: none;\n}\n.popup-wrapper.active[data-v-2ddcca36] {\n    display: block;\n}\n.popup-wrapper ul li a[data-v-2ddcca36] {\n    display: block;\n    padding: 7px 25px 7px 15px;\n    font-size: 14px;\n    transition: all .3s;\n}\n.popup-wrapper ul li a[data-v-2ddcca36]:hover {\n    color: #01987a;\n}\n\n/* popup area end */\n\n\n/* new account area start  */\n.new-account-form-wrapper[data-v-2ddcca36] {\n    width: 100%;\n    height: 100%;\n    position: absolute;\n    top: 0;\n    left: 0;\n    z-index: 9;\n    background: #00000070;\n    justify-content: center;\n    align-items: center;\n    display: none;\n}\n.new-account-form-wrapper.active[data-v-2ddcca36] {\n    display: flex;\n}\n.new-account-form-wrapper form[data-v-2ddcca36] {\n    padding: 30px 20px;\n    row-gap: 10px;\n    background: #fff;\n    border-radius: 5px;\n    display: flex;\n    flex-direction: column;\n}\n.new-account-form-wrapper form .input-wrapper[data-v-2ddcca36] {\n    display: flex;\n    justify-content: space-between;\n    align-items: center;\n}\n.new-account-form-wrapper form input[data-v-2ddcca36],\ntextarea[data-v-2ddcca36],\nselect[data-v-2ddcca36] {\n    border: 1px solid #d2d2d2;\n    outline: none;\n    padding: 10px;\n    width: 70%;\n    border-radius: 4px;\n}\n.new-account-form-wrapper form label[data-v-2ddcca36] {\n    margin-right: 10px;\n}\n.desc-label[data-v-2ddcca36],\n.notes-label[data-v-2ddcca36] {\n    align-self: flex-start;\n}\nform .btn-wrapper[data-v-2ddcca36] {\n    display: flex;\n    align-items: center;\n    justify-content: flex-end;\n    column-gap: 10px;\n}\n.btn-wrapper button[data-v-2ddcca36] {\n    padding: 10px;\n    border: none;\n    background-color: red;\n    color: #fff;\n    cursor: pointer;\n}\n.btn-wrapper button[data-v-2ddcca36]:first-child {\n    background-color: rgb(0, 140, 255);\n    color: #fff;\n    border: none;\n    outline: none;\n}\n\n/* new account area end  */\n.accordion-wrapper .accordion-heading-wrapper[data-v-2ddcca36] {\n    display: flex;\n    justify-content: space-between;\n    border-bottom: 1px solid #d1d1d1;\n    margin-bottom: 10px;\n    padding: 5px;\n}\n.accordion-wrapper .accordion-heading-wrapper h4[data-v-2ddcca36] {\n    font-size: 18px;\n    font-weight: 600;\n    color: #a7a7a7;\n}\n.accordion-wrapper[data-v-2ddcca36] {\n    width: 1000px;\n}\n.accordion-wrapper li a[data-v-2ddcca36] {\n    display: flex;\n    justify-content: space-between;\n    padding: 5px;\n    text-decoration: none;\n    color: #000;\n    font-size: 18px;\n}\n.accordion-wrapper ul[data-v-2ddcca36] {\n    padding-left: 50px;\n}\n.accordion-wrapper .accordion-btn img[data-v-2ddcca36] {\n    width: 10px;\n    margin-right: 10px;\n    transition: .4s ease;\n}\n.accordion[data-v-2ddcca36] {\n    display: none;\n}\n.accordion.open[data-v-2ddcca36] {\n    display: block;\n}\n.accordion-btn.active img[data-v-2ddcca36] {\n    transform: rotate(90deg);\n}\nul.accordion-wrapper a span[data-v-2ddcca36]:nth-child(2),\nul.accordion a span[data-v-2ddcca36]:nth-child(2) {\n    position: absolute;\n    left: 865px;\n}\n\n/* main content end here  */\n", ""]);
 
 // exports
 
@@ -15704,6 +18265,36 @@ process.umask = function() { return 0; };
 }(typeof self === "undefined" ? typeof global === "undefined" ? this : global : self));
 
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../webpack/buildin/global.js */ "./node_modules/webpack/buildin/global.js"), __webpack_require__(/*! ./../process/browser.js */ "./node_modules/process/browser.js")))
+
+/***/ }),
+
+/***/ "./node_modules/style-loader/index.js!./node_modules/css-loader/index.js?!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/Pages/Accounts/Accounts.vue?vue&type=style&index=0&id=2ddcca36&scoped=true&lang=css&":
+/*!**********************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/style-loader!./node_modules/css-loader??ref--5-1!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src??ref--5-2!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/Pages/Accounts/Accounts.vue?vue&type=style&index=0&id=2ddcca36&scoped=true&lang=css& ***!
+  \**********************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+
+var content = __webpack_require__(/*! !../../../../node_modules/css-loader??ref--5-1!../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../node_modules/postcss-loader/src??ref--5-2!../../../../node_modules/vue-loader/lib??vue-loader-options!./Accounts.vue?vue&type=style&index=0&id=2ddcca36&scoped=true&lang=css& */ "./node_modules/css-loader/index.js?!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/Pages/Accounts/Accounts.vue?vue&type=style&index=0&id=2ddcca36&scoped=true&lang=css&");
+
+if(typeof content === 'string') content = [[module.i, content, '']];
+
+var transform;
+var insertInto;
+
+
+
+var options = {"hmr":true}
+
+options.transform = transform
+options.insertInto = undefined;
+
+var update = __webpack_require__(/*! ../../../../node_modules/style-loader/lib/addStyles.js */ "./node_modules/style-loader/lib/addStyles.js")(content, options);
+
+if(content.locals) module.exports = content.locals;
+
+if(false) {}
 
 /***/ }),
 
@@ -33094,6 +35685,93 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./resources/js/Pages/Accounts/Accounts.vue":
+/*!**************************************************!*\
+  !*** ./resources/js/Pages/Accounts/Accounts.vue ***!
+  \**************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _Accounts_vue_vue_type_template_id_2ddcca36_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Accounts.vue?vue&type=template&id=2ddcca36&scoped=true& */ "./resources/js/Pages/Accounts/Accounts.vue?vue&type=template&id=2ddcca36&scoped=true&");
+/* harmony import */ var _Accounts_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Accounts.vue?vue&type=script&lang=js& */ "./resources/js/Pages/Accounts/Accounts.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport *//* harmony import */ var _Accounts_vue_vue_type_style_index_0_id_2ddcca36_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Accounts.vue?vue&type=style&index=0&id=2ddcca36&scoped=true&lang=css& */ "./resources/js/Pages/Accounts/Accounts.vue?vue&type=style&index=0&id=2ddcca36&scoped=true&lang=css&");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+
+/* normalize component */
+
+var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__["default"])(
+  _Accounts_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _Accounts_vue_vue_type_template_id_2ddcca36_scoped_true___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _Accounts_vue_vue_type_template_id_2ddcca36_scoped_true___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  false,
+  null,
+  "2ddcca36",
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/Pages/Accounts/Accounts.vue"
+/* harmony default export */ __webpack_exports__["default"] = (component.exports);
+
+/***/ }),
+
+/***/ "./resources/js/Pages/Accounts/Accounts.vue?vue&type=script&lang=js&":
+/*!***************************************************************************!*\
+  !*** ./resources/js/Pages/Accounts/Accounts.vue?vue&type=script&lang=js& ***!
+  \***************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_Accounts_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib??ref--4-0!../../../../node_modules/vue-loader/lib??vue-loader-options!./Accounts.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/Pages/Accounts/Accounts.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_Accounts_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/js/Pages/Accounts/Accounts.vue?vue&type=style&index=0&id=2ddcca36&scoped=true&lang=css&":
+/*!***********************************************************************************************************!*\
+  !*** ./resources/js/Pages/Accounts/Accounts.vue?vue&type=style&index=0&id=2ddcca36&scoped=true&lang=css& ***!
+  \***********************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_style_loader_index_js_node_modules_css_loader_index_js_ref_5_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_5_2_node_modules_vue_loader_lib_index_js_vue_loader_options_Accounts_vue_vue_type_style_index_0_id_2ddcca36_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/style-loader!../../../../node_modules/css-loader??ref--5-1!../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../node_modules/postcss-loader/src??ref--5-2!../../../../node_modules/vue-loader/lib??vue-loader-options!./Accounts.vue?vue&type=style&index=0&id=2ddcca36&scoped=true&lang=css& */ "./node_modules/style-loader/index.js!./node_modules/css-loader/index.js?!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/Pages/Accounts/Accounts.vue?vue&type=style&index=0&id=2ddcca36&scoped=true&lang=css&");
+/* harmony import */ var _node_modules_style_loader_index_js_node_modules_css_loader_index_js_ref_5_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_5_2_node_modules_vue_loader_lib_index_js_vue_loader_options_Accounts_vue_vue_type_style_index_0_id_2ddcca36_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_index_js_node_modules_css_loader_index_js_ref_5_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_5_2_node_modules_vue_loader_lib_index_js_vue_loader_options_Accounts_vue_vue_type_style_index_0_id_2ddcca36_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__);
+/* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _node_modules_style_loader_index_js_node_modules_css_loader_index_js_ref_5_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_5_2_node_modules_vue_loader_lib_index_js_vue_loader_options_Accounts_vue_vue_type_style_index_0_id_2ddcca36_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__) if(["default"].indexOf(__WEBPACK_IMPORT_KEY__) < 0) (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _node_modules_style_loader_index_js_node_modules_css_loader_index_js_ref_5_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_5_2_node_modules_vue_loader_lib_index_js_vue_loader_options_Accounts_vue_vue_type_style_index_0_id_2ddcca36_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__[key]; }) }(__WEBPACK_IMPORT_KEY__));
+
+
+/***/ }),
+
+/***/ "./resources/js/Pages/Accounts/Accounts.vue?vue&type=template&id=2ddcca36&scoped=true&":
+/*!*********************************************************************************************!*\
+  !*** ./resources/js/Pages/Accounts/Accounts.vue?vue&type=template&id=2ddcca36&scoped=true& ***!
+  \*********************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ref_6_node_modules_vue_loader_lib_index_js_vue_loader_options_Accounts_vue_vue_type_template_id_2ddcca36_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib??ref--4-0!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??ref--6!../../../../node_modules/vue-loader/lib??vue-loader-options!./Accounts.vue?vue&type=template&id=2ddcca36&scoped=true& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/Pages/Accounts/Accounts.vue?vue&type=template&id=2ddcca36&scoped=true&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ref_6_node_modules_vue_loader_lib_index_js_vue_loader_options_Accounts_vue_vue_type_template_id_2ddcca36_scoped_true___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ref_6_node_modules_vue_loader_lib_index_js_vue_loader_options_Accounts_vue_vue_type_template_id_2ddcca36_scoped_true___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+
+
+
+/***/ }),
+
 /***/ "./resources/js/Pages/Auth/Login.vue":
 /*!*******************************************!*\
   !*** ./resources/js/Pages/Auth/Login.vue ***!
@@ -33525,11 +36203,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Pages_Layout_Layout_vue__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../Pages/Layout/Layout.vue */ "./resources/js/Pages/Layout/Layout.vue");
 /* harmony import */ var _Pages_Auth_Login__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../Pages/Auth/Login */ "./resources/js/Pages/Auth/Login.vue");
 /* harmony import */ var _Pages_Dashboard_Dashboard_vue__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../Pages/Dashboard/Dashboard.vue */ "./resources/js/Pages/Dashboard/Dashboard.vue");
+/* harmony import */ var _Pages_Accounts_Accounts__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../Pages/Accounts/Accounts */ "./resources/js/Pages/Accounts/Accounts.vue");
 
 
 
 
 vue__WEBPACK_IMPORTED_MODULE_0___default.a.use(vuex__WEBPACK_IMPORTED_MODULE_2__["default"]);
+
 
 
 
@@ -33554,6 +36234,10 @@ var router = new vue_router__WEBPACK_IMPORTED_MODULE_1__["default"]({
       path: ROOT_URL + "/dashboard",
       name: "Dashboard",
       component: _Pages_Dashboard_Dashboard_vue__WEBPACK_IMPORTED_MODULE_6__["default"]
+    }, {
+      path: ROOT_URL + "/accounts",
+      name: "Accounts",
+      component: _Pages_Accounts_Accounts__WEBPACK_IMPORTED_MODULE_7__["default"]
     }]
   }]
 });
@@ -33916,7 +36600,7 @@ var app = new vue__WEBPACK_IMPORTED_MODULE_1___default.a({
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! D:\xampp7.4\htdocs\fuelmatix\resources\js\app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! E:\xampp8\htdocs\projects\fuelmatix\resources\js\app.js */"./resources/js/app.js");
 
 
 /***/ })
