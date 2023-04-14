@@ -17,6 +17,6 @@ class AccountHead extends Model
     }
     public function grandchildren()
     {
-        return $this->children()->with('grandchildren');
+        return $this->children()->select('id', 'parent_id', 'name', 'balance')->with('grandchildren');
     }
 }
