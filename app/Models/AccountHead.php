@@ -11,12 +11,12 @@ class AccountHead extends Model
     protected $table = 'account_heads';
     public $timestamps = false;
 
-    public function children()
+    public function grandchildren()
     {
         return $this->hasMany(self::class, 'parent_id');
     }
-    public function grandchildren()
+    public function children()
     {
-        return $this->children()->select('id', 'parent_id', 'name', 'balance')->with('grandchildren');
+        return $this->grandchildren()->select('id', 'parent_id', 'name', 'balance')->with('children');
     }
 }

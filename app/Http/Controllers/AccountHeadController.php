@@ -10,7 +10,7 @@ class AccountHeadController extends Controller
     public function list(Request $request)
     {
         $result = AccountHead::select('id', 'name', 'balance', 'parent_id')
-            ->with(['grandchildren' => function($q) {
+            ->with(['children' => function($q) {
                 $q->select('id', 'name', 'parent_id', 'balance');
             }])
             ->where('parent_id', 0)
