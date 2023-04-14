@@ -291,7 +291,7 @@
                     <h4>Description</h4>
                     <h4>Total</h4>
                 </li>
-                <li>
+                <li v-for="heads in accHeads">
                     <a href="#" @contextmenu="rightClick($event)" class="accordion-btn"><span><img
                         src="images/arrow-svg.svg" alt=""/>
                         Assets</span><span>Assets</span><span>8364983</span></a>
@@ -754,10 +754,14 @@
 </template>
 
 <script>
+import ApiService from "../../Services/ApiService";
+import ApiRoutes from "../../Services/ApiRoutes";
+
 export default {
     data() {
         return {
-            popup: null
+            popup: null,
+            accHeads: []
         }
     },
     methods: {
@@ -777,6 +781,16 @@ export default {
                 }
             }
         },
+        getAccountsHead: function () {
+            ApiService.POST(ApiRoutes.AccountList, {}, res => {
+                if (parseInt(res.status) === 200) {
+                    this.accHeads = res.data;
+                }
+            });
+        },
+    },
+    created() {
+        this.getAccountsHead()
     },
     mounted() {
         const accordion = document.querySelector(".accordion");

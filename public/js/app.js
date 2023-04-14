@@ -1921,10 +1921,15 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../Services/ApiService */ "./resources/js/Services/ApiService.js");
+/* harmony import */ var _Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../Services/ApiRoutes */ "./resources/js/Services/ApiRoutes.js");
+
+
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
-      popup: null
+      popup: null,
+      accHeads: []
     };
   },
   methods: {
@@ -1943,10 +1948,21 @@ __webpack_require__.r(__webpack_exports__);
           this.popup.classList.remove('active');
         }
       }
+    },
+    getAccountsHead: function getAccountsHead() {
+      var _this = this;
+      _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].AccountList, {}, function (res) {
+        if (parseInt(res.status) === 200) {
+          _this.accHeads = res.data;
+        }
+      });
     }
   },
+  created: function created() {
+    this.getAccountsHead();
+  },
   mounted: function mounted() {
-    var _this = this;
+    var _this2 = this;
     var accordion = document.querySelector(".accordion");
     var accordionBtn = document.querySelectorAll(".accordion-btn");
     this.popup = document.querySelector(".popup-wrapper");
@@ -1969,7 +1985,7 @@ __webpack_require__.r(__webpack_exports__);
 
     // hide the popup when user clicks outside the popup box
     window.addEventListener('click', function (e) {
-      _this.hidePopup(e);
+      _this2.hidePopup(e);
       if (e.target == newAccForm && e.target !== form) {
         newAccForm.classList.remove('active');
       }
@@ -1977,7 +1993,7 @@ __webpack_require__.r(__webpack_exports__);
 
     // hide the popup when user spin the mouse wheel
     window.addEventListener('wheel', function (e) {
-      _this.hidePopup(e);
+      _this2.hidePopup(e);
     });
     newAccount.onclick = function (e) {
       hidePopup(e);
@@ -2250,17 +2266,19 @@ var render = function render() {
     staticClass: "container-fluid"
   }, [_vm._m(0), _vm._v(" "), _vm._m(1), _vm._v(" "), _c("ul", {
     staticClass: "accordion-wrapper"
-  }, [_vm._m(2), _vm._v(" "), _c("li", [_c("a", {
-    staticClass: "accordion-btn",
-    attrs: {
-      href: "#"
-    },
-    on: {
-      contextmenu: function contextmenu($event) {
-        return _vm.rightClick($event);
+  }, [_vm._m(2), _vm._v(" "), _vm._l(_vm.accHeads, function (heads) {
+    return _c("li", [_c("a", {
+      staticClass: "accordion-btn",
+      attrs: {
+        href: "#"
+      },
+      on: {
+        contextmenu: function contextmenu($event) {
+          return _vm.rightClick($event);
+        }
       }
-    }
-  }, [_vm._m(3), _c("span", [_vm._v("Assets")]), _c("span", [_vm._v("8364983")])]), _vm._v(" "), _vm._m(4)]), _vm._v(" "), _vm._m(5), _vm._v(" "), _vm._m(6), _vm._v(" "), _vm._m(7), _vm._v(" "), _vm._m(8), _vm._v(" "), _vm._m(9), _vm._v(" "), _vm._m(10), _vm._v(" "), _vm._m(11)])])]);
+    }, [_vm._m(3, true), _c("span", [_vm._v("Assets")]), _c("span", [_vm._v("8364983")])]), _vm._v(" "), _vm._m(4, true)]);
+  }), _vm._v(" "), _vm._m(5), _vm._v(" "), _vm._m(6), _vm._v(" "), _vm._m(7), _vm._v(" "), _vm._m(8), _vm._v(" "), _vm._m(9), _vm._v(" "), _vm._m(10), _vm._v(" "), _vm._m(11)], 2)])]);
 };
 var staticRenderFns = [function () {
   var _vm = this,
@@ -36262,96 +36280,8 @@ var ApiRoutes = {
   Register: ApiVersion + '/auth/register',
   ForgotPassword: ApiVersion + '/auth/forgot',
   ResetPassword: ApiVersion + '/auth/reset/password',
-  //Role
-  role: ApiVersion + '/role/list',
-  SaveRole: ApiVersion + '/role/save',
-  UpdateRole: ApiVersion + '/role/update',
-  DeleteRole: ApiVersion + '/role/delete',
-  SingleRole: ApiVersion + '/role/single',
-  //Access
-  SaveAccess: ApiVersion + '/access/save',
-  GetAccess: ApiVersion + '/access/get',
-  //Module
-  GetModule: ApiVersion + '/module/get',
-  //Agent
-  GetAgent: ApiVersion + '/agent/list',
-  GetAgentAll: ApiVersion + '/agent/all',
-  SaveAgent: ApiVersion + '/agent/save',
-  SingleAgent: ApiVersion + '/agent/single',
-  UpdateAgent: ApiVersion + '/agent/update',
-  DeleteAgent: ApiVersion + '/agent/delete',
-  //customer
-  GetCustomer: ApiVersion + '/customer/list',
-  GetCustomerAll: ApiVersion + '/customer/all',
-  SaveCustomer: ApiVersion + '/customer/save',
-  SingleCustomer: ApiVersion + '/customer/single',
-  UpdateCustomer: ApiVersion + '/customer/update',
-  DeleteCustomer: ApiVersion + '/customer/delete',
-  AddContact: ApiVersion + '/customer/add/contact',
-  //ticket
-  GetTicket: ApiVersion + '/ticket/list',
-  SaveTicket: ApiVersion + '/ticket/save',
-  SingleTicket: ApiVersion + '/ticket/single',
-  UpdateTicket: ApiVersion + '/ticket/update',
-  DeleteTicket: ApiVersion + '/ticket/delete',
-  LatestTicket: ApiVersion + '/ticket/latest',
-  UpdateStatusTicket: ApiVersion + '/ticket/change/status',
-  AllTicket: ApiVersion + '/ticket/all',
-  MergeTicket: ApiVersion + '/ticket/merge',
-  ViewTicket: ApiVersion + '/ticket/view',
-  RemoveTicketUser: ApiVersion + '/ticket/user/remove',
-  TagSave: ApiVersion + '/ticket/tag/save',
-  TagList: ApiVersion + '/ticket/tag/list',
-  TicketTagDelete: ApiVersion + '/ticket/tag/delete',
-  //conversation
-  GetConversation: ApiVersion + '/conversation/list',
-  SaveConversation: ApiVersion + '/conversation/save',
-  SingleConversation: ApiVersion + '/conversation/single',
-  UpdateConversation: ApiVersion + '/conversation/update',
-  DeleteConversation: ApiVersion + '/conversation/delete',
-  //Tag
-  GetTag: ApiVersion + '/tag/list',
-  SaveTag: ApiVersion + '/tag/save',
-  UpdateTag: ApiVersion + '/tag/update',
-  DeleteTag: ApiVersion + '/tag/delete',
-  SingleTag: ApiVersion + '/tag/single',
-  //Note
-  GetNote: ApiVersion + '/call/note/list',
-  SaveNote: ApiVersion + '/call/note/save',
-  UpdateNote: ApiVersion + '/call/note/update',
-  DeleteNote: ApiVersion + '/call/note/delete',
-  SingleNote: ApiVersion + '/call/note/single',
-  //log
-  GetLog: ApiVersion + '/log/call',
-  GetLogAgent: ApiVersion + '/log/agent',
-  GetDailySummery: ApiVersion + '/log/daily/summary',
-  //dashboard
-  GetDashboard: ApiVersion + '/dashboard/get',
-  //Replies
-  GetReplies: ApiVersion + '/quick/reply/list',
-  SaveReplies: ApiVersion + '/quick/reply/save',
-  UpdateReplies: ApiVersion + '/quick/reply/update',
-  DeleteReplies: ApiVersion + '/quick/reply/delete',
-  SingleReplies: ApiVersion + '/quick/reply/single',
-  AllReplies: ApiVersion + '/quick/reply/all',
-  //Report
-  ServicePerformance: ApiVersion + '/report/service/performance',
-  Productivity: ApiVersion + '/report/productivity',
-  HourlyFrequency: ApiVersion + '/report/hourly/frequency',
-  AgentPerformance: ApiVersion + '/report/agent/performance',
-  Csat: ApiVersion + '/report/csat',
-  //Report PDF
-  ServicePerformancePDF: ApiVersion + '/report/pdf/service/performance',
-  ProductivityPDF: ApiVersion + '/report/pdf/productivity',
-  HourlyFrequencyPDF: ApiVersion + '/report/pdf/hourly/frequency',
-  AgentPerformancePDF: ApiVersion + '/report/pdf/agent/performance',
-  CsatPDF: ApiVersion + '/report/pdf/csat',
-  //Report xls
-  ServicePerformanceXls: ApiVersion + '/report/excel/service/performance',
-  ProductivityXls: ApiVersion + '/report/excel/productivity',
-  HourlyFrequencyXls: ApiVersion + '/report/excel/hourly/frequency',
-  AgentPerformanceXls: ApiVersion + '/report/excel/agent/performance',
-  CsatXls: ApiVersion + '/report/excel/csat'
+  //accounts
+  AccountList: ApiVersion + '/accounts/head/list'
 };
 /* harmony default export */ __webpack_exports__["default"] = (ApiRoutes);
 
