@@ -11,6 +11,8 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
+    public $timestamps = false;
+
     /**
      * The attributes that are mass assignable.
      *
@@ -37,4 +39,14 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public static function ParseData($userInfo)
+    {
+        return [
+            'id' => $userInfo->id,
+            'name' => $userInfo->name,
+            'email' => $userInfo->email,
+            'permission' => []
+        ];
+    }
 }

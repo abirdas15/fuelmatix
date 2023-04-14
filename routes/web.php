@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\SpaController;
 
 /*
 |--------------------------------------------------------------------------
@@ -12,7 +13,5 @@ use Illuminate\Support\Facades\Route;
 | contains the "web" middleware group. Now create something great!
 |
 */
-
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::middleware('LoginCheck')->get('/auth/{any}', [SpaController::class, 'index'])->where('any', '.*')->name('Spa.Auth');
+Route::middleware('LoginCheck')->get('/{any}', [SpaController::class, 'index'])->where('any', '.*')->name('Spa.Dashboard');
