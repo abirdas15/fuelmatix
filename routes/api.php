@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\TransactionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,5 +26,8 @@ Route::group(['prefix' => 'category'], function() {
     Route::post('save', [CategoryController::class, 'save']);
     Route::post('single', [CategoryController::class, 'single']);
     Route::post('update', [CategoryController::class, 'update']);
+});
+Route::group(['prefix' => 'transaction'], function() {
+    Route::post('save', [TransactionController::class, 'save']);
 });
 
