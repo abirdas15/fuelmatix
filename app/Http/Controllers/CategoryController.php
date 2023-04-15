@@ -18,7 +18,7 @@ class CategoryController extends Controller
             ->toArray();
         return response()->json(['status' => 200, 'data' => $result]);
     }
-    public function get(Request $request)
+    public function parent(Request $request)
     {
         $result = Category::select('id', 'category_hericy', 'type')
             ->get()

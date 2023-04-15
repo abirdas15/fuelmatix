@@ -21,6 +21,6 @@ Route::group(['prefix' => 'auth'], function() {
 });
 Route::group(['prefix' => 'category'], function() {
     Route::post('list', [CategoryController::class, 'list']);
-    Route::post('get', [CategoryController::class, 'get']);
+    Route::post('parent', [CategoryController::class, 'parent']);
 });
 
