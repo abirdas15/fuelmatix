@@ -30,7 +30,23 @@ class TransactionController extends Controller
             $newTransaction->save();
 
             $category = Category::with('parent')->where('id', $newTransaction->account_id)->first();
-            self::updateCategoryBalance($category, ($newTransaction['debit_amount'] - $newTransaction['credit_amount']));
+
+            $balance = 0;
+            if ($category['type'] == 'expenses') {
+                $balance = $newTransaction['credit_amount'] - $newTransaction['debit_amount'];
+            } else if ($category['type'] == 'income') {
+                $balance = $newTransaction['debit_amount'] - $newTransaction['credit_amount'];
+            } else if ($category['type'] == 'income') {
+                $balance = $newTransaction['debit_amount'] - $newTransaction['credit_amount'];
+            } else if ($category['type'] == 'assets') {
+                $balance = $newTransaction['credit_amount'] - $newTransaction['debit_amount'];
+            } else if ($category['type'] == 'assets') {
+                $balance = $newTransaction['debit_amount'] - $newTransaction['credit_amount'];
+            } else if ($category['type'] == 'equity') {
+                $balance = $newTransaction['debit_amount'] - $newTransaction['credit_amount'];
+            }
+
+            self::updateCategoryBalance($category, $balance);
 
             $newTransaction = new Transaction();
             $newTransaction->date = $transaction['date'];
@@ -42,7 +58,22 @@ class TransactionController extends Controller
             $newTransaction->save();
 
             $category = Category::with('parent')->where('id', $newTransaction->account_id)->first();
-            self::updateCategoryBalance($category, ($transaction['debit_amount'] - $transaction['credit_amount']));
+
+            $balance = 0;
+            if ($category['type'] == 'expenses') {
+                $balance = $newTransaction['credit_amount'] - $newTransaction['debit_amount'];
+            } else if ($category['type'] == 'income') {
+                $balance = $newTransaction['debit_amount'] - $newTransaction['credit_amount'];
+            } else if ($category['type'] == 'income') {
+                $balance = $newTransaction['debit_amount'] - $newTransaction['credit_amount'];
+            } else if ($category['type'] == 'assets') {
+                $balance = $newTransaction['credit_amount'] - $newTransaction['debit_amount'];
+            } else if ($category['type'] == 'assets') {
+                $balance = $newTransaction['debit_amount'] - $newTransaction['credit_amount'];
+            } else if ($category['type'] == 'equity') {
+                $balance = $newTransaction['debit_amount'] - $newTransaction['credit_amount'];
+            }
+            self::updateCategoryBalance($category, $balance);
         }
         return response()->json(['status' => 200, 'message' => 'Successfully save transaction.']);
     }
