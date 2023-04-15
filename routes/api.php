@@ -29,5 +29,6 @@ Route::group(['prefix' => 'category'], function() {
 });
 Route::group(['prefix' => 'transaction'], function() {
     Route::post('save', [TransactionController::class, 'save']);
+    Route::post('single', [TransactionController::class, 'single']);
 });
 

@@ -22,7 +22,7 @@ class TransactionController extends Controller
         foreach ($inputData['transaction'] as $transaction) {
             $newTransaction = new Transaction();
             $newTransaction->date = $transaction['date'];
-            $newTransaction->descripton = $transaction['description'];
+            $newTransaction->description = $transaction['description'];
             $newTransaction->account_id = $transaction['account_id'];
             $newTransaction->debit_amount = $transaction['debit_amount'] ?? 0;
             $newTransaction->credit_amount = $transaction['credit_amount'] ?? 0;
@@ -30,11 +30,27 @@ class TransactionController extends Controller
             $newTransaction->save();
 
             $category = Category::with('parent')->where('id', $newTransaction->account_id)->first();
-            self::updateCategoryBalance($category, ($newTransaction['debit_amount'] - $newTransaction['credit_amount']));
+
+            $balance = 0;
+            if ($category['type'] == 'expenses') {
+                $balance = $newTransaction['credit_amount'] - $newTransaction['debit_amount'];
+            } else if ($category['type'] == 'income') {
+                $balance = $newTransaction['debit_amount'] - $newTransaction['credit_amount'];
+            } else if ($category['type'] == 'income') {
+                $balance = $newTransaction['debit_amount'] - $newTransaction['credit_amount'];
+            } else if ($category['type'] == 'assets') {
+                $balance = $newTransaction['credit_amount'] - $newTransaction['debit_amount'];
+            } else if ($category['type'] == 'assets') {
+                $balance = $newTransaction['debit_amount'] - $newTransaction['credit_amount'];
+            } else if ($category['type'] == 'equity') {
+                $balance = $newTransaction['debit_amount'] - $newTransaction['credit_amount'];
+            }
+
+            self::updateCategoryBalance($category, $balance);
 
             $newTransaction = new Transaction();
             $newTransaction->date = $transaction['date'];
-            $newTransaction->descripton = null;
+            $newTransaction->description = null;
             $newTransaction->account_id = $inputData['linked_id'];
             $newTransaction->debit_amount = $transaction['credit_amount'] ?? 0;
             $newTransaction->credit_amount = $transaction['debit_amount'] ?? 0;
@@ -42,7 +58,22 @@ class TransactionController extends Controller
             $newTransaction->save();
 
             $category = Category::with('parent')->where('id', $newTransaction->account_id)->first();
-            self::updateCategoryBalance($category, ($transaction['debit_amount'] - $transaction['credit_amount']));
+
+            $balance = 0;
+            if ($category['type'] == 'expenses') {
+                $balance = $newTransaction['credit_amount'] - $newTransaction['debit_amount'];
+            } else if ($category['type'] == 'income') {
+                $balance = $newTransaction['debit_amount'] - $newTransaction['credit_amount'];
+            } else if ($category['type'] == 'income') {
+                $balance = $newTransaction['debit_amount'] - $newTransaction['credit_amount'];
+            } else if ($category['type'] == 'assets') {
+                $balance = $newTransaction['credit_amount'] - $newTransaction['debit_amount'];
+            } else if ($category['type'] == 'assets') {
+                $balance = $newTransaction['debit_amount'] - $newTransaction['credit_amount'];
+            } else if ($category['type'] == 'equity') {
+                $balance = $newTransaction['debit_amount'] - $newTransaction['credit_amount'];
+            }
+            self::updateCategoryBalance($category, $balance);
         }
         return response()->json(['status' => 200, 'message' => 'Successfully save transaction.']);
     }
@@ -55,5 +86,20 @@ class TransactionController extends Controller
             self::updateCategoryBalance($category['parent'], $balance);
         }
         return true;
+    }
+    public function single(Request $request)
+    {
+        $inputData = $request->all();
+        $validator = Validator::make($inputData, [
+            'id' => 'required'
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['status' => 500, 'errors' => $validator->errors()]);
+        }
+        $result = Transaction::select('id', 'date', 'account_id', 'debit_amount', 'credit_amount', 'description')
+            ->where('linked_id', $inputData['id'])
+            ->get()
+            ->toArray();
+        return response()->json(['status' => 200, 'data' => $result]);
     }
 }
