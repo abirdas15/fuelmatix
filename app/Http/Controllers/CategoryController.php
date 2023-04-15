@@ -80,4 +80,36 @@ class CategoryController extends Controller
             ->first();
         return response()->json(['status' => 200, 'data' => $result]);
     }
+    public function update(Request $request)
+    {
+        $inputData = $request->all();
+        $validator = Validator::make($inputData, [
+            'id' => 'required',
+            'category' => 'required',
+            'type' => 'required'
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['status' => 500, 'errors' => $validator->errors()]);
+        }
+        $category = Category::find($inputData['id']);
+        $category->category = $inputData['category'];
+        $category->code = $inputData['code'] ?? null;
+        $category->parent_category = !empty($inputData['parent_category']) ? $inputData['parent_category'] : null;
+        $category->type = $inputData['type'];
+        $category->description = $inputData['description'] ?? null;
+        if ($category->save()) {
+            if (!empty($inputData['parent_category'])) {
+                $parentCategory = Category::select('category_hericy')->where('id', $inputData['parent_category'])->first();
+                $category_hericy = json_decode($parentCategory['category_hericy']);
+                array_push($category_hericy, $category->category);
+                $category_hericy = json_encode($category_hericy);
+            } else {
+                $category_hericy = json_encode([$category->category]);
+            }
+            $category->category_hericy = $category_hericy;
+            $category->save();
+            return response()->json(['status' => 200, 'msg' => 'Successfully update category']);
+        }
+        return response()->json(['status' => 200, 'msg' => 'Can not update category']);
+    }
 }
