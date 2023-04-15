@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class CategoryController extends Controller
 {
@@ -18,7 +19,7 @@ class CategoryController extends Controller
             ->toArray();
         return response()->json(['status' => 200, 'data' => $result]);
     }
-    public function get(Request $request)
+    public function parent(Request $request)
     {
         $result = Category::select('id', 'category_hericy', 'type')
             ->get()
@@ -33,5 +34,35 @@ class CategoryController extends Controller
         });
 
         return response()->json(['status' => 200, 'data' => $result]);
+    }
+    public function save(Request $request)
+    {
+        $inputData = $request->all();
+        $validator = Validator::make($inputData, [
+            'category' => 'required',
+            'type' => 'required'
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['status' => 500, 'errors' => $validator->errors()]);
+        }
+        $category = new Category();
+        $category->category = $inputData['category'];
+        $category->code = $inputData['code'];
+        $category->parent_category = !empty($inputData['parent_category']) ? $inputData['category'] : null;
+        $category->type = $inputData['type'];
+        $category->description = $inputData['description'];
+        if ($category->save()) {
+            if (!empty($inputData['parent_category'])) {
+                $parentCategory = Category::select('category_hericy')->where('id', $inputData['parent_category'])->first();
+                $category_hericy = json_decode($parentCategory['category_hericy']);
+                array_push($category_hericy, $category->category);
+                $category_hericy = json_decode($category_hericy);
+            } else {
+                $category_hericy = json_encode([$category->category]);
+            }
+            $category->category_hericy = $category_hericy;
+            $category->save();
+            return response()->json(['status' => 200, 'msg' => 'Successfully save category']);
+        }
     }
 }
