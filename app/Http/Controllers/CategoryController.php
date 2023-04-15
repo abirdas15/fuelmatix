@@ -75,7 +75,7 @@ class CategoryController extends Controller
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
-        $result = Category::select('id', 'category', 'code', 'parent_category', 'type')
+        $result = Category::select('id', 'category', 'code', 'parent_category', 'type', 'description')
             ->where('id', $inputData['id'])
             ->first();
         return response()->json(['status' => 200, 'data' => $result]);

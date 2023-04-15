@@ -2,7 +2,7 @@ body {
     position: relative;
 }
 
-.popup-wrapper {
+.popup-wrapper-modal {
     position: fixed;
     top: 0;
     left: 0;
@@ -12,10 +12,10 @@ body {
     height: 100vh;
     z-index: 99;
     width: 100vw;
-    background: rgb(0 0 0 / 70%);
+    background: rgb(0 0 0 / 15%);
 }
 
-.popup-wrapper .popup-box {
+.popup-wrapper-modal .popup-box {
     padding: 30px 20px;
     padding-top: 10px;
     background: #fff;
@@ -46,13 +46,13 @@ body {
     column-gap: 20px;
 }
 
-.popup-wrapper input[type="text"],
-.popup-wrapper input[type="number"],
-.popup-wrapper input[type="password"],
-.popup-wrapper input[type="email"] {
+.popup-wrapper-modal input[type="text"],
+.popup-wrapper-modal input[type="number"],
+.popup-wrapper-modal input[type="password"],
+.popup-wrapper-modal input[type="email"] {
     background-color: #5e7a2315;
 }
 
-.popup-wrapper input[type="text"]:hover {
+.popup-wrapper-modal input[type="text"]:hover {
     background-color: #5e7a2315;
 }

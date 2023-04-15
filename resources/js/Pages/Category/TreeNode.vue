@@ -4,14 +4,14 @@
             <div class="popup">
                 <ul style="padding: 0">
                     <li><a href="#">Open Account</a></li>
-                    <li><a href="#">Edit Account</a></li>
-                    <li><a href="javascript:void(0)" @click="openCategoryModal(node.id)">New account</a></li>
-                    <li><a href="#">Delete account</a></li>
+                    <li><a href="javascript:void(0)" @click="openCategoryModalEdit()">Edit Account</a></li>
+                    <li><a href="javascript:void(0)" @click="openCategoryModal()">New account</a></li>
+                    <li><a href="javascript:void(0)" @click="openCategoryModal()">Delete account</a></li>
                 </ul>
             </div>
         </div>
         <li>
-            <a href="#" @contextmenu="rightClick($event)" class="accordion-btn">
+            <a href="#" @dblclick="openTransaction(node)" @contextmenu="rightClick($event, node.id)" class="accordion-btn">
                 <span>
                     <img src="images/arrow-svg.svg" alt="" v-if="node.children.length > 0"/>
                     {{ node.category }}
@@ -31,9 +31,14 @@ import TreeNode from "./TreeNode";
 import ApiService from "../../Services/ApiService";
 import ApiRoutes from "../../Services/ApiRoutes";
 export default {
-    props: ['node'],
+    props: ['node', 'parentCategory'],
     name: "TreeNode",
     components: {TreeNode},
+    data() {
+        return {
+            parent_id: ''
+        }
+    },
     mounted() {
         const accordion = document.querySelector(".accordion");
         const accordionBtn = document.querySelectorAll(".accordion-btn");
@@ -52,12 +57,6 @@ export default {
             }
         });
 
-
-        // hide pup function
-        const hidePopup = (e) => {
-
-        };
-
         // hide the popup when user clicks outside the popup box
         window.addEventListener('click',  (e) => {
             this.hidePopup(e);
@@ -72,11 +71,24 @@ export default {
         })
     },
     methods: {
-        openCategoryModal: function (parent_id) {
-            $(".categoryModal").removeClass('d-none');
+        openTransaction: function (category) {
+            this.$router.push({
+                name: 'Transaction',
+                params: {
+                    id: category.id,
+                    name: category.category,
+                }
+            })
         },
-        rightClick: function (e) {
+        openCategoryModal: function () {
+            this.$parent.openCategoryModal()
+        },
+        openCategoryModalEdit: function () {
+            this.$parent.openCategoryEditModal()
+        },
+        rightClick: function (e, id) {
             e.preventDefault();
+            this.$store.commit('PutParentCategory', id);
             this.showPopup(e);
         },
         showPopup: function (evt) {
@@ -91,7 +103,11 @@ export default {
                 }
             }
         },
+
     },
+    created() {
+
+    }
 }
 </script>
 
