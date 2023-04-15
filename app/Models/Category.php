@@ -23,6 +23,16 @@ class Category extends Model
     {
         return $this->grandchildren()->select('id', 'parent_category', 'category', 'balance', 'description')->with('children');
     }
+
+    public function grandparent()
+    {
+        return $this->belongsTo(self::class, 'parent_category');
+    }
+    public function parent()
+    {
+        return $this->grandparent()->with('parent');
+    }
+
     public function getBalanceFormatAttribute()
     {
         if ($this->balance != null) {
