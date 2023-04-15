@@ -330,3 +330,30 @@ h1 {
     height: auto!important;
     border: 0.0625rem solid #898989!important;
 }
+.router-link-exact-active {
+    font-weight: 600;
+    background: var(--rgba-primary-1);
+    border-bottom-right-radius: 5rem;
+    border-top-right-radius: 0.9rem;
+    color: var(--primary) !important;
+}
+.router-link-exact-active i {
+    color: var(--primary) !important;
+}
+.router-link-exact-active:before{
+    width: 0.563rem!important;
+    position: absolute;
+    content: "";
+    background: var(--primary);
+    height: 100%;
+    top: 0;
+    left: 0rem;
+    border-top-right-radius: 3.563rem;
+    border-bottom-right-radius: 3.563rem;
+    -webkit-transition: all 0.5s;
+    -ms-transition: all 0.5s;
+    transition: all 0.5s;
+}
+.cursor-pointer{
+    cursor: pointer;
+}

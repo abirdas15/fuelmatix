@@ -9,6 +9,7 @@ import Layout from "../Pages/Layout/Layout.vue";
 import Login from "../Pages/Auth/Login";
 import Dashboard from "../Pages/Dashboard/Dashboard.vue";
 import Category from "../Pages/Category/Category.vue";
+import Transaction from "../Pages/Transaction/Transaction.vue";
 
 const ROOT_URL = "";
 const router = new VueRouter({
@@ -25,6 +26,7 @@ const router = new VueRouter({
             children: [
                 { path: ROOT_URL + "/dashboard", name: "Dashboard", component: Dashboard},
                 { path: ROOT_URL + "/accounts", name: "Accounts", component: Category},
+                { path: ROOT_URL + "/transaction", name: "Transaction", component: Transaction},
             ],
         },
     ],

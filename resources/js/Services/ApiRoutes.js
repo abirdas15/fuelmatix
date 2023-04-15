@@ -10,6 +10,8 @@ const ApiRoutes = {
     CategoryList: ApiVersion + '/category/list',
     CategoryParent: ApiVersion + '/category/parent',
     CategorySave: ApiVersion + '/category/save',
+    CategorySingle: ApiVersion + '/category/single',
+    CategoryUpdate: ApiVersion + '/category/update',
 
 };
 

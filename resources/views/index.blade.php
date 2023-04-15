@@ -20,6 +20,7 @@
     <link href="{{ asset('vendor/jquery-nice-select/css/nice-select.css') }}" rel="stylesheet" />
     <link href="{{ asset('vendor/owl-carousel/owl.carousel.css') }}" rel="stylesheet" />
     <link rel="stylesheet" href="./vendor/nouislider/nouislider.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 
     <!-- Style css -->
 
@@ -61,6 +62,7 @@
 
 <script src="{{ asset('js/custom.js') }}"></script>
 <script src="{{ asset('js/dlabnav-init.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <!--==============pi chart cdn link up===========-->
 <script src="{{ asset('js/plugins-init/chartjs-init.js') }}"></script>
 </body>

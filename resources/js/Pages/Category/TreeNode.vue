@@ -4,14 +4,14 @@
             <div class="popup">
                 <ul style="padding: 0">
                     <li><a href="#">Open Account</a></li>
-                    <li><a href="#">Edit Account</a></li>
-                    <li><a href="javascript:void(0)" @click="openCategoryModal(node.id)">New account</a></li>
-                    <li><a href="#">Delete account</a></li>
+                    <li><a href="javascript:void(0)" @click="openCategoryModalEdit()">Edit Account</a></li>
+                    <li><a href="javascript:void(0)" @click="openCategoryModal()">New account</a></li>
+                    <li><a href="javascript:void(0)" @click="openCategoryModal()">Delete account</a></li>
                 </ul>
             </div>
         </div>
         <li>
-            <a href="#" @contextmenu="rightClick($event, node.id)" class="accordion-btn">
+            <a href="#" @dblclick="openTransaction(node)" @contextmenu="rightClick($event, node.id)" class="accordion-btn">
                 <span>
                     <img src="images/arrow-svg.svg" alt="" v-if="node.children.length > 0"/>
                     {{ node.category }}
@@ -71,8 +71,20 @@ export default {
         })
     },
     methods: {
+        openTransaction: function (category) {
+            this.$router.push({
+                name: 'Transaction',
+                params: {
+                    id: category.id,
+                    name: category.category,
+                }
+            })
+        },
         openCategoryModal: function () {
             this.$parent.openCategoryModal()
+        },
+        openCategoryModalEdit: function () {
+            this.$parent.openCategoryEditModal()
         },
         rightClick: function (e, id) {
             e.preventDefault();
