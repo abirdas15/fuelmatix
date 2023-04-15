@@ -26,7 +26,7 @@ class CategoryController extends Controller
             ->toArray();
         foreach ($result as &$data) {
             $category = json_decode($data['category_hericy']);
-            $data['category'] = implode(':', $category);
+            $data['category'] = implode('-->', $category);
             unset($data['category_hericy']);
         }
         usort($result, function ($item1, $item2) {
@@ -47,16 +47,16 @@ class CategoryController extends Controller
         }
         $category = new Category();
         $category->category = $inputData['category'];
-        $category->code = $inputData['code'];
-        $category->parent_category = !empty($inputData['parent_category']) ? $inputData['category'] : null;
+        $category->code = $inputData['code'] ?? null;
+        $category->parent_category = !empty($inputData['parent_category']) ? $inputData['parent_category'] : null;
         $category->type = $inputData['type'];
-        $category->description = $inputData['description'];
+        $category->description = $inputData['description'] ?? null;
         if ($category->save()) {
             if (!empty($inputData['parent_category'])) {
                 $parentCategory = Category::select('category_hericy')->where('id', $inputData['parent_category'])->first();
                 $category_hericy = json_decode($parentCategory['category_hericy']);
                 array_push($category_hericy, $category->category);
-                $category_hericy = json_decode($category_hericy);
+                $category_hericy = json_encode($category_hericy);
             } else {
                 $category_hericy = json_encode([$category->category]);
             }
@@ -64,5 +64,6 @@ class CategoryController extends Controller
             $category->save();
             return response()->json(['status' => 200, 'msg' => 'Successfully save category']);
         }
+        return response()->json(['status' => 200, 'msg' => 'Can not save category']);
     }
 }
