@@ -167,6 +167,7 @@ export default {
                     this.$toast.success(res.msg);
                     this.closeModal()
                     this.getCategory()
+                    this.getParentCategory()
                     this.accountParam = {
                         category: '',
                         code: '',
@@ -187,6 +188,7 @@ export default {
                     this.$toast.success(res.msg);
                     this.closeModal()
                     this.getCategory()
+                    this.getParentCategory()
                 } else {
                     ApiService.ErrorHandler(res.errors);
                 }

@@ -357,3 +357,12 @@ h1 {
 .cursor-pointer{
     cursor: pointer;
 }
+.bg-transparent-input{
+    background: transparent!important;
+    height: 2.5rem!important;
+    padding: 10px!important;
+}
+.bg-transparent-input:focus{
+     border-color: transparent;
+     border: none!important;
+ }

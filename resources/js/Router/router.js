@@ -26,7 +26,7 @@ const router = new VueRouter({
             children: [
                 { path: ROOT_URL + "/dashboard", name: "Dashboard", component: Dashboard},
                 { path: ROOT_URL + "/accounts", name: "Accounts", component: Category},
-                { path: ROOT_URL + "/transaction", name: "Transaction", component: Transaction},
+                { path: ROOT_URL + "/transaction/:id", name: "Transaction", component: Transaction},
             ],
         },
     ],

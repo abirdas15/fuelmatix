@@ -36,7 +36,7 @@ export default {
     components: {TreeNode},
     data() {
         return {
-            parent_id: ''
+            parent_id: '',
         }
     },
     mounted() {
@@ -74,10 +74,7 @@ export default {
         openTransaction: function (category) {
             this.$router.push({
                 name: 'Transaction',
-                params: {
-                    id: category.id,
-                    name: category.category,
-                }
+                params: {id: category.id}
             })
         },
         openCategoryModal: function () {
