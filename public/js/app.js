@@ -4673,32 +4673,11 @@ var render = function render() {
     staticClass: "fas fa-home me-0 icon-style"
   }), _vm._v(" "), _c("p", {
     staticClass: "nav-text"
-  }, [_vm._v("Dashboard")])])], 1), _vm._v(" "), _vm._m(0), _vm._v(" "), _vm._m(1), _vm._v(" "), _vm._m(2), _vm._v(" "), _vm._m(3), _vm._v(" "), _vm._m(4), _vm._v(" "), _vm._m(5), _vm._v(" "), _vm._m(6), _vm._v(" "), _vm._m(7), _vm._v(" "), _vm._m(8), _vm._v(" "), _vm._m(9), _vm._v(" "), _vm._m(10), _vm._v(" "), _vm._m(11), _vm._v(" "), _vm._m(12), _vm._v(" "), _c("li", {
+  }, [_vm._v("Dashboard")])])], 1), _vm._v(" "), _c("li", {
     staticStyle: {
       "text-align": "center"
     }
   }, [_c("router-link", {
-    staticClass: "sidemenu-item px-4",
-    attrs: {
-      to: {
-        name: "Accounts"
-      },
-      "aria-expanded": "false"
-    }
-  }, [_c("i", {
-    staticClass: "fas fa-money icon-style"
-  }), _vm._v(" "), _c("span", {
-    staticClass: "nav-text"
-  }, [_vm._v("Accounting")])])], 1)])])]);
-};
-var staticRenderFns = [function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("li", {
-    staticStyle: {
-      "text-align": "center"
-    }
-  }, [_c("a", {
     staticClass: "has-arrow sidemenu-item px-4",
     attrs: {
       href: "javascript:void(0)",
@@ -4715,45 +4694,41 @@ var staticRenderFns = [function () {
     attrs: {
       "aria-expanded": "false"
     }
-  }, [_c("li", [_c("a", {
+  }, [_c("li", [_c("router-link", {
     staticClass: "sudo-ele-none px-4 font-w500",
     attrs: {
       href: "./shiftSaleStart.html"
     }
-  }, [_vm._v("Shift Sale")])]), _vm._v(" "), _c("li", [_c("a", {
+  }, [_vm._v("Shift Sale")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
     staticClass: "sudo-ele-none px-4 font-w500",
     attrs: {
       href: "./sale.html"
     }
-  }, [_vm._v("Sale")])]), _vm._v(" "), _c("li", [_c("a", {
+  }, [_vm._v("Sale")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
     staticClass: "sudo-ele-none px-4 font-w500",
     attrs: {
       href: "./salesHistroy.html"
     }
-  }, [_vm._v("Sale Histroy")])]), _vm._v(" "), _c("li", [_c("a", {
+  }, [_vm._v("Sale Histroy")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
     staticClass: "sudo-ele-none px-4 font-w500",
     attrs: {
       href: "./#"
     }
-  }, [_vm._v("Item Sale")])]), _vm._v(" "), _c("li", [_c("a", {
+  }, [_vm._v("Item Sale")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
     staticClass: "sudo-ele-none px-4 font-w500",
     attrs: {
       href: "./#"
     }
-  }, [_vm._v("Bill")])]), _vm._v(" "), _c("li", [_c("a", {
+  }, [_vm._v("Bill")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
     staticClass: "sudo-ele-none px-4 font-w500",
     attrs: {
       href: "./creditSaleDetailEntry.html"
     }
-  }, [_vm._v("Credit Sale\n                            Detail Entry")])])])]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("li", {
+  }, [_vm._v("Credit Sale\n                            Detail Entry")])], 1)])], 1), _vm._v(" "), _c("li", {
     staticStyle: {
       "text-align": "center"
     }
-  }, [_c("a", {
+  }, [_c("router-link", {
     staticClass: "has-arrow sidemenu-item px-4",
     attrs: {
       href: "javascript:void(0)",
@@ -4770,50 +4745,46 @@ var staticRenderFns = [function () {
     attrs: {
       "aria-expanded": "false"
     }
-  }, [_c("li", [_c("a", {
+  }, [_c("li", [_c("router-link", {
     staticClass: "sudo-ele-none px-4 font-w500",
     attrs: {
       href: "./tankRefill.html"
     }
-  }, [_vm._v("Refill")])]), _vm._v(" "), _c("li", [_c("a", {
+  }, [_vm._v("Refill")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
     staticClass: "sudo-ele-none px-4 font-w500",
     attrs: {
       href: "./tankRefillHistory.html"
     }
-  }, [_vm._v("Tank Refill\n                            History")])]), _vm._v(" "), _c("li", [_c("a", {
+  }, [_vm._v("Tank Refill\n                            History")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
     staticClass: "sudo-ele-none px-4 font-w500",
     attrs: {
       href: "./fuelRefillVoucher.html"
     }
-  }, [_vm._v("Fuel Refill\n                            Voucher")])]), _vm._v(" "), _c("li", [_c("a", {
+  }, [_vm._v("Fuel Refill\n                            Voucher")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
     staticClass: "sudo-ele-none px-4 font-w500",
     attrs: {
       href: "./refillHistroyDetails.html"
     }
-  }, [_vm._v("Refill Histroy\n                            Details")])]), _vm._v(" "), _c("li", [_c("a", {
+  }, [_vm._v("Refill Histroy\n                            Details")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
     staticClass: "sudo-ele-none px-4 font-w500",
     attrs: {
       href: "./nozzleReading.html"
     }
-  }, [_vm._v("Nozzle Reading")])]), _vm._v(" "), _c("li", [_c("a", {
+  }, [_vm._v("Nozzle Reading")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
     staticClass: "sudo-ele-none px-4 font-w500",
     attrs: {
       href: "./tankReading.html"
     }
-  }, [_vm._v("Tank Reading")])]), _vm._v(" "), _c("li", [_c("a", {
+  }, [_vm._v("Tank Reading")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
     staticClass: "sudo-ele-none px-4 font-w500",
     attrs: {
       href: "./tankReadingHistory.html"
     }
-  }, [_vm._v("Tank Reading\n                            History")])])])]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("li", {
+  }, [_vm._v("Tank Reading\n                            History")])], 1)])], 1), _vm._v(" "), _c("li", {
     staticStyle: {
       "text-align": "center"
     }
-  }, [_c("a", {
+  }, [_c("router-link", {
     staticClass: "has-arrow sidemenu-item px-4",
     attrs: {
       href: "javascript:void()",
@@ -4827,20 +4798,16 @@ var staticRenderFns = [function () {
     attrs: {
       "aria-expanded": "false"
     }
-  }, [_c("li", [_c("a", {
+  }, [_c("li", [_c("router-link", {
     staticClass: "sudo-ele-none px-4 font-w500",
     attrs: {
       href: "./#"
     }
-  }, [_vm._v("Vendors")])])])]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("li", {
+  }, [_vm._v("Vendors")])], 1)])], 1), _vm._v(" "), _c("li", {
     staticStyle: {
       "text-align": "center"
     }
-  }, [_c("a", {
+  }, [_c("router-link", {
     staticClass: "has-arrow sidemenu-item px-4",
     attrs: {
       href: "javascript:void()",
@@ -4854,35 +4821,31 @@ var staticRenderFns = [function () {
     attrs: {
       "aria-expanded": "false"
     }
-  }, [_c("li", [_c("a", {
+  }, [_c("li", [_c("router-link", {
     staticClass: "sudo-ele-none px-4 font-w500",
     attrs: {
       href: "./#"
     }
-  }, [_vm._v("Bnaks ")])]), _vm._v(" "), _c("li", [_c("a", {
+  }, [_vm._v("Bnaks ")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
     staticClass: "sudo-ele-none px-4 font-w500",
     attrs: {
       href: "./#"
     }
-  }, [_vm._v("Personal Accounts")])]), _vm._v(" "), _c("li", [_c("a", {
+  }, [_vm._v("Personal Accounts")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
     staticClass: "sudo-ele-none px-4 font-w500",
     attrs: {
       href: "./#"
     }
-  }, [_vm._v("Transfer")])]), _vm._v(" "), _c("li", [_c("a", {
+  }, [_vm._v("Transfer")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
     staticClass: "sudo-ele-none px-4 font-w500",
     attrs: {
       href: "./#"
     }
-  }, [_vm._v("Transaction")])])])]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("li", {
+  }, [_vm._v("Transaction")])], 1)])], 1), _vm._v(" "), _c("li", {
     staticStyle: {
       "text-align": "center"
     }
-  }, [_c("a", {
+  }, [_c("router-link", {
     staticClass: "has-arrow sidemenu-item px-4",
     attrs: {
       href: "javascript:void()",
@@ -4896,50 +4859,46 @@ var staticRenderFns = [function () {
     attrs: {
       "aria-expanded": "false"
     }
-  }, [_c("li", [_c("a", {
+  }, [_c("li", [_c("router-link", {
     staticClass: "sudo-ele-none px-4 font-w500",
     attrs: {
       href: "./Field1.html"
     }
-  }, [_vm._v("Field-1")])]), _vm._v(" "), _c("li", [_c("a", {
+  }, [_vm._v("Field-1")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
     staticClass: "sudo-ele-none px-4 font-w500",
     attrs: {
       href: "./Field217.html"
     }
-  }, [_vm._v("Field-217")])]), _vm._v(" "), _c("li", [_c("a", {
+  }, [_vm._v("Field-217")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
     staticClass: "sudo-ele-none px-4 font-w500",
     attrs: {
       href: "./card.html"
     }
-  }, [_vm._v("Shopping caed")])]), _vm._v(" "), _c("li", [_c("a", {
+  }, [_vm._v("Shopping caed")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
     staticClass: "sudo-ele-none px-4 font-w500",
     attrs: {
       href: "./cashierBalance.html"
     }
-  }, [_vm._v("Cashier balance")])]), _vm._v(" "), _c("li", [_c("a", {
+  }, [_vm._v("Cashier balance")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
     staticClass: "sudo-ele-none px-4 font-w500",
     attrs: {
       href: "./reading.html"
     }
-  }, [_vm._v("Reading")])]), _vm._v(" "), _c("li", [_c("a", {
+  }, [_vm._v("Reading")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
     staticClass: "sudo-ele-none px-4 font-w500",
     attrs: {
       href: "./createHeads.html"
     }
-  }, [_vm._v("Create Heads")])]), _vm._v(" "), _c("li", [_c("a", {
+  }, [_vm._v("Create Heads")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
     staticClass: "sudo-ele-none px-4 font-w500",
     attrs: {
       href: "./#"
     }
-  }, [_vm._v("Transaction")])])])]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("li", {
+  }, [_vm._v("Transaction")])], 1)])], 1), _vm._v(" "), _c("li", {
     staticStyle: {
       "text-align": "center"
     }
-  }, [_c("a", {
+  }, [_c("router-link", {
     staticClass: "has-arrow sidemenu-item px-4",
     attrs: {
       href: "javascript:void()",
@@ -4953,35 +4912,31 @@ var staticRenderFns = [function () {
     attrs: {
       "aria-expanded": "false"
     }
-  }, [_c("li", [_c("a", {
+  }, [_c("li", [_c("router-link", {
     staticClass: "sudo-ele-none px-4 font-w500",
     attrs: {
       href: "./expense.html"
     }
-  }, [_vm._v("Expense")])]), _vm._v(" "), _c("li", [_c("a", {
+  }, [_vm._v("Expense")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
     staticClass: "sudo-ele-none px-4 font-w500",
     attrs: {
       href: "./#"
     }
-  }, [_vm._v("Salary Expense")])]), _vm._v(" "), _c("li", [_c("a", {
+  }, [_vm._v("Salary Expense")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
     staticClass: "sudo-ele-none px-4 font-w500",
     attrs: {
       href: "./#"
     }
-  }, [_vm._v("Machine Expense")])]), _vm._v(" "), _c("li", [_c("a", {
+  }, [_vm._v("Machine Expense")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
     staticClass: "sudo-ele-none px-4 font-w500",
     attrs: {
       href: "./#"
     }
-  }, [_vm._v("Mics Expense")])])])]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("li", {
+  }, [_vm._v("Mics Expense")])], 1)])], 1), _vm._v(" "), _c("li", {
     staticStyle: {
       "text-align": "center"
     }
-  }, [_c("a", {
+  }, [_c("router-link", {
     staticClass: "sidemenu-item px-4",
     attrs: {
       href: "#",
@@ -4991,15 +4946,11 @@ var staticRenderFns = [function () {
     staticClass: "fas fa-phone icon-style me-0"
   }), _vm._v(" "), _c("span", {
     staticClass: "nav-text"
-  }, [_vm._v("Vendors")])])]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("li", {
+  }, [_vm._v("Vendors")])])], 1), _vm._v(" "), _c("li", {
     staticStyle: {
       "text-align": "center"
     }
-  }, [_c("a", {
+  }, [_c("router-link", {
     staticClass: "sidemenu-item px-4",
     attrs: {
       href: "#",
@@ -5009,15 +4960,11 @@ var staticRenderFns = [function () {
     staticClass: "fa-solid fa-user icon-style me-0"
   }), _vm._v(" "), _c("span", {
     staticClass: "nav-text"
-  }, [_vm._v("Human")])])]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("li", {
+  }, [_vm._v("Human")])])], 1), _vm._v(" "), _c("li", {
     staticStyle: {
       "text-align": "center"
     }
-  }, [_c("a", {
+  }, [_c("router-link", {
     staticClass: "sidemenu-item px-4",
     attrs: {
       href: "#",
@@ -5027,15 +4974,11 @@ var staticRenderFns = [function () {
     staticClass: "fa-solid fa-users icon-style me-0"
   }), _vm._v(" "), _c("span", {
     staticClass: "nav-text"
-  }, [_vm._v("Customers")])])]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("li", {
+  }, [_vm._v("Customers")])])], 1), _vm._v(" "), _c("li", {
     staticStyle: {
       "text-align": "center"
     }
-  }, [_c("a", {
+  }, [_c("router-link", {
     staticClass: "has-arrow sidemenu-item px-4",
     attrs: {
       href: "javascript:void()",
@@ -5049,45 +4992,41 @@ var staticRenderFns = [function () {
     attrs: {
       "aria-expanded": "false"
     }
-  }, [_c("li", [_c("a", {
+  }, [_c("li", [_c("router-link", {
     staticClass: "sudo-ele-none px-4 font-w500",
     attrs: {
       href: "./tank&NozzleSetup.html"
     }
-  }, [_vm._v("Pump & Nozzle\n                            Setup")])]), _vm._v(" "), _c("li", [_c("a", {
+  }, [_vm._v("Pump & Nozzle\n                            Setup")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
     staticClass: "sudo-ele-none px-4 font-w500",
     attrs: {
       href: "./tank.html"
     }
-  }, [_vm._v("Tank Setup")])]), _vm._v(" "), _c("li", [_c("a", {
+  }, [_vm._v("Tank Setup")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
     staticClass: "sudo-ele-none px-4 font-w500",
     attrs: {
       href: "./creditCompanySetup.html"
     }
-  }, [_vm._v("Credit Company\n                            Setup ")])]), _vm._v(" "), _c("li", [_c("a", {
+  }, [_vm._v("Credit Company\n                            Setup ")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
     staticClass: "sudo-ele-none px-4 font-w500",
     attrs: {
       href: "./posSetup.html"
     }
-  }, [_vm._v("Pos Setup")])]), _vm._v(" "), _c("li", [_c("a", {
+  }, [_vm._v("Pos Setup")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
     staticClass: "sudo-ele-none px-4 font-w500",
     attrs: {
       href: "./#"
     }
-  }, [_vm._v("Products")])]), _vm._v(" "), _c("li", [_c("a", {
+  }, [_vm._v("Products")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
     staticClass: "sudo-ele-none px-4 font-w500",
     attrs: {
       href: "./#"
     }
-  }, [_vm._v("Sekkubg Price")])])])]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("li", {
+  }, [_vm._v("Sekkubg Price")])], 1)])], 1), _vm._v(" "), _c("li", {
     staticStyle: {
       "text-align": "center"
     }
-  }, [_c("a", {
+  }, [_c("router-link", {
     staticClass: "has-arrow sidemenu-item px-4",
     attrs: {
       href: "javascript:void()",
@@ -5101,40 +5040,36 @@ var staticRenderFns = [function () {
     attrs: {
       "aria-expanded": "false"
     }
-  }, [_c("li", [_c("a", {
+  }, [_c("li", [_c("router-link", {
     staticClass: "sudo-ele-none px-4 font-w500",
     attrs: {
       href: "./#"
     }
-  }, [_vm._v("General")])]), _vm._v(" "), _c("li", [_c("a", {
+  }, [_vm._v("General")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
     staticClass: "sudo-ele-none px-4 font-w500",
     attrs: {
       href: "./#"
     }
-  }, [_vm._v("Income Statement")])]), _vm._v(" "), _c("li", [_c("a", {
+  }, [_vm._v("Income Statement")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
     staticClass: "sudo-ele-none px-4 font-w500",
     attrs: {
       href: "./#"
     }
-  }, [_vm._v("Porfit & Loss")])]), _vm._v(" "), _c("li", [_c("a", {
+  }, [_vm._v("Porfit & Loss")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
     staticClass: "sudo-ele-none px-4 font-w500",
     attrs: {
       href: "./#"
     }
-  }, [_vm._v("A/C Receivable")])]), _vm._v(" "), _c("li", [_c("a", {
+  }, [_vm._v("A/C Receivable")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
     staticClass: "sudo-ele-none px-4 font-w500",
     attrs: {
       href: "./#"
     }
-  }, [_vm._v("A/C Payable")])])])]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("li", {
+  }, [_vm._v("A/C Payable")])], 1)])], 1), _vm._v(" "), _c("li", {
     staticStyle: {
       "text-align": "center"
     }
-  }, [_c("a", {
+  }, [_c("router-link", {
     staticClass: "sidemenu-item px-4",
     attrs: {
       href: "salesReport.html",
@@ -5144,15 +5079,11 @@ var staticRenderFns = [function () {
     staticClass: "fas fa-user-cog icon-style me-0"
   }), _vm._v(" "), _c("span", {
     staticClass: "nav-text"
-  }, [_vm._v("Sale Report")])])]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("li", {
+  }, [_vm._v("Sale Report")])])], 1), _vm._v(" "), _c("li", {
     staticStyle: {
       "text-align": "center"
     }
-  }, [_c("a", {
+  }, [_c("router-link", {
     staticClass: "sidemenu-item px-4",
     attrs: {
       href: "#",
@@ -5162,8 +5093,25 @@ var staticRenderFns = [function () {
     staticClass: "fas fa-user-cog icon-style"
   }), _vm._v(" "), _c("span", {
     staticClass: "nav-text"
-  }, [_vm._v("consumption Report")])])]);
-}];
+  }, [_vm._v("consumption Report")])])], 1), _vm._v(" "), _c("li", {
+    staticStyle: {
+      "text-align": "center"
+    }
+  }, [_c("router-link", {
+    staticClass: "sidemenu-item px-4",
+    attrs: {
+      to: {
+        name: "Accounts"
+      },
+      "aria-expanded": "false"
+    }
+  }, [_c("i", {
+    staticClass: "fa-solid fa-dollar-sign icon-style"
+  }), _vm._v(" "), _c("span", {
+    staticClass: "nav-text"
+  }, [_vm._v("Accounting")])])], 1)])])]);
+};
+var staticRenderFns = [];
 render._withStripped = true;
 
 
