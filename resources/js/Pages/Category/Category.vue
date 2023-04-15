@@ -7,7 +7,7 @@
                     <h4>Description</h4>
                     <h4>Total</h4>
                 </li>
-                <TreeNode v-for="category in categories" :key="category.id" :node="category" />
+                <TreeNode v-for="category in categories" :key="category.id" :node="category" :parentCategory="parentCategory"/>
             </ul>
         </div>
     </div>
@@ -23,7 +23,8 @@ export default {
     data() {
         return {
             popup: null,
-            categories: []
+            categories: [],
+            parentCategory: []
         }
     },
     methods: {
@@ -34,9 +35,17 @@ export default {
                 }
             });
         },
+        getParentCategory: function () {
+            ApiService.POST(ApiRoutes.CategoryParent, {}, res => {
+                if (parseInt(res.status) === 200) {
+                    this.parentCategory = res.data;
+                }
+            });
+        },
     },
     created() {
         this.getAccountsHead()
+        this.getParentCategory()
     },
 
     destroyed() {

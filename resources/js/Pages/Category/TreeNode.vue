@@ -29,29 +29,29 @@
                 <div class="row">
                     <div class="col-sm-12">
                         <label >Account Name</label>
-                        <input type="text" class="form-control-sm" name="category" v-model="accountParam.category">
+                        <input type="text" class="form-control sm-control bg-white" name="category" v-model="accountParam.category">
                         <div class="invalid-feedback"></div>
                     </div>
                     <div class="col-sm-12">
                         <label >Account Code</label>
-                        <input type="text" class="form-control-sm" name="code" v-model="accountParam.code">
+                        <input type="text" class="form-control sm-control bg-white" name="code" v-model="accountParam.code">
                         <div class="invalid-feedback"></div>
                     </div>
                     <div class="col-sm-12">
                         <label >Account Description</label>
-                        <textarea name="description" class="form-control" cols="30" rows="10" v-model="accountParam.description"></textarea>
+                        <textarea name="description" class="form-control sm-area bg-white" cols="30" rows="10" v-model="accountParam.description"></textarea>
                         <div class="invalid-feedback"></div>
                     </div>
                     <div class="col-sm-12">
                         <label >Parent Account</label>
-                        <select class="form-control-sm" name="parent_category"  v-model="accountParam.parent_category">
-
+                        <select class="form-control sm-control " name="parent_category"  v-model="accountParam.parent_category">
+                            <option v-for="category in parentCategory" :value="category.id">{{category.category}}</option>
                         </select>
                         <div class="invalid-feedback"></div>
                     </div>
                     <div class="col-sm-12">
                         <label >Account Type</label>
-                        <select class="form-control-sm" name="parent_category"  v-model="accountParam.type">
+                        <select class="form-control sm-control" name="parent_category"  v-model="accountParam.type">
                             <option value="assets">Assets</option>
                             <option value="equity">Equity</option>
                             <option value="liabilities">Liabilities</option>
@@ -73,7 +73,7 @@ import TreeNode from "./TreeNode";
 import ApiService from "../../Services/ApiService";
 import ApiRoutes from "../../Services/ApiRoutes";
 export default {
-    props: ['node'],
+    props: ['node', 'parentCategory'],
     name: "TreeNode",
     components: {TreeNode},
     data() {
@@ -86,13 +86,15 @@ export default {
                 parent_category: '',
                 type: '',
             },
-            parentCategory: []
         }
     },
     mounted() {
+        const accordion = document.querySelector(".accordion");
         const accordionBtn = document.querySelectorAll(".accordion-btn");
         this.popup = document.querySelector(".popup-wrapper");
+        const newAccount = document.getElementById('newAccount');
         const newAccForm = document.querySelector('.new-account-form-wrapper');
+        const cancelBtn = document.querySelector('.cancel-btn');
         const form = document.querySelector('form');
 
         // accourdion show and hide
@@ -103,12 +105,6 @@ export default {
                 e.classList.toggle('active');
             }
         });
-
-
-        // hide pup function
-        const hidePopup = (e) => {
-
-        };
 
         // hide the popup when user clicks outside the popup box
         window.addEventListener('click',  (e) => {
@@ -125,6 +121,8 @@ export default {
     },
     methods: {
         openCategoryModal: function (parent_id) {
+            console.log(parent_id)
+            this.accountParam.parent_category = parent_id
             $(".categoryModal").removeClass('d-none');
         },
         rightClick: function (e) {
@@ -146,16 +144,10 @@ export default {
         closeModal: function () {
             $(".categoryModal").addClass('d-none');
         },
-        getParentCategory: function () {
-            ApiService.POST(ApiRoutes.CategoryGet, {}, res => {
-                if (parseInt(res.status) === 200) {
-                    this.parentCategory = res.data;
-                }
-            });
-        },
+
     },
     created() {
-        this.getParentCategory()
+
     }
 }
 </script>

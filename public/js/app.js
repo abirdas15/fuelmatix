@@ -1979,7 +1979,8 @@ __webpack_require__.r(__webpack_exports__);
   data: function data() {
     return {
       popup: null,
-      categories: []
+      categories: [],
+      parentCategory: []
     };
   },
   methods: {
@@ -1990,10 +1991,19 @@ __webpack_require__.r(__webpack_exports__);
           _this.categories = res.data;
         }
       });
+    },
+    getParentCategory: function getParentCategory() {
+      var _this2 = this;
+      _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].CategoryParent, {}, function (res) {
+        if (parseInt(res.status) === 200) {
+          _this2.parentCategory = res.data;
+        }
+      });
     }
   },
   created: function created() {
     this.getAccountsHead();
+    this.getParentCategory();
   },
   destroyed: function destroyed() {}
 });
@@ -2016,7 +2026,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
-  props: ['node'],
+  props: ['node', 'parentCategory'],
   name: "TreeNode",
   components: {
     TreeNode: _TreeNode__WEBPACK_IMPORTED_MODULE_0__["default"]
@@ -2030,15 +2040,17 @@ __webpack_require__.r(__webpack_exports__);
         description: '',
         parent_category: '',
         type: ''
-      },
-      parentCategory: []
+      }
     };
   },
   mounted: function mounted() {
     var _this = this;
+    var accordion = document.querySelector(".accordion");
     var accordionBtn = document.querySelectorAll(".accordion-btn");
     this.popup = document.querySelector(".popup-wrapper");
+    var newAccount = document.getElementById('newAccount');
     var newAccForm = document.querySelector('.new-account-form-wrapper');
+    var cancelBtn = document.querySelector('.cancel-btn');
     var form = document.querySelector('form');
 
     // accourdion show and hide
@@ -2049,9 +2061,6 @@ __webpack_require__.r(__webpack_exports__);
         e.classList.toggle('active');
       };
     });
-
-    // hide pup function
-    var hidePopup = function hidePopup(e) {};
 
     // hide the popup when user clicks outside the popup box
     window.addEventListener('click', function (e) {
@@ -2068,6 +2077,8 @@ __webpack_require__.r(__webpack_exports__);
   },
   methods: {
     openCategoryModal: function openCategoryModal(parent_id) {
+      console.log(parent_id);
+      this.accountParam.parent_category = parent_id;
       $(".categoryModal").removeClass('d-none');
     },
     rightClick: function rightClick(e) {
@@ -2088,19 +2099,9 @@ __webpack_require__.r(__webpack_exports__);
     },
     closeModal: function closeModal() {
       $(".categoryModal").addClass('d-none');
-    },
-    getParentCategory: function getParentCategory() {
-      var _this2 = this;
-      _Services_ApiService__WEBPACK_IMPORTED_MODULE_1__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_2__["default"].CategoryGet, {}, function (res) {
-        if (parseInt(res.status) === 200) {
-          _this2.parentCategory = res.data;
-        }
-      });
     }
   },
-  created: function created() {
-    this.getParentCategory();
-  }
+  created: function created() {}
 });
 
 /***/ }),
@@ -2507,7 +2508,8 @@ var render = function render() {
     return _c("TreeNode", {
       key: category.id,
       attrs: {
-        node: category
+        node: category,
+        parentCategory: _vm.parentCategory
       }
     });
   })], 2)])]);
@@ -2611,7 +2613,7 @@ var render = function render() {
       value: _vm.accountParam.category,
       expression: "accountParam.category"
     }],
-    staticClass: "form-control-sm",
+    staticClass: "form-control sm-control bg-white",
     attrs: {
       type: "text",
       name: "category"
@@ -2636,7 +2638,7 @@ var render = function render() {
       value: _vm.accountParam.code,
       expression: "accountParam.code"
     }],
-    staticClass: "form-control-sm",
+    staticClass: "form-control sm-control bg-white",
     attrs: {
       type: "text",
       name: "code"
@@ -2661,7 +2663,7 @@ var render = function render() {
       value: _vm.accountParam.description,
       expression: "accountParam.description"
     }],
-    staticClass: "form-control",
+    staticClass: "form-control sm-area bg-white",
     attrs: {
       name: "description",
       cols: "30",
@@ -2687,7 +2689,7 @@ var render = function render() {
       value: _vm.accountParam.parent_category,
       expression: "accountParam.parent_category"
     }],
-    staticClass: "form-control-sm",
+    staticClass: "form-control sm-control",
     attrs: {
       name: "parent_category"
     },
@@ -2702,7 +2704,13 @@ var render = function render() {
         _vm.$set(_vm.accountParam, "parent_category", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
       }
     }
-  }), _vm._v(" "), _c("div", {
+  }, _vm._l(_vm.parentCategory, function (category) {
+    return _c("option", {
+      domProps: {
+        value: category.id
+      }
+    }, [_vm._v(_vm._s(category.category))]);
+  }), 0), _vm._v(" "), _c("div", {
     staticClass: "invalid-feedback"
   })]), _vm._v(" "), _c("div", {
     staticClass: "col-sm-12"
@@ -2713,7 +2721,7 @@ var render = function render() {
       value: _vm.accountParam.type,
       expression: "accountParam.type"
     }],
-    staticClass: "form-control-sm",
+    staticClass: "form-control sm-control",
     attrs: {
       name: "parent_category"
     },
@@ -4680,6 +4688,7 @@ var render = function render() {
   }, [_c("router-link", {
     staticClass: "has-arrow sidemenu-item px-4",
     attrs: {
+      to: {},
       href: "javascript:void(0)",
       "aria-expanded": "false"
     }
@@ -4697,31 +4706,37 @@ var render = function render() {
   }, [_c("li", [_c("router-link", {
     staticClass: "sudo-ele-none px-4 font-w500",
     attrs: {
+      to: {},
       href: "./shiftSaleStart.html"
     }
   }, [_vm._v("Shift Sale")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
     staticClass: "sudo-ele-none px-4 font-w500",
     attrs: {
+      to: {},
       href: "./sale.html"
     }
   }, [_vm._v("Sale")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
     staticClass: "sudo-ele-none px-4 font-w500",
     attrs: {
+      to: {},
       href: "./salesHistroy.html"
     }
   }, [_vm._v("Sale Histroy")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
     staticClass: "sudo-ele-none px-4 font-w500",
     attrs: {
+      to: {},
       href: "./#"
     }
   }, [_vm._v("Item Sale")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
     staticClass: "sudo-ele-none px-4 font-w500",
     attrs: {
+      to: {},
       href: "./#"
     }
   }, [_vm._v("Bill")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
     staticClass: "sudo-ele-none px-4 font-w500",
     attrs: {
+      to: {},
       href: "./creditSaleDetailEntry.html"
     }
   }, [_vm._v("Credit Sale\n                            Detail Entry")])], 1)])], 1), _vm._v(" "), _c("li", {
@@ -4731,6 +4746,7 @@ var render = function render() {
   }, [_c("router-link", {
     staticClass: "has-arrow sidemenu-item px-4",
     attrs: {
+      to: {},
       href: "javascript:void(0)",
       "aria-expanded": "false"
     }
@@ -4748,36 +4764,43 @@ var render = function render() {
   }, [_c("li", [_c("router-link", {
     staticClass: "sudo-ele-none px-4 font-w500",
     attrs: {
+      to: {},
       href: "./tankRefill.html"
     }
   }, [_vm._v("Refill")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
     staticClass: "sudo-ele-none px-4 font-w500",
     attrs: {
+      to: {},
       href: "./tankRefillHistory.html"
     }
   }, [_vm._v("Tank Refill\n                            History")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
     staticClass: "sudo-ele-none px-4 font-w500",
     attrs: {
+      to: {},
       href: "./fuelRefillVoucher.html"
     }
   }, [_vm._v("Fuel Refill\n                            Voucher")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
     staticClass: "sudo-ele-none px-4 font-w500",
     attrs: {
+      to: {},
       href: "./refillHistroyDetails.html"
     }
   }, [_vm._v("Refill Histroy\n                            Details")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
     staticClass: "sudo-ele-none px-4 font-w500",
     attrs: {
+      to: {},
       href: "./nozzleReading.html"
     }
   }, [_vm._v("Nozzle Reading")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
     staticClass: "sudo-ele-none px-4 font-w500",
     attrs: {
+      to: {},
       href: "./tankReading.html"
     }
   }, [_vm._v("Tank Reading")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
     staticClass: "sudo-ele-none px-4 font-w500",
     attrs: {
+      to: {},
       href: "./tankReadingHistory.html"
     }
   }, [_vm._v("Tank Reading\n                            History")])], 1)])], 1), _vm._v(" "), _c("li", {
@@ -4787,6 +4810,7 @@ var render = function render() {
   }, [_c("router-link", {
     staticClass: "has-arrow sidemenu-item px-4",
     attrs: {
+      to: {},
       href: "javascript:void()",
       "aria-expanded": "false"
     }
@@ -4801,6 +4825,7 @@ var render = function render() {
   }, [_c("li", [_c("router-link", {
     staticClass: "sudo-ele-none px-4 font-w500",
     attrs: {
+      to: {},
       href: "./#"
     }
   }, [_vm._v("Vendors")])], 1)])], 1), _vm._v(" "), _c("li", {
@@ -4810,6 +4835,7 @@ var render = function render() {
   }, [_c("router-link", {
     staticClass: "has-arrow sidemenu-item px-4",
     attrs: {
+      to: {},
       href: "javascript:void()",
       "aria-expanded": "false"
     }
@@ -4824,21 +4850,25 @@ var render = function render() {
   }, [_c("li", [_c("router-link", {
     staticClass: "sudo-ele-none px-4 font-w500",
     attrs: {
+      to: {},
       href: "./#"
     }
   }, [_vm._v("Bnaks ")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
     staticClass: "sudo-ele-none px-4 font-w500",
     attrs: {
+      to: {},
       href: "./#"
     }
   }, [_vm._v("Personal Accounts")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
     staticClass: "sudo-ele-none px-4 font-w500",
     attrs: {
+      to: {},
       href: "./#"
     }
   }, [_vm._v("Transfer")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
     staticClass: "sudo-ele-none px-4 font-w500",
     attrs: {
+      to: {},
       href: "./#"
     }
   }, [_vm._v("Transaction")])], 1)])], 1), _vm._v(" "), _c("li", {
@@ -4848,6 +4878,7 @@ var render = function render() {
   }, [_c("router-link", {
     staticClass: "has-arrow sidemenu-item px-4",
     attrs: {
+      to: {},
       href: "javascript:void()",
       "aria-expanded": "false"
     }
@@ -4862,36 +4893,43 @@ var render = function render() {
   }, [_c("li", [_c("router-link", {
     staticClass: "sudo-ele-none px-4 font-w500",
     attrs: {
+      to: {},
       href: "./Field1.html"
     }
   }, [_vm._v("Field-1")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
     staticClass: "sudo-ele-none px-4 font-w500",
     attrs: {
+      to: {},
       href: "./Field217.html"
     }
   }, [_vm._v("Field-217")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
     staticClass: "sudo-ele-none px-4 font-w500",
     attrs: {
+      to: {},
       href: "./card.html"
     }
   }, [_vm._v("Shopping caed")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
     staticClass: "sudo-ele-none px-4 font-w500",
     attrs: {
+      to: {},
       href: "./cashierBalance.html"
     }
   }, [_vm._v("Cashier balance")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
     staticClass: "sudo-ele-none px-4 font-w500",
     attrs: {
+      to: {},
       href: "./reading.html"
     }
   }, [_vm._v("Reading")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
     staticClass: "sudo-ele-none px-4 font-w500",
     attrs: {
+      to: {},
       href: "./createHeads.html"
     }
   }, [_vm._v("Create Heads")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
     staticClass: "sudo-ele-none px-4 font-w500",
     attrs: {
+      to: {},
       href: "./#"
     }
   }, [_vm._v("Transaction")])], 1)])], 1), _vm._v(" "), _c("li", {
@@ -4901,6 +4939,7 @@ var render = function render() {
   }, [_c("router-link", {
     staticClass: "has-arrow sidemenu-item px-4",
     attrs: {
+      to: {},
       href: "javascript:void()",
       "aria-expanded": "false"
     }
@@ -4915,21 +4954,25 @@ var render = function render() {
   }, [_c("li", [_c("router-link", {
     staticClass: "sudo-ele-none px-4 font-w500",
     attrs: {
+      to: {},
       href: "./expense.html"
     }
   }, [_vm._v("Expense")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
     staticClass: "sudo-ele-none px-4 font-w500",
     attrs: {
+      to: {},
       href: "./#"
     }
   }, [_vm._v("Salary Expense")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
     staticClass: "sudo-ele-none px-4 font-w500",
     attrs: {
+      to: {},
       href: "./#"
     }
   }, [_vm._v("Machine Expense")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
     staticClass: "sudo-ele-none px-4 font-w500",
     attrs: {
+      to: {},
       href: "./#"
     }
   }, [_vm._v("Mics Expense")])], 1)])], 1), _vm._v(" "), _c("li", {
@@ -4939,7 +4982,7 @@ var render = function render() {
   }, [_c("router-link", {
     staticClass: "sidemenu-item px-4",
     attrs: {
-      href: "#",
+      to: {},
       "aria-expanded": "false"
     }
   }, [_c("i", {
@@ -4953,7 +4996,7 @@ var render = function render() {
   }, [_c("router-link", {
     staticClass: "sidemenu-item px-4",
     attrs: {
-      href: "#",
+      to: {},
       "aria-expanded": "false"
     }
   }, [_c("i", {
@@ -4967,7 +5010,7 @@ var render = function render() {
   }, [_c("router-link", {
     staticClass: "sidemenu-item px-4",
     attrs: {
-      href: "#",
+      to: {},
       "aria-expanded": "false"
     }
   }, [_c("i", {
@@ -4981,6 +5024,7 @@ var render = function render() {
   }, [_c("router-link", {
     staticClass: "has-arrow sidemenu-item px-4",
     attrs: {
+      to: {},
       href: "javascript:void()",
       "aria-expanded": "false"
     }
@@ -4995,31 +5039,37 @@ var render = function render() {
   }, [_c("li", [_c("router-link", {
     staticClass: "sudo-ele-none px-4 font-w500",
     attrs: {
+      to: {},
       href: "./tank&NozzleSetup.html"
     }
   }, [_vm._v("Pump & Nozzle\n                            Setup")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
     staticClass: "sudo-ele-none px-4 font-w500",
     attrs: {
+      to: {},
       href: "./tank.html"
     }
   }, [_vm._v("Tank Setup")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
     staticClass: "sudo-ele-none px-4 font-w500",
     attrs: {
+      to: {},
       href: "./creditCompanySetup.html"
     }
   }, [_vm._v("Credit Company\n                            Setup ")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
     staticClass: "sudo-ele-none px-4 font-w500",
     attrs: {
+      to: {},
       href: "./posSetup.html"
     }
   }, [_vm._v("Pos Setup")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
     staticClass: "sudo-ele-none px-4 font-w500",
     attrs: {
+      to: {},
       href: "./#"
     }
   }, [_vm._v("Products")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
     staticClass: "sudo-ele-none px-4 font-w500",
     attrs: {
+      to: {},
       href: "./#"
     }
   }, [_vm._v("Sekkubg Price")])], 1)])], 1), _vm._v(" "), _c("li", {
@@ -5029,6 +5079,7 @@ var render = function render() {
   }, [_c("router-link", {
     staticClass: "has-arrow sidemenu-item px-4",
     attrs: {
+      to: {},
       href: "javascript:void()",
       "aria-expanded": "false"
     }
@@ -5043,26 +5094,31 @@ var render = function render() {
   }, [_c("li", [_c("router-link", {
     staticClass: "sudo-ele-none px-4 font-w500",
     attrs: {
+      to: {},
       href: "./#"
     }
   }, [_vm._v("General")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
     staticClass: "sudo-ele-none px-4 font-w500",
     attrs: {
+      to: {},
       href: "./#"
     }
   }, [_vm._v("Income Statement")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
     staticClass: "sudo-ele-none px-4 font-w500",
     attrs: {
+      to: {},
       href: "./#"
     }
   }, [_vm._v("Porfit & Loss")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
     staticClass: "sudo-ele-none px-4 font-w500",
     attrs: {
+      to: {},
       href: "./#"
     }
   }, [_vm._v("A/C Receivable")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
     staticClass: "sudo-ele-none px-4 font-w500",
     attrs: {
+      to: {},
       href: "./#"
     }
   }, [_vm._v("A/C Payable")])], 1)])], 1), _vm._v(" "), _c("li", {
@@ -5072,6 +5128,7 @@ var render = function render() {
   }, [_c("router-link", {
     staticClass: "sidemenu-item px-4",
     attrs: {
+      to: {},
       href: "salesReport.html",
       "aria-expanded": "false"
     }
@@ -5086,7 +5143,7 @@ var render = function render() {
   }, [_c("router-link", {
     staticClass: "sidemenu-item px-4",
     attrs: {
-      href: "#",
+      to: {},
       "aria-expanded": "false"
     }
   }, [_c("i", {
@@ -5186,7 +5243,7 @@ exports = module.exports = __webpack_require__(/*! ../../../../node_modules/css-
 
 
 // module
-exports.push([module.i, "\nul {\r\n    list-style: none;\n}\na {\r\n    text-decoration: none;\r\n    color: #000;\r\n    font-weight: 400;\n}\r\n\r\n\r\n/* main content start here  */\r\n\r\n\r\n/* popup area start  */\n.popup-wrapper {\r\n    display: block;\r\n    position: absolute;\r\n    background: #fff;\r\n    box-shadow: 0px 0px 4px #00000047;\r\n    z-index: 9;\r\n    display: none;\n}\n.popup-wrapper.active {\r\n    display: block;\n}\n.popup-wrapper ul li a {\r\n    display: block;\r\n    padding: 7px 25px 7px 15px;\r\n    font-size: 14px;\r\n    transition: all .3s;\n}\n.popup-wrapper ul li a:hover {\r\n    color: #01987a;\n}\r\n\r\n/* popup area end */\r\n\r\n\r\n/* new account area start  */\n.new-account-form-wrapper {\r\n    width: 100%;\r\n    height: 100%;\r\n    position: absolute;\r\n    top: 0;\r\n    left: 0;\r\n    z-index: 9;\r\n    background: #00000070;\r\n    justify-content: center;\r\n    align-items: center;\r\n    display: none;\n}\n.new-account-form-wrapper.active {\r\n    display: flex;\n}\n.new-account-form-wrapper form {\r\n    padding: 30px 20px;\r\n    row-gap: 10px;\r\n    background: #fff;\r\n    border-radius: 5px;\r\n    display: flex;\r\n    flex-direction: column;\n}\n.new-account-form-wrapper form .input-wrapper {\r\n    display: flex;\r\n    justify-content: space-between;\r\n    align-items: center;\n}\n.new-account-form-wrapper form input,\r\ntextarea,\r\nselect {\r\n    border: 1px solid #d2d2d2;\r\n    outline: none;\r\n    padding: 10px;\r\n    width: 70%;\r\n    border-radius: 4px;\n}\n.new-account-form-wrapper form label {\r\n    margin-right: 10px;\n}\n.desc-label,\r\n.notes-label {\r\n    align-self: flex-start;\n}\nform .btn-wrapper {\r\n    display: flex;\r\n    align-items: center;\r\n    justify-content: flex-end;\r\n    column-gap: 10px;\n}\n.btn-wrapper button {\r\n    padding: 10px;\r\n    border: none;\r\n    background-color: red;\r\n    color: #fff;\r\n    cursor: pointer;\n}\n.btn-wrapper button:first-child {\r\n    background-color: rgb(0, 140, 255);\r\n    color: #fff;\r\n    border: none;\r\n    outline: none;\n}\r\n\r\n/* new account area end  */\n.accordion-wrapper .accordion-heading-wrapper {\r\n    display: flex;\r\n    justify-content: space-between;\r\n    border-bottom: 1px solid #d1d1d1;\r\n    margin-bottom: 10px;\r\n    padding: 5px;\n}\n.accordion-wrapper .accordion-heading-wrapper h4 {\r\n    font-size: 18px;\r\n    font-weight: 600;\r\n    color: #a7a7a7;\n}\n.accordion-wrapper {\r\n    width: 1000px;\n}\n.accordion-wrapper li a {\r\n    display: flex;\r\n    justify-content: space-between;\r\n    padding: 5px;\r\n    text-decoration: none;\r\n    color: #000;\r\n    font-size: 18px;\n}\n.accordion-wrapper ul {\r\n    padding-left: 50px;\n}\n.accordion-wrapper .accordion-btn img {\r\n    width: 10px;\r\n    margin-right: 10px;\r\n    transition: .4s ease;\n}\n.accordion {\r\n    display: none;\n}\n.accordion.open {\r\n    display: block;\n}\n.accordion-btn.active img {\r\n    transform: rotate(90deg);\n}\nul.accordion-wrapper a span:nth-child(2),\r\nul.accordion a span:nth-child(2) {\r\n    position: absolute;\r\n    left: 865px;\n}\r\n\r\n/* main content end here  */\r\n", ""]);
+exports.push([module.i, "\nul {\n    list-style: none;\n}\na {\n    text-decoration: none;\n    color: #000;\n    font-weight: 400;\n}\n\n\n/* main content start here  */\n\n\n/* popup area start  */\n.popup-wrapper {\n    display: block;\n    position: absolute;\n    background: #fff;\n    box-shadow: 0px 0px 4px #00000047;\n    z-index: 9;\n    display: none;\n}\n.popup-wrapper.active {\n    display: block;\n}\n.popup-wrapper ul li a {\n    display: block;\n    padding: 7px 25px 7px 15px;\n    font-size: 14px;\n    transition: all .3s;\n}\n.popup-wrapper ul li a:hover {\n    color: #01987a;\n}\n\n/* popup area end */\n\n\n/* new account area start  */\n.new-account-form-wrapper {\n    width: 100%;\n    height: 100%;\n    position: absolute;\n    top: 0;\n    left: 0;\n    z-index: 9;\n    background: #00000070;\n    justify-content: center;\n    align-items: center;\n    display: none;\n}\n.new-account-form-wrapper.active {\n    display: flex;\n}\n.new-account-form-wrapper form {\n    padding: 30px 20px;\n    row-gap: 10px;\n    background: #fff;\n    border-radius: 5px;\n    display: flex;\n    flex-direction: column;\n}\n.new-account-form-wrapper form .input-wrapper {\n    display: flex;\n    justify-content: space-between;\n    align-items: center;\n}\n.new-account-form-wrapper form input,\ntextarea,\nselect {\n    border: 1px solid #d2d2d2;\n    outline: none;\n    padding: 10px;\n    width: 70%;\n    border-radius: 4px;\n}\n.new-account-form-wrapper form label {\n    margin-right: 10px;\n}\n.desc-label,\n.notes-label {\n    align-self: flex-start;\n}\nform .btn-wrapper {\n    display: flex;\n    align-items: center;\n    justify-content: flex-end;\n    column-gap: 10px;\n}\n.btn-wrapper button {\n    padding: 10px;\n    border: none;\n    background-color: red;\n    color: #fff;\n    cursor: pointer;\n}\n.btn-wrapper button:first-child {\n    background-color: rgb(0, 140, 255);\n    color: #fff;\n    border: none;\n    outline: none;\n}\n\n/* new account area end  */\n.accordion-wrapper .accordion-heading-wrapper {\n    display: flex;\n    justify-content: space-between;\n    border-bottom: 1px solid #d1d1d1;\n    margin-bottom: 10px;\n    padding: 5px;\n}\n.accordion-wrapper .accordion-heading-wrapper h4 {\n    font-size: 18px;\n    font-weight: 600;\n    color: #a7a7a7;\n}\n.accordion-wrapper {\n    width: 1000px;\n}\n.accordion-wrapper li a {\n    display: flex;\n    justify-content: space-between;\n    padding: 5px;\n    text-decoration: none;\n    color: #000;\n    font-size: 18px;\n}\n.accordion-wrapper ul {\n    padding-left: 50px;\n}\n.accordion-wrapper .accordion-btn img {\n    width: 10px;\n    margin-right: 10px;\n    transition: .4s ease;\n}\n.accordion {\n    display: none;\n}\n.accordion.open {\n    display: block;\n}\n.accordion-btn.active img {\n    transform: rotate(90deg);\n}\nul.accordion-wrapper a span:nth-child(2),\nul.accordion a span:nth-child(2) {\n    position: absolute;\n    left: 865px;\n}\n\n/* main content end here  */\n", ""]);
 
 // exports
 
@@ -34715,7 +34772,7 @@ var ApiRoutes = {
   ResetPassword: ApiVersion + '/auth/reset/password',
   //accounts
   CategoryList: ApiVersion + '/category/list',
-  CategoryGet: ApiVersion + '/category/get'
+  CategoryParent: ApiVersion + '/category/parent'
 };
 /* harmony default export */ __webpack_exports__["default"] = (ApiRoutes);
 
