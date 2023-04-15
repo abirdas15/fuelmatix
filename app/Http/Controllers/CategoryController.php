@@ -66,4 +66,18 @@ class CategoryController extends Controller
         }
         return response()->json(['status' => 200, 'msg' => 'Can not save category']);
     }
+    public function single(Request $request)
+    {
+        $inputData = $request->all();
+        $validator = Validator::make($inputData, [
+            'id' => 'required'
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['status' => 500, 'errors' => $validator->errors()]);
+        }
+        $result = Category::select('id', 'category', 'code', 'parent_category', 'type')
+            ->where('id', $inputData['id'])
+            ->first();
+        return response()->json(['status' => 200, 'data' => $result]);
+    }
 }
