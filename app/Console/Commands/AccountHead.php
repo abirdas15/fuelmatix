@@ -41,35 +41,35 @@ class AccountHead extends Command
         $data = [
             [
                'category' => 'Assets',
-               'parent_category' => 0,
+               'parent_category' => null,
                'balance' => 0,
                 'type' => 'assets',
                 'category_hericy' => json_encode(['Assets'])
             ],
             [
                 'category' => 'Equity',
-                'parent_category' => 0,
+                'parent_category' => null,
                 'type' => 'equity',
                 'balance' => 0,
                 'category_hericy' => json_encode(['Equity'])
             ],
             [
                 'category' => 'Liabilities',
-                'parent_category' => 0,
+                'parent_category' => null,
                 'type' => 'liabilities',
                 'balance' => 0,
                 'category_hericy' => json_encode(['Liabilities'])
             ],
             [
                 'category' => 'Income',
-                'parent_category' => 0,
+                'parent_category' => null,
                 'type' => 'income',
                 'balance' => 0,
                 'category_hericy' => json_encode(['Income'])
             ],
             [
                 'category' => 'Expenses',
-                'parent_category' => 0,
+                'parent_category' => null,
                 'type' => 'expenses',
                 'balance' => 0,
                 'category_hericy' => json_encode(['Expenses'])
