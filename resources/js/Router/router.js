@@ -8,7 +8,7 @@ Vue.use(Vuex);
 import Layout from "../Pages/Layout/Layout.vue";
 import Login from "../Pages/Auth/Login";
 import Dashboard from "../Pages/Dashboard/Dashboard.vue";
-import Accounts from "../Pages/Accounts/Accounts";
+import Category from "../Pages/Category/Category.vue";
 
 const ROOT_URL = "";
 const router = new VueRouter({
@@ -24,7 +24,7 @@ const router = new VueRouter({
             component: Layout,
             children: [
                 { path: ROOT_URL + "/dashboard", name: "Dashboard", component: Dashboard},
-                { path: ROOT_URL + "/accounts", name: "Accounts", component: Accounts},
+                { path: ROOT_URL + "/accounts", name: "Accounts", component: Category},
             ],
         },
     ],

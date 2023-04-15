@@ -3,7 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\AccountHeadController;
+use App\Http\Controllers\CategoryController;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,7 +19,8 @@ use App\Http\Controllers\AccountHeadController;
 Route::group(['prefix' => 'auth'], function() {
     Route::post('login', [AuthController::class, 'login']);
 });
-Route::group(['prefix' => 'accounts/head'], function() {
-    Route::post('list', [AccountHeadController::class, 'list']);
+Route::group(['prefix' => 'category'], function() {
+    Route::post('list', [CategoryController::class, 'list']);
+    Route::post('get', [CategoryController::class, 'get']);
 });
 

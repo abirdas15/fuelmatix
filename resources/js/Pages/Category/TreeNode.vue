@@ -1,16 +1,26 @@
 <template>
     <div>
+        <div class="popup-wrapper">
+            <div class="popup">
+                <ul style="padding: 0">
+                    <li><a href="#">Open Account</a></li>
+                    <li><a href="#">Edit Account</a></li>
+                    <li><a href="javascript:void(0)" @click="openCategoryModal(node.id)">New account</a></li>
+                    <li><a href="#">Delete account</a></li>
+                </ul>
+            </div>
+        </div>
         <li>
             <a href="#" @contextmenu="rightClick($event)" class="accordion-btn">
                 <span>
                     <img src="images/arrow-svg.svg" alt="" v-if="node.children.length > 0"/>
-                    {{ node.name }}
+                    {{ node.category }}
                 </span>
-                <span> {{ node.name }}</span>
+                <span> {{ node.description }}</span>
                 <span>{{node.balance_format }}</span>
             </a>
             <ul class="accordion" v-if="node.children.length > 0">
-                <TreeNode v-for="heads in node.children" :key="heads.id" :node="heads" />
+                <TreeNode v-for="category in node.children" :key="category.id" :node="category" />
             </ul>
         </li>
     </div>
@@ -60,21 +70,11 @@ export default {
         window.addEventListener('wheel',  (e) =>  {
             this.hidePopup(e)
         })
-
-
-        newAccount.onclick = function (e) {
-            hidePopup(e)
-            if (!newAccForm.classList.contains('active')) {
-                newAccForm.classList.add('active')
-            }
-
-        }
-
-        cancelBtn.onclick = function () {
-            newAccForm.classList.remove('active')
-        }
     },
     methods: {
+        openCategoryModal: function (parent_id) {
+            $(".categoryModal").removeClass('d-none');
+        },
         rightClick: function (e) {
             e.preventDefault();
             this.showPopup(e);

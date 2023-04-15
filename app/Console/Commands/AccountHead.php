@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Category;
 use Illuminate\Console\Command;
 
 class AccountHead extends Command
@@ -39,43 +40,43 @@ class AccountHead extends Command
     {
         $data = [
             [
-               'name' => 'Assets',
-               'parent_id' => 0,
-               'inc' => 'dr',
-               'dec' => 'cr',
-               'balance' => 0
+               'category' => 'Assets',
+               'parent_category' => 0,
+               'balance' => 0,
+                'type' => 'assets',
+                'category_hericy' => json_encode(['Assets'])
             ],
             [
-                'name' => 'Equity',
-                'parent_id' => 0,
-                'inc' => 'dr',
-                'dec' => 'cr',
-                'balance' => 0
+                'category' => 'Equity',
+                'parent_category' => 0,
+                'type' => 'equity',
+                'balance' => 0,
+                'category_hericy' => json_encode(['Equity'])
             ],
             [
-                'name' => 'Liabilities',
-                'parent_id' => 0,
-                'inc' => 'dr',
-                'dec' => 'cr',
-                'balance' => 0
+                'category' => 'Liabilities',
+                'parent_category' => 0,
+                'type' => 'liabilities',
+                'balance' => 0,
+                'category_hericy' => json_encode(['Liabilities'])
             ],
             [
-                'name' => 'Income',
-                'parent_id' => 0,
-                'inc' => 'dr',
-                'dec' => 'cr',
-                'balance' => 0
+                'category' => 'Income',
+                'parent_category' => 0,
+                'type' => 'income',
+                'balance' => 0,
+                'category_hericy' => json_encode(['Income'])
             ],
             [
-                'name' => 'Expenses',
-                'parent_id' => 0,
-                'inc' => 'dr',
-                'dec' => 'cr',
-                'balance' => 0
+                'category' => 'Expenses',
+                'parent_category' => 0,
+                'type' => 'expenses',
+                'balance' => 0,
+                'category_hericy' => json_encode(['Expenses'])
             ]
         ];
-        \App\Models\AccountHead::truncate();
-        \App\Models\AccountHead::insert($data);
-        print_r('Successfully create account head.'. PHP_EOL);
+        Category::truncate();
+        Category::insert($data);
+        print_r('Successfully create category.'. PHP_EOL);
     }
 }
