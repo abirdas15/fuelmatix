@@ -7,7 +7,8 @@ const ApiRoutes = {
     ForgotPassword: ApiVersion + '/auth/forgot',
     ResetPassword: ApiVersion + '/auth/reset/password',
     //accounts
-    CategoryList: ApiVersion + '/category/list'
+    CategoryList: ApiVersion + '/category/list',
+    CategoryGet: ApiVersion + '/category/get',
 
 };
 

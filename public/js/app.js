@@ -2021,14 +2021,24 @@ __webpack_require__.r(__webpack_exports__);
   components: {
     TreeNode: _TreeNode__WEBPACK_IMPORTED_MODULE_0__["default"]
   },
+  data: function data() {
+    return {
+      infoLoading: false,
+      accountParam: {
+        category: '',
+        code: '',
+        description: '',
+        parent_category: '',
+        type: ''
+      },
+      parentCategory: []
+    };
+  },
   mounted: function mounted() {
     var _this = this;
-    var accordion = document.querySelector(".accordion");
     var accordionBtn = document.querySelectorAll(".accordion-btn");
     this.popup = document.querySelector(".popup-wrapper");
-    var newAccount = document.getElementById('newAccount');
     var newAccForm = document.querySelector('.new-account-form-wrapper');
-    var cancelBtn = document.querySelector('.cancel-btn');
     var form = document.querySelector('form');
 
     // accourdion show and hide
@@ -2075,7 +2085,21 @@ __webpack_require__.r(__webpack_exports__);
           this.popup.classList.remove('active');
         }
       }
+    },
+    closeModal: function closeModal() {
+      $(".categoryModal").addClass('d-none');
+    },
+    getParentCategory: function getParentCategory() {
+      var _this2 = this;
+      _Services_ApiService__WEBPACK_IMPORTED_MODULE_1__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_2__["default"].CategoryGet, {}, function (res) {
+        if (parseInt(res.status) === 200) {
+          _this2.parentCategory = res.data;
+        }
+      });
     }
+  },
+  created: function created() {
+    this.getParentCategory();
   }
 });
 
@@ -2555,7 +2579,189 @@ var render = function render() {
         node: category
       }
     });
-  }), 1) : _vm._e()])]);
+  }), 1) : _vm._e()]), _vm._v(" "), _c("div", {
+    staticClass: "popup-wrapper-modal categoryModal d-none"
+  }, [_c("form", {
+    staticClass: "popup-box",
+    on: {
+      submit: function submit($event) {
+        $event.preventDefault();
+      }
+    }
+  }, [_c("button", {
+    staticClass: "btn closeBtn",
+    attrs: {
+      type: "button"
+    },
+    on: {
+      click: function click($event) {
+        return _vm.closeModal();
+      }
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-times"
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "row"
+  }, [_c("div", {
+    staticClass: "col-sm-12"
+  }, [_c("label", [_vm._v("Account Name")]), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.accountParam.category,
+      expression: "accountParam.category"
+    }],
+    staticClass: "form-control-sm",
+    attrs: {
+      type: "text",
+      name: "category"
+    },
+    domProps: {
+      value: _vm.accountParam.category
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.accountParam, "category", $event.target.value);
+      }
+    }
+  }), _vm._v(" "), _c("div", {
+    staticClass: "invalid-feedback"
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "col-sm-12"
+  }, [_c("label", [_vm._v("Account Code")]), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.accountParam.code,
+      expression: "accountParam.code"
+    }],
+    staticClass: "form-control-sm",
+    attrs: {
+      type: "text",
+      name: "code"
+    },
+    domProps: {
+      value: _vm.accountParam.code
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.accountParam, "code", $event.target.value);
+      }
+    }
+  }), _vm._v(" "), _c("div", {
+    staticClass: "invalid-feedback"
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "col-sm-12"
+  }, [_c("label", [_vm._v("Account Description")]), _vm._v(" "), _c("textarea", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.accountParam.description,
+      expression: "accountParam.description"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      name: "description",
+      cols: "30",
+      rows: "10"
+    },
+    domProps: {
+      value: _vm.accountParam.description
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.accountParam, "description", $event.target.value);
+      }
+    }
+  }), _vm._v(" "), _c("div", {
+    staticClass: "invalid-feedback"
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "col-sm-12"
+  }, [_c("label", [_vm._v("Parent Account")]), _vm._v(" "), _c("select", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.accountParam.parent_category,
+      expression: "accountParam.parent_category"
+    }],
+    staticClass: "form-control-sm",
+    attrs: {
+      name: "parent_category"
+    },
+    on: {
+      change: function change($event) {
+        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
+          return o.selected;
+        }).map(function (o) {
+          var val = "_value" in o ? o._value : o.value;
+          return val;
+        });
+        _vm.$set(_vm.accountParam, "parent_category", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
+      }
+    }
+  }), _vm._v(" "), _c("div", {
+    staticClass: "invalid-feedback"
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "col-sm-12"
+  }, [_c("label", [_vm._v("Account Type")]), _vm._v(" "), _c("select", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.accountParam.type,
+      expression: "accountParam.type"
+    }],
+    staticClass: "form-control-sm",
+    attrs: {
+      name: "parent_category"
+    },
+    on: {
+      change: function change($event) {
+        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
+          return o.selected;
+        }).map(function (o) {
+          var val = "_value" in o ? o._value : o.value;
+          return val;
+        });
+        _vm.$set(_vm.accountParam, "type", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
+      }
+    }
+  }, [_c("option", {
+    attrs: {
+      value: "assets"
+    }
+  }, [_vm._v("Assets")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "equity"
+    }
+  }, [_vm._v("Equity")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "liabilities"
+    }
+  }, [_vm._v("Liabilities")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "income"
+    }
+  }, [_vm._v("Income")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "expenses"
+    }
+  }, [_vm._v("Expenses")])]), _vm._v(" "), _c("div", {
+    staticClass: "invalid-feedback"
+  })])]), _vm._v(" "), !_vm.infoLoading ? _c("button", {
+    staticClass: "btn btn-primary",
+    attrs: {
+      type: "submit"
+    }
+  }, [_vm._v("Merge")]) : _vm._e(), _vm._v(" "), _vm.infoLoading ? _c("button", {
+    staticClass: "btn btn-primary",
+    attrs: {
+      type: "button",
+      disabled: ""
+    }
+  }, [_vm._v("Merging...")]) : _vm._e()])])]);
 };
 var staticRenderFns = [function () {
   var _vm = this,
@@ -5032,7 +5238,7 @@ exports = module.exports = __webpack_require__(/*! ../../../../node_modules/css-
 
 
 // module
-exports.push([module.i, "\nul {\n    list-style: none;\n}\na {\n    text-decoration: none;\n    color: #000;\n    font-weight: 400;\n}\n\n\n/* main content start here  */\n\n\n/* popup area start  */\n.popup-wrapper {\n    display: block;\n    position: absolute;\n    background: #fff;\n    box-shadow: 0px 0px 4px #00000047;\n    z-index: 9;\n    display: none;\n}\n.popup-wrapper.active {\n    display: block;\n}\n.popup-wrapper ul li a {\n    display: block;\n    padding: 7px 25px 7px 15px;\n    font-size: 14px;\n    transition: all .3s;\n}\n.popup-wrapper ul li a:hover {\n    color: #01987a;\n}\n\n/* popup area end */\n\n\n/* new account area start  */\n.new-account-form-wrapper {\n    width: 100%;\n    height: 100%;\n    position: absolute;\n    top: 0;\n    left: 0;\n    z-index: 9;\n    background: #00000070;\n    justify-content: center;\n    align-items: center;\n    display: none;\n}\n.new-account-form-wrapper.active {\n    display: flex;\n}\n.new-account-form-wrapper form {\n    padding: 30px 20px;\n    row-gap: 10px;\n    background: #fff;\n    border-radius: 5px;\n    display: flex;\n    flex-direction: column;\n}\n.new-account-form-wrapper form .input-wrapper {\n    display: flex;\n    justify-content: space-between;\n    align-items: center;\n}\n.new-account-form-wrapper form input,\ntextarea,\nselect {\n    border: 1px solid #d2d2d2;\n    outline: none;\n    padding: 10px;\n    width: 70%;\n    border-radius: 4px;\n}\n.new-account-form-wrapper form label {\n    margin-right: 10px;\n}\n.desc-label,\n.notes-label {\n    align-self: flex-start;\n}\nform .btn-wrapper {\n    display: flex;\n    align-items: center;\n    justify-content: flex-end;\n    column-gap: 10px;\n}\n.btn-wrapper button {\n    padding: 10px;\n    border: none;\n    background-color: red;\n    color: #fff;\n    cursor: pointer;\n}\n.btn-wrapper button:first-child {\n    background-color: rgb(0, 140, 255);\n    color: #fff;\n    border: none;\n    outline: none;\n}\n\n/* new account area end  */\n.accordion-wrapper .accordion-heading-wrapper {\n    display: flex;\n    justify-content: space-between;\n    border-bottom: 1px solid #d1d1d1;\n    margin-bottom: 10px;\n    padding: 5px;\n}\n.accordion-wrapper .accordion-heading-wrapper h4 {\n    font-size: 18px;\n    font-weight: 600;\n    color: #a7a7a7;\n}\n.accordion-wrapper {\n    width: 1000px;\n}\n.accordion-wrapper li a {\n    display: flex;\n    justify-content: space-between;\n    padding: 5px;\n    text-decoration: none;\n    color: #000;\n    font-size: 18px;\n}\n.accordion-wrapper ul {\n    padding-left: 50px;\n}\n.accordion-wrapper .accordion-btn img {\n    width: 10px;\n    margin-right: 10px;\n    transition: .4s ease;\n}\n.accordion {\n    display: none;\n}\n.accordion.open {\n    display: block;\n}\n.accordion-btn.active img {\n    transform: rotate(90deg);\n}\nul.accordion-wrapper a span:nth-child(2),\nul.accordion a span:nth-child(2) {\n    position: absolute;\n    left: 865px;\n}\n\n/* main content end here  */\n", ""]);
+exports.push([module.i, "\nul {\r\n    list-style: none;\n}\na {\r\n    text-decoration: none;\r\n    color: #000;\r\n    font-weight: 400;\n}\r\n\r\n\r\n/* main content start here  */\r\n\r\n\r\n/* popup area start  */\n.popup-wrapper {\r\n    display: block;\r\n    position: absolute;\r\n    background: #fff;\r\n    box-shadow: 0px 0px 4px #00000047;\r\n    z-index: 9;\r\n    display: none;\n}\n.popup-wrapper.active {\r\n    display: block;\n}\n.popup-wrapper ul li a {\r\n    display: block;\r\n    padding: 7px 25px 7px 15px;\r\n    font-size: 14px;\r\n    transition: all .3s;\n}\n.popup-wrapper ul li a:hover {\r\n    color: #01987a;\n}\r\n\r\n/* popup area end */\r\n\r\n\r\n/* new account area start  */\n.new-account-form-wrapper {\r\n    width: 100%;\r\n    height: 100%;\r\n    position: absolute;\r\n    top: 0;\r\n    left: 0;\r\n    z-index: 9;\r\n    background: #00000070;\r\n    justify-content: center;\r\n    align-items: center;\r\n    display: none;\n}\n.new-account-form-wrapper.active {\r\n    display: flex;\n}\n.new-account-form-wrapper form {\r\n    padding: 30px 20px;\r\n    row-gap: 10px;\r\n    background: #fff;\r\n    border-radius: 5px;\r\n    display: flex;\r\n    flex-direction: column;\n}\n.new-account-form-wrapper form .input-wrapper {\r\n    display: flex;\r\n    justify-content: space-between;\r\n    align-items: center;\n}\n.new-account-form-wrapper form input,\r\ntextarea,\r\nselect {\r\n    border: 1px solid #d2d2d2;\r\n    outline: none;\r\n    padding: 10px;\r\n    width: 70%;\r\n    border-radius: 4px;\n}\n.new-account-form-wrapper form label {\r\n    margin-right: 10px;\n}\n.desc-label,\r\n.notes-label {\r\n    align-self: flex-start;\n}\nform .btn-wrapper {\r\n    display: flex;\r\n    align-items: center;\r\n    justify-content: flex-end;\r\n    column-gap: 10px;\n}\n.btn-wrapper button {\r\n    padding: 10px;\r\n    border: none;\r\n    background-color: red;\r\n    color: #fff;\r\n    cursor: pointer;\n}\n.btn-wrapper button:first-child {\r\n    background-color: rgb(0, 140, 255);\r\n    color: #fff;\r\n    border: none;\r\n    outline: none;\n}\r\n\r\n/* new account area end  */\n.accordion-wrapper .accordion-heading-wrapper {\r\n    display: flex;\r\n    justify-content: space-between;\r\n    border-bottom: 1px solid #d1d1d1;\r\n    margin-bottom: 10px;\r\n    padding: 5px;\n}\n.accordion-wrapper .accordion-heading-wrapper h4 {\r\n    font-size: 18px;\r\n    font-weight: 600;\r\n    color: #a7a7a7;\n}\n.accordion-wrapper {\r\n    width: 1000px;\n}\n.accordion-wrapper li a {\r\n    display: flex;\r\n    justify-content: space-between;\r\n    padding: 5px;\r\n    text-decoration: none;\r\n    color: #000;\r\n    font-size: 18px;\n}\n.accordion-wrapper ul {\r\n    padding-left: 50px;\n}\n.accordion-wrapper .accordion-btn img {\r\n    width: 10px;\r\n    margin-right: 10px;\r\n    transition: .4s ease;\n}\n.accordion {\r\n    display: none;\n}\n.accordion.open {\r\n    display: block;\n}\n.accordion-btn.active img {\r\n    transform: rotate(90deg);\n}\nul.accordion-wrapper a span:nth-child(2),\r\nul.accordion a span:nth-child(2) {\r\n    position: absolute;\r\n    left: 865px;\n}\r\n\r\n/* main content end here  */\r\n", ""]);
 
 // exports
 
@@ -34560,7 +34766,8 @@ var ApiRoutes = {
   ForgotPassword: ApiVersion + '/auth/forgot',
   ResetPassword: ApiVersion + '/auth/reset/password',
   //accounts
-  CategoryList: ApiVersion + '/category/list'
+  CategoryList: ApiVersion + '/category/list',
+  CategoryGet: ApiVersion + '/category/get'
 };
 /* harmony default export */ __webpack_exports__["default"] = (ApiRoutes);
 
@@ -34809,7 +35016,7 @@ var app = new vue__WEBPACK_IMPORTED_MODULE_1___default.a({
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! D:\xampp7.4\htdocs\fuelmatix\resources\js\app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! E:\xampp8\htdocs\projects\fuelmatix\resources\js\app.js */"./resources/js/app.js");
 
 
 /***/ })

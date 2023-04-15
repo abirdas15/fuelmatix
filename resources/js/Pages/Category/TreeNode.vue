@@ -23,6 +23,48 @@
                 <TreeNode v-for="category in node.children" :key="category.id" :node="category" />
             </ul>
         </li>
+        <div class="popup-wrapper-modal categoryModal d-none">
+            <form @submit.prevent="" class="popup-box">
+                <button type="button" class=" btn  closeBtn" @click="closeModal()"><i class="fas fa-times"></i></button>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <label >Account Name</label>
+                        <input type="text" class="form-control-sm" name="category" v-model="accountParam.category">
+                        <div class="invalid-feedback"></div>
+                    </div>
+                    <div class="col-sm-12">
+                        <label >Account Code</label>
+                        <input type="text" class="form-control-sm" name="code" v-model="accountParam.code">
+                        <div class="invalid-feedback"></div>
+                    </div>
+                    <div class="col-sm-12">
+                        <label >Account Description</label>
+                        <textarea name="description" class="form-control" cols="30" rows="10" v-model="accountParam.description"></textarea>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                    <div class="col-sm-12">
+                        <label >Parent Account</label>
+                        <select class="form-control-sm" name="parent_category"  v-model="accountParam.parent_category">
+
+                        </select>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                    <div class="col-sm-12">
+                        <label >Account Type</label>
+                        <select class="form-control-sm" name="parent_category"  v-model="accountParam.type">
+                            <option value="assets">Assets</option>
+                            <option value="equity">Equity</option>
+                            <option value="liabilities">Liabilities</option>
+                            <option value="income">Income</option>
+                            <option value="expenses">Expenses</option>
+                        </select>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary " v-if="!infoLoading">Merge</button>
+                <button type="button" class="btn btn-primary " disabled v-if="infoLoading">Merging...</button>
+            </form>
+        </div>
     </div>
 </template>
 
@@ -34,13 +76,23 @@ export default {
     props: ['node'],
     name: "TreeNode",
     components: {TreeNode},
+    data() {
+        return {
+            infoLoading: false,
+            accountParam: {
+                category: '',
+                code: '',
+                description: '',
+                parent_category: '',
+                type: '',
+            },
+            parentCategory: []
+        }
+    },
     mounted() {
-        const accordion = document.querySelector(".accordion");
         const accordionBtn = document.querySelectorAll(".accordion-btn");
         this.popup = document.querySelector(".popup-wrapper");
-        const newAccount = document.getElementById('newAccount');
         const newAccForm = document.querySelector('.new-account-form-wrapper');
-        const cancelBtn = document.querySelector('.cancel-btn');
         const form = document.querySelector('form');
 
         // accourdion show and hide
@@ -91,7 +143,20 @@ export default {
                 }
             }
         },
+        closeModal: function () {
+            $(".categoryModal").addClass('d-none');
+        },
+        getParentCategory: function () {
+            ApiService.POST(ApiRoutes.CategoryGet, {}, res => {
+                if (parseInt(res.status) === 200) {
+                    this.parentCategory = res.data;
+                }
+            });
+        },
     },
+    created() {
+        this.getParentCategory()
+    }
 }
 </script>
 
