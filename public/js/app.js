@@ -1980,29 +1980,104 @@ __webpack_require__.r(__webpack_exports__);
     return {
       popup: null,
       categories: [],
-      parentCategory: []
+      parentCategory: [],
+      accountParam: {
+        category: '',
+        code: '',
+        description: '',
+        parent_category: '',
+        type: ''
+      },
+      accountParamEdit: {
+        id: '',
+        category: '',
+        code: '',
+        description: '',
+        parent_category: '',
+        type: ''
+      },
+      parent_id: '',
+      infoLoading: false
     };
   },
-  methods: {
-    getAccountsHead: function getAccountsHead() {
+  watch: {
+    'accountParam.parent_category': function accountParamParent_category() {
       var _this = this;
+      this.parentCategory.map(function (v) {
+        if (v.id == _this.accountParam.parent_category) {
+          _this.accountParam.type = v.type;
+        }
+      });
+    }
+  },
+  methods: {
+    openCategoryModal: function openCategoryModal() {
+      this.accountParam.parent_category = this.$store.getters.GetParentId;
+      $(".categoryModal").removeClass('d-none');
+    },
+    openCategoryEditModal: function openCategoryEditModal() {
+      $(".categoryModalEdit").removeClass('d-none');
+    },
+    closeModal: function closeModal() {
+      $(".popup-wrapper-modal").addClass('d-none');
+    },
+    saveCategory: function saveCategory() {
+      var _this2 = this;
+      this.infoLoading = true;
+      _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].CategorySave, this.accountParam, function (res) {
+        _this2.infoLoading = false;
+        if (parseInt(res.status) === 200) {
+          _this2.$toast.success(res.msg);
+          _this2.categories = res.data;
+          _this2.closeModal();
+          _this2.getCategory();
+        } else {
+          _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].ErrorHandler(res.errors);
+        }
+      });
+    },
+    editCategory: function editCategory() {
+      var _this3 = this;
+      this.infoLoading = true;
+      _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].CategorySave, this.accountParam, function (res) {
+        _this3.infoLoading = false;
+        if (parseInt(res.status) === 200) {
+          _this3.$toast.success(res.msg);
+          _this3.categories = res.data;
+          _this3.closeModal();
+          _this3.getCategory();
+        } else {
+          _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].ErrorHandler(res.errors);
+        }
+      });
+    },
+    getCategory: function getCategory() {
+      var _this4 = this;
       _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].CategoryList, {}, function (res) {
         if (parseInt(res.status) === 200) {
-          _this.categories = res.data;
+          _this4.categories = res.data;
+        }
+      });
+    },
+    getCategorySingle: function getCategorySingle() {
+      var _this5 = this;
+      _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].CategoryList, {}, function (res) {
+        if (parseInt(res.status) === 200) {
+          _this5.categories = res.data;
         }
       });
     },
     getParentCategory: function getParentCategory() {
-      var _this2 = this;
+      var _this6 = this;
       _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].CategoryParent, {}, function (res) {
         if (parseInt(res.status) === 200) {
-          _this2.parentCategory = res.data;
+          _this6.parentCategory = res.data;
         }
       });
     }
   },
   created: function created() {
-    this.getAccountsHead();
+    this.getCategory();
     this.getParentCategory();
   },
   destroyed: function destroyed() {}
@@ -2033,14 +2108,7 @@ __webpack_require__.r(__webpack_exports__);
   },
   data: function data() {
     return {
-      infoLoading: false,
-      accountParam: {
-        category: '',
-        code: '',
-        description: '',
-        parent_category: '',
-        type: ''
-      }
+      parent_id: ''
     };
   },
   mounted: function mounted() {
@@ -2076,13 +2144,12 @@ __webpack_require__.r(__webpack_exports__);
     });
   },
   methods: {
-    openCategoryModal: function openCategoryModal(parent_id) {
-      console.log(parent_id);
-      this.accountParam.parent_category = parent_id;
-      $(".categoryModal").removeClass('d-none');
+    openCategoryModal: function openCategoryModal() {
+      this.$parent.openCategoryModal();
     },
-    rightClick: function rightClick(e) {
+    rightClick: function rightClick(e, id) {
       e.preventDefault();
+      this.$store.commit('PutParentCategory', id);
       this.showPopup(e);
     },
     showPopup: function showPopup(evt) {
@@ -2096,9 +2163,6 @@ __webpack_require__.r(__webpack_exports__);
           this.popup.classList.remove('active');
         }
       }
-    },
-    closeModal: function closeModal() {
-      $(".categoryModal").addClass('d-none');
     }
   },
   created: function created() {}
@@ -2512,82 +2576,14 @@ var render = function render() {
         parentCategory: _vm.parentCategory
       }
     });
-  })], 2)])]);
-};
-var staticRenderFns = [function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("li", {
-    staticClass: "accordion-heading-wrapper"
-  }, [_c("h4", [_vm._v("Account name")]), _vm._v(" "), _c("h4", [_vm._v("Description")]), _vm._v(" "), _c("h4", [_vm._v("Total")])]);
-}];
-render._withStripped = true;
-
-
-/***/ }),
-
-/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/Pages/Category/TreeNode.vue?vue&type=template&id=312e2df8&scoped=true&":
-/*!*********************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib/loaders/templateLoader.js??ref--6!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/Pages/Category/TreeNode.vue?vue&type=template&id=312e2df8&scoped=true& ***!
-  \*********************************************************************************************************************************************************************************************************************************************************/
-/*! exports provided: render, staticRenderFns */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
-var render = function render() {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("div", [_c("div", {
-    staticClass: "popup-wrapper"
-  }, [_c("div", {
-    staticClass: "popup"
-  }, [_c("ul", {
-    staticStyle: {
-      padding: "0"
-    }
-  }, [_vm._m(0), _vm._v(" "), _vm._m(1), _vm._v(" "), _c("li", [_c("a", {
-    attrs: {
-      href: "javascript:void(0)"
-    },
-    on: {
-      click: function click($event) {
-        return _vm.openCategoryModal(_vm.node.id);
-      }
-    }
-  }, [_vm._v("New account")])]), _vm._v(" "), _vm._m(2)])])]), _vm._v(" "), _c("li", [_c("a", {
-    staticClass: "accordion-btn",
-    attrs: {
-      href: "#"
-    },
-    on: {
-      contextmenu: function contextmenu($event) {
-        return _vm.rightClick($event);
-      }
-    }
-  }, [_c("span", [_vm.node.children.length > 0 ? _c("img", {
-    attrs: {
-      src: "images/arrow-svg.svg",
-      alt: ""
-    }
-  }) : _vm._e(), _vm._v("\n                " + _vm._s(_vm.node.category) + "\n            ")]), _vm._v(" "), _c("span", [_vm._v(" " + _vm._s(_vm.node.description))]), _vm._v(" "), _c("span", [_vm._v(_vm._s(_vm.node.balance_format))])]), _vm._v(" "), _vm.node.children.length > 0 ? _c("ul", {
-    staticClass: "accordion"
-  }, _vm._l(_vm.node.children, function (category) {
-    return _c("TreeNode", {
-      key: category.id,
-      attrs: {
-        node: category
-      }
-    });
-  }), 1) : _vm._e()]), _vm._v(" "), _c("div", {
+  })], 2)]), _vm._v(" "), _c("div", {
     staticClass: "popup-wrapper-modal categoryModal d-none"
   }, [_c("form", {
     staticClass: "popup-box",
     on: {
       submit: function submit($event) {
         $event.preventDefault();
+        return _vm.editCategory.apply(null, arguments);
       }
     }
   }, [_c("button", {
@@ -2605,7 +2601,7 @@ var render = function render() {
   })]), _vm._v(" "), _c("div", {
     staticClass: "row"
   }, [_c("div", {
-    staticClass: "col-sm-12"
+    staticClass: "col-sm-12 form-group"
   }, [_c("label", [_vm._v("Account Name")]), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
@@ -2630,7 +2626,7 @@ var render = function render() {
   }), _vm._v(" "), _c("div", {
     staticClass: "invalid-feedback"
   })]), _vm._v(" "), _c("div", {
-    staticClass: "col-sm-12"
+    staticClass: "col-sm-12 form-group"
   }, [_c("label", [_vm._v("Account Code")]), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
@@ -2655,7 +2651,7 @@ var render = function render() {
   }), _vm._v(" "), _c("div", {
     staticClass: "invalid-feedback"
   })]), _vm._v(" "), _c("div", {
-    staticClass: "col-sm-12"
+    staticClass: "col-sm-12 form-group"
   }, [_c("label", [_vm._v("Account Description")]), _vm._v(" "), _c("textarea", {
     directives: [{
       name: "model",
@@ -2681,7 +2677,7 @@ var render = function render() {
   }), _vm._v(" "), _c("div", {
     staticClass: "invalid-feedback"
   })]), _vm._v(" "), _c("div", {
-    staticClass: "col-sm-12"
+    staticClass: "col-sm-12 form-group"
   }, [_c("label", [_vm._v("Parent Account")]), _vm._v(" "), _c("select", {
     directives: [{
       name: "model",
@@ -2704,16 +2700,213 @@ var render = function render() {
         _vm.$set(_vm.accountParam, "parent_category", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
       }
     }
-  }, _vm._l(_vm.parentCategory, function (category) {
+  }, [_c("option", {
+    attrs: {
+      value: ""
+    }
+  }, [_vm._v("New Top Level Account")]), _vm._v(" "), _vm._l(_vm.parentCategory, function (pCat) {
     return _c("option", {
       domProps: {
-        value: category.id
+        value: pCat.id
       }
-    }, [_vm._v(_vm._s(category.category))]);
-  }), 0), _vm._v(" "), _c("div", {
+    }, [_vm._v(_vm._s(pCat.category))]);
+  })], 2), _vm._v(" "), _c("div", {
     staticClass: "invalid-feedback"
   })]), _vm._v(" "), _c("div", {
-    staticClass: "col-sm-12"
+    staticClass: "col-sm-12 form-group"
+  }, [_c("label", [_vm._v("Account Type")]), _vm._v(" "), _c("select", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.accountParam.type,
+      expression: "accountParam.type"
+    }],
+    staticClass: "form-control sm-control",
+    attrs: {
+      name: "parent_category"
+    },
+    on: {
+      change: function change($event) {
+        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
+          return o.selected;
+        }).map(function (o) {
+          var val = "_value" in o ? o._value : o.value;
+          return val;
+        });
+        _vm.$set(_vm.accountParam, "type", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
+      }
+    }
+  }, [_c("option", {
+    attrs: {
+      value: "assets"
+    }
+  }, [_vm._v("Assets")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "equity"
+    }
+  }, [_vm._v("Equity")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "liabilities"
+    }
+  }, [_vm._v("Liabilities")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "income"
+    }
+  }, [_vm._v("Income")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "expenses"
+    }
+  }, [_vm._v("Expenses")])]), _vm._v(" "), _c("div", {
+    staticClass: "invalid-feedback"
+  })])]), _vm._v(" "), !_vm.infoLoading ? _c("button", {
+    staticClass: "btn btn-primary",
+    attrs: {
+      type: "submit"
+    }
+  }, [_vm._v("Merge")]) : _vm._e(), _vm._v(" "), _vm.infoLoading ? _c("button", {
+    staticClass: "btn btn-primary",
+    attrs: {
+      type: "button",
+      disabled: ""
+    }
+  }, [_vm._v("Merging...")]) : _vm._e()])]), _vm._v(" "), _c("div", {
+    staticClass: "popup-wrapper-modal categoryModalEdit d-none"
+  }, [_c("form", {
+    staticClass: "popup-box",
+    on: {
+      submit: function submit($event) {
+        $event.preventDefault();
+        return _vm.saveCategory.apply(null, arguments);
+      }
+    }
+  }, [_c("button", {
+    staticClass: "btn closeBtn",
+    attrs: {
+      type: "button"
+    },
+    on: {
+      click: function click($event) {
+        return _vm.closeModal();
+      }
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-times"
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "row"
+  }, [_c("div", {
+    staticClass: "col-sm-12 form-group"
+  }, [_c("label", [_vm._v("Account Name")]), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.accountParam.category,
+      expression: "accountParam.category"
+    }],
+    staticClass: "form-control sm-control bg-white",
+    attrs: {
+      type: "text",
+      name: "category"
+    },
+    domProps: {
+      value: _vm.accountParam.category
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.accountParam, "category", $event.target.value);
+      }
+    }
+  }), _vm._v(" "), _c("div", {
+    staticClass: "invalid-feedback"
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "col-sm-12 form-group"
+  }, [_c("label", [_vm._v("Account Code")]), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.accountParam.code,
+      expression: "accountParam.code"
+    }],
+    staticClass: "form-control sm-control bg-white",
+    attrs: {
+      type: "text",
+      name: "code"
+    },
+    domProps: {
+      value: _vm.accountParam.code
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.accountParam, "code", $event.target.value);
+      }
+    }
+  }), _vm._v(" "), _c("div", {
+    staticClass: "invalid-feedback"
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "col-sm-12 form-group"
+  }, [_c("label", [_vm._v("Account Description")]), _vm._v(" "), _c("textarea", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.accountParam.description,
+      expression: "accountParam.description"
+    }],
+    staticClass: "form-control sm-area bg-white",
+    attrs: {
+      name: "description",
+      cols: "30",
+      rows: "10"
+    },
+    domProps: {
+      value: _vm.accountParam.description
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.accountParam, "description", $event.target.value);
+      }
+    }
+  }), _vm._v(" "), _c("div", {
+    staticClass: "invalid-feedback"
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "col-sm-12 form-group"
+  }, [_c("label", [_vm._v("Parent Account")]), _vm._v(" "), _c("select", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.accountParam.parent_category,
+      expression: "accountParam.parent_category"
+    }],
+    staticClass: "form-control sm-control",
+    attrs: {
+      name: "parent_category"
+    },
+    on: {
+      change: function change($event) {
+        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
+          return o.selected;
+        }).map(function (o) {
+          var val = "_value" in o ? o._value : o.value;
+          return val;
+        });
+        _vm.$set(_vm.accountParam, "parent_category", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
+      }
+    }
+  }, [_c("option", {
+    attrs: {
+      value: ""
+    }
+  }, [_vm._v("New Top Level Account")]), _vm._v(" "), _vm._l(_vm.parentCategory, function (pCat) {
+    return _c("option", {
+      domProps: {
+        value: pCat.id
+      }
+    }, [_vm._v(_vm._s(pCat.category))]);
+  })], 2), _vm._v(" "), _c("div", {
+    staticClass: "invalid-feedback"
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "col-sm-12 form-group"
   }, [_c("label", [_vm._v("Account Type")]), _vm._v(" "), _c("select", {
     directives: [{
       name: "model",
@@ -2770,6 +2963,75 @@ var render = function render() {
       disabled: ""
     }
   }, [_vm._v("Merging...")]) : _vm._e()])])]);
+};
+var staticRenderFns = [function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("li", {
+    staticClass: "accordion-heading-wrapper"
+  }, [_c("h4", [_vm._v("Account name")]), _vm._v(" "), _c("h4", [_vm._v("Description")]), _vm._v(" "), _c("h4", [_vm._v("Total")])]);
+}];
+render._withStripped = true;
+
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/Pages/Category/TreeNode.vue?vue&type=template&id=312e2df8&scoped=true&":
+/*!*********************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib/loaders/templateLoader.js??ref--6!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/Pages/Category/TreeNode.vue?vue&type=template&id=312e2df8&scoped=true& ***!
+  \*********************************************************************************************************************************************************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
+var render = function render() {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", [_c("div", {
+    staticClass: "popup-wrapper"
+  }, [_c("div", {
+    staticClass: "popup"
+  }, [_c("ul", {
+    staticStyle: {
+      padding: "0"
+    }
+  }, [_vm._m(0), _vm._v(" "), _vm._m(1), _vm._v(" "), _c("li", [_c("a", {
+    attrs: {
+      href: "javascript:void(0)"
+    },
+    on: {
+      click: function click($event) {
+        return _vm.openCategoryModal(_vm.node.id);
+      }
+    }
+  }, [_vm._v("New account")])]), _vm._v(" "), _vm._m(2)])])]), _vm._v(" "), _c("li", [_c("a", {
+    staticClass: "accordion-btn",
+    attrs: {
+      href: "#"
+    },
+    on: {
+      contextmenu: function contextmenu($event) {
+        return _vm.rightClick($event, _vm.node.id);
+      }
+    }
+  }, [_c("span", [_vm.node.children.length > 0 ? _c("img", {
+    attrs: {
+      src: "images/arrow-svg.svg",
+      alt: ""
+    }
+  }) : _vm._e(), _vm._v("\n                " + _vm._s(_vm.node.category) + "\n            ")]), _vm._v(" "), _c("span", [_vm._v(" " + _vm._s(_vm.node.description))]), _vm._v(" "), _c("span", [_vm._v(_vm._s(_vm.node.balance_format))])]), _vm._v(" "), _vm.node.children.length > 0 ? _c("ul", {
+    staticClass: "accordion"
+  }, _vm._l(_vm.node.children, function (category) {
+    return _c("TreeNode", {
+      key: category.id,
+      attrs: {
+        node: category
+      }
+    });
+  }), 1) : _vm._e()])]);
 };
 var staticRenderFns = [function () {
   var _vm = this,
@@ -34772,7 +35034,8 @@ var ApiRoutes = {
   ResetPassword: ApiVersion + '/auth/reset/password',
   //accounts
   CategoryList: ApiVersion + '/category/list',
-  CategoryParent: ApiVersion + '/category/parent'
+  CategoryParent: ApiVersion + '/category/parent',
+  CategorySave: ApiVersion + '/category/save'
 };
 /* harmony default export */ __webpack_exports__["default"] = (ApiRoutes);
 
@@ -34926,7 +35189,7 @@ var store = new vuex__WEBPACK_IMPORTED_MODULE_1__["default"].Store({
   state: {
     Auth: null,
     AccessToken: null,
-    CompanyId: null
+    parentId: null
   },
   getters: {
     GetAuth: function GetAuth(state) {
@@ -34935,11 +35198,8 @@ var store = new vuex__WEBPACK_IMPORTED_MODULE_1__["default"].Store({
       }
       return state.Auth;
     },
-    GetCompanyId: function GetCompanyId(state) {
-      if (state.CompanyId == null) {
-        return localStorage.getItem("company_id");
-      }
-      return state.CompanyId;
+    GetParentId: function GetParentId(state) {
+      return state.parentId;
     }
   },
   mutations: {
@@ -34947,9 +35207,8 @@ var store = new vuex__WEBPACK_IMPORTED_MODULE_1__["default"].Store({
       localStorage.setItem("userInfo", JSON.stringify(data));
       state.Auth = data;
     },
-    PutCompanyId: function PutCompanyId(state, data) {
-      localStorage.setItem("company_id", data);
-      state.CompanyId = data;
+    PutParentCategory: function PutParentCategory(state, data) {
+      state.parentId = data;
     }
   },
   actions: {}

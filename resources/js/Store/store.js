@@ -14,7 +14,7 @@ const store = new Vuex.Store({
     state: {
         Auth: null,
         AccessToken: null,
-        CompanyId: null,
+        parentId: null,
     },
     getters: {
         GetAuth: function (state) {
@@ -23,11 +23,8 @@ const store = new Vuex.Store({
             }
             return state.Auth;
         },
-        GetCompanyId(state) {
-            if (state.CompanyId == null) {
-                return localStorage.getItem("company_id");
-            }
-            return state.CompanyId;
+        GetParentId(state) {
+            return state.parentId;
         },
     },
     mutations: {
@@ -35,9 +32,8 @@ const store = new Vuex.Store({
             localStorage.setItem("userInfo", JSON.stringify(data));
             state.Auth = data;
         },
-        PutCompanyId(state, data) {
-            localStorage.setItem("company_id", data);
-            state.CompanyId = data;
+        PutParentCategory(state, data) {
+            state.parentId = data;
         },
     },
     actions: {

@@ -9,6 +9,7 @@ const ApiRoutes = {
     //accounts
     CategoryList: ApiVersion + '/category/list',
     CategoryParent: ApiVersion + '/category/parent',
+    CategorySave: ApiVersion + '/category/save',
 
 };
 

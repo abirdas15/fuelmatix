@@ -11,7 +11,7 @@
             </div>
         </div>
         <li>
-            <a href="#" @contextmenu="rightClick($event)" class="accordion-btn">
+            <a href="#" @contextmenu="rightClick($event, node.id)" class="accordion-btn">
                 <span>
                     <img src="images/arrow-svg.svg" alt="" v-if="node.children.length > 0"/>
                     {{ node.category }}
@@ -23,48 +23,6 @@
                 <TreeNode v-for="category in node.children" :key="category.id" :node="category" />
             </ul>
         </li>
-        <div class="popup-wrapper-modal categoryModal d-none">
-            <form @submit.prevent="" class="popup-box">
-                <button type="button" class=" btn  closeBtn" @click="closeModal()"><i class="fas fa-times"></i></button>
-                <div class="row">
-                    <div class="col-sm-12">
-                        <label >Account Name</label>
-                        <input type="text" class="form-control sm-control bg-white" name="category" v-model="accountParam.category">
-                        <div class="invalid-feedback"></div>
-                    </div>
-                    <div class="col-sm-12">
-                        <label >Account Code</label>
-                        <input type="text" class="form-control sm-control bg-white" name="code" v-model="accountParam.code">
-                        <div class="invalid-feedback"></div>
-                    </div>
-                    <div class="col-sm-12">
-                        <label >Account Description</label>
-                        <textarea name="description" class="form-control sm-area bg-white" cols="30" rows="10" v-model="accountParam.description"></textarea>
-                        <div class="invalid-feedback"></div>
-                    </div>
-                    <div class="col-sm-12">
-                        <label >Parent Account</label>
-                        <select class="form-control sm-control " name="parent_category"  v-model="accountParam.parent_category">
-                            <option v-for="category in parentCategory" :value="category.id">{{category.category}}</option>
-                        </select>
-                        <div class="invalid-feedback"></div>
-                    </div>
-                    <div class="col-sm-12">
-                        <label >Account Type</label>
-                        <select class="form-control sm-control" name="parent_category"  v-model="accountParam.type">
-                            <option value="assets">Assets</option>
-                            <option value="equity">Equity</option>
-                            <option value="liabilities">Liabilities</option>
-                            <option value="income">Income</option>
-                            <option value="expenses">Expenses</option>
-                        </select>
-                        <div class="invalid-feedback"></div>
-                    </div>
-                </div>
-                <button type="submit" class="btn btn-primary " v-if="!infoLoading">Merge</button>
-                <button type="button" class="btn btn-primary " disabled v-if="infoLoading">Merging...</button>
-            </form>
-        </div>
     </div>
 </template>
 
@@ -78,14 +36,7 @@ export default {
     components: {TreeNode},
     data() {
         return {
-            infoLoading: false,
-            accountParam: {
-                category: '',
-                code: '',
-                description: '',
-                parent_category: '',
-                type: '',
-            },
+            parent_id: ''
         }
     },
     mounted() {
@@ -120,13 +71,12 @@ export default {
         })
     },
     methods: {
-        openCategoryModal: function (parent_id) {
-            console.log(parent_id)
-            this.accountParam.parent_category = parent_id
-            $(".categoryModal").removeClass('d-none');
+        openCategoryModal: function () {
+            this.$parent.openCategoryModal()
         },
-        rightClick: function (e) {
+        rightClick: function (e, id) {
             e.preventDefault();
+            this.$store.commit('PutParentCategory', id);
             this.showPopup(e);
         },
         showPopup: function (evt) {
@@ -140,9 +90,6 @@ export default {
                     this.popup.classList.remove('active')
                 }
             }
-        },
-        closeModal: function () {
-            $(".categoryModal").addClass('d-none');
         },
 
     },

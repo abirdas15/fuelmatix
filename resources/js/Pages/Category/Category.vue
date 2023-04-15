@@ -10,6 +10,92 @@
                 <TreeNode v-for="category in categories" :key="category.id" :node="category" :parentCategory="parentCategory"/>
             </ul>
         </div>
+        <div class="popup-wrapper-modal categoryModal d-none">
+            <form @submit.prevent="editCategory" class="popup-box">
+                <button type="button" class=" btn  closeBtn" @click="closeModal()"><i class="fas fa-times"></i></button>
+                <div class="row">
+                    <div class="col-sm-12 form-group">
+                        <label >Account Name</label>
+                        <input type="text" class="form-control sm-control bg-white" name="category" v-model="accountParam.category">
+                        <div class="invalid-feedback"></div>
+                    </div>
+                    <div class="col-sm-12 form-group">
+                        <label >Account Code</label>
+                        <input type="text" class="form-control sm-control bg-white" name="code" v-model="accountParam.code">
+                        <div class="invalid-feedback"></div>
+                    </div>
+                    <div class="col-sm-12 form-group">
+                        <label >Account Description</label>
+                        <textarea name="description" class="form-control sm-area bg-white" cols="30" rows="10" v-model="accountParam.description"></textarea>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                    <div class="col-sm-12 form-group">
+                        <label >Parent Account</label>
+                        <select class="form-control sm-control " name="parent_category" v-model=accountParam.parent_category >
+                            <option value="">New Top Level Account</option>
+                            <option  v-for="pCat in parentCategory"  :value="pCat.id">{{pCat.category}}</option>
+                        </select>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                    <div class="col-sm-12 form-group">
+                        <label >Account Type</label>
+                        <select class="form-control sm-control" name="parent_category"  v-model="accountParam.type">
+                            <option value="assets">Assets</option>
+                            <option value="equity">Equity</option>
+                            <option value="liabilities">Liabilities</option>
+                            <option value="income">Income</option>
+                            <option value="expenses">Expenses</option>
+                        </select>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary " v-if="!infoLoading">Merge</button>
+                <button type="button" class="btn btn-primary " disabled v-if="infoLoading">Merging...</button>
+            </form>
+        </div>
+        <div class="popup-wrapper-modal categoryModalEdit d-none">
+            <form @submit.prevent="saveCategory" class="popup-box">
+                <button type="button" class=" btn  closeBtn" @click="closeModal()"><i class="fas fa-times"></i></button>
+                <div class="row">
+                    <div class="col-sm-12 form-group">
+                        <label >Account Name</label>
+                        <input type="text" class="form-control sm-control bg-white" name="category" v-model="accountParam.category">
+                        <div class="invalid-feedback"></div>
+                    </div>
+                    <div class="col-sm-12 form-group">
+                        <label >Account Code</label>
+                        <input type="text" class="form-control sm-control bg-white" name="code" v-model="accountParam.code">
+                        <div class="invalid-feedback"></div>
+                    </div>
+                    <div class="col-sm-12 form-group">
+                        <label >Account Description</label>
+                        <textarea name="description" class="form-control sm-area bg-white" cols="30" rows="10" v-model="accountParam.description"></textarea>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                    <div class="col-sm-12 form-group">
+                        <label >Parent Account</label>
+                        <select class="form-control sm-control " name="parent_category" v-model=accountParam.parent_category >
+                            <option value="">New Top Level Account</option>
+                            <option  v-for="pCat in parentCategory"  :value="pCat.id">{{pCat.category}}</option>
+                        </select>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                    <div class="col-sm-12 form-group">
+                        <label >Account Type</label>
+                        <select class="form-control sm-control" name="parent_category"  v-model="accountParam.type">
+                            <option value="assets">Assets</option>
+                            <option value="equity">Equity</option>
+                            <option value="liabilities">Liabilities</option>
+                            <option value="income">Income</option>
+                            <option value="expenses">Expenses</option>
+                        </select>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary " v-if="!infoLoading">Merge</button>
+                <button type="button" class="btn btn-primary " disabled v-if="infoLoading">Merging...</button>
+            </form>
+        </div>
     </div>
 </template>
 
@@ -24,11 +110,82 @@ export default {
         return {
             popup: null,
             categories: [],
-            parentCategory: []
+            parentCategory: [],
+            accountParam: {
+                category: '',
+                code: '',
+                description: '',
+                parent_category: '',
+                type: '',
+            },
+            accountParamEdit: {
+                id: '',
+                category: '',
+                code: '',
+                description: '',
+                parent_category: '',
+                type: '',
+            },
+            parent_id: '',
+            infoLoading: false,
+        }
+    },
+    watch: {
+        'accountParam.parent_category': function () {
+            this.parentCategory.map(v => {
+                if (v.id == this.accountParam.parent_category) {
+                    this.accountParam.type = v.type
+                }
+            })
         }
     },
     methods: {
-        getAccountsHead: function () {
+        openCategoryModal: function () {
+            this.accountParam.parent_category = this.$store.getters.GetParentId
+            $(".categoryModal").removeClass('d-none');
+        },
+        openCategoryEditModal: function () {
+            $(".categoryModalEdit").removeClass('d-none');
+        },
+        closeModal: function () {
+            $(".popup-wrapper-modal").addClass('d-none');
+        },
+        saveCategory: function () {
+            this.infoLoading = true
+            ApiService.POST(ApiRoutes.CategorySave, this.accountParam, res => {
+                this.infoLoading = false
+                if (parseInt(res.status) === 200) {
+                    this.$toast.success(res.msg);
+                    this.categories = res.data;
+                    this.closeModal()
+                    this.getCategory()
+                } else {
+                    ApiService.ErrorHandler(res.errors);
+                }
+            });
+        },
+        editCategory: function () {
+            this.infoLoading = true
+            ApiService.POST(ApiRoutes.CategorySave, this.accountParam, res => {
+                this.infoLoading = false
+                if (parseInt(res.status) === 200) {
+                    this.$toast.success(res.msg);
+                    this.categories = res.data;
+                    this.closeModal()
+                    this.getCategory()
+                } else {
+                    ApiService.ErrorHandler(res.errors);
+                }
+            });
+        },
+        getCategory: function () {
+            ApiService.POST(ApiRoutes.CategoryList, {}, res => {
+                if (parseInt(res.status) === 200) {
+                    this.categories = res.data;
+                }
+            });
+        },
+        getCategorySingle: function () {
             ApiService.POST(ApiRoutes.CategoryList, {}, res => {
                 if (parseInt(res.status) === 200) {
                     this.categories = res.data;
@@ -44,7 +201,7 @@ export default {
         },
     },
     created() {
-        this.getAccountsHead()
+        this.getCategory()
         this.getParentCategory()
     },
 
