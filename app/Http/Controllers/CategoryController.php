@@ -20,33 +20,18 @@ class CategoryController extends Controller
     }
     public function get(Request $request)
     {
-        $result = Category::select('id', 'category', 'balance', 'parent_category', 'description')
-            ->with(['children' => function($q) {
-                $q->select('id', 'category', 'parent_category', 'balance', 'description');
-            }])
-            ->whereNull('parent_category')
+        $result = Category::select('id', 'category_hericy', 'type')
             ->get()
             ->toArray();
-
-        $dataArray = [];
-        foreach ($result as $data) {
-            return self::getChildCategory($data);
+        foreach ($result as &$data) {
+            $category = json_decode($data['category_hericy']);
+            $data['category'] = implode(':', $category);
+            unset($data['category_hericy']);
         }
+        usort($result, function ($item1, $item2) {
+            return $item1['category'] <=> $item2['category'];
+        });
 
-        return $dataArray;
-    }
-    public static function getChildCategory($data)
-    {
-        $categoryArray = [];
-        foreach ($data['children'] as $key => $category) {
-            $categoryArray[$key][] = $data['category'];
-            if ($data['id'] == $category['parent_category']) {
-                $categoryArray[$key][] = $category['category'];
-            }
-//            if (count($category['children']) > 0) {
-//                $categoryArray[$key][] = self::getChildCategory($category);
-//            }
-        }
-        return $categoryArray;
+        return response()->json(['status' => 200, 'data' => $result]);
     }
 }
