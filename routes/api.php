@@ -23,5 +23,7 @@ Route::group(['prefix' => 'category'], function() {
     Route::post('list', [CategoryController::class, 'list']);
     Route::post('parent', [CategoryController::class, 'parent']);
     Route::post('save', [CategoryController::class, 'save']);
+    Route::post('single', [CategoryController::class, 'single']);
+    Route::post('update', [CategoryController::class, 'update']);
 });
 
