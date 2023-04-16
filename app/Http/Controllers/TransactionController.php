@@ -100,6 +100,13 @@ class TransactionController extends Controller
             ->where('linked_id', $inputData['id'])
             ->get()
             ->toArray();
+        foreach ($result as $key => &$data) {
+            if ($key == 0) {
+                $data['balance'] = $data['debit_amount'] - $data['credit_amount'];
+            } else {
+                $data['balance'] = $result[$key - 1]['balance'] + ($data['debit_amount'] - $data['credit_amount']);
+            }
+        }
         return response()->json(['status' => 200, 'data' => $result]);
     }
 }
