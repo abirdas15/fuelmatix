@@ -2400,22 +2400,68 @@ __webpack_require__.r(__webpack_exports__);
     };
   },
   methods: {
+    getNameDr: function getNameDr() {
+      if (this.singleCategory.type == 'assets') {
+        return 'Increase';
+      }
+      if (this.singleCategory.type == 'equity') {
+        return 'Decrease';
+      }
+      if (this.singleCategory.type == 'expenses') {
+        return 'Expense';
+      }
+      if (this.singleCategory.type == 'income') {
+        return 'Charge';
+      }
+      if (this.singleCategory.type == 'liabilities') {
+        return 'Decrease';
+      }
+    },
+    getNameCr: function getNameCr() {
+      if (this.singleCategory.type == 'assets') {
+        return 'Decrease';
+      }
+      if (this.singleCategory.type == 'equity') {
+        return 'Increase';
+      }
+      if (this.singleCategory.type == 'expenses') {
+        return 'Rebate';
+      }
+      if (this.singleCategory.type == 'income') {
+        return 'Income';
+      }
+      if (this.singleCategory.type == 'liabilities') {
+        return 'Increase';
+      }
+    },
     saveTransaction: function saveTransaction() {
       var _this = this;
       this.loading = true;
-      _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].TransactionSave, this.transactionParam, function (res) {
+      var transaction = {
+        transaction: [],
+        linked_id: this.parent_category_id
+      };
+      this.transactionParam.transaction.map(function (v) {
+        if (v.id == undefined) {
+          transaction.transaction.push(v);
+        }
+      });
+      _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].TransactionSave, transaction, function (res) {
         _this.loading = false;
         if (parseInt(res.status) === 200) {
-          _this.$toast.success(res.msg);
+          _this.$toast.success(res.message);
           _this.singleTransaction();
         }
       });
     },
     singleTransaction: function singleTransaction() {
+      var _this2 = this;
       _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].TransactionSingle, {
         id: this.parent_category_id
       }, function (res) {
-        if (parseInt(res.status) === 200) {}
+        if (parseInt(res.status) === 200) {
+          _this2.transactionParam.transaction = res.data;
+        }
       });
     },
     categoryName: function categoryName(id) {
@@ -2461,30 +2507,30 @@ __webpack_require__.r(__webpack_exports__);
       }
     },
     calculateBalance: function calculateBalance() {
-      var _this2 = this;
+      var _this3 = this;
       this.transactionParam.transaction.map(function (v, i) {
         if (i == 0) {
           v.balance = v.debit_amount - v.credit_amount;
         } else {
-          v.balance = _this2.transactionParam.transaction[i - 1].balance + (v.debit_amount - v.credit_amount);
+          v.balance = _this3.transactionParam.transaction[i - 1].balance + (v.debit_amount - v.credit_amount);
         }
       });
     },
     getParentCategory: function getParentCategory() {
-      var _this3 = this;
+      var _this4 = this;
       _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].CategoryParent, {}, function (res) {
         if (parseInt(res.status) === 200) {
-          _this3.parentCategory = res.data;
+          _this4.parentCategory = res.data;
         }
       });
     },
     getCategorySingle: function getCategorySingle() {
-      var _this4 = this;
+      var _this5 = this;
       _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].CategorySingle, {
         id: this.parent_category_id
       }, function (res) {
         if (parseInt(res.status) === 200) {
-          _this4.singleCategory = res.data;
+          _this5.singleCategory = res.data;
         }
       });
     }
@@ -2497,7 +2543,7 @@ __webpack_require__.r(__webpack_exports__);
     this.singleTransaction();
   },
   mounted: function mounted() {
-    var _this5 = this;
+    var _this6 = this;
     setTimeout(function () {
       $('.date').flatpickr({
         altInput: true,
@@ -2505,7 +2551,7 @@ __webpack_require__.r(__webpack_exports__);
         dateFormat: "Y-m-d",
         defaultDate: 'today',
         onChange: function onChange(dateStr) {
-          _this5.param.date = dateStr;
+          _this6.param.date = dateStr;
         }
       });
     }, 500);
@@ -3222,7 +3268,9 @@ var render = function render() {
       src: "images/arrow-svg.svg",
       alt: ""
     }
-  }) : _vm._e(), _vm._v("\n                " + _vm._s(_vm.node.category) + "\n            ")]), _vm._v(" "), _c("span", [_vm._v(" " + _vm._s(_vm.node.description))]), _vm._v(" "), _c("span", [_vm._v(_vm._s(_vm.node.balance_format))])]), _vm._v(" "), _vm.node.children.length > 0 ? _c("ul", {
+  }) : _vm._e(), _vm._v("\n                " + _vm._s(_vm.node.category) + "\n            ")]), _vm._v(" "), _c("span", [_vm._v(" " + _vm._s(_vm.node.description))]), _vm._v(" "), _vm.node.balance < 0 ? _c("span", {
+    staticClass: "text-danger"
+  }, [_vm._v("(" + _vm._s(_vm.formatPrice(Math.abs(_vm.node.balance))) + ")")]) : _c("span", [_vm._v(_vm._s(_vm.formatPrice(_vm.node.balance)))])]), _vm._v(" "), _vm.node.children.length > 0 ? _c("ul", {
     staticClass: "accordion"
   }, _vm._l(_vm.node.children, function (category) {
     return _c("TreeNode", {
@@ -5801,14 +5849,22 @@ var render = function render() {
     }
   }, [_vm._v("Saving...")]) : _vm._e()]), _vm._v(" "), _c("table", {
     staticClass: "table table-sm table-transaction table-responsive"
-  }, [_vm._m(0), _vm._v(" "), _c("tbody", [_vm._l(_vm.transactionParam.transaction, function (transaction) {
+  }, [_c("thead", [_c("tr", [_c("th", {
+    staticClass: "text-start"
+  }, [_vm._v("Date")]), _vm._v(" "), _c("th", {
+    staticClass: "text-start"
+  }, [_vm._v("Description")]), _vm._v(" "), _c("th", {
+    staticClass: "text-start"
+  }, [_vm._v("Transfer")]), _vm._v(" "), _c("th", [_vm._v(_vm._s(_vm.getNameDr()))]), _vm._v(" "), _c("th", [_vm._v(_vm._s(_vm.getNameCr()))]), _vm._v(" "), _c("th", [_vm._v("Balance")]), _vm._v(" "), _c("th", [_vm._v("Action")])])]), _vm._v(" "), _c("tbody", [_vm._l(_vm.transactionParam.transaction, function (transaction) {
     return _c("tr", [_c("td", {
       staticClass: "text-start"
     }, [_vm._v(_vm._s(_vm.formatDate(transaction.date)))]), _vm._v(" "), _c("td", {
       staticClass: "text-start"
     }, [_vm._v(_vm._s(transaction.description))]), _vm._v(" "), _c("td", {
       staticClass: "text-start"
-    }, [_vm._v(_vm._s(_vm.categoryName(transaction.account_id)))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(transaction.debit_amount))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(transaction.credit_amount))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(transaction.balance))]), _vm._v(" "), _vm._m(1, true)]);
+    }, [_vm._v(_vm._s(_vm.categoryName(transaction.account_id)))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(_vm.formatPrice(transaction.debit_amount)))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(_vm.formatPrice(transaction.credit_amount)))]), _vm._v(" "), _c("td", [transaction.balance < 0 ? _c("span", {
+      staticClass: "text-danger"
+    }, [_vm._v("(" + _vm._s(_vm.formatPrice(Math.abs(transaction.balance))) + ")")]) : _c("span", [_vm._v(_vm._s(_vm.formatPrice(transaction.balance)))])]), _vm._v(" "), _vm._m(0, true)]);
   }), _vm._v(" "), _c("tr", {
     staticClass: "input-box"
   }, [_c("td", {
@@ -5930,19 +5986,9 @@ var render = function render() {
         _vm.$set(_vm.param, "credit_amount", $event.target.value);
       }
     }
-  })]), _vm._v(" "), _vm._m(2), _vm._v(" "), _vm._m(3)])], 2)])])]);
+  })]), _vm._v(" "), _vm._m(1), _vm._v(" "), _vm._m(2)])], 2)])])]);
 };
 var staticRenderFns = [function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("thead", [_c("tr", [_c("th", {
-    staticClass: "text-start"
-  }, [_vm._v("Date")]), _vm._v(" "), _c("th", {
-    staticClass: "text-start"
-  }, [_vm._v("Description")]), _vm._v(" "), _c("th", {
-    staticClass: "text-start"
-  }, [_vm._v("Transfer")]), _vm._v(" "), _c("th", [_vm._v("Increase")]), _vm._v(" "), _c("th", [_vm._v("Decrease")]), _vm._v(" "), _c("th", [_vm._v("Balance")]), _vm._v(" "), _c("th", [_vm._v("Action")])])]);
-}, function () {
   var _vm = this,
     _c = _vm._self._c;
   return _c("td", [_c("i", {
@@ -35943,6 +35989,24 @@ vue__WEBPACK_IMPORTED_MODULE_1___default.a.use(vue_router__WEBPACK_IMPORTED_MODU
 vue__WEBPACK_IMPORTED_MODULE_1___default.a.use(vue_page_transition__WEBPACK_IMPORTED_MODULE_5__["default"]);
 vue__WEBPACK_IMPORTED_MODULE_1___default.a.use(vue_toast_notification__WEBPACK_IMPORTED_MODULE_6___default.a, {
   position: "top-right"
+});
+vue__WEBPACK_IMPORTED_MODULE_1___default.a.mixin({
+  data: function data() {
+    return {};
+  },
+  methods: {
+    formatPrice: function formatPrice(value) {
+      var formatter = new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+        minimumFractionDigits: 2,
+        currencySign: 'accounting'
+      });
+      var str = formatter.format(value);
+      var replace = str.replace('$', ' ');
+      return replace;
+    }
+  }
 });
 var app = new vue__WEBPACK_IMPORTED_MODULE_1___default.a({
   el: "#app",

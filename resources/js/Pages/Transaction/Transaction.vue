@@ -13,8 +13,8 @@
                     <th class="text-start">Date</th>
                     <th class="text-start">Description</th>
                     <th class="text-start">Transfer</th>
-                    <th>Increase</th>
-                    <th>Decrease</th>
+                    <th>{{getNameDr()}}</th>
+                    <th>{{getNameCr()}}</th>
                     <th>Balance</th>
                     <th>Action</th>
                 </tr>
@@ -24,9 +24,12 @@
                     <td class="text-start">{{ formatDate(transaction.date) }}</td>
                     <td class="text-start">{{ transaction.description }}</td>
                     <td class="text-start">{{ categoryName(transaction.account_id) }}</td>
-                    <td>{{ transaction.debit_amount }}</td>
-                    <td>{{ transaction.credit_amount }}</td>
-                    <td>{{ transaction.balance }}</td>
+                    <td>{{ formatPrice(transaction.debit_amount) }}</td>
+                    <td>{{ formatPrice(transaction.credit_amount) }}</td>
+                    <td>
+                        <span v-if="transaction.balance < 0" class="text-danger">({{ formatPrice(Math.abs(transaction.balance)) }})</span>
+                        <span v-else>{{ formatPrice(transaction.balance) }}</span>
+                    </td>
                     <td>
                         <i class="fa fa-edit me-2 cursor-pointer"></i>
                         <i class="fa fa-trash cursor-pointer"></i>
@@ -94,12 +97,55 @@ export default {
         }
     },
     methods: {
+        getNameDr: function () {
+            if (this.singleCategory.type == 'assets') {
+                return 'Increase'
+            }
+            if (this.singleCategory.type == 'equity') {
+                return 'Decrease'
+            }
+            if (this.singleCategory.type == 'expenses') {
+                return 'Expense'
+            }
+            if (this.singleCategory.type == 'income') {
+                return 'Charge'
+            }
+            if (this.singleCategory.type == 'liabilities') {
+                return 'Decrease'
+            }
+        },
+        getNameCr: function () {
+            if (this.singleCategory.type == 'assets') {
+                return 'Decrease'
+            }
+            if (this.singleCategory.type == 'equity') {
+                return 'Increase'
+            }
+            if (this.singleCategory.type == 'expenses') {
+                return 'Rebate'
+            }
+            if (this.singleCategory.type == 'income') {
+                return 'Income'
+            }
+            if (this.singleCategory.type == 'liabilities') {
+                return 'Increase'
+            }
+        },
         saveTransaction: function () {
             this.loading = true
-            ApiService.POST(ApiRoutes.TransactionSave, this.transactionParam, res => {
+            let transaction = {
+                transaction: [],
+                linked_id: this.parent_category_id
+            }
+            this.transactionParam.transaction.map(v => {
+                if (v.id == undefined) {
+                    transaction.transaction.push(v)
+                }
+            })
+            ApiService.POST(ApiRoutes.TransactionSave, transaction, res => {
                 this.loading = false
                 if (parseInt(res.status) === 200) {
-                    this.$toast.success(res.msg);
+                    this.$toast.success(res.message);
                     this.singleTransaction()
                 }
             });
@@ -107,7 +153,7 @@ export default {
         singleTransaction: function () {
             ApiService.POST(ApiRoutes.TransactionSingle, {id: this.parent_category_id}, res => {
                 if (parseInt(res.status) === 200) {
-
+                    this.transactionParam.transaction = res.data
                 }
             });
         },

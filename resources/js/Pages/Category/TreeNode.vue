@@ -17,7 +17,8 @@
                     {{ node.category }}
                 </span>
                 <span> {{ node.description }}</span>
-                <span>{{node.balance_format }}</span>
+                <span v-if="node.balance < 0" class="text-danger">({{formatPrice(Math.abs(node.balance))}})</span>
+                <span v-else>{{formatPrice(node.balance)}}</span>
             </a>
             <ul class="accordion" v-if="node.children.length > 0">
                 <TreeNode v-for="category in node.children" :key="category.id" :node="category" />
