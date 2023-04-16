@@ -2395,10 +2395,29 @@ __webpack_require__.r(__webpack_exports__);
         balance: 0
       },
       parent_category_id: '',
-      singleCategory: {}
+      singleCategory: {},
+      loading: false
     };
   },
   methods: {
+    saveTransaction: function saveTransaction() {
+      var _this = this;
+      this.loading = true;
+      _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].TransactionSave, this.transactionParam, function (res) {
+        _this.loading = false;
+        if (parseInt(res.status) === 200) {
+          _this.$toast.success(res.msg);
+          _this.singleTransaction();
+        }
+      });
+    },
+    singleTransaction: function singleTransaction() {
+      _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].TransactionSingle, {
+        id: this.parent_category_id
+      }, function (res) {
+        if (parseInt(res.status) === 200) {}
+      });
+    },
     categoryName: function categoryName(id) {
       var rv = '';
       this.parentCategory.map(function (v) {
@@ -2442,30 +2461,30 @@ __webpack_require__.r(__webpack_exports__);
       }
     },
     calculateBalance: function calculateBalance() {
-      var _this = this;
+      var _this2 = this;
       this.transactionParam.transaction.map(function (v, i) {
         if (i == 0) {
           v.balance = v.debit_amount - v.credit_amount;
         } else {
-          v.balance = _this.transactionParam.transaction[i - 1].balance + (v.debit_amount - v.credit_amount);
+          v.balance = _this2.transactionParam.transaction[i - 1].balance + (v.debit_amount - v.credit_amount);
         }
       });
     },
     getParentCategory: function getParentCategory() {
-      var _this2 = this;
+      var _this3 = this;
       _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].CategoryParent, {}, function (res) {
         if (parseInt(res.status) === 200) {
-          _this2.parentCategory = res.data;
+          _this3.parentCategory = res.data;
         }
       });
     },
     getCategorySingle: function getCategorySingle() {
-      var _this3 = this;
+      var _this4 = this;
       _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].CategorySingle, {
         id: this.parent_category_id
       }, function (res) {
         if (parseInt(res.status) === 200) {
-          _this3.singleCategory = res.data;
+          _this4.singleCategory = res.data;
         }
       });
     }
@@ -2475,9 +2494,10 @@ __webpack_require__.r(__webpack_exports__);
     this.parent_category_id = this.$route.params.id;
     this.transactionParam.linked_id = this.parent_category_id;
     this.getCategorySingle();
+    this.singleTransaction();
   },
   mounted: function mounted() {
-    var _this4 = this;
+    var _this5 = this;
     setTimeout(function () {
       $('.date').flatpickr({
         altInput: true,
@@ -2485,7 +2505,7 @@ __webpack_require__.r(__webpack_exports__);
         dateFormat: "Y-m-d",
         defaultDate: 'today',
         onChange: function onChange(dateStr) {
-          _this4.param.date = dateStr;
+          _this5.param.date = dateStr;
         }
       });
     }, 500);
@@ -3157,7 +3177,16 @@ var render = function render() {
     staticStyle: {
       padding: "0"
     }
-  }, [_vm._m(0), _vm._v(" "), _c("li", [_c("a", {
+  }, [_c("li", [_c("a", {
+    attrs: {
+      href: "javascript:void(0)"
+    },
+    on: {
+      click: function click($event) {
+        return _vm.openTransaction(_vm.node);
+      }
+    }
+  }, [_vm._v("Open Account")])]), _vm._v(" "), _c("li", [_c("a", {
     attrs: {
       href: "javascript:void(0)"
     },
@@ -3175,16 +3204,7 @@ var render = function render() {
         return _vm.openCategoryModal();
       }
     }
-  }, [_vm._v("New account")])]), _vm._v(" "), _c("li", [_c("a", {
-    attrs: {
-      href: "javascript:void(0)"
-    },
-    on: {
-      click: function click($event) {
-        return _vm.openCategoryModal();
-      }
-    }
-  }, [_vm._v("Delete account")])])])])]), _vm._v(" "), _c("li", [_c("a", {
+  }, [_vm._v("New account")])]), _vm._v(" "), _vm._m(0)])])]), _vm._v(" "), _c("li", [_c("a", {
     staticClass: "accordion-btn",
     attrs: {
       href: "#"
@@ -3218,9 +3238,9 @@ var staticRenderFns = [function () {
     _c = _vm._self._c;
   return _c("li", [_c("a", {
     attrs: {
-      href: "#"
+      href: "javascript:void(0)"
     }
-  }, [_vm._v("Open Account")])]);
+  }, [_vm._v("Delete account")])]);
 }];
 render._withStripped = true;
 
@@ -5764,16 +5784,31 @@ var render = function render() {
     }
   }), _vm._v(" "), _c("div", {
     staticClass: "container-fluid"
-  }, [_vm._m(0), _vm._v(" "), _c("table", {
+  }, [_c("div", {
+    staticClass: "text-end mb-3"
+  }, [!_vm.loading ? _c("button", {
+    staticClass: "btn btn-success",
+    attrs: {
+      type: "button"
+    },
+    on: {
+      click: _vm.saveTransaction
+    }
+  }, [_vm._v("Save")]) : _vm._e(), _vm._v(" "), _vm.loading ? _c("button", {
+    staticClass: "btn btn-success",
+    attrs: {
+      type: "button"
+    }
+  }, [_vm._v("Saving...")]) : _vm._e()]), _vm._v(" "), _c("table", {
     staticClass: "table table-sm table-transaction table-responsive"
-  }, [_vm._m(1), _vm._v(" "), _c("tbody", [_vm._l(_vm.transactionParam.transaction, function (transaction) {
+  }, [_vm._m(0), _vm._v(" "), _c("tbody", [_vm._l(_vm.transactionParam.transaction, function (transaction) {
     return _c("tr", [_c("td", {
       staticClass: "text-start"
     }, [_vm._v(_vm._s(_vm.formatDate(transaction.date)))]), _vm._v(" "), _c("td", {
       staticClass: "text-start"
     }, [_vm._v(_vm._s(transaction.description))]), _vm._v(" "), _c("td", {
       staticClass: "text-start"
-    }, [_vm._v(_vm._s(_vm.categoryName(transaction.account_id)))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(transaction.debit_amount))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(transaction.credit_amount))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(transaction.balance))]), _vm._v(" "), _vm._m(2, true)]);
+    }, [_vm._v(_vm._s(_vm.categoryName(transaction.account_id)))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(transaction.debit_amount))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(transaction.credit_amount))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(transaction.balance))]), _vm._v(" "), _vm._m(1, true)]);
   }), _vm._v(" "), _c("tr", {
     staticClass: "input-box"
   }, [_c("td", {
@@ -5895,20 +5930,9 @@ var render = function render() {
         _vm.$set(_vm.param, "credit_amount", $event.target.value);
       }
     }
-  })]), _vm._v(" "), _vm._m(3), _vm._v(" "), _vm._m(4)])], 2)])])]);
+  })]), _vm._v(" "), _vm._m(2), _vm._v(" "), _vm._m(3)])], 2)])])]);
 };
 var staticRenderFns = [function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("div", {
-    staticClass: "text-end mb-3"
-  }, [_c("button", {
-    staticClass: "btn btn-success",
-    attrs: {
-      type: "button"
-    }
-  }, [_vm._v("Save")])]);
-}, function () {
   var _vm = this,
     _c = _vm._self._c;
   return _c("thead", [_c("tr", [_c("th", {
@@ -6036,7 +6060,7 @@ exports = module.exports = __webpack_require__(/*! ../../../../node_modules/css-
 
 
 // module
-exports.push([module.i, "\nul {\r\n    list-style: none;\n}\na {\r\n    text-decoration: none;\r\n    color: #000;\r\n    font-weight: 400;\n}\r\n\r\n\r\n/* main content start here  */\r\n\r\n\r\n/* popup area start  */\n.popup-wrapper {\r\n    display: block;\r\n    position: absolute;\r\n    background: #fff;\r\n    box-shadow: 0px 0px 4px #00000047;\r\n    z-index: 9;\r\n    display: none;\n}\n.popup-wrapper.active {\r\n    display: block;\n}\n.popup-wrapper ul li a {\r\n    display: block;\r\n    padding: 7px 25px 7px 15px;\r\n    font-size: 14px;\r\n    transition: all .3s;\n}\n.popup-wrapper ul li a:hover {\r\n    color: #01987a;\n}\r\n\r\n/* popup area end */\r\n\r\n\r\n/* new account area start  */\n.new-account-form-wrapper {\r\n    width: 100%;\r\n    height: 100%;\r\n    position: absolute;\r\n    top: 0;\r\n    left: 0;\r\n    z-index: 9;\r\n    background: #00000070;\r\n    justify-content: center;\r\n    align-items: center;\r\n    display: none;\n}\n.new-account-form-wrapper.active {\r\n    display: flex;\n}\n.new-account-form-wrapper form {\r\n    padding: 30px 20px;\r\n    row-gap: 10px;\r\n    background: #fff;\r\n    border-radius: 5px;\r\n    display: flex;\r\n    flex-direction: column;\n}\n.new-account-form-wrapper form .input-wrapper {\r\n    display: flex;\r\n    justify-content: space-between;\r\n    align-items: center;\n}\n.new-account-form-wrapper form input,\r\ntextarea,\r\nselect {\r\n    border: 1px solid #d2d2d2;\r\n    outline: none;\r\n    padding: 10px;\r\n    width: 70%;\r\n    border-radius: 4px;\n}\n.new-account-form-wrapper form label {\r\n    margin-right: 10px;\n}\n.desc-label,\r\n.notes-label {\r\n    align-self: flex-start;\n}\nform .btn-wrapper {\r\n    display: flex;\r\n    align-items: center;\r\n    justify-content: flex-end;\r\n    column-gap: 10px;\n}\n.btn-wrapper button {\r\n    padding: 10px;\r\n    border: none;\r\n    background-color: red;\r\n    color: #fff;\r\n    cursor: pointer;\n}\n.btn-wrapper button:first-child {\r\n    background-color: rgb(0, 140, 255);\r\n    color: #fff;\r\n    border: none;\r\n    outline: none;\n}\r\n\r\n/* new account area end  */\n.accordion-wrapper .accordion-heading-wrapper {\r\n    display: flex;\r\n    justify-content: space-between;\r\n    border-bottom: 1px solid #d1d1d1;\r\n    margin-bottom: 10px;\r\n    padding: 5px;\n}\n.accordion-wrapper .accordion-heading-wrapper h4 {\r\n    font-size: 18px;\r\n    font-weight: 600;\r\n    color: #a7a7a7;\n}\n.accordion-wrapper {\n}\n.accordion-wrapper li a {\r\n    display: flex;\r\n    justify-content: space-between;\r\n    padding: 5px;\r\n    text-decoration: none;\r\n    color: #000;\r\n    font-size: 18px;\n}\n.accordion-wrapper ul {\r\n    padding-left: 50px;\n}\n.accordion-wrapper .accordion-btn img {\r\n    width: 10px;\r\n    margin-right: 10px;\r\n    transition: .4s ease;\n}\n.accordion {\r\n    display: none;\n}\n.accordion.open {\r\n    display: block;\n}\n.accordion-btn.active img {\r\n    transform: rotate(90deg);\n}\nul.accordion-wrapper a span:nth-child(2),\r\nul.accordion a span:nth-child(2) {\r\n    position: absolute;\r\n    left: 66rem;\n}\r\n\r\n/* main content end here  */\r\n", ""]);
+exports.push([module.i, "\nul {\n    list-style: none;\n}\na {\n    text-decoration: none;\n    color: #000;\n    font-weight: 400;\n}\n\n\n/* main content start here  */\n\n\n/* popup area start  */\n.popup-wrapper {\n    display: block;\n    position: absolute;\n    background: #fff;\n    box-shadow: 0px 0px 4px #00000047;\n    z-index: 9;\n    display: none;\n}\n.popup-wrapper.active {\n    display: block;\n}\n.popup-wrapper ul li a {\n    display: block;\n    padding: 7px 25px 7px 15px;\n    font-size: 14px;\n    transition: all .3s;\n}\n.popup-wrapper ul li a:hover {\n    color: #01987a;\n}\n\n/* popup area end */\n\n\n/* new account area start  */\n.new-account-form-wrapper {\n    width: 100%;\n    height: 100%;\n    position: absolute;\n    top: 0;\n    left: 0;\n    z-index: 9;\n    background: #00000070;\n    justify-content: center;\n    align-items: center;\n    display: none;\n}\n.new-account-form-wrapper.active {\n    display: flex;\n}\n.new-account-form-wrapper form {\n    padding: 30px 20px;\n    row-gap: 10px;\n    background: #fff;\n    border-radius: 5px;\n    display: flex;\n    flex-direction: column;\n}\n.new-account-form-wrapper form .input-wrapper {\n    display: flex;\n    justify-content: space-between;\n    align-items: center;\n}\n.new-account-form-wrapper form input,\ntextarea,\nselect {\n    border: 1px solid #d2d2d2;\n    outline: none;\n    padding: 10px;\n    width: 70%;\n    border-radius: 4px;\n}\n.new-account-form-wrapper form label {\n    margin-right: 10px;\n}\n.desc-label,\n.notes-label {\n    align-self: flex-start;\n}\nform .btn-wrapper {\n    display: flex;\n    align-items: center;\n    justify-content: flex-end;\n    column-gap: 10px;\n}\n.btn-wrapper button {\n    padding: 10px;\n    border: none;\n    background-color: red;\n    color: #fff;\n    cursor: pointer;\n}\n.btn-wrapper button:first-child {\n    background-color: rgb(0, 140, 255);\n    color: #fff;\n    border: none;\n    outline: none;\n}\n\n/* new account area end  */\n.accordion-wrapper .accordion-heading-wrapper {\n    display: flex;\n    justify-content: space-between;\n    border-bottom: 1px solid #d1d1d1;\n    margin-bottom: 10px;\n    padding: 5px;\n}\n.accordion-wrapper .accordion-heading-wrapper h4 {\n    font-size: 18px;\n    font-weight: 600;\n    color: #a7a7a7;\n}\n.accordion-wrapper {\n}\n.accordion-wrapper li a {\n    display: flex;\n    justify-content: space-between;\n    padding: 5px;\n    text-decoration: none;\n    color: #000;\n    font-size: 18px;\n}\n.accordion-wrapper ul {\n    padding-left: 50px;\n}\n.accordion-wrapper .accordion-btn img {\n    width: 10px;\n    margin-right: 10px;\n    transition: .4s ease;\n}\n.accordion {\n    display: none;\n}\n.accordion.open {\n    display: block;\n}\n.accordion-btn.active img {\n    transform: rotate(90deg);\n}\nul.accordion-wrapper a span:nth-child(2),\nul.accordion a span:nth-child(2) {\n    position: absolute;\n    left: 66rem;\n}\n\n/* main content end here  */\n", ""]);
 
 // exports
 
@@ -35686,12 +35710,15 @@ var ApiRoutes = {
   Register: ApiVersion + '/auth/register',
   ForgotPassword: ApiVersion + '/auth/forgot',
   ResetPassword: ApiVersion + '/auth/reset/password',
-  //accounts
+  //Accounts
   CategoryList: ApiVersion + '/category/list',
   CategoryParent: ApiVersion + '/category/parent',
   CategorySave: ApiVersion + '/category/save',
   CategorySingle: ApiVersion + '/category/single',
-  CategoryUpdate: ApiVersion + '/category/update'
+  CategoryUpdate: ApiVersion + '/category/update',
+  //Transaction
+  TransactionSave: ApiVersion + '/transaction/save',
+  TransactionSingle: ApiVersion + '/transaction/single'
 };
 /* harmony default export */ __webpack_exports__["default"] = (ApiRoutes);
 
@@ -35936,7 +35963,7 @@ var app = new vue__WEBPACK_IMPORTED_MODULE_1___default.a({
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! D:\xampp7.4\htdocs\fuelmatix\resources\js\app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! E:\xampp8\htdocs\projects\fuelmatix\resources\js\app.js */"./resources/js/app.js");
 
 
 /***/ })

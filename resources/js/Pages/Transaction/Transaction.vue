@@ -4,7 +4,8 @@
 
         <div class="container-fluid">
             <div class="text-end mb-3">
-                <button class="btn btn-success" type="button">Save</button>
+                <button class="btn btn-success" v-if="!loading" type="button" @click="saveTransaction">Save</button>
+                <button class="btn btn-success" v-if="loading" type="button">Saving...</button>
             </div>
             <table class="table table-sm table-transaction table-responsive">
                 <thead>
@@ -32,7 +33,7 @@
                     </td>
                 </tr>
                 <tr class="input-box">
-                    <td class="text-start"> 
+                    <td class="text-start">
                         <input type="text" class="date bg-transparent-input" placeholder="Date" v-model="param.date"
                                form="transaction_form">
                     </td>
@@ -89,9 +90,27 @@ export default {
             },
             parent_category_id: '',
             singleCategory: {},
+            loading: false
         }
     },
     methods: {
+        saveTransaction: function () {
+            this.loading = true
+            ApiService.POST(ApiRoutes.TransactionSave, this.transactionParam, res => {
+                this.loading = false
+                if (parseInt(res.status) === 200) {
+                    this.$toast.success(res.msg);
+                    this.singleTransaction()
+                }
+            });
+        },
+        singleTransaction: function () {
+            ApiService.POST(ApiRoutes.TransactionSingle, {id: this.parent_category_id}, res => {
+                if (parseInt(res.status) === 200) {
+
+                }
+            });
+        },
         categoryName: function (id) {
             let rv = ''
             this.parentCategory.map(v => {
@@ -164,6 +183,7 @@ export default {
         this.parent_category_id = this.$route.params.id;
         this.transactionParam.linked_id = this.parent_category_id;
         this.getCategorySingle()
+        this.singleTransaction()
     },
     mounted() {
         setTimeout(() => {

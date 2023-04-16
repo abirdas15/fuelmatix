@@ -3,10 +3,10 @@
         <div class="popup-wrapper">
             <div class="popup">
                 <ul style="padding: 0">
-                    <li><a href="#">Open Account</a></li>
+                    <li><a href="javascript:void(0)" @click="openTransaction(node)">Open Account</a></li>
                     <li><a href="javascript:void(0)" @click="openCategoryModalEdit()">Edit Account</a></li>
                     <li><a href="javascript:void(0)" @click="openCategoryModal()">New account</a></li>
-                    <li><a href="javascript:void(0)" @click="openCategoryModal()">Delete account</a></li>
+                    <li><a href="javascript:void(0)">Delete account</a></li>
                 </ul>
             </div>
         </div>

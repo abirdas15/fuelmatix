@@ -6,12 +6,15 @@ const ApiRoutes = {
     Register: ApiVersion + '/auth/register',
     ForgotPassword: ApiVersion + '/auth/forgot',
     ResetPassword: ApiVersion + '/auth/reset/password',
-    //accounts
+    //Accounts
     CategoryList: ApiVersion + '/category/list',
     CategoryParent: ApiVersion + '/category/parent',
     CategorySave: ApiVersion + '/category/save',
     CategorySingle: ApiVersion + '/category/single',
     CategoryUpdate: ApiVersion + '/category/update',
+    //Transaction
+    TransactionSave: ApiVersion + '/transaction/save',
+    TransactionSingle: ApiVersion + '/transaction/single'
 
 };
 
