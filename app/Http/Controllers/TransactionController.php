@@ -95,15 +95,36 @@ class TransactionController extends Controller
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
+        $category = Category::find($inputData['id']);
         $result = Transaction::select('id', 'date', 'account_id', 'debit_amount', 'credit_amount', 'description')
             ->where('linked_id', $inputData['id'])
             ->get()
             ->toArray();
         foreach ($result as $key => &$data) {
-            if ($key == 0) {
-                $data['balance'] = $data['debit_amount'] - $data['credit_amount'];
-            } else {
-                $data['balance'] = $result[$key - 1]['balance'] + ($data['debit_amount'] - $data['credit_amount']);
+            if ($category->type == 'income') {
+                if ($key == 0) {
+                    $data['balance'] = $data['credit_amount'] - $data['debit_amount'];
+                } else {
+                    $data['balance'] = $result[$key - 1]['balance'] + ($data['credit_amount'] - $data['debit_amount']);
+                }
+            } else  if ($category->type == 'expenses') {
+                if ($key == 0) {
+                    $data['balance'] = $data['debit_amount'] - $data['credit_amount'];
+                } else {
+                    $data['balance'] = $result[$key - 1]['balance'] + ($data['debit_amount'] - $data['credit_amount']);
+                }
+            } else  if ($category->type == 'assets') {
+                if ($key == 0) {
+                    $data['balance'] = $data['debit_amount'] - $data['credit_amount'];
+                } else {
+                    $data['balance'] = $result[$key - 1]['balance'] + ($data['debit_amount'] - $data['credit_amount']);
+                }
+            } else  if ($category->type == 'liabilities' || $category->type == 'equity') {
+                if ($key == 0) {
+                    $data['balance'] = $data['credit_amount'] - $data['debit_amount'];
+                } else {
+                    $data['balance'] = $result[$key - 1]['balance'] + ($data['credit_amount'] - $data['debit_amount']);
+                }
             }
         }
         return response()->json(['status' => 200, 'data' => $result]);

@@ -202,10 +202,30 @@ export default {
         },
         calculateBalance: function () {
             this.transactionParam.transaction.map((v, i) => {
-                if (i == 0) {
-                    v.balance = v.debit_amount - v.credit_amount
-                } else {
-                    v.balance = this.transactionParam.transaction[i - 1].balance + (v.debit_amount - v.credit_amount)
+                if (this.singleCategory.type == 'income') {
+                    if (i == 0) {
+                        v.balance = v.credit_amount - v.debit_amount
+                    } else {
+                        v.balance = this.transactionParam.transaction[i - 1].balance + (v.credit_amount - v.debit_amount)
+                    }
+                } else if (this.singleCategory.type == 'expenses') {
+                    if (i == 0) {
+                        v.balance = v.debit_amount - v.credit_amount
+                    } else {
+                        v.balance = this.transactionParam.transaction[i - 1].balance + (v.debit_amount - v.credit_amount)
+                    }
+                } else if (this.singleCategory.type == 'assets') {
+                    if (i == 0) {
+                        v.balance = v.debit_amount - v.credit_amount
+                    } else {
+                        v.balance = this.transactionParam.transaction[i - 1].balance + (v.debit_amount - v.credit_amount)
+                    }
+                } else if (this.singleCategory.type == 'liabilities' || this.singleCategory.type == 'equity') {
+                    if (i == 0) {
+                        v.balance = v.credit_amount - v.debit_amount
+                    } else {
+                        v.balance = this.transactionParam.transaction[i - 1].balance + (v.credit_amount - v.debit_amount)
+                    }
                 }
             })
         },
