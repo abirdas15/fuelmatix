@@ -216,6 +216,9 @@ export default {
             });
         },
     },
+    mounted() {
+        $('#dashboard_bar').text('Category')
+    },
     created() {
         this.getCategory()
         this.getParentCategory()

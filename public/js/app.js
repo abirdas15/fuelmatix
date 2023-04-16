@@ -2095,6 +2095,9 @@ __webpack_require__.r(__webpack_exports__);
       });
     }
   },
+  mounted: function mounted() {
+    $('#dashboard_bar').text('Category');
+  },
   created: function created() {
     this.getCategory();
     this.getParentCategory();
@@ -2171,6 +2174,14 @@ __webpack_require__.r(__webpack_exports__);
         }
       });
     },
+    openCategory: function openCategory() {
+      this.$router.push({
+        name: 'Transaction',
+        params: {
+          id: this.$store.getters.GetParentId
+        }
+      });
+    },
     openCategoryModal: function openCategoryModal() {
       this.$parent.openCategoryModal();
     },
@@ -2214,7 +2225,10 @@ __webpack_require__.r(__webpack_exports__);
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
-  name: "Dashboard"
+  name: "Dashboard",
+  mounted: function mounted() {
+    $('#dashboard_bar').text('Category');
+  }
 });
 
 /***/ }),
@@ -2396,7 +2410,8 @@ __webpack_require__.r(__webpack_exports__);
       },
       parent_category_id: '',
       singleCategory: {},
-      loading: false
+      loading: false,
+      getLoading: false
     };
   },
   methods: {
@@ -2450,15 +2465,16 @@ __webpack_require__.r(__webpack_exports__);
         _this.loading = false;
         if (parseInt(res.status) === 200) {
           _this.$toast.success(res.message);
-          _this.singleTransaction();
         }
       });
     },
     singleTransaction: function singleTransaction() {
       var _this2 = this;
+      this.getLoading = true;
       _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].TransactionSingle, {
         id: this.parent_category_id
       }, function (res) {
+        _this2.getLoading = false;
         if (parseInt(res.status) === 200) {
           _this2.transactionParam.transaction = res.data;
         }
@@ -2502,6 +2518,8 @@ __webpack_require__.r(__webpack_exports__);
           debit_amount: '',
           balance: ''
         };
+        var objDiv = document.getElementById("table-scroll");
+        objDiv.scrollTop = objDiv.scrollHeight;
       } else {
         this.$toast.error('Please insert all input field');
       }
@@ -2544,6 +2562,7 @@ __webpack_require__.r(__webpack_exports__);
   },
   mounted: function mounted() {
     var _this6 = this;
+    $('#dashboard_bar').text('Transaction');
     setTimeout(function () {
       $('.date').flatpickr({
         altInput: true,
@@ -3229,7 +3248,7 @@ var render = function render() {
     },
     on: {
       click: function click($event) {
-        return _vm.openTransaction(_vm.node);
+        return _vm.openCategory();
       }
     }
   }, [_vm._v("Open Account")])]), _vm._v(" "), _c("li", [_c("a", {
@@ -4985,7 +5004,10 @@ var staticRenderFns = [function () {
   return _c("div", {
     staticClass: "header-left"
   }, [_c("div", {
-    staticClass: "dashboard_bar"
+    staticClass: "dashboard_bar",
+    attrs: {
+      id: "dashboard_bar"
+    }
   }, [_vm._v("Dashboard")])]);
 }, function () {
   var _vm = this,
@@ -5833,8 +5855,18 @@ var render = function render() {
   }), _vm._v(" "), _c("div", {
     staticClass: "container-fluid"
   }, [_c("div", {
-    staticClass: "text-end mb-3"
-  }, [!_vm.loading ? _c("button", {
+    staticClass: "d-flex align-items-center justify-content-between mb-3"
+  }, [_c("router-link", {
+    attrs: {
+      to: {
+        name: "Accounts"
+      }
+    }
+  }, [_c("i", {
+    staticClass: "fa-solid fa-left-long fa-3x"
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "categoryName"
+  }, [_vm._v(_vm._s(_vm.singleCategory.category))]), _vm._v(" "), !_vm.loading ? _c("button", {
     staticClass: "btn btn-success",
     attrs: {
       type: "button"
@@ -5847,15 +5879,45 @@ var render = function render() {
     attrs: {
       type: "button"
     }
-  }, [_vm._v("Saving...")]) : _vm._e()]), _vm._v(" "), _c("table", {
+  }, [_vm._v("Saving...")]) : _vm._e()], 1), _vm._v(" "), _c("div", {
+    staticClass: "table-height d-flex flex-column-reverse",
+    attrs: {
+      id: "table-scroll"
+    }
+  }, [_c("table", {
     staticClass: "table table-sm table-transaction table-responsive"
   }, [_c("thead", [_c("tr", [_c("th", {
-    staticClass: "text-start"
+    staticClass: "text-start",
+    staticStyle: {
+      width: "10%"
+    }
   }, [_vm._v("Date")]), _vm._v(" "), _c("th", {
-    staticClass: "text-start"
+    staticClass: "text-start",
+    staticStyle: {
+      width: "30%"
+    }
   }, [_vm._v("Description")]), _vm._v(" "), _c("th", {
-    staticClass: "text-start"
-  }, [_vm._v("Transfer")]), _vm._v(" "), _c("th", [_vm._v(_vm._s(_vm.getNameDr()))]), _vm._v(" "), _c("th", [_vm._v(_vm._s(_vm.getNameCr()))]), _vm._v(" "), _c("th", [_vm._v("Balance")]), _vm._v(" "), _c("th", [_vm._v("Action")])])]), _vm._v(" "), _c("tbody", [_vm._l(_vm.transactionParam.transaction, function (transaction) {
+    staticClass: "text-start",
+    staticStyle: {
+      width: "20%"
+    }
+  }, [_vm._v("Transfer")]), _vm._v(" "), _c("th", {
+    staticStyle: {
+      width: "10%"
+    }
+  }, [_vm._v(_vm._s(_vm.getNameDr()))]), _vm._v(" "), _c("th", {
+    staticStyle: {
+      width: "10%"
+    }
+  }, [_vm._v(_vm._s(_vm.getNameCr()))]), _vm._v(" "), _c("th", {
+    staticStyle: {
+      width: "15%"
+    }
+  }, [_vm._v("Balance")]), _vm._v(" "), _c("th", {
+    staticStyle: {
+      width: "5%"
+    }
+  }, [_vm._v("Action")])])]), _vm._v(" "), !_vm.getLoading ? _c("tbody", _vm._l(_vm.transactionParam.transaction, function (transaction) {
     return _c("tr", [_c("td", {
       staticClass: "text-start"
     }, [_vm._v(_vm._s(_vm.formatDate(transaction.date)))]), _vm._v(" "), _c("td", {
@@ -5865,10 +5927,15 @@ var render = function render() {
     }, [_vm._v(_vm._s(_vm.categoryName(transaction.account_id)))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(_vm.formatPrice(transaction.debit_amount)))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(_vm.formatPrice(transaction.credit_amount)))]), _vm._v(" "), _c("td", [transaction.balance < 0 ? _c("span", {
       staticClass: "text-danger"
     }, [_vm._v("(" + _vm._s(_vm.formatPrice(Math.abs(transaction.balance))) + ")")]) : _c("span", [_vm._v(_vm._s(_vm.formatPrice(transaction.balance)))])]), _vm._v(" "), _vm._m(0, true)]);
-  }), _vm._v(" "), _c("tr", {
+  }), 0) : _vm._e(), _vm._v(" "), _vm.getLoading ? _c("tbody", [_vm._m(1)]) : _vm._e()])]), _vm._v(" "), _c("table", {
+    staticClass: "table table-sm table-transaction table-responsive"
+  }, [_c("tbody", [_c("tr", {
     staticClass: "input-box"
   }, [_c("td", {
-    staticClass: "text-start"
+    staticClass: "text-start",
+    staticStyle: {
+      width: "10%"
+    }
   }, [_c("input", {
     directives: [{
       name: "model",
@@ -5892,7 +5959,10 @@ var render = function render() {
       }
     }
   })]), _vm._v(" "), _c("td", {
-    staticClass: "text-start"
+    staticClass: "text-start",
+    staticStyle: {
+      width: "30%"
+    }
   }, [_c("input", {
     directives: [{
       name: "model",
@@ -5914,7 +5984,11 @@ var render = function render() {
         _vm.$set(_vm.param, "description", $event.target.value);
       }
     }
-  })]), _vm._v(" "), _c("td", [_c("select", {
+  })]), _vm._v(" "), _c("td", {
+    staticStyle: {
+      width: "20%"
+    }
+  }, [_c("select", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -5942,7 +6016,11 @@ var render = function render() {
         value: pCat.id
       }
     }, [_vm._v(_vm._s(pCat.category))]);
-  }), 0)]), _vm._v(" "), _c("td", [_c("input", {
+  }), 0)]), _vm._v(" "), _c("td", {
+    staticStyle: {
+      width: "10%"
+    }
+  }, [_c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -5952,7 +6030,7 @@ var render = function render() {
     staticClass: "text-end",
     attrs: {
       type: "number",
-      placeholder: "Increase",
+      placeholder: _vm.getNameDr(),
       form: "transaction_form"
     },
     domProps: {
@@ -5964,7 +6042,11 @@ var render = function render() {
         _vm.$set(_vm.param, "debit_amount", $event.target.value);
       }
     }
-  })]), _vm._v(" "), _c("td", [_c("input", {
+  })]), _vm._v(" "), _c("td", {
+    staticStyle: {
+      width: "10%"
+    }
+  }, [_c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -5974,7 +6056,7 @@ var render = function render() {
     staticClass: "text-end",
     attrs: {
       type: "number",
-      placeholder: "Decrease",
+      placeholder: _vm.getNameCr(),
       form: "transaction_form"
     },
     domProps: {
@@ -5986,7 +6068,7 @@ var render = function render() {
         _vm.$set(_vm.param, "credit_amount", $event.target.value);
       }
     }
-  })]), _vm._v(" "), _vm._m(1), _vm._v(" "), _vm._m(2)])], 2)])])]);
+  })]), _vm._v(" "), _vm._m(2), _vm._v(" "), _vm._m(3)])])])])]);
 };
 var staticRenderFns = [function () {
   var _vm = this,
@@ -5999,13 +6081,36 @@ var staticRenderFns = [function () {
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
-  return _c("td", [_c("i", {
+  return _c("tr", [_c("td", {
+    attrs: {
+      colspan: "20"
+    }
+  }, [_c("div", {
+    staticClass: "d-flex align-items-center justify-content-center",
+    staticStyle: {
+      height: "300px"
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-spinner fa-5x fa-spin"
+  })])])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("td", {
+    staticStyle: {
+      width: "15%"
+    }
+  }, [_c("i", {
     staticClass: "p-1"
   }, [_vm._v("Balance")])]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
-  return _c("td", [_c("button", {
+  return _c("td", {
+    staticStyle: {
+      width: "5%"
+    }
+  }, [_c("button", {
     staticClass: "btn btn-primary btn-sm",
     attrs: {
       type: "submit",
@@ -6049,7 +6154,7 @@ exports = module.exports = __webpack_require__(/*! ../../../../node_modules/css-
 
 
 // module
-exports.push([module.i, ".form-control[data-v-2b98d8f4]:focus {\n  border-color: transparent !important;\n}\n\n/* Chrome, Safari, Edge, Opera */\ninput[data-v-2b98d8f4]::-webkit-outer-spin-button,\ninput[data-v-2b98d8f4]::-webkit-inner-spin-button {\n  -webkit-appearance: none;\n  margin: 0;\n}\n\n/* Firefox */\ninput[type=number][data-v-2b98d8f4] {\n  -moz-appearance: textfield;\n}\n.bg-transparent-input[data-v-2b98d8f4] {\n  background: transparent !important;\n  height: 2.5rem !important;\n}\n.bg-transparent-input[data-v-2b98d8f4]:focus {\n  border-color: transparent;\n  border: none !important;\n}\n.table-transaction thead tr th[data-v-2b98d8f4] {\n  background-color: #96B183;\n  color: #ffffff;\n  text-align: right;\n}\n.table-transaction tbody tr td[data-v-2b98d8f4] {\n  text-align: right;\n}\n.table-transaction tbody tr.input-box[data-v-2b98d8f4] {\n  background-color: #fff69f !important;\n}\n.table-transaction tbody tr.input-box td[data-v-2b98d8f4] {\n  padding: 0;\n  color: #000;\n  border: 1px solid #d6d6d6;\n  border-bottom: none;\n}\n.table-transaction tbody tr.input-box input[data-v-2b98d8f4] {\n  width: 100% !important;\n  border: none !important;\n  border-radius: 0;\n  padding: 0 10px !important;\n  color: #000 !important;\n  background-color: #fff69f !important;\n  background: #fff69f !important;\n  outline: none !important;\n}\n.table-transaction tbody tr.input-box .form-control[readonly][data-v-2b98d8f4] {\n  width: 100% !important;\n  border: none !important;\n  padding: 0 10px !important;\n  color: #000 !important;\n  background-color: #fff69f !important;\n  border-radius: 0;\n  background: #fff69f !important;\n  outline: none !important;\n}\n.table-transaction tbody tr.input-box .form-control[readonly][data-v-2b98d8f4]:focus {\n  border-color: transparent;\n  border: none !important;\n}\n.table-transaction tbody tr.input-box .form-control[data-v-2b98d8f4] {\n  width: 100% !important;\n  border: none !important;\n  padding: 0 10px !important;\n  color: #000 !important;\n  background-color: #fff69f !important;\n  border-radius: 0;\n  background: #fff69f !important;\n  outline: none !important;\n}\n.table-transaction tbody tr.input-box .form-control[data-v-2b98d8f4]:focus {\n  border-color: transparent;\n  border: none !important;\n}\n.table-transaction tbody tr.input-box select[data-v-2b98d8f4] {\n  width: 100% !important;\n  border: none !important;\n  padding: 0 10px !important;\n  color: #000 !important;\n  background-color: #fff69f !important;\n  outline: none !important;\n}\n.table-transaction tbody tr[data-v-2b98d8f4]:nth-child(odd) {\n  background-color: #BFDEB9;\n}\n.table-transaction tbody tr[data-v-2b98d8f4]:nth-child(even) {\n  background-color: #F6FFDA;\n}", ""]);
+exports.push([module.i, ".form-control[data-v-2b98d8f4]:focus {\n  border-color: transparent !important;\n}\n\n/* Chrome, Safari, Edge, Opera */\ninput[data-v-2b98d8f4]::-webkit-outer-spin-button,\ninput[data-v-2b98d8f4]::-webkit-inner-spin-button {\n  -webkit-appearance: none;\n  margin: 0;\n}\n\n/* Firefox */\ninput[type=number][data-v-2b98d8f4] {\n  -moz-appearance: textfield;\n}\n.bg-transparent-input[data-v-2b98d8f4] {\n  background: transparent !important;\n  height: 2.5rem !important;\n}\n.bg-transparent-input[data-v-2b98d8f4]:focus {\n  border-color: transparent;\n  border: none !important;\n}\n.table-height[data-v-2b98d8f4] {\n  max-height: 65vh;\n  overflow: auto;\n}\n.table-transaction[data-v-2b98d8f4] {\n  margin-bottom: 0;\n}\n.table-transaction thead tr th[data-v-2b98d8f4] {\n  background-color: #96B183;\n  color: #ffffff;\n  text-align: right;\n}\n.table-transaction.table-scroll tbody[data-v-2b98d8f4] {\n  display: block;\n  overflow: auto;\n  height: 200px;\n  width: 100%;\n}\n.table-transaction tbody tr td[data-v-2b98d8f4] {\n  text-align: right;\n}\n.table-transaction tbody tr.input-box[data-v-2b98d8f4] {\n  background-color: #fff69f !important;\n}\n.table-transaction tbody tr.input-box td[data-v-2b98d8f4] {\n  padding: 0;\n  color: #000;\n  border: 1px solid #d6d6d6;\n  border-bottom: none;\n}\n.table-transaction tbody tr.input-box input[data-v-2b98d8f4] {\n  width: 100% !important;\n  border: none !important;\n  border-radius: 0;\n  padding: 0 10px !important;\n  color: #000 !important;\n  background-color: #fff69f !important;\n  background: #fff69f !important;\n  outline: none !important;\n}\n.table-transaction tbody tr.input-box .form-control[readonly][data-v-2b98d8f4] {\n  width: 100% !important;\n  border: none !important;\n  padding: 0 10px !important;\n  color: #000 !important;\n  background-color: #fff69f !important;\n  border-radius: 0;\n  background: #fff69f !important;\n  outline: none !important;\n}\n.table-transaction tbody tr.input-box .form-control[readonly][data-v-2b98d8f4]:focus {\n  border-color: transparent;\n  border: none !important;\n}\n.table-transaction tbody tr.input-box .form-control[data-v-2b98d8f4] {\n  width: 100% !important;\n  border: none !important;\n  padding: 0 10px !important;\n  color: #000 !important;\n  background-color: #fff69f !important;\n  border-radius: 0;\n  background: #fff69f !important;\n  outline: none !important;\n}\n.table-transaction tbody tr.input-box .form-control[data-v-2b98d8f4]:focus {\n  border-color: transparent;\n  border: none !important;\n}\n.table-transaction tbody tr.input-box select[data-v-2b98d8f4] {\n  width: 100% !important;\n  border: none !important;\n  padding: 0 10px !important;\n  color: #000 !important;\n  background-color: #fff69f !important;\n  outline: none !important;\n}\n.table-transaction tbody tr[data-v-2b98d8f4]:nth-child(odd) {\n  background-color: #BFDEB9;\n}\n.table-transaction tbody tr[data-v-2b98d8f4]:nth-child(even) {\n  background-color: #F6FFDA;\n}", ""]);
 
 // exports
 

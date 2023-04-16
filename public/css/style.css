@@ -12852,14 +12852,13 @@ label {
     padding: 0rem;
     background: #4886EE;
     z-index: 3;
-    padding-left: 20.563rem;
+    padding-left: 18.563rem;
     padding-top: 0rem;
     transition: all 0.2s ease;
 }
 
 .header .header-content {
     height: 100%;
-    padding-left: 7rem;
     padding-right: 1.875rem;
     align-items: center;
     display: flex;

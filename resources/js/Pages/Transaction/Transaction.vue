@@ -3,64 +3,79 @@
         <form @submit.prevent="addTransaction" id="transaction_form"></form>
 
         <div class="container-fluid">
-            <div class="text-end mb-3">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <router-link :to="{name: 'Accounts'}"><i class="fa-solid fa-left-long fa-3x"></i></router-link>
+                <div class="categoryName">{{singleCategory.category}}</div>
                 <button class="btn btn-success" v-if="!loading" type="button" @click="saveTransaction">Save</button>
                 <button class="btn btn-success" v-if="loading" type="button">Saving...</button>
             </div>
+            <div class="table-height d-flex flex-column-reverse" id="table-scroll">
+                <table class="table table-sm table-transaction table-responsive">
+                    <thead>
+                    <tr>
+                        <th style="width: 10%" class="text-start">Date</th>
+                        <th style="width: 30%" class="text-start">Description</th>
+                        <th style="width: 20%" class="text-start">Transfer</th>
+                        <th style="width: 10%">{{getNameDr()}}</th>
+                        <th style="width: 10%">{{getNameCr()}}</th>
+                        <th style="width: 15%">Balance</th>
+                        <th style="width: 5%">Action</th>
+                    </tr>
+                    </thead>
+                    <tbody v-if="!getLoading">
+                    <tr v-for="transaction of transactionParam.transaction">
+                        <td class="text-start">{{ formatDate(transaction.date) }}</td>
+                        <td class="text-start">{{ transaction.description }}</td>
+                        <td class="text-start">{{ categoryName(transaction.account_id) }}</td>
+                        <td>{{ formatPrice(transaction.debit_amount) }}</td>
+                        <td>{{ formatPrice(transaction.credit_amount) }}</td>
+                        <td>
+                            <span v-if="transaction.balance < 0" class="text-danger">({{ formatPrice(Math.abs(transaction.balance)) }})</span>
+                            <span v-else>{{ formatPrice(transaction.balance) }}</span>
+                        </td>
+                        <td>
+                            <i class="fa fa-edit me-2 cursor-pointer"></i>
+                            <i class="fa fa-trash cursor-pointer"></i>
+                        </td>
+                    </tr>
+                    </tbody>
+                    <tbody v-if="getLoading">
+                    <tr>
+                        <td colspan="20">
+                            <div class="d-flex align-items-center justify-content-center" style="height: 300px"><i class="fas fa-spinner fa-5x fa-spin"></i></div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
             <table class="table table-sm table-transaction table-responsive">
-                <thead>
-                <tr>
-                    <th class="text-start">Date</th>
-                    <th class="text-start">Description</th>
-                    <th class="text-start">Transfer</th>
-                    <th>{{getNameDr()}}</th>
-                    <th>{{getNameCr()}}</th>
-                    <th>Balance</th>
-                    <th>Action</th>
-                </tr>
-                </thead>
                 <tbody>
-                <tr v-for="transaction of transactionParam.transaction">
-                    <td class="text-start">{{ formatDate(transaction.date) }}</td>
-                    <td class="text-start">{{ transaction.description }}</td>
-                    <td class="text-start">{{ categoryName(transaction.account_id) }}</td>
-                    <td>{{ formatPrice(transaction.debit_amount) }}</td>
-                    <td>{{ formatPrice(transaction.credit_amount) }}</td>
-                    <td>
-                        <span v-if="transaction.balance < 0" class="text-danger">({{ formatPrice(Math.abs(transaction.balance)) }})</span>
-                        <span v-else>{{ formatPrice(transaction.balance) }}</span>
-                    </td>
-                    <td>
-                        <i class="fa fa-edit me-2 cursor-pointer"></i>
-                        <i class="fa fa-trash cursor-pointer"></i>
-                    </td>
-                </tr>
                 <tr class="input-box">
-                    <td class="text-start">
+                    <td style="width: 10%" class="text-start">
                         <input type="text" class="date bg-transparent-input" placeholder="Date" v-model="param.date"
                                form="transaction_form">
                     </td>
-                    <td class="text-start">
+                    <td style="width: 30%" class="text-start">
                         <input type="text" placeholder="Description" v-model="param.description"
                                form="transaction_form">
                     </td>
-                    <td>
+                    <td style="width: 20%">
                         <select name="parent_category" v-model=param.account_id form="transaction_form">
                             <option v-for="pCat in parentCategory" :value="pCat.id">{{ pCat.category }}</option>
                         </select>
                     </td>
-                    <td>
-                        <input type="number" class="text-end" placeholder="Increase" v-model="param.debit_amount"
+                    <td style="width: 10%">
+                        <input type="number" class="text-end" :placeholder="getNameDr()" v-model="param.debit_amount"
                                form="transaction_form">
                     </td>
-                    <td>
-                        <input type="number" class="text-end" placeholder="Decrease" v-model="param.credit_amount"
+                    <td style="width: 10%">
+                        <input type="number" class="text-end" :placeholder="getNameCr()" v-model="param.credit_amount"
                                form="transaction_form">
                     </td>
-                    <td>
+                    <td style="width: 15%">
                         <i class="p-1">Balance</i>
                     </td>
-                    <td>
+                    <td style="width: 5%">
                         <button type="submit" class="btn btn-primary btn-sm" form="transaction_form">Add</button>
                     </td>
                 </tr>
@@ -93,7 +108,8 @@ export default {
             },
             parent_category_id: '',
             singleCategory: {},
-            loading: false
+            loading: false,
+            getLoading: false
         }
     },
     methods: {
@@ -146,12 +162,13 @@ export default {
                 this.loading = false
                 if (parseInt(res.status) === 200) {
                     this.$toast.success(res.message);
-                    this.singleTransaction()
                 }
             });
         },
         singleTransaction: function () {
+            this.getLoading = true
             ApiService.POST(ApiRoutes.TransactionSingle, {id: this.parent_category_id}, res => {
+                this.getLoading = false
                 if (parseInt(res.status) === 200) {
                     this.transactionParam.transaction = res.data
                 }
@@ -195,6 +212,8 @@ export default {
                     debit_amount: '',
                     balance: '',
                 }
+                let objDiv = document.getElementById("table-scroll");
+                objDiv.scrollTop = objDiv.scrollHeight;
             } else {
                 this.$toast.error('Please insert all input field');
             }
@@ -232,6 +251,7 @@ export default {
         this.singleTransaction()
     },
     mounted() {
+        $('#dashboard_bar').text('Transaction')
         setTimeout(() => {
             $('.date').flatpickr({
                 altInput: true,
@@ -273,8 +293,12 @@ input[type=number] {
         border: none !important;
     }
 }
-
+.table-height{
+    max-height: 65vh;
+    overflow: auto;
+}
 .table-transaction {
+    margin-bottom: 0;
     thead {
         tr {
             th {
@@ -282,6 +306,14 @@ input[type=number] {
                 color: #ffffff;
                 text-align: right;
             }
+        }
+    }
+    &.table-scroll {
+        tbody{
+            display:block;
+            overflow:auto;
+            height:200px;
+            width:100%;
         }
     }
 

@@ -302,7 +302,10 @@ import ApiService from "../../Services/ApiService";
 import ApiRoutes from "../../Services/ApiRoutes";
 
 export default {
-    name: "Dashboard"
+    name: "Dashboard",
+    mounted() {
+        $('#dashboard_bar').text('Category')
+    }
 }
 </script>
 

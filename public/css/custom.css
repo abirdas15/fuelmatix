@@ -366,3 +366,27 @@ h1 {
      border-color: transparent;
      border: none!important;
  }
+.categoryName{
+    font-size: 20px;
+    font-weight: 600;
+}
+/* width */
+::-webkit-scrollbar {
+    width: 5px;
+    border-radius: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: #a7a7a7;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: #808080;
+}
