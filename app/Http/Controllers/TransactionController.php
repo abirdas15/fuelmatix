@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class TransactionController extends Controller
@@ -27,6 +28,7 @@ class TransactionController extends Controller
             $newTransaction->debit_amount = $transaction['debit_amount'] ?? 0;
             $newTransaction->credit_amount = $transaction['credit_amount'] ?? 0;
             $newTransaction->linked_id = $inputData['linked_id'];
+            $newTransaction->added_by = Auth::user()->id;
             $newTransaction->save();
 
             $category = Category::with('parent')->where('id', $newTransaction->account_id)->first();
@@ -36,11 +38,9 @@ class TransactionController extends Controller
                 $balance = $newTransaction['credit_amount'] - $newTransaction['debit_amount'];
             } else if ($category['type'] == 'income') {
                 $balance = $newTransaction['debit_amount'] - $newTransaction['credit_amount'];
-            } else if ($category['type'] == 'income') {
-                $balance = $newTransaction['debit_amount'] - $newTransaction['credit_amount'];
-            } else if ($category['type'] == 'assets') {
+            }  else if ($category['type'] == 'assets') {
                 $balance = $newTransaction['credit_amount'] - $newTransaction['debit_amount'];
-            } else if ($category['type'] == 'assets') {
+            } else if ($category['type'] == 'liabilities') {
                 $balance = $newTransaction['debit_amount'] - $newTransaction['credit_amount'];
             } else if ($category['type'] == 'equity') {
                 $balance = $newTransaction['debit_amount'] - $newTransaction['credit_amount'];
@@ -55,6 +55,7 @@ class TransactionController extends Controller
             $newTransaction->debit_amount = $transaction['credit_amount'] ?? 0;
             $newTransaction->credit_amount = $transaction['debit_amount'] ?? 0;
             $newTransaction->linked_id = $transaction['account_id'];
+            $newTransaction->added_by = Auth::user()->id;
             $newTransaction->save();
 
             $category = Category::with('parent')->where('id', $newTransaction->account_id)->first();
@@ -64,11 +65,9 @@ class TransactionController extends Controller
                 $balance = $newTransaction['credit_amount'] - $newTransaction['debit_amount'];
             } else if ($category['type'] == 'income') {
                 $balance = $newTransaction['debit_amount'] - $newTransaction['credit_amount'];
-            } else if ($category['type'] == 'income') {
-                $balance = $newTransaction['debit_amount'] - $newTransaction['credit_amount'];
-            } else if ($category['type'] == 'assets') {
+            }  else if ($category['type'] == 'assets') {
                 $balance = $newTransaction['credit_amount'] - $newTransaction['debit_amount'];
-            } else if ($category['type'] == 'assets') {
+            } else if ($category['type'] == 'liabilities') {
                 $balance = $newTransaction['debit_amount'] - $newTransaction['credit_amount'];
             } else if ($category['type'] == 'equity') {
                 $balance = $newTransaction['debit_amount'] - $newTransaction['credit_amount'];
@@ -100,6 +99,13 @@ class TransactionController extends Controller
             ->where('linked_id', $inputData['id'])
             ->get()
             ->toArray();
+        foreach ($result as $key => &$data) {
+            if ($key == 0) {
+                $data['balance'] = $data['debit_amount'] - $data['credit_amount'];
+            } else {
+                $data['balance'] = $result[$key - 1]['balance'] + ($data['debit_amount'] - $data['credit_amount']);
+            }
+        }
         return response()->json(['status' => 200, 'data' => $result]);
     }
 }
