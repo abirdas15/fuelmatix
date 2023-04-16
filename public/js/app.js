@@ -2040,6 +2040,7 @@ __webpack_require__.r(__webpack_exports__);
           _this3.$toast.success(res.msg);
           _this3.closeModal();
           _this3.getCategory();
+          _this3.getParentCategory();
           _this3.accountParam = {
             category: '',
             code: '',
@@ -2061,6 +2062,7 @@ __webpack_require__.r(__webpack_exports__);
           _this4.$toast.success(res.msg);
           _this4.closeModal();
           _this4.getCategory();
+          _this4.getParentCategory();
         } else {
           _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].ErrorHandler(res.errors);
         }
@@ -2165,8 +2167,7 @@ __webpack_require__.r(__webpack_exports__);
       this.$router.push({
         name: 'Transaction',
         params: {
-          id: category.id,
-          name: category.category
+          id: category.id
         }
       });
     },
@@ -2373,9 +2374,14 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../Services/ApiService */ "./resources/js/Services/ApiService.js");
+/* harmony import */ var _Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../Services/ApiRoutes */ "./resources/js/Services/ApiRoutes.js");
+
+
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
+      parentCategory: [],
       transactionParam: {
         transaction: [],
         linked_id: ''
@@ -2385,27 +2391,93 @@ __webpack_require__.r(__webpack_exports__);
         description: '',
         account_id: '',
         credit_amount: '',
-        debit_amount: ''
+        debit_amount: '',
+        balance: 0
       },
       parent_category_id: '',
-      parent_category: ''
+      singleCategory: {}
     };
   },
   methods: {
-    addTransaction: function addTransaction() {
-      this.transactionParam.transaction.push(this.param);
+    categoryName: function categoryName(id) {
+      var rv = '';
+      this.parentCategory.map(function (v) {
+        if (v.id == id) {
+          rv = v.category;
+        }
+      });
+      return rv;
     },
-    balance: function balance() {
-      return '';
+    formatDate: function formatDate(date) {
+      var dateArr = date.split('-');
+      return dateArr[2] + '/' + dateArr[1] + '/' + dateArr[0];
+    },
+    addTransaction: function addTransaction() {
+      if (this.param.account_id != '' && (this.param.credit_amount != '' || this.param.debit_amount != '')) {
+        if (this.param.credit_amount != '' && this.param.debit_amount != '') {
+          if (Number(this.param.debit_amount) > Number(this.param.credit_amount)) {
+            this.param.debit_amount = this.param.debit_amount - this.param.credit_amount;
+            this.param.credit_amount = '';
+          } else {
+            this.param.credit_amount = this.param.credit_amount - this.param.debit_amount;
+            this.param.debit_amount = '';
+          }
+        }
+        if (this.param.date == '') {
+          this.param.date = moment().format('YYYY-MM-DD');
+        }
+        this.param.balance = this.param.debit_amount - this.param.credit_amount;
+        this.transactionParam.transaction.push(this.param);
+        this.calculateBalance();
+        this.param = {
+          date: '',
+          description: '',
+          account_id: '',
+          credit_amount: '',
+          debit_amount: '',
+          balance: ''
+        };
+      } else {
+        this.$toast.error('Please insert all input field');
+      }
+    },
+    calculateBalance: function calculateBalance() {
+      var _this = this;
+      this.transactionParam.transaction.map(function (v, i) {
+        if (i == 0) {
+          v.balance = v.debit_amount - v.credit_amount;
+        } else {
+          v.balance = _this.transactionParam.transaction[i - 1].balance + (v.debit_amount - v.credit_amount);
+        }
+      });
+    },
+    getParentCategory: function getParentCategory() {
+      var _this2 = this;
+      _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].CategoryParent, {}, function (res) {
+        if (parseInt(res.status) === 200) {
+          _this2.parentCategory = res.data;
+        }
+      });
+    },
+    getCategorySingle: function getCategorySingle() {
+      var _this3 = this;
+      _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].CategorySingle, {
+        id: this.parent_category_id
+      }, function (res) {
+        if (parseInt(res.status) === 200) {
+          _this3.singleCategory = res.data;
+        }
+      });
     }
   },
   created: function created() {
+    this.getParentCategory();
     this.parent_category_id = this.$route.params.id;
-    this.parent_category = this.$route.params.name;
     this.transactionParam.linked_id = this.parent_category_id;
+    this.getCategorySingle();
   },
   mounted: function mounted() {
-    var _this = this;
+    var _this4 = this;
     setTimeout(function () {
       $('.date').flatpickr({
         altInput: true,
@@ -2413,7 +2485,7 @@ __webpack_require__.r(__webpack_exports__);
         dateFormat: "Y-m-d",
         defaultDate: 'today',
         onChange: function onChange(dateStr) {
-          _this.param.date = dateStr;
+          _this4.param.date = dateStr;
         }
       });
     }, 500);
@@ -5680,16 +5752,28 @@ var render = function render() {
     _c = _vm._self._c;
   return _c("div", {
     staticClass: "content-body"
-  }, [_c("div", {
+  }, [_c("form", {
+    attrs: {
+      id: "transaction_form"
+    },
+    on: {
+      submit: function submit($event) {
+        $event.preventDefault();
+        return _vm.addTransaction.apply(null, arguments);
+      }
+    }
+  }), _vm._v(" "), _c("div", {
     staticClass: "container-fluid"
-  }, [_c("table", {
+  }, [_vm._m(0), _vm._v(" "), _c("table", {
     staticClass: "table table-sm table-transaction table-responsive"
-  }, [_vm._m(0), _vm._v(" "), _c("tbody", [_vm._l(_vm.transactionParam.transaction, function (transaction) {
+  }, [_vm._m(1), _vm._v(" "), _c("tbody", [_vm._l(_vm.transactionParam.transaction, function (transaction) {
     return _c("tr", [_c("td", {
       staticClass: "text-start"
-    }, [_vm._v(_vm._s(transaction.date))]), _vm._v(" "), _c("td", {
+    }, [_vm._v(_vm._s(_vm.formatDate(transaction.date)))]), _vm._v(" "), _c("td", {
       staticClass: "text-start"
-    }, [_vm._v(_vm._s(transaction.description))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(transaction.debit_amount))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(transaction.credit_amount))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(_vm.balance()))]), _vm._v(" "), _vm._m(1, true)]);
+    }, [_vm._v(_vm._s(transaction.description))]), _vm._v(" "), _c("td", {
+      staticClass: "text-start"
+    }, [_vm._v(_vm._s(_vm.categoryName(transaction.account_id)))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(transaction.debit_amount))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(transaction.credit_amount))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(transaction.balance))]), _vm._v(" "), _vm._m(2, true)]);
   }), _vm._v(" "), _c("tr", {
     staticClass: "input-box"
   }, [_c("td", {
@@ -5701,10 +5785,11 @@ var render = function render() {
       value: _vm.param.date,
       expression: "param.date"
     }],
-    staticClass: "date",
+    staticClass: "date bg-transparent-input",
     attrs: {
       type: "text",
-      placeholder: "Date"
+      placeholder: "Date",
+      form: "transaction_form"
     },
     domProps: {
       value: _vm.param.date
@@ -5726,7 +5811,8 @@ var render = function render() {
     }],
     attrs: {
       type: "text",
-      placeholder: "Description"
+      placeholder: "Description",
+      form: "transaction_form"
     },
     domProps: {
       value: _vm.param.description
@@ -5744,6 +5830,10 @@ var render = function render() {
       value: _vm.param.account_id,
       expression: "param.account_id"
     }],
+    attrs: {
+      name: "parent_category",
+      form: "transaction_form"
+    },
     on: {
       change: function change($event) {
         var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
@@ -5755,16 +5845,24 @@ var render = function render() {
         _vm.$set(_vm.param, "account_id", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
       }
     }
-  })]), _vm._v(" "), _c("td", [_c("input", {
+  }, _vm._l(_vm.parentCategory, function (pCat) {
+    return _c("option", {
+      domProps: {
+        value: pCat.id
+      }
+    }, [_vm._v(_vm._s(pCat.category))]);
+  }), 0)]), _vm._v(" "), _c("td", [_c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
       value: _vm.param.debit_amount,
       expression: "param.debit_amount"
     }],
+    staticClass: "text-end",
     attrs: {
       type: "number",
-      placeholder: "Increase"
+      placeholder: "Increase",
+      form: "transaction_form"
     },
     domProps: {
       value: _vm.param.debit_amount
@@ -5782,9 +5880,11 @@ var render = function render() {
       value: _vm.param.credit_amount,
       expression: "param.credit_amount"
     }],
+    staticClass: "text-end",
     attrs: {
       type: "number",
-      placeholder: "Decrease"
+      placeholder: "Decrease",
+      form: "transaction_form"
     },
     domProps: {
       value: _vm.param.credit_amount
@@ -5795,43 +5895,48 @@ var render = function render() {
         _vm.$set(_vm.param, "credit_amount", $event.target.value);
       }
     }
-  })]), _vm._v(" "), _vm._m(2), _vm._v(" "), _vm._m(3)])], 2)]), _vm._v(" "), _c("form", {
-    attrs: {
-      id: "transaction_form"
-    },
-    on: {
-      submit: function submit($event) {
-        $event.preventDefault();
-        return _vm.addTransaction.apply(null, arguments);
-      }
-    }
-  })])]);
+  })]), _vm._v(" "), _vm._m(3), _vm._v(" "), _vm._m(4)])], 2)])])]);
 };
 var staticRenderFns = [function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "text-end mb-3"
+  }, [_c("button", {
+    staticClass: "btn btn-success",
+    attrs: {
+      type: "button"
+    }
+  }, [_vm._v("Save")])]);
+}, function () {
   var _vm = this,
     _c = _vm._self._c;
   return _c("thead", [_c("tr", [_c("th", {
     staticClass: "text-start"
   }, [_vm._v("Date")]), _vm._v(" "), _c("th", {
     staticClass: "text-start"
-  }, [_vm._v("Description")]), _vm._v(" "), _c("th", [_vm._v("Transfer")]), _vm._v(" "), _c("th", [_vm._v("Increase")]), _vm._v(" "), _c("th", [_vm._v("Decrease")]), _vm._v(" "), _c("th", [_vm._v("Balance")]), _vm._v(" "), _c("th", [_vm._v("Action")])])]);
+  }, [_vm._v("Description")]), _vm._v(" "), _c("th", {
+    staticClass: "text-start"
+  }, [_vm._v("Transfer")]), _vm._v(" "), _c("th", [_vm._v("Increase")]), _vm._v(" "), _c("th", [_vm._v("Decrease")]), _vm._v(" "), _c("th", [_vm._v("Balance")]), _vm._v(" "), _c("th", [_vm._v("Action")])])]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
   return _c("td", [_c("i", {
     staticClass: "fa fa-edit me-2 cursor-pointer"
   }), _vm._v(" "), _c("i", {
-    staticClass: "fa fa-delete cursor-pointer"
+    staticClass: "fa fa-trash cursor-pointer"
   })]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
-  return _c("td", [_c("i", [_vm._v("Balance")])]);
+  return _c("td", [_c("i", {
+    staticClass: "p-1"
+  }, [_vm._v("Balance")])]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
   return _c("td", [_c("button", {
-    staticClass: "btn btn-primary",
+    staticClass: "btn btn-primary btn-sm",
     attrs: {
       type: "submit",
       form: "transaction_form"
@@ -5874,7 +5979,7 @@ exports = module.exports = __webpack_require__(/*! ../../../../node_modules/css-
 
 
 // module
-exports.push([module.i, ".table-transaction thead tr th[data-v-2b98d8f4] {\n  background-color: #96B183;\n  color: #ffffff;\n  text-align: right;\n}\n.table-transaction tbody tr td[data-v-2b98d8f4] {\n  text-align: right;\n}\n.table-transaction tbody tr.input-box[data-v-2b98d8f4] {\n  background-color: #fff69f !important;\n}\n.table-transaction tbody tr.input-box td[data-v-2b98d8f4] {\n  padding: 0;\n  color: #000;\n  border: 1px solid #d6d6d6;\n  border-bottom: none;\n}\n.table-transaction tbody tr.input-box input[data-v-2b98d8f4] {\n  width: 100%;\n  border: none;\n  padding: 10px;\n  color: #000;\n  background-color: #fff69f;\n  outline: none;\n}\n.table-transaction tbody tr.input-box select[data-v-2b98d8f4] {\n  width: 100%;\n  border: none;\n  padding: 10px;\n  color: #000;\n  background-color: #fff69f;\n  outline: none;\n}\n.table-transaction tbody tr[data-v-2b98d8f4]:nth-child(odd) {\n  background-color: #BFDEB9;\n}\n.table-transaction tbody tr[data-v-2b98d8f4]:nth-child(even) {\n  background-color: #F6FFDA;\n}", ""]);
+exports.push([module.i, ".form-control[data-v-2b98d8f4]:focus {\n  border-color: transparent !important;\n}\n\n/* Chrome, Safari, Edge, Opera */\ninput[data-v-2b98d8f4]::-webkit-outer-spin-button,\ninput[data-v-2b98d8f4]::-webkit-inner-spin-button {\n  -webkit-appearance: none;\n  margin: 0;\n}\n\n/* Firefox */\ninput[type=number][data-v-2b98d8f4] {\n  -moz-appearance: textfield;\n}\n.bg-transparent-input[data-v-2b98d8f4] {\n  background: transparent !important;\n  height: 2.5rem !important;\n}\n.bg-transparent-input[data-v-2b98d8f4]:focus {\n  border-color: transparent;\n  border: none !important;\n}\n.table-transaction thead tr th[data-v-2b98d8f4] {\n  background-color: #96B183;\n  color: #ffffff;\n  text-align: right;\n}\n.table-transaction tbody tr td[data-v-2b98d8f4] {\n  text-align: right;\n}\n.table-transaction tbody tr.input-box[data-v-2b98d8f4] {\n  background-color: #fff69f !important;\n}\n.table-transaction tbody tr.input-box td[data-v-2b98d8f4] {\n  padding: 0;\n  color: #000;\n  border: 1px solid #d6d6d6;\n  border-bottom: none;\n}\n.table-transaction tbody tr.input-box input[data-v-2b98d8f4] {\n  width: 100% !important;\n  border: none !important;\n  border-radius: 0;\n  padding: 0 10px !important;\n  color: #000 !important;\n  background-color: #fff69f !important;\n  background: #fff69f !important;\n  outline: none !important;\n}\n.table-transaction tbody tr.input-box .form-control[readonly][data-v-2b98d8f4] {\n  width: 100% !important;\n  border: none !important;\n  padding: 0 10px !important;\n  color: #000 !important;\n  background-color: #fff69f !important;\n  border-radius: 0;\n  background: #fff69f !important;\n  outline: none !important;\n}\n.table-transaction tbody tr.input-box .form-control[readonly][data-v-2b98d8f4]:focus {\n  border-color: transparent;\n  border: none !important;\n}\n.table-transaction tbody tr.input-box .form-control[data-v-2b98d8f4] {\n  width: 100% !important;\n  border: none !important;\n  padding: 0 10px !important;\n  color: #000 !important;\n  background-color: #fff69f !important;\n  border-radius: 0;\n  background: #fff69f !important;\n  outline: none !important;\n}\n.table-transaction tbody tr.input-box .form-control[data-v-2b98d8f4]:focus {\n  border-color: transparent;\n  border: none !important;\n}\n.table-transaction tbody tr.input-box select[data-v-2b98d8f4] {\n  width: 100% !important;\n  border: none !important;\n  padding: 0 10px !important;\n  color: #000 !important;\n  background-color: #fff69f !important;\n  outline: none !important;\n}\n.table-transaction tbody tr[data-v-2b98d8f4]:nth-child(odd) {\n  background-color: #BFDEB9;\n}\n.table-transaction tbody tr[data-v-2b98d8f4]:nth-child(even) {\n  background-color: #F6FFDA;\n}", ""]);
 
 // exports
 
@@ -35554,7 +35659,7 @@ var router = new vue_router__WEBPACK_IMPORTED_MODULE_1__["default"]({
       name: "Accounts",
       component: _Pages_Category_Category_vue__WEBPACK_IMPORTED_MODULE_7__["default"]
     }, {
-      path: ROOT_URL + "/transaction",
+      path: ROOT_URL + "/transaction/:id",
       name: "Transaction",
       component: _Pages_Transaction_Transaction_vue__WEBPACK_IMPORTED_MODULE_8__["default"]
     }]
