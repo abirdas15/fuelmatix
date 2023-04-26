@@ -65,5 +65,6 @@
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <!--==============pi chart cdn link up===========-->
 <script src="{{ asset('js/plugins-init/chartjs-init.js') }}"></script>
+<script src="{{ asset('js/print.js') }}"></script>
 </body>
 </html>

@@ -2002,6 +2002,9 @@ __webpack_require__.r(__webpack_exports__);
           _this.balance = res.data;
         }
       });
+    },
+    print: function print() {
+      $('#print_area').print();
     }
   },
   mounted: function mounted() {
@@ -2918,7 +2921,13 @@ var render = function render() {
     staticClass: "content-body"
   }, [_c("div", {
     staticClass: "container-fluid"
-  }, [_vm._m(0), _vm._v(" "), _c("div", {
+  }, [_c("div", {
+    staticClass: "text-end"
+  }), _vm._v(" "), _c("div", {
+    attrs: {
+      id: "print_area"
+    }
+  }, [_c("div", {
     staticClass: "text-center mb-3"
   }, [_c("h2", [_vm._v("Balance Sheet")]), _vm._v(" "), _c("input", {
     directives: [{
@@ -2990,17 +2999,9 @@ var render = function render() {
     staticClass: "d-flex align-items-center justify-content-between"
   }, [_c("h4", [_vm._v("Total Liabilities and Equity ")]), _vm._v(" "), _c("strong", [_vm.balance.total_equity_and_liabilities < 0 ? _c("span", {
     staticClass: "text-danger"
-  }, [_vm._v("(" + _vm._s(_vm.formatPrice(Math.abs(_vm.balance.total_equity_and_liabilities))) + ")")]) : _c("span", [_vm._v(_vm._s(_vm.formatPrice(_vm.balance.total_equity_and_liabilities)))])])])], 2) : _vm._e()])])]);
+  }, [_vm._v("(" + _vm._s(_vm.formatPrice(Math.abs(_vm.balance.total_equity_and_liabilities))) + ")")]) : _c("span", [_vm._v(_vm._s(_vm.formatPrice(_vm.balance.total_equity_and_liabilities)))])])])], 2) : _vm._e()])])])]);
 };
-var staticRenderFns = [function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("div", {
-    staticClass: "text-end"
-  }, [_c("button", {
-    staticClass: "btn btn-primary"
-  }, [_vm._v("Print")])]);
-}];
+var staticRenderFns = [];
 render._withStripped = true;
 
 

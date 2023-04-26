@@ -1,68 +1,69 @@
 <template>
     <div class="content-body">
-        <div class="container-fluid">
+        <div class="container-fluid" >
             <div class="text-end">
-                <button class="btn btn-primary">Print</button>
+<!--                <button class="btn btn-primary" @click="print">Print</button>-->
             </div>
-            <div class="text-center mb-3">
-                <h2>Balance Sheet</h2>
-                <input type="text" class="date form-control m-auto w-15" placeholder="Date" v-model="param.date">
-            </div>
-            <div class="w-35 balance-sheet">
-                <div class="asset-value" v-if="assets.length > 0">
-                    <h4>Assets</h4>
-                    <TreeNode v-for="data in assets" :key="data.id" :node="data"/>
-                    <div class="d-flex align-items-center justify-content-between">
-                        <h4>Total Assets</h4>
-                        <strong>
-                            <span v-if="balance.total_asset < 0" class="text-danger">({{formatPrice(Math.abs(balance.total_asset))}})</span>
-                            <span v-else>{{formatPrice(balance.total_asset)}}</span>
-                        </strong>
-                    </div>
-                    <hr>
-                    <hr>
+            <div id="print_area">
+                <div class="text-center mb-3" >
+                    <h2>Balance Sheet</h2>
+                    <input type="text" class="date form-control m-auto w-15" placeholder="Date" v-model="param.date">
                 </div>
-                <div class="liability-value" v-if="liabilities.length > 0">
-                    <h4>Liabilities</h4>
-                    <TreeNode v-for="data in liabilities" :key="data.id" :node="data"/>
-                    <div class="d-flex align-items-center justify-content-between">
-                        <h4>Total Liabilities</h4>
-                        <strong>
-                            <span v-if="balance.total_liabilities < 0" class="text-danger">({{formatPrice(Math.abs(balance.total_liabilities))}})</span>
-                            <span v-else>{{formatPrice(balance.total_liabilities)}}</span>
-                        </strong>
+                <div class="w-35 balance-sheet">
+                    <div class="asset-value" v-if="assets.length > 0">
+                        <h4>Assets</h4>
+                        <TreeNode v-for="data in assets" :key="data.id" :node="data"/>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <h4>Total Assets</h4>
+                            <strong>
+                                <span v-if="balance.total_asset < 0" class="text-danger">({{formatPrice(Math.abs(balance.total_asset))}})</span>
+                                <span v-else>{{formatPrice(balance.total_asset)}}</span>
+                            </strong>
+                        </div>
+                        <hr>
+                        <hr>
                     </div>
-                    <hr>
-                </div>
-                <div class="equity-value" v-if="equity.length > 0">
-                    <h4>Equity</h4>
-                    <TreeNode v-for="data in equity" :key="data.id" :node="data"/>
-                    <div class="d-flex align-items-center justify-content-between">
-                        <h4>Retained Earnings</h4>
-                        <strong>
-                            <span v-if="balance.retain_earning < 0" class="text-danger">({{formatPrice(Math.abs(balance.retain_earning))}})</span>
-                            <span v-else>{{formatPrice(balance.retain_earning)}}</span>
-                        </strong>
+                    <div class="liability-value" v-if="liabilities.length > 0">
+                        <h4>Liabilities</h4>
+                        <TreeNode v-for="data in liabilities" :key="data.id" :node="data"/>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <h4>Total Liabilities</h4>
+                            <strong>
+                                <span v-if="balance.total_liabilities < 0" class="text-danger">({{formatPrice(Math.abs(balance.total_liabilities))}})</span>
+                                <span v-else>{{formatPrice(balance.total_liabilities)}}</span>
+                            </strong>
+                        </div>
+                        <hr>
                     </div>
-                    <div class="d-flex align-items-center justify-content-between">
-                        <h4>Total Equity</h4>
-                        <strong>
-                            <span v-if="balance.total_equity < 0" class="text-danger">({{formatPrice(Math.abs(balance.total_equity))}})</span>
-                            <span v-else>{{formatPrice(balance.total_equity)}}</span>
-                        </strong>
-                    </div>
-                    <hr>
+                    <div class="equity-value" v-if="equity.length > 0">
+                        <h4>Equity</h4>
+                        <TreeNode v-for="data in equity" :key="data.id" :node="data"/>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <h4>Retained Earnings</h4>
+                            <strong>
+                                <span v-if="balance.retain_earning < 0" class="text-danger">({{formatPrice(Math.abs(balance.retain_earning))}})</span>
+                                <span v-else>{{formatPrice(balance.retain_earning)}}</span>
+                            </strong>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <h4>Total Equity</h4>
+                            <strong>
+                                <span v-if="balance.total_equity < 0" class="text-danger">({{formatPrice(Math.abs(balance.total_equity))}})</span>
+                                <span v-else>{{formatPrice(balance.total_equity)}}</span>
+                            </strong>
+                        </div>
+                        <hr>
 
-                    <div class="d-flex align-items-center justify-content-between">
-                        <h4>Total Liabilities and Equity </h4>
-                        <strong>
-                            <span v-if="balance.total_equity_and_liabilities < 0" class="text-danger">({{formatPrice(Math.abs(balance.total_equity_and_liabilities))}})</span>
-                            <span v-else>{{formatPrice(balance.total_equity_and_liabilities)}}</span>
-                        </strong>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <h4>Total Liabilities and Equity </h4>
+                            <strong>
+                                <span v-if="balance.total_equity_and_liabilities < 0" class="text-danger">({{formatPrice(Math.abs(balance.total_equity_and_liabilities))}})</span>
+                                <span v-else>{{formatPrice(balance.total_equity_and_liabilities)}}</span>
+                            </strong>
+                        </div>
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
 </template>
@@ -100,6 +101,9 @@ export default {
                 }
             });
         },
+        print() {
+            $('#print_area').print()
+        }
     },
     mounted() {
         setTimeout(() => {
