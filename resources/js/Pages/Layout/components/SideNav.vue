@@ -10,11 +10,11 @@
                 </li>
 
                 <li style="text-align: center;">
-                    <router-link :to="{name: 'Vendor'}" class="has-arrow sidemenu-item px-4" href="javascript:void(0)"
+                    <a  class="has-arrow sidemenu-item px-4" href="javascript:void(0)"
                        aria-expanded="false">
                         <i class="fa-solid fa-cart-shopping icon-style me-0" aria-hidden="true"></i>
                         <span class="nav-text">Sales</span>
-                    </router-link>
+                    </a>
                     <ul aria-expanded="false">
                         <li><router-link :to="{name: 'Vendor'}" class="sudo-ele-none px-4 font-w500" href="./shiftSaleStart.html">Shift Sale</router-link></li>
                         <li><router-link :to="{name: 'Vendor'}" class="sudo-ele-none px-4 font-w500" href="./sale.html">Sale</router-link></li>
@@ -28,10 +28,10 @@
 
 
                 <li style="text-align: center;">
-                    <router-link :to="{name: 'Vendor'}" class="has-arrow sidemenu-item px-4" href="javascript:void(0)" aria-expanded="false">
+                    <a class="has-arrow sidemenu-item px-4" href="javascript:void(0)" aria-expanded="false">
                         <i class="fa-solid fa-gas-pump icon-style me-0" aria-hidden="true"></i>
                         <span class="nav-text ">Fule</span>
-                    </router-link>
+                    </a>
                     <ul aria-expanded="false">
                         <li><router-link :to="{name: 'Vendor'}" class="sudo-ele-none px-4 font-w500" href="./tankRefill.html">Refill</router-link></li>
                         <li><router-link :to="{name: 'Vendor'}" class="sudo-ele-none px-4 font-w500" href="./tankRefillHistory.html">Tank Refill
@@ -64,20 +64,20 @@
                   </ul>
                 </li> -->
                 <li style="text-align: center;">
-                    <router-link :to="{name: 'Vendor'}" class="has-arrow sidemenu-item px-4" href="javascript:void()" aria-expanded="false">
+                    <a class="has-arrow sidemenu-item px-4" href="javascript:void(0)" aria-expanded="false">
                         <i class="fa-regular fa-money-bill-1 icon-style me-0"></i>
                         <span class="nav-text">Payment </span>
-                    </router-link>
+                    </a>
                     <ul aria-expanded="false">
                         <li><router-link :to="{name: 'Vendor'}" class="sudo-ele-none px-4 font-w500" href="./#">Vendors</router-link></li>
                     </ul>
                 </li>
 
                 <li style="text-align: center;">
-                    <router-link :to="{name: 'Vendor'}" class="has-arrow sidemenu-item px-4" href="javascript:void()" aria-expanded="false">
+                    <a  class="has-arrow sidemenu-item px-4" href="javascript:void(0)" aria-expanded="false">
                         <i class="fa-solid fa-building-columns icon-style me-0"></i>
                         <span class="nav-text">Banks</span>
-                    </router-link>
+                    </a>
                     <ul aria-expanded="false">
                         <li><router-link :to="{name: 'Vendor'}" class="sudo-ele-none px-4 font-w500" href="./#">Bnaks </router-link></li>
                         <li><router-link :to="{name: 'Vendor'}" class="sudo-ele-none px-4 font-w500" href="./#">Personal Accounts</router-link></li>
@@ -87,10 +87,10 @@
                 </li>
 
                 <li style="text-align: center;">
-                    <router-link :to="{name: 'Vendor'}" class="has-arrow sidemenu-item px-4" href="javascript:void()" aria-expanded="false">
+                    <a class="has-arrow sidemenu-item px-4" href="javascript:void(0)" aria-expanded="false">
                         <i class="	fas fa-users icon-style me-0"></i>
                         <span class="nav-text">Field</span>
-                    </router-link>
+                    </a>
                     <ul aria-expanded="false">
                         <li><router-link :to="{name: 'Vendor'}" class="sudo-ele-none px-4 font-w500" href="./Field1.html">Field-1</router-link></li>
                         <li><router-link :to="{name: 'Vendor'}" class="sudo-ele-none px-4 font-w500" href="./Field217.html">Field-217</router-link></li>
@@ -104,10 +104,10 @@
                 </li>
 
                 <li style="text-align: center;">
-                    <router-link :to="{name: 'Vendor'}" class="has-arrow sidemenu-item px-4" href="javascript:void()" aria-expanded="false">
+                    <a class="has-arrow sidemenu-item px-4" href="javascript:void(0)" aria-expanded="false">
                         <i class="fa-solid fa-money-bill icon-style me-0"></i>
                         <span class="nav-text">Expenses</span>
-                    </router-link>
+                    </a>
                     <ul aria-expanded="false">
                         <li><router-link :to="{name: 'Vendor'}" class="sudo-ele-none px-4 font-w500" href="./expense.html">Expense</router-link></li>
                         <li><router-link :to="{name: 'Vendor'}" class="sudo-ele-none px-4 font-w500" href="./#">Salary Expense</router-link></li>
@@ -142,10 +142,10 @@
                 </li>
 
                 <li style="text-align: center;">
-                    <router-link :to="{name: 'Vendor'}" class="has-arrow sidemenu-item px-4" href="javascript:void()" aria-expanded="false">
+                    <a class="has-arrow sidemenu-item px-4" href="javascript:void(0)" aria-expanded="false">
                         <i class="	fas fa-users icon-style me-0"></i>
                         <span class="nav-text">Setup</span>
-                    </router-link>
+                    </a>
                     <ul aria-expanded="false">
                         <li><router-link :to="{name: 'Vendor'}" class="sudo-ele-none px-4 font-w500" href="./tank&NozzleSetup.html">Pump & Nozzle
                             Setup</router-link></li>
@@ -159,10 +159,10 @@
                 </li>
 
                 <li style="text-align: center;">
-                    <router-link :to="{name: 'Vendor'}" class="has-arrow sidemenu-item px-4" href="javascript:void()" aria-expanded="false">
+                    <a  class="has-arrow sidemenu-item px-4" href="javascript:void(0)" aria-expanded="false">
                         <i class="	fas fa-users icon-style me-0"></i>
                         <span class="nav-text">Report</span>
-                    </router-link>
+                    </a>
                     <ul aria-expanded="false">
                         <li><router-link :to="{name: 'Vendor'}" class="sudo-ele-none px-4 font-w500" href="./#">General</router-link></li>
                         <li><router-link :to="{name: 'Vendor'}" class="sudo-ele-none px-4 font-w500" href="./#">Income Statement</router-link></li>
@@ -185,11 +185,16 @@
                     </router-link>
                 </li>
                 <li style="text-align: center;">
-                    <router-link :to="{name: 'Accounts'}" class="sidemenu-item px-4" aria-expanded="false"  @click.native="LoadLoader()">
+                    <a  class="has-arrow sidemenu-item px-4" aria-expanded="false" >
                         <i class="fa-solid fa-dollar-sign icon-style"></i>
                         <span class="nav-text">Accounting</span>
-                    </router-link>
+                    </a>
+                    <ul aria-expanded="false">
+                        <li><router-link :to="{name: 'Accounts'}" class="sudo-ele-none px-4 font-w500" >Accounting</router-link></li>
+                        <li><router-link :to="{name: 'BalanceSheet'}" class="sudo-ele-none px-4 font-w500" >Balance Sheet</router-link></li>
+                    </ul>
                 </li>
+
                 <!-- <li>
                   <router-link :to={} href="settings.html" aria-expanded="false">
                     <i class="fas fa-cog"></i>

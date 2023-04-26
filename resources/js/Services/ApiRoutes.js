@@ -14,7 +14,9 @@ const ApiRoutes = {
     CategoryUpdate: ApiVersion + '/category/update',
     //Transaction
     TransactionSave: ApiVersion + '/transaction/save',
-    TransactionSingle: ApiVersion + '/transaction/single'
+    TransactionSingle: ApiVersion + '/transaction/single',
+    //Balance Sheet
+    BalanceSheetGet: ApiVersion + '/balance-sheet/get'
 
 };
 

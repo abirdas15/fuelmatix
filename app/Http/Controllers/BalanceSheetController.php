@@ -22,14 +22,18 @@ class BalanceSheetController extends Controller
         $assets = self::getAssets($inputData['date']);
         $liabilities = self::getLiabilities($inputData['date']);
         $equity = self::getEquity($inputData['date']);
+        $retain_earning = self::getRetainEarning($inputData['date']);
+        $total_equity = $retain_earning + self::getTotalAmount($equity);
+        $total_liabilities = self::getTotalAmount($liabilities);
         $result = [
             'assets' => $assets,
             'liabilities' => $liabilities,
             'equity' => $equity,
-            'retain_earning' => self::getRetainEarning($inputData['date']),
+            'retain_earning' => $retain_earning,
             'total_asset' => self::getTotalAmount($assets),
-            'total_liabilities' => self::getTotalAmount($liabilities),
-            'total_equity' => self::getTotalAmount($equity),
+            'total_liabilities' => $total_liabilities,
+            'total_equity' => $total_equity,
+            'total_equity_and_liabilities' => $total_equity + $total_liabilities,
         ];
         return response()->json(['status' => 200, 'data' => $result]);
     }
@@ -94,7 +98,7 @@ class BalanceSheetController extends Controller
         }
         return $branch;
     }
-    public function addCategoryAmount($categories, $transactions)
+    public static function addCategoryAmount($categories, $transactions)
     {
         foreach ($categories as &$category) {
             $category['balance'] = isset($transactions[$category['id']]) ? $transactions[$category['id']]  : 0;
