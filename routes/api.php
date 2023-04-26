@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\BalanceSheetController;
 
 /*
 |--------------------------------------------------------------------------
@@ -31,4 +32,8 @@ Route::group(['prefix' => 'transaction'], function() {
     Route::post('save', [TransactionController::class, 'save']);
     Route::post('single', [TransactionController::class, 'single']);
 });
+Route::group(['prefix' => 'balance-sheet'], function() {
+    Route::post('get', [BalanceSheetController::class, 'get']);
+});
+
 

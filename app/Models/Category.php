@@ -11,9 +11,6 @@ class Category extends Model
     protected $table = 'categories';
     public $timestamps = false;
 
-    protected $appends = [
-        'balance_format'
-    ];
 
     public function grandchildren()
     {
@@ -33,11 +30,8 @@ class Category extends Model
         return $this->grandparent()->with('parent');
     }
 
-    public function getBalanceFormatAttribute()
+    public function transaction()
     {
-        if ($this->balance != null) {
-            return number_format($this->balance, 2);
-        }
-        return '0.00';
+        return $this->hasMany(Transaction::class, 'account_id', 'id');
     }
 }

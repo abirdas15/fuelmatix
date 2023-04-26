@@ -10,4 +10,8 @@ class Transaction extends Model
     use HasFactory;
     protected $table = 'transactions';
     public $timestamps = false;
+    public function category()
+    {
+
+    }
 }

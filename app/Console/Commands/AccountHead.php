@@ -73,7 +73,35 @@ class AccountHead extends Command
                 'type' => 'expenses',
                 'balance' => 0,
                 'category_hericy' => json_encode(['Expenses'])
-            ]
+            ],
+            [
+                'category' => 'Current Assets',
+                'parent_category' => 1,
+                'type' => 'assets',
+                'balance' => 0,
+                'category_hericy' => json_encode(['Assets', 'Current Assets'])
+            ],
+            [
+                'category' => 'Account Receivable',
+                'parent_category' => 6,
+                'type' => 'assets',
+                'balance' => 0,
+                'category_hericy' => json_encode(['Assets', 'Current Asset', 'Account Receivable'])
+            ],
+            [
+                'category' => 'Current Liabilities',
+                'parent_category' => 3,
+                'type' => 'liabilities',
+                'balance' => 0,
+                'category_hericy' => json_encode(['Liabilities', 'Current Liabilities'])
+            ],
+            [
+                'category' => 'Account Payable',
+                'parent_category' => 8,
+                'type' => 'liabilities',
+                'balance' => 0,
+                'category_hericy' => json_encode(['Liabilities', 'Current Liabilities', 'Account Payable'])
+            ],
         ];
         Category::truncate();
         Category::insert($data);
