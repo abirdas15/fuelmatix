@@ -48,6 +48,19 @@
                         </select>
                         <div class="invalid-feedback"></div>
                     </div>
+                    <div class="col-sm-12 form-group">
+                        <label>Account Category</label>
+                        <select class="form-control sm-control" name="account_category"  v-model="accountParam.account_category">
+                            <option value="">Select Account Category</option>
+                            <option value="1">Cost of Good Sold</option>
+                            <option value="2">Operating Expense</option>
+                            <option value="3">Interest Expense</option>
+                            <option value="4">Tax</option>
+                            <option value="5">Account Payable</option>
+                            <option value="6">Account Receivable</option>
+                        </select>
+                        <div class="invalid-feedback"></div>
+                    </div>
                 </div>
                 <button type="submit" class="btn btn-primary " v-if="!infoLoading">Save</button>
                 <button type="button" class="btn btn-primary " disabled v-if="infoLoading">Saving...</button>
@@ -91,6 +104,19 @@
                         </select>
                         <div class="invalid-feedback"></div>
                     </div>
+                    <div class="col-sm-12 form-group">
+                        <label>Account Category</label>
+                        <select class="form-control sm-control" name="account_category"  v-model="accountParamEdit.account_category">
+                            <option value="">Select Account Category</option>
+                            <option value="1">Cost of Good Sold</option>
+                            <option value="2">Operating Expense</option>
+                            <option value="3">Interest Expense</option>
+                            <option value="4">Tax</option>
+                            <option value="5">Account Payable</option>
+                            <option value="6">Account Receivable</option>
+                        </select>
+                        <div class="invalid-feedback"></div>
+                    </div>
                 </div>
                 <button type="submit" class="btn btn-primary " v-if="!infoLoading">Update</button>
                 <button type="button" class="btn btn-primary " disabled v-if="infoLoading">Updating...</button>
@@ -117,6 +143,7 @@ export default {
                 description: '',
                 parent_category: '',
                 type: '',
+                account_category: ''
             },
             accountParamEdit: {
                 id: '',
@@ -125,6 +152,7 @@ export default {
                 description: '',
                 parent_category: '',
                 type: '',
+                account_category: ''
             },
             parent_id: '',
             infoLoading: false,
@@ -174,6 +202,7 @@ export default {
                         description: '',
                         parent_category: '',
                         type: '',
+                        account_category: ''
                     }
                 } else {
                     ApiService.ErrorHandler(res.errors);

@@ -2077,7 +2077,8 @@ __webpack_require__.r(__webpack_exports__);
         code: '',
         description: '',
         parent_category: '',
-        type: ''
+        type: '',
+        account_category: ''
       },
       accountParamEdit: {
         id: '',
@@ -2085,7 +2086,8 @@ __webpack_require__.r(__webpack_exports__);
         code: '',
         description: '',
         parent_category: '',
-        type: ''
+        type: '',
+        account_category: ''
       },
       parent_id: '',
       infoLoading: false
@@ -2137,7 +2139,8 @@ __webpack_require__.r(__webpack_exports__);
             code: '',
             description: '',
             parent_category: '',
-            type: ''
+            type: '',
+            account_category: ''
           };
         } else {
           _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].ErrorHandler(res.errors);
@@ -3252,6 +3255,60 @@ var render = function render() {
     }
   }, [_vm._v("Expenses")])]), _vm._v(" "), _c("div", {
     staticClass: "invalid-feedback"
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "col-sm-12 form-group"
+  }, [_c("label", [_vm._v("Account Category")]), _vm._v(" "), _c("select", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.accountParam.account_category,
+      expression: "accountParam.account_category"
+    }],
+    staticClass: "form-control sm-control",
+    attrs: {
+      name: "account_category"
+    },
+    on: {
+      change: function change($event) {
+        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
+          return o.selected;
+        }).map(function (o) {
+          var val = "_value" in o ? o._value : o.value;
+          return val;
+        });
+        _vm.$set(_vm.accountParam, "account_category", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
+      }
+    }
+  }, [_c("option", {
+    attrs: {
+      value: ""
+    }
+  }, [_vm._v("Select Account Category")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "1"
+    }
+  }, [_vm._v("Cost of Good Sold")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "2"
+    }
+  }, [_vm._v("Operating Expense")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "3"
+    }
+  }, [_vm._v("Interest Expense")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "4"
+    }
+  }, [_vm._v("Tax")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "5"
+    }
+  }, [_vm._v("Account Payable")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "6"
+    }
+  }, [_vm._v("Account Receivable")])]), _vm._v(" "), _c("div", {
+    staticClass: "invalid-feedback"
   })])]), _vm._v(" "), !_vm.infoLoading ? _c("button", {
     staticClass: "btn btn-primary",
     attrs: {
@@ -3444,6 +3501,60 @@ var render = function render() {
       value: "expenses"
     }
   }, [_vm._v("Expenses")])]), _vm._v(" "), _c("div", {
+    staticClass: "invalid-feedback"
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "col-sm-12 form-group"
+  }, [_c("label", [_vm._v("Account Category")]), _vm._v(" "), _c("select", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.accountParamEdit.account_category,
+      expression: "accountParamEdit.account_category"
+    }],
+    staticClass: "form-control sm-control",
+    attrs: {
+      name: "account_category"
+    },
+    on: {
+      change: function change($event) {
+        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
+          return o.selected;
+        }).map(function (o) {
+          var val = "_value" in o ? o._value : o.value;
+          return val;
+        });
+        _vm.$set(_vm.accountParamEdit, "account_category", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
+      }
+    }
+  }, [_c("option", {
+    attrs: {
+      value: ""
+    }
+  }, [_vm._v("Select Account Category")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "1"
+    }
+  }, [_vm._v("Cost of Good Sold")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "2"
+    }
+  }, [_vm._v("Operating Expense")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "3"
+    }
+  }, [_vm._v("Interest Expense")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "4"
+    }
+  }, [_vm._v("Tax")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "5"
+    }
+  }, [_vm._v("Account Payable")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "6"
+    }
+  }, [_vm._v("Account Receivable")])]), _vm._v(" "), _c("div", {
     staticClass: "invalid-feedback"
   })])]), _vm._v(" "), !_vm.infoLoading ? _c("button", {
     staticClass: "btn btn-primary",
@@ -6502,7 +6613,7 @@ exports = module.exports = __webpack_require__(/*! ../../../../node_modules/css-
 
 
 // module
-exports.push([module.i, "\n.w-85[data-v-0b95009a]{\n    width: 85%;\n}\n", ""]);
+exports.push([module.i, "\n.w-85[data-v-0b95009a]{\r\n    width: 85%;\n}\r\n", ""]);
 
 // exports
 
@@ -36684,7 +36795,7 @@ var app = new vue__WEBPACK_IMPORTED_MODULE_1___default.a({
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! E:\xampp8\htdocs\projects\fuelmatix\resources\js\app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! D:\xampp7.4\htdocs\fuelmatix\resources\js\app.js */"./resources/js/app.js");
 
 
 /***/ })

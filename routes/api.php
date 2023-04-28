@@ -6,6 +6,12 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\BalanceSheetController;
+use App\Http\Controllers\ProfitLossController;
+use App\Http\Controllers\IncomeStatementController;
+use App\Http\Controllers\PayableController;
+use App\Http\Controllers\ReceivableController;
+use App\Http\Controllers\TrailBalanceController;
+use App\Http\Controllers\LedgerController;
 
 /*
 |--------------------------------------------------------------------------
@@ -35,5 +41,25 @@ Route::group(['prefix' => 'transaction'], function() {
 Route::group(['prefix' => 'balance-sheet'], function() {
     Route::post('get', [BalanceSheetController::class, 'get']);
 });
+Route::group(['prefix' => 'profit-and-loss'], function() {
+    Route::post('get', [ProfitLossController::class, 'get']);
+});
+Route::group(['prefix' => 'income-statement'], function() {
+    Route::post('get', [IncomeStatementController::class, 'get']);
+});
+Route::group(['prefix' => 'payable'], function() {
+    Route::post('get', [PayableController::class, 'get']);
+});
+Route::group(['prefix' => 'receivable'], function() {
+    Route::post('get', [ReceivableController::class, 'get']);
+});
+Route::group(['prefix' => 'trail-balance'], function() {
+    Route::post('get', [TrailBalanceController::class, 'get']);
+});
+Route::group(['prefix' => 'ledger'], function() {
+    Route::post('get', [LedgerController::class, 'get']);
+});
+
+
 
 

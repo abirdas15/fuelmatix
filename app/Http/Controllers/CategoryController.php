@@ -45,12 +45,18 @@ class CategoryController extends Controller
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
+        if ($inputData['type'] == 'expenses') {
+            if ($inputData['account_category'] == '') {
+                return response()->json(['status' => 500, 'errors' => ['account_category' => ['Account category field is required.']]]);
+            }
+        }
         $category = new Category();
         $category->category = $inputData['category'];
         $category->code = $inputData['code'] ?? null;
         $category->parent_category = !empty($inputData['parent_category']) ? $inputData['parent_category'] : null;
         $category->type = $inputData['type'];
         $category->description = $inputData['description'] ?? null;
+        $category->account_category = $inputData['account_category'] ?? 0;
         if ($category->save()) {
             if (!empty($inputData['parent_category'])) {
                 $parentCategory = Category::select('category_hericy')->where('id', $inputData['parent_category'])->first();
@@ -75,7 +81,7 @@ class CategoryController extends Controller
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
-        $result = Category::select('id', 'category', 'code', 'parent_category', 'type', 'description')
+        $result = Category::select('id', 'category', 'code', 'parent_category', 'type', 'description', 'account_category')
             ->where('id', $inputData['id'])
             ->first();
         return response()->json(['status' => 200, 'data' => $result]);
@@ -91,12 +97,18 @@ class CategoryController extends Controller
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
+        if ($inputData['type'] == 'expenses') {
+            if ($inputData['account_category'] == '') {
+                return response()->json(['status' => 500, 'errors' => ['account_category' => ['Account category field is required.']]]);
+            }
+        }
         $category = Category::find($inputData['id']);
         $category->category = $inputData['category'];
         $category->code = $inputData['code'] ?? null;
         $category->parent_category = !empty($inputData['parent_category']) ? $inputData['parent_category'] : null;
         $category->type = $inputData['type'];
         $category->description = $inputData['description'] ?? null;
+        $category->account_category = $inputData['account_category'] ?? 0;
         if ($category->save()) {
             if (!empty($inputData['parent_category'])) {
                 $parentCategory = Category::select('category_hericy')->where('id', $inputData['parent_category'])->first();
