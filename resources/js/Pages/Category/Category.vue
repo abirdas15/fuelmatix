@@ -176,10 +176,12 @@ export default {
     },
     methods: {
         openCategoryModal: function () {
+            ApiService.ClearErrorHandler()
             this.accountParam.parent_category = this.$store.getters.GetParentId
             $(".categoryModal").removeClass('d-none');
         },
         openCategoryEditModal: function () {
+            ApiService.ClearErrorHandler()
             this.accountParamEdit.parent_category = this.$store.getters.GetParentId
             this.getCategorySingle()
             $(".categoryModalEdit").removeClass('d-none');

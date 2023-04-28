@@ -192,6 +192,12 @@
                     <ul aria-expanded="false">
                         <li><router-link :to="{name: 'Accounts'}" class="sudo-ele-none px-4 font-w500" >Accounting</router-link></li>
                         <li><router-link :to="{name: 'BalanceSheet'}" class="sudo-ele-none px-4 font-w500" >Balance Sheet</router-link></li>
+                        <li><router-link :to="{name: 'ProfitLoss'}" class="sudo-ele-none px-4 font-w500" >Profit and loss</router-link></li>
+                        <li><router-link :to="{name: 'IncomeStatement'}" class="sudo-ele-none px-4 font-w500" >Income Statement</router-link></li>
+                        <li><router-link :to="{name: 'AccountPayable'}" class="sudo-ele-none px-4 font-w500" >Account Payable</router-link></li>
+                        <li><router-link :to="{name: 'AccountReceivable'}" class="sudo-ele-none px-4 font-w500" >Account Receivable</router-link></li>
+                        <li><router-link :to="{name: 'TrailBalance'}" class="sudo-ele-none px-4 font-w500" >Trail balance</router-link></li>
+                        <li><router-link :to="{name: 'LedgerSheet'}" class="sudo-ele-none px-4 font-w500" >Ledger Sheet</router-link></li>
                     </ul>
                 </li>
 

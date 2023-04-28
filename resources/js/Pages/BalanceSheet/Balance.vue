@@ -9,7 +9,7 @@
                     <h2>Balance Sheet</h2>
                     <input type="text" class="date form-control m-auto w-15" placeholder="Date" v-model="param.date">
                 </div>
-                <div class="w-35 balance-sheet">
+                <div class="w-35 balance-sheet" v-if="!loading">
                     <div class="asset-value" v-if="assets.length > 0">
                         <h4>Assets</h4>
                         <TreeNode v-for="data in assets" :key="data.id" :node="data"/>
@@ -39,11 +39,11 @@
                         <h4>Equity</h4>
                         <TreeNode v-for="data in equity" :key="data.id" :node="data"/>
                         <div class="d-flex align-items-center justify-content-between">
-                            <h4>Retained Earnings</h4>
-                            <strong>
+                            <div>Retained Earnings</div>
+                            <div>
                                 <span v-if="balance.retain_earning < 0" class="text-danger">({{formatPrice(Math.abs(balance.retain_earning))}})</span>
                                 <span v-else>{{formatPrice(balance.retain_earning)}}</span>
-                            </strong>
+                            </div>
                         </div>
                         <div class="d-flex align-items-center justify-content-between">
                             <h4>Total Equity</h4>
@@ -62,6 +62,9 @@
                             </strong>
                         </div>
                     </div>
+                </div>
+                <div class="w-35 balance-sheet text-center" v-if="loading">
+                    <i class="fas fa-spinner fa-5x fa-spin"></i>
                 </div>
             </div>
         </div>
@@ -83,15 +86,18 @@ export default {
             equity: [],
             param: {
                 date: ''
-            }
+            },
+            loading: false
         }
     },
     methods: {
         getBalanceSheet: function () {
+            this.loading = true
             if (this.param.date == '') {
                 this.param.date = moment().format('YYYY-MM-DD')
             }
             ApiService.POST(ApiRoutes.BalanceSheetGet, this.param, res => {
+                this.loading = false
                 if (parseInt(res.status) === 200) {
                     this.assets = res.data.assets;
                     this.liabilities = res.data.liabilities;
@@ -106,6 +112,8 @@ export default {
         }
     },
     mounted() {
+        $('#dashboard_bar').text('Balance Sheet')
+        this.loading = true
         setTimeout(() => {
             $('.date').flatpickr({
                 altInput: true,
@@ -126,6 +134,7 @@ export default {
 <style scoped lang="scss">
 
 .balance-sheet{
+    background-color: #ffffff;
     margin: auto;
     padding: 10px;
     border: 1px solid #d1cfcf;

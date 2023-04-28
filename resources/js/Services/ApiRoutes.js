@@ -16,7 +16,20 @@ const ApiRoutes = {
     TransactionSave: ApiVersion + '/transaction/save',
     TransactionSingle: ApiVersion + '/transaction/single',
     //Balance Sheet
-    BalanceSheetGet: ApiVersion + '/balance-sheet/get'
+    BalanceSheetGet: ApiVersion + '/balance-sheet/get',
+    //Profit and loss
+    ProfitLossGet: ApiVersion + '/profit-and-loss/get',
+    //Income statement
+    IncomeStatement: ApiVersion + '/income-statement/get',
+    //Account payable
+    PayableGet: ApiVersion + '/payable/get',
+    //Account receivable
+    ReceivableGet: ApiVersion + '/receivable/get',
+    //Trail Balance
+    TrailBalanceGet: ApiVersion + '/trail-balance/get',
+    //Ledger
+    LedgerGet: ApiVersion + '/ledger/get',
+
 
 };
 
