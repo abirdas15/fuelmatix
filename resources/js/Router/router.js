@@ -17,6 +17,12 @@ import AccountPayable from "../Pages/AccountPayable/payable";
 import AccountReceivable from "../Pages/AccountReceivable/receivable";
 import TrailBalance from "../Pages/TrialBalance/trail";
 import LedgerSheet from "../Pages/Ledger/ledger";
+import Product from "../Pages/Fuel/Product/List";
+import ProductAdd from "../Pages/Fuel/Product/Add";
+import ProductEdit from "../Pages/Fuel/Product/Edit";
+import Dispenser from "../Pages/Fuel/Dispenser/List";
+import DispenserAdd from "../Pages/Fuel/Dispenser/Add";
+import DispenserEdit from "../Pages/Fuel/Dispenser/Edit";
 
 const ROOT_URL = "";
 const router = new VueRouter({
@@ -41,6 +47,12 @@ const router = new VueRouter({
                 { path: ROOT_URL + "/account-receivable", name: "AccountReceivable", component: AccountReceivable},
                 { path: ROOT_URL + "/trial-balance", name: "TrailBalance", component: TrailBalance},
                 { path: ROOT_URL + "/ledger-sheet", name: "LedgerSheet", component: LedgerSheet},
+                { path: ROOT_URL + "/product", name: "Product", component: Product},
+                { path: ROOT_URL + "/product/add", name: "ProductAdd", component: ProductAdd},
+                { path: ROOT_URL + "/product/edit/:id", name: "ProductEdit", component: ProductEdit},
+                { path: ROOT_URL + "/dispenser", name: "Dispenser", component: Dispenser},
+                { path: ROOT_URL + "/dispenser/add", name: "DispenserAdd", component: DispenserAdd},
+                { path: ROOT_URL + "/dispenser/edit/:id", name: "DispenserEdit", component: DispenserEdit},
             ],
         },
     ],

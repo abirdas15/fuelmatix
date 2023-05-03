@@ -304,7 +304,7 @@ import ApiRoutes from "../../Services/ApiRoutes";
 export default {
     name: "Dashboard",
     mounted() {
-        $('#dashboard_bar').text('Category')
+        $('#dashboard_bar').text('Dashboard')
     }
 }
 </script>

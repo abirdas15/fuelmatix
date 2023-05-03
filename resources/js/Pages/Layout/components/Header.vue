@@ -2,13 +2,7 @@
   <div>
       <div class="nav-header">
           <a href="index.html" class="brand-logo">
-              <svg viewBox="0 0 24 24">
-                  <path d="M9 5a7 7 0 0 1 7 7h1v3h-1v4H9a7 7 0 0 1-7-7 7 7 0 0 1 7-7m0 3a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m8 9h5v4h-2v-2h-3v-2z" />
-              </svg>
-              <div class="brand-title">
-                  <h3 class="">FuleMetrics</h3>
-                  <span class="brand-sub-title">Admin Dashboard</span>
-              </div>
+              <img src="images/fuelBL.jpeg"alt="">
           </a>
           <div class="nav-control">
               <div class="hamburger">

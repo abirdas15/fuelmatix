@@ -29,7 +29,19 @@ const ApiRoutes = {
     TrailBalanceGet: ApiVersion + '/trail-balance/get',
     //Ledger
     LedgerGet: ApiVersion + '/ledger/get',
-
+    //Product
+    ProductAdd: ApiVersion + '/product/save',
+    ProductEdit: ApiVersion + '/product/update',
+    ProductDelete: ApiVersion + '/product/delete',
+    ProductList: ApiVersion + '/product/list',
+    ProductSingle: ApiVersion + '/product/single',
+    ProductType: ApiVersion + '/product/type/list',
+    //Dispenser
+    DispenserAdd: ApiVersion + '/dispenser/save',
+    DispenserEdit: ApiVersion + '/dispenser/update',
+    DispenserDelete: ApiVersion + '/dispenser/delete',
+    DispenserList: ApiVersion + '/dispenser/list',
+    DispenserSingle: ApiVersion + '/dispenser/single',
 
 };
 
