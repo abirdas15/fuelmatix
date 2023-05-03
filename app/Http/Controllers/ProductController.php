@@ -46,7 +46,7 @@ class ProductController extends Controller
                 $q->where('products.name', 'LIKE', '%'.$keyword.'%');
                 $q->orWhere('products.selling_price', 'LIKE', '%'.$keyword.'%');
                 $q->orWhere('products.buying_price', 'LIKE', '%'.$keyword.'%');
-                $q->orWhere('product_type.name', 'LIKE', '%'.$keyword.'%');
+                $q->orWhere('product_types.name', 'LIKE', '%'.$keyword.'%');
             });
         }
         $result = $result->orderBy($order_by, $order_mode)
