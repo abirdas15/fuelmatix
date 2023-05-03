@@ -12,6 +12,9 @@ use App\Http\Controllers\PayableController;
 use App\Http\Controllers\ReceivableController;
 use App\Http\Controllers\TrailBalanceController;
 use App\Http\Controllers\LedgerController;
+use App\Http\Controllers\ProductTypeController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\DispenserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -58,6 +61,23 @@ Route::group(['prefix' => 'trail-balance'], function() {
 });
 Route::group(['prefix' => 'ledger'], function() {
     Route::post('get', [LedgerController::class, 'get']);
+});
+Route::group(['prefix' => 'product/type'], function() {
+    Route::post('list', [ProductTypeController::class, 'list']);
+});
+Route::group(['prefix' => 'product'], function() {
+    Route::post('save', [ProductController::class, 'save']);
+    Route::post('list', [ProductController::class, 'list']);
+    Route::post('single', [ProductController::class, 'single']);
+    Route::post('update', [ProductController::class, 'update']);
+    Route::post('delete', [ProductController::class, 'delete']);
+});
+Route::group(['prefix' => 'dispenser'], function() {
+    Route::post('save', [DispenserController::class, 'save']);
+    Route::post('list', [DispenserController::class, 'list']);
+    Route::post('single', [DispenserController::class, 'single']);
+    Route::post('update', [DispenserController::class, 'update']);
+    Route::post('delete', [DispenserController::class, 'delete']);
 });
 
 
