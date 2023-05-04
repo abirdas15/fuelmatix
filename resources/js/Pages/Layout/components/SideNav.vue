@@ -35,10 +35,10 @@
                         <li><router-link :to="{name: 'Dispenser'}" href="./dispenserList.html">Dispenser List</router-link></li>
                         <li><a href="./dispenserReading.html">Dispenser Reading</a></li>
                         <li><a href="./dispenserReadingHistory.html">Dispenser Reading History</a></li>
-                        <li><a href="./addNozzle.html">Add Nozzle</a></li>
-                        <li><a href="./nozzleList.html">Nozzle List</a></li>
-                        <li><a href="./nozzleReading.html">Nozzle Reading</a></li>
-                        <li><a href="./nozzleReadingHistory.html">Nozzle Reading History</a></li>
+                        <li><router-link :to="{name: 'NozzleAdd'}">Add Nozzle</router-link></li>
+                        <li><router-link :to="{name: 'Nozzle'}">Nozzle List</router-link></li>
+                        <li><router-link :to="{name: 'NozzleReadingAdd'}">Nozzle Reading</router-link></li>
+                        <li><router-link :to="{name: 'NozzleReading'}">Nozzle Reading History</router-link></li>
                         <li><a href="./addTank.html"> Add Tank</a></li>
                         <li><a href="./tankList.html"> Tank List</a></li>
                         <li><a href="./tankReading.html">Tank Reading</a></li>

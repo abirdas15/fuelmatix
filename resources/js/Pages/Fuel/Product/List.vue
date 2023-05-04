@@ -170,7 +170,7 @@ export default {
                 confirmButtonText: 'Yes, delete it!'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    this.DeleteAgent(data)
+                    this.Delete(data)
                 }
             })
         },
@@ -192,7 +192,7 @@ export default {
                 }
             });
         },
-        DeleteAgent: function (data) {
+        Delete: function (data) {
             ApiService.POST(ApiRoutes.ProductDelete, {id: data.id },res => {
                 if (parseInt(res.status) === 200) {
                     this.$toast.success(res.message);

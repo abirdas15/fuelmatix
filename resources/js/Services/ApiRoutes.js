@@ -42,6 +42,18 @@ const ApiRoutes = {
     DispenserDelete: ApiVersion + '/dispenser/delete',
     DispenserList: ApiVersion + '/dispenser/list',
     DispenserSingle: ApiVersion + '/dispenser/single',
+    //Nozzle
+    NozzleAdd: ApiVersion + '/nozzle/save',
+    NozzleEdit: ApiVersion + '/nozzle/update',
+    NozzleDelete: ApiVersion + '/nozzle/delete',
+    NozzleList: ApiVersion + '/nozzle/list',
+    NozzleSingle: ApiVersion + '/nozzle/single',
+    //Nozzle Reading
+    NozzleReadingAdd: ApiVersion + '/nozzle/reading/save',
+    NozzleReadingEdit: ApiVersion + '/nozzle/reading/update',
+    NozzleReadingDelete: ApiVersion + '/nozzle/reading/delete',
+    NozzleReadingList: ApiVersion + '/nozzle/reading/list',
+    NozzleReadingSingle: ApiVersion + '/nozzle/reading/single',
 
 };
 

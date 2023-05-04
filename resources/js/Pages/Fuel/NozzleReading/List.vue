@@ -4,17 +4,40 @@
             <div class="row page-titles">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item active"><router-link :to="{name: 'Dashboard'}">Home</router-link></li>
-                    <li class="breadcrumb-item"><a href="javascript:void(0)">Dispenser List</a></li>
-                    <li style="margin-left: 66%;"><router-link :to="{name: 'DispenserAdd'}"><i class="fa-solid fa-plus"></i> Add New Dispenser</router-link></li>
+                    <li class="breadcrumb-item"><a href="javascript:void(0)">Nozzle Reading List</a></li>
+                    <li style="margin-left: 66%;"><router-link :to="{name: 'NozzleReadingAdd'}"><i class="fa-solid fa-plus"></i> Add Nozzle Reading</router-link></li>
                 </ol>
             </div>
             <div class="row">
                 <div class="col-12">
                     <div class="card">
                         <div class="card-header bg-secondary">
-                            <h4 class="card-title">Dispenser List</h4>
+                            <h4 class="card-title">Nozzle Reading List</h4>
                         </div>
                         <div class="card-body">
+                            <div class="row align-items-end">
+                                <div class="col-xl-3 mb-3">
+                                    <div class="example">
+                                        <p class="mb-1">Select Date </p>
+                                        <input type="text" class="form-control date" name="date">
+                                    </div>
+                                </div>
+                                <div class="col-xl-3 mb-3">
+                                    <div class="example">
+                                        <p class="mb-1">Select Nozzle </p>
+                                        <select class="me-sm-2 form-control wide" v-model="Param.nozzle_id">
+                                            <option value="">Select Type</option>
+                                            <option v-for="t of nozzle" :value="t.id">{{t.name}}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-xl-3 mb-3">
+                                    <button type="button" class="btn btn-rounded btn-white border" @click="list"><span
+                                        class="btn-icon-start text-info"><i class="fa fa-filter color-white"></i>
+											</span>Filter</button>
+
+                                </div>
+                            </div>
                             <div class="row mt-4">
                                 <div class="table-responsive">
                                     <div class="dataTables_wrapper no-footer">
@@ -37,20 +60,20 @@
                                         <table class="display  dataTable no-footer" style="min-width: 845px">
                                             <thead>
                                             <tr class="text-white" style="background-color: #4886EE;color:#ffffff">
-                                                <th class="text-white" @click="sortData('serial')" :class="sortClass('serial')">Dispenser Serial</th>
-                                                <th class="text-white" @click="sortData('dispenser_name')" :class="sortClass('dispenser_name')">Dispenser Name</th>
-                                                <th class="text-white" @click="sortData('brand')" :class="sortClass('brand')">Dispenser Brand</th>
+                                                <th class="text-white" @click="sortData('name')" :class="sortClass('name')">Nozzle Name</th>
+                                                <th class="text-white" @click="sortData('date')" :class="sortClass('date')">Date</th>
+                                                <th class="text-white" @click="sortData('reading')" :class="sortClass('reading')">Reading</th>
                                                 <th class="text-white" >Action</th>
                                             </tr>
                                             </thead>
                                             <tbody v-if="listData.length > 0 && TableLoading == false">
                                             <tr v-for="f in listData">
-                                                <td >{{f.serial}}</td>
-                                                <td><a href="javascript:void(0);">{{f.dispenser_name}}</a></td>
-                                                <td><a href="javascript:void(0);">{{f?.brand}}</a></td>
+                                                <td >{{f.name}}</td>
+                                                <td >{{f.date}}</td>
+                                                <td><a href="javascript:void(0);">{{f.reading}}</a></td>
                                                 <td>
                                                     <div class="d-flex justify-content-end">
-                                                        <router-link :to="{name: 'DispenserEdit', params: { id: f.id }}" class=" btn btn-primary shadow btn-xs sharp me-1">
+                                                        <router-link :to="{name: 'NozzleReadingEdit', params: { id: f.id }}" class=" btn btn-primary shadow btn-xs sharp me-1">
                                                             <i class="fas fa-pencil-alt"></i>
                                                         </router-link>
                                                         <a  href="javascript:void(0)"  @click="openModalDelete(f)" class="btn btn-danger shadow btn-xs sharp">
@@ -107,10 +130,12 @@ export default {
                 order_by: 'id',
                 order_mode: 'DESC',
                 page: 1,
+                nozzle_id: '',
             },
             Loading: false,
             TableLoading: false,
             listData: [],
+            nozzle: [],
         };
     },
     watch: {
@@ -120,6 +145,7 @@ export default {
     },
     created() {
         this.list();
+        this.nozzleList();
     },
     computed: {
         Auth: function () {
@@ -127,6 +153,15 @@ export default {
         },
     },
     methods: {
+        nozzleList: function () {
+            ApiService.POST(ApiRoutes.NozzleList, this.listParam,res => {
+                if (parseInt(res.status) === 200) {
+                    this.nozzle = res.data.data;
+                } else {
+                    ApiService.ErrorHandler(res.error);
+                }
+            });
+        },
         openModalDelete(data) {
             Swal.fire({
                 title: 'Are you sure you want to delete?',
@@ -150,7 +185,7 @@ export default {
             }
             this.Param.page = page.page;
             this.TableLoading = true
-            ApiService.POST(ApiRoutes.DispenserList, this.Param,res => {
+            ApiService.POST(ApiRoutes.NozzleReadingList, this.Param,res => {
                 this.TableLoading = false
                 if (parseInt(res.status) === 200) {
                     this.paginateData = res.data;
@@ -161,7 +196,7 @@ export default {
             });
         },
         Delete: function (data) {
-            ApiService.POST(ApiRoutes.DispenserDelete, {id: data.id },res => {
+            ApiService.POST(ApiRoutes.NozzleReadingDelete, {id: data.id },res => {
                 if (parseInt(res.status) === 200) {
                     this.$toast.success(res.message);
                     this.list()
@@ -190,7 +225,22 @@ export default {
 
     },
     mounted() {
-        $('#dashboard_bar').text('Dispenser List')
+        $('#dashboard_bar').text('Nozzle Reading List')
+        setTimeout(() => {
+            $('.date').flatpickr({
+                altInput: true,
+                altFormat: "d/m/Y",
+                dateFormat: "Y-m-d",
+                mode: 'range',
+                onChange: (date, dateStr) => {
+                    let dateArr = dateStr.split('to')
+                    if (dateArr.length == 2) {
+                        this.Param.start_date = dateArr[0]
+                        this.Param.end_date = dateArr[1]
+                    }
+                }
+            })
+        }, 1000)
     }
 }
 </script>

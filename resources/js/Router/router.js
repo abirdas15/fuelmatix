@@ -23,6 +23,12 @@ import ProductEdit from "../Pages/Fuel/Product/Edit";
 import Dispenser from "../Pages/Fuel/Dispenser/List";
 import DispenserAdd from "../Pages/Fuel/Dispenser/Add";
 import DispenserEdit from "../Pages/Fuel/Dispenser/Edit";
+import Nozzle from "../Pages/Fuel/Nozzle/List";
+import NozzleAdd from "../Pages/Fuel/Nozzle/Add";
+import NozzleEdit from "../Pages/Fuel/Nozzle/Edit";
+import NozzleReading from "../Pages/Fuel/NozzleReading/List";
+import NozzleReadingAdd from "../Pages/Fuel/NozzleReading/Add";
+import NozzleReadingEdit from "../Pages/Fuel/NozzleReading/Edit";
 
 const ROOT_URL = "";
 const router = new VueRouter({
@@ -53,6 +59,12 @@ const router = new VueRouter({
                 { path: ROOT_URL + "/dispenser", name: "Dispenser", component: Dispenser},
                 { path: ROOT_URL + "/dispenser/add", name: "DispenserAdd", component: DispenserAdd},
                 { path: ROOT_URL + "/dispenser/edit/:id", name: "DispenserEdit", component: DispenserEdit},
+                { path: ROOT_URL + "/nozzle", name: "Nozzle", component: Nozzle},
+                { path: ROOT_URL + "/nozzle/add", name: "NozzleAdd", component: NozzleAdd},
+                { path: ROOT_URL + "/nozzle/edit/:id", name: "NozzleEdit", component: NozzleEdit},
+                { path: ROOT_URL + "/nozzle/reading", name: "NozzleReading", component: NozzleReading},
+                { path: ROOT_URL + "/nozzle/reading/add", name: "NozzleReadingAdd", component: NozzleReadingAdd},
+                { path: ROOT_URL + "/nozzle/reading/edit/:id", name: "NozzleReadingEdit", component: NozzleReadingEdit},
             ],
         },
     ],
