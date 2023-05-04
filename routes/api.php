@@ -15,6 +15,7 @@ use App\Http\Controllers\LedgerController;
 use App\Http\Controllers\ProductTypeController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\DispenserController;
+use App\Http\Controllers\NozzleController;
 
 /*
 |--------------------------------------------------------------------------
@@ -78,6 +79,20 @@ Route::group(['prefix' => 'dispenser'], function() {
     Route::post('single', [DispenserController::class, 'single']);
     Route::post('update', [DispenserController::class, 'update']);
     Route::post('delete', [DispenserController::class, 'delete']);
+});
+Route::group(['prefix' => 'nozzle'], function() {
+    Route::post('save', [NozzleController::class, 'save']);
+    Route::post('list', [NozzleController::class, 'list']);
+    Route::post('single', [NozzleController::class, 'single']);
+    Route::post('update', [NozzleController::class, 'update']);
+    Route::post('delete', [NozzleController::class, 'delete']);
+    Route::group(['prefix' => 'reading'], function() {
+        Route::post('save', [NozzleController::class, 'readingSave']);
+        Route::post('list', [NozzleController::class, 'readingList']);
+        Route::post('single', [NozzleController::class, 'readingSingle']);
+        Route::post('update', [NozzleController::class, 'readingUpdate']);
+        Route::post('delete', [NozzleController::class, 'readingDelete']);
+    });
 });
 
 
