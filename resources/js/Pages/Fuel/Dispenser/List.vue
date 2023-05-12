@@ -40,6 +40,7 @@
                                                 <th class="text-white" @click="sortData('serial')" :class="sortClass('serial')">Dispenser Serial</th>
                                                 <th class="text-white" @click="sortData('dispenser_name')" :class="sortClass('dispenser_name')">Dispenser Name</th>
                                                 <th class="text-white" @click="sortData('brand')" :class="sortClass('brand')">Dispenser Brand</th>
+                                                <th class="text-white" @click="sortData('product_name')" :class="sortClass('product_name')">Product Name</th>
                                                 <th class="text-white" >Action</th>
                                             </tr>
                                             </thead>
@@ -48,6 +49,7 @@
                                                 <td >{{f.serial}}</td>
                                                 <td><a href="javascript:void(0);">{{f.dispenser_name}}</a></td>
                                                 <td><a href="javascript:void(0);">{{f?.brand}}</a></td>
+                                                <td><a href="javascript:void(0);">{{f?.product_name}}</a></td>
                                                 <td>
                                                     <div class="d-flex justify-content-end">
                                                         <router-link :to="{name: 'DispenserEdit', params: { id: f.id }}" class=" btn btn-primary shadow btn-xs sharp me-1">

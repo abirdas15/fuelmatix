@@ -2566,7 +2566,8 @@ __webpack_require__.r(__webpack_exports__);
       param: {
         dispenser_name: '',
         brand: '',
-        serial: ''
+        serial: '',
+        product_id: ''
       },
       loading: false,
       listData: []
@@ -2629,7 +2630,8 @@ __webpack_require__.r(__webpack_exports__);
     return {
       param: {},
       loading: false,
-      id: ''
+      id: '',
+      listData: []
     };
   },
   methods: {
@@ -2657,11 +2659,24 @@ __webpack_require__.r(__webpack_exports__);
           _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].ErrorHandler(res.errors);
         }
       });
+    },
+    getProduct: function getProduct() {
+      var _this3 = this;
+      _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].ProductList, {
+        limit: 5000,
+        page: 1
+      }, function (res) {
+        _this3.TableLoading = false;
+        if (parseInt(res.status) === 200) {
+          _this3.listData = res.data.data;
+        }
+      });
     }
   },
   created: function created() {
     this.id = this.$route.params.id;
     this.getSingle();
+    this.getProduct();
   },
   mounted: function mounted() {
     $('#dashboard_bar').text('Dispenser Edit');
@@ -3983,6 +3998,23 @@ __webpack_require__.r(__webpack_exports__);
       });
       _this2.getProfitLoss();
     }, 1000);
+  }
+});
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/Pages/ShiftSale/ShiftSaleAdd.vue?vue&type=script&lang=js&":
+/*!****************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/Pages/ShiftSale/ShiftSaleAdd.vue?vue&type=script&lang=js& ***!
+  \****************************************************************************************************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony default export */ __webpack_exports__["default"] = ({
+  mounted: function mounted() {
+    $('#dashboard_bar').text('Shift Sale Start');
   }
 });
 
@@ -5941,28 +5973,7 @@ var render = function render() {
         value: d.id
       }
     }, [_vm._v(_vm._s(d.name))]);
-  })], 2), _vm._v(" "), _c("input", {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: _vm.param.serial,
-      expression: "param.serial"
-    }],
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      name: "serial"
-    },
-    domProps: {
-      value: _vm.param.serial
-    },
-    on: {
-      input: function input($event) {
-        if ($event.target.composing) return;
-        _vm.$set(_vm.param, "serial", $event.target.value);
-      }
-    }
-  }), _vm._v(" "), _c("div", {
+  })], 2), _vm._v(" "), _c("div", {
     staticClass: "invalid-feedback"
   })])]), _vm._v(" "), _c("div", {
     staticClass: "row",
@@ -6152,6 +6163,45 @@ var render = function render() {
       }
     }
   }), _vm._v(" "), _c("div", {
+    staticClass: "invalid-feedback"
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 form-group col-md-6"
+  }, [_c("label", {
+    staticClass: "form-label"
+  }, [_vm._v("Select Product:")]), _vm._v(" "), _c("select", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.param.product_id,
+      expression: "param.product_id"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      name: "product_id",
+      id: "product_id"
+    },
+    on: {
+      change: function change($event) {
+        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
+          return o.selected;
+        }).map(function (o) {
+          var val = "_value" in o ? o._value : o.value;
+          return val;
+        });
+        _vm.$set(_vm.param, "product_id", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
+      }
+    }
+  }, [_c("option", {
+    attrs: {
+      value: ""
+    }
+  }, [_vm._v("Select Product")]), _vm._v(" "), _vm._l(_vm.listData, function (d) {
+    return _c("option", {
+      domProps: {
+        value: d.id
+      }
+    }, [_vm._v(_vm._s(d.name))]);
+  })], 2), _vm._v(" "), _c("div", {
     staticClass: "invalid-feedback"
   })])]), _vm._v(" "), _c("div", {
     staticClass: "row",
@@ -6362,6 +6412,14 @@ var render = function render() {
       }
     }
   }, [_vm._v("Dispenser Brand")]), _vm._v(" "), _c("th", {
+    staticClass: "text-white",
+    "class": _vm.sortClass("product_name"),
+    on: {
+      click: function click($event) {
+        return _vm.sortData("product_name");
+      }
+    }
+  }, [_vm._v("Product Name")]), _vm._v(" "), _c("th", {
     staticClass: "text-white"
   }, [_vm._v("Action")])])]), _vm._v(" "), _vm.listData.length > 0 && _vm.TableLoading == false ? _c("tbody", _vm._l(_vm.listData, function (f) {
     return _c("tr", [_c("td", [_vm._v(_vm._s(f.serial))]), _vm._v(" "), _c("td", [_c("a", {
@@ -6372,7 +6430,11 @@ var render = function render() {
       attrs: {
         href: "javascript:void(0);"
       }
-    }, [_vm._v(_vm._s(f === null || f === void 0 ? void 0 : f.brand))])]), _vm._v(" "), _c("td", [_c("div", {
+    }, [_vm._v(_vm._s(f === null || f === void 0 ? void 0 : f.brand))])]), _vm._v(" "), _c("td", [_c("a", {
+      attrs: {
+        href: "javascript:void(0);"
+      }
+    }, [_vm._v(_vm._s(f === null || f === void 0 ? void 0 : f.product_name))])]), _vm._v(" "), _c("td", [_c("div", {
       staticClass: "d-flex justify-content-end"
     }, [_c("router-link", {
       staticClass: "btn btn-primary shadow btn-xs sharp me-1",
@@ -10248,11 +10310,21 @@ var render = function render() {
     staticClass: "fas fa-home"
   }), _vm._v(" "), _c("span", {
     staticClass: "nav-text"
-  }, [_vm._v("Dashboard")])])], 1), _vm._v(" "), _vm._m(0), _vm._v(" "), _c("li", [_vm._m(1), _vm._v(" "), _c("ul", {
+  }, [_vm._v("Dashboard")])])], 1), _vm._v(" "), _c("li", [_vm._m(0), _vm._v(" "), _c("ul", {
     attrs: {
       "aria-expanded": "false"
     }
-  }, [_vm._m(2), _vm._v(" "), _vm._m(3), _vm._v(" "), _vm._m(4), _vm._v(" "), _vm._m(5), _vm._v(" "), _c("li", [_c("router-link", {
+  }, [_c("li", [_c("router-link", {
+    attrs: {
+      to: {
+        name: "ShiftSaleStart"
+      }
+    }
+  }, [_vm._v("Shift Sale")])], 1), _vm._v(" "), _vm._m(1), _vm._v(" "), _vm._m(2), _vm._v(" "), _vm._m(3), _vm._v(" "), _vm._m(4), _vm._v(" "), _vm._m(5)])]), _vm._v(" "), _c("li", [_vm._m(6), _vm._v(" "), _c("ul", {
+    attrs: {
+      "aria-expanded": "false"
+    }
+  }, [_vm._m(7), _vm._v(" "), _vm._m(8), _vm._v(" "), _vm._m(9), _vm._v(" "), _vm._m(10), _vm._v(" "), _c("li", [_c("router-link", {
     attrs: {
       to: {
         name: "DispenserAdd"
@@ -10265,7 +10337,7 @@ var render = function render() {
       },
       href: "./dispenserList.html"
     }
-  }, [_vm._v("Dispenser List")])], 1), _vm._v(" "), _vm._m(6), _vm._v(" "), _vm._m(7), _vm._v(" "), _c("li", [_c("router-link", {
+  }, [_vm._v("Dispenser List")])], 1), _vm._v(" "), _vm._m(11), _vm._v(" "), _vm._m(12), _vm._v(" "), _c("li", [_c("router-link", {
     attrs: {
       to: {
         name: "NozzleAdd"
@@ -10289,7 +10361,7 @@ var render = function render() {
         name: "NozzleReading"
       }
     }
-  }, [_vm._v("Nozzle Reading History")])], 1), _vm._v(" "), _vm._m(8), _vm._v(" "), _vm._m(9), _vm._v(" "), _vm._m(10), _vm._v(" "), _vm._m(11), _vm._v(" "), _c("li", [_c("router-link", {
+  }, [_vm._v("Nozzle Reading History")])], 1), _vm._v(" "), _vm._m(13), _vm._v(" "), _vm._m(14), _vm._v(" "), _vm._m(15), _vm._v(" "), _vm._m(16), _vm._v(" "), _c("li", [_c("router-link", {
     attrs: {
       to: {
         name: "ProductAdd"
@@ -10301,7 +10373,7 @@ var render = function render() {
         name: "Product"
       }
     }
-  }, [_vm._v("Product List")])], 1)])]), _vm._v(" "), _vm._m(12), _vm._v(" "), _vm._m(13), _vm._v(" "), _vm._m(14), _vm._v(" "), _vm._m(15), _vm._v(" "), _vm._m(16), _vm._v(" "), _vm._m(17), _vm._v(" "), _vm._m(18), _vm._v(" "), _c("li", [_vm._m(19), _vm._v(" "), _c("ul", {
+  }, [_vm._v("Product List")])], 1)])]), _vm._v(" "), _vm._m(17), _vm._v(" "), _vm._m(18), _vm._v(" "), _vm._m(19), _vm._v(" "), _vm._m(20), _vm._v(" "), _vm._m(21), _vm._v(" "), _vm._m(22), _vm._v(" "), _vm._m(23), _vm._v(" "), _c("li", [_vm._m(24), _vm._v(" "), _c("ul", {
     attrs: {
       "aria-expanded": "false"
     }
@@ -10358,7 +10430,7 @@ var render = function render() {
 var staticRenderFns = [function () {
   var _vm = this,
     _c = _vm._self._c;
-  return _c("li", [_c("a", {
+  return _c("a", {
     staticClass: "has-arrow",
     attrs: {
       href: "javascript:void(0)",
@@ -10371,35 +10443,47 @@ var staticRenderFns = [function () {
     }
   }), _vm._v(" "), _c("span", {
     staticClass: "nav-text"
-  }, [_vm._v("Sales")])]), _vm._v(" "), _c("ul", {
-    attrs: {
-      "aria-expanded": "false"
-    }
-  }, [_c("li", [_c("a", {
-    attrs: {
-      href: "./shiftSaleStart.html"
-    }
-  }, [_vm._v("Shift Sale")])]), _vm._v(" "), _c("li", [_c("a", {
+  }, [_vm._v("Sales")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("li", [_c("a", {
     attrs: {
       href: "./sale.html"
     }
-  }, [_vm._v("Sale")])]), _vm._v(" "), _c("li", [_c("a", {
+  }, [_vm._v("Sale")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("li", [_c("a", {
     attrs: {
       href: "./salesHistroy.html"
     }
-  }, [_vm._v("Sale Histroy")])]), _vm._v(" "), _c("li", [_c("a", {
+  }, [_vm._v("Sale Histroy")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("li", [_c("a", {
     attrs: {
       href: "#"
     }
-  }, [_vm._v("Item Sale")])]), _vm._v(" "), _c("li", [_c("a", {
+  }, [_vm._v("Item Sale")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("li", [_c("a", {
     attrs: {
       href: "#"
     }
-  }, [_vm._v("Bill")])]), _vm._v(" "), _c("li", [_c("a", {
+  }, [_vm._v("Bill")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("li", [_c("a", {
     attrs: {
       href: "./creditSaleDetailEntry.html"
     }
-  }, [_vm._v("Credit Sale Detail Entry")])])])]);
+  }, [_vm._v("Credit Sale Detail Entry")])]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
@@ -10934,6 +11018,1188 @@ var staticRenderFns = [function () {
       placeholder: "Date"
     }
   })]);
+}];
+render._withStripped = true;
+
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/Pages/ShiftSale/ShiftSaleAdd.vue?vue&type=template&id=716b8b32&scoped=true&":
+/*!**************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib/loaders/templateLoader.js??ref--6!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/Pages/ShiftSale/ShiftSaleAdd.vue?vue&type=template&id=716b8b32&scoped=true& ***!
+  \**************************************************************************************************************************************************************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
+var render = function render() {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "content-body"
+  }, [_c("div", {
+    staticClass: "container-fluid"
+  }, [_c("div", {
+    staticClass: "row page-titles"
+  }, [_c("ol", {
+    staticClass: "breadcrumb"
+  }, [_c("li", {
+    staticClass: "breadcrumb-item active"
+  }, [_c("router-link", {
+    attrs: {
+      to: {
+        name: "Dashboard"
+      }
+    }
+  }, [_vm._v("Home")])], 1), _vm._v(" "), _vm._m(0)])]), _vm._v(" "), _vm._m(1)])]);
+};
+var staticRenderFns = [function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("li", {
+    staticClass: "breadcrumb-item"
+  }, [_c("a", {
+    attrs: {
+      href: "javascript:void(0)"
+    }
+  }, [_vm._v("Shift Sale")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "row"
+  }, [_c("div", {
+    staticClass: "col-xl-12 col-lg-12"
+  }, [_c("div", {
+    staticClass: "card"
+  }, [_c("div", {
+    staticClass: "card-header"
+  }, [_c("h4", {
+    staticClass: "card-title"
+  }, [_vm._v("Shift Sale Start")])]), _vm._v(" "), _c("div", {
+    staticClass: "card-body"
+  }, [_c("div", {
+    staticClass: "process-wrapper"
+  }, [_c("div", {
+    attrs: {
+      id: "progress-bar-container"
+    }
+  }, [_c("ul", [_c("li", {
+    staticClass: "step step01 active"
+  }, [_c("div", {
+    staticClass: "step-inner"
+  }, [_vm._v("Octane")])]), _vm._v(" "), _c("li", {
+    staticClass: "step step02"
+  }, [_c("div", {
+    staticClass: "step-inner"
+  }, [_vm._v("Petrol ")])]), _vm._v(" "), _c("li", {
+    staticClass: "step step03"
+  }, [_c("div", {
+    staticClass: "step-inner"
+  }, [_vm._v("LPG")])]), _vm._v(" "), _c("li", {
+    staticClass: "step step04"
+  }, [_c("div", {
+    staticClass: "step-inner"
+  }, [_vm._v("CNG")])]), _vm._v(" "), _c("li", {
+    staticClass: "step step05"
+  }, [_c("div", {
+    staticClass: "step-inner"
+  }, [_vm._v("Summary")])])]), _vm._v(" "), _c("div", {
+    attrs: {
+      id: "line"
+    }
+  }, [_c("div", {
+    attrs: {
+      id: "line-progress"
+    }
+  })])]), _vm._v(" "), _c("div", {
+    attrs: {
+      id: "progress-content-section"
+    }
+  }, [_c("div", {
+    staticClass: "section-content discovery active"
+  }, [_c("div", {
+    staticClass: "card"
+  }, [_c("div", {
+    staticClass: "card-header"
+  }, [_c("h5", {
+    staticClass: "card-title"
+  }, [_vm._v("Octane")])]), _vm._v(" "), _c("div", {
+    staticClass: "card-body"
+  }, [_c("div", {
+    staticClass: "row"
+  }, [_c("div", {
+    staticClass: "mb-3 col-md-2"
+  }, [_c("label", {
+    staticClass: "form-label"
+  }, [_c("p", [_vm._v("Oll Stock ")])])]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-3"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "Previous Reading "
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-3"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "Final Reading"
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-2"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "Consumption "
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-2"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "Amount"
+    }
+  })])])])]), _vm._v(" "), _c("div", {
+    staticClass: "card"
+  }, [_c("div", {
+    staticClass: "card-header"
+  }, [_c("h5", {
+    staticClass: "card-title"
+  }, [_vm._v("Dispenser-1")])]), _vm._v(" "), _c("div", {
+    staticClass: "card-body"
+  }, [_c("div", {
+    staticClass: "row"
+  }, [_c("div", {
+    staticClass: "mb-3 col-md-2"
+  }, [_c("label", {
+    staticClass: "form-label"
+  }, [_c("p", [_vm._v("Nozzle 1")])])]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-3"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "initial reading"
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-3"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "End reading"
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-2"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "sale on nozzle 1"
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-2"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "Amount "
+    }
+  })])]), _vm._v(" "), _c("div", {
+    staticClass: "row"
+  }, [_c("div", {
+    staticClass: "mb-3 col-md-2"
+  }, [_c("label", {
+    staticClass: "form-label"
+  }, [_c("p", [_vm._v("Nozzle 1")])])]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-3"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "initial reading"
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-3"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "End reading"
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-2"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "sale on nozzle 2"
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-2"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "Amount "
+    }
+  })])])])]), _vm._v(" "), _c("div", {
+    staticClass: "card"
+  }, [_c("div", {
+    staticClass: "card-header"
+  }, [_c("h5", {
+    staticClass: "card-title"
+  }, [_vm._v("Dispenser-2")])]), _vm._v(" "), _c("div", {
+    staticClass: "card-body"
+  }, [_c("div", {
+    staticClass: "row"
+  }, [_c("div", {
+    staticClass: "mb-3 col-md-2"
+  }, [_c("label", {
+    staticClass: "form-label"
+  }, [_c("p", [_vm._v("Nozzle 1")])])]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-3"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "initial reading"
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-3"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "End reading"
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-2"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "sale on nozzle 1"
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-2"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "Amount "
+    }
+  })])]), _vm._v(" "), _c("div", {
+    staticClass: "row"
+  }, [_c("div", {
+    staticClass: "mb-3 col-md-2"
+  }, [_c("label", {
+    staticClass: "form-label"
+  }, [_c("p", [_vm._v("Nozzle 1")])])]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-3"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "initial reading"
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-3"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "End reading"
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-2"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "sale on nozzle 2"
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-2"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "Amount "
+    }
+  })])])])])]), _vm._v(" "), _c("div", {
+    staticClass: "section-content strategy"
+  }, [_c("div", {
+    staticClass: "card"
+  }, [_c("div", {
+    staticClass: "card-header"
+  }, [_c("h5", {
+    staticClass: "card-title"
+  }, [_vm._v("Petrol")])]), _vm._v(" "), _c("div", {
+    staticClass: "card-body"
+  }, [_c("div", {
+    staticClass: "row"
+  }, [_c("div", {
+    staticClass: "mb-3 col-md-2"
+  }, [_c("label", {
+    staticClass: "form-label"
+  }, [_c("p", [_vm._v("Oll Stock ")])])]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-3"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "Previous Reading "
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-3"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "Final Reading"
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-2"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "Consumption "
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-2"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "Amount"
+    }
+  })])])])]), _vm._v(" "), _c("div", {
+    staticClass: "card"
+  }, [_c("div", {
+    staticClass: "card-header"
+  }, [_c("h5", {
+    staticClass: "card-title"
+  }, [_vm._v("Dispenser-1")])]), _vm._v(" "), _c("div", {
+    staticClass: "card-body"
+  }, [_c("div", {
+    staticClass: "row"
+  }, [_c("div", {
+    staticClass: "mb-3 col-md-2"
+  }, [_c("label", {
+    staticClass: "form-label"
+  }, [_c("p", [_vm._v("Nozzle 1")])])]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-3"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "initial reading"
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-3"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "End reading"
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-2"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "sale on nozzle 1"
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-2"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "Amount "
+    }
+  })])]), _vm._v(" "), _c("div", {
+    staticClass: "row"
+  }, [_c("div", {
+    staticClass: "mb-3 col-md-2"
+  }, [_c("label", {
+    staticClass: "form-label"
+  }, [_c("p", [_vm._v("Nozzle 1")])])]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-3"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "initial reading"
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-3"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "End reading"
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-2"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "sale on nozzle 2"
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-2"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "Amount "
+    }
+  })])])])]), _vm._v(" "), _c("div", {
+    staticClass: "card"
+  }, [_c("div", {
+    staticClass: "card-header"
+  }, [_c("h5", {
+    staticClass: "card-title"
+  }, [_vm._v("Dispenser-2")])]), _vm._v(" "), _c("div", {
+    staticClass: "card-body"
+  }, [_c("div", {
+    staticClass: "row"
+  }, [_c("div", {
+    staticClass: "mb-3 col-md-2"
+  }, [_c("label", {
+    staticClass: "form-label"
+  }, [_c("p", [_vm._v("Nozzle 1")])])]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-3"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "initial reading"
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-3"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "End reading"
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-2"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "sale on nozzle 1"
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-2"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "Amount "
+    }
+  })])]), _vm._v(" "), _c("div", {
+    staticClass: "row"
+  }, [_c("div", {
+    staticClass: "mb-3 col-md-2"
+  }, [_c("label", {
+    staticClass: "form-label"
+  }, [_c("p", [_vm._v("Nozzle 1")])])]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-3"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "initial reading"
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-3"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "End reading"
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-2"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "sale on nozzle 2"
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-2"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "Amount "
+    }
+  })])])])])]), _vm._v(" "), _c("div", {
+    staticClass: "section-content creative"
+  }, [_c("div", {
+    staticClass: "card"
+  }, [_c("div", {
+    staticClass: "card-header"
+  }, [_c("h5", {
+    staticClass: "card-title"
+  }, [_vm._v("LPG")])]), _vm._v(" "), _c("div", {
+    staticClass: "card-body"
+  }, [_c("div", {
+    staticClass: "row"
+  }, [_c("div", {
+    staticClass: "mb-3 col-md-2"
+  }, [_c("label", {
+    staticClass: "form-label"
+  }, [_c("p", [_vm._v("Oll Stock ")])])]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-3"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "Previous Reading "
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-3"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "Final Reading"
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-2"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "Consumption "
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-2"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "Amount"
+    }
+  })])])])]), _vm._v(" "), _c("div", {
+    staticClass: "card"
+  }, [_c("div", {
+    staticClass: "card-header"
+  }, [_c("h5", {
+    staticClass: "card-title"
+  }, [_vm._v("Dispenser-1")])]), _vm._v(" "), _c("div", {
+    staticClass: "card-body"
+  }, [_c("div", {
+    staticClass: "row"
+  }, [_c("div", {
+    staticClass: "mb-3 col-md-2"
+  }, [_c("label", {
+    staticClass: "form-label"
+  }, [_c("p", [_vm._v("Nozzle 1")])])]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-3"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "initial reading"
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-3"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "End reading"
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-2"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "sale on nozzle 1"
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-2"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "Amount "
+    }
+  })])]), _vm._v(" "), _c("div", {
+    staticClass: "row"
+  }, [_c("div", {
+    staticClass: "mb-3 col-md-2"
+  }, [_c("label", {
+    staticClass: "form-label"
+  }, [_c("p", [_vm._v("Nozzle 1")])])]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-3"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "initial reading"
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-3"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "End reading"
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-2"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "sale on nozzle 2"
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-2"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "Amount "
+    }
+  })])])])]), _vm._v(" "), _c("div", {
+    staticClass: "card"
+  }, [_c("div", {
+    staticClass: "card-header"
+  }, [_c("h5", {
+    staticClass: "card-title"
+  }, [_vm._v("Dispenser-2")])]), _vm._v(" "), _c("div", {
+    staticClass: "card-body"
+  }, [_c("div", {
+    staticClass: "row"
+  }, [_c("div", {
+    staticClass: "mb-3 col-md-2"
+  }, [_c("label", {
+    staticClass: "form-label"
+  }, [_c("p", [_vm._v("Nozzle 1")])])]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-3"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "initial reading"
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-3"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "End reading"
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-2"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "sale on nozzle 1"
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-2"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "Amount "
+    }
+  })])]), _vm._v(" "), _c("div", {
+    staticClass: "row"
+  }, [_c("div", {
+    staticClass: "mb-3 col-md-2"
+  }, [_c("label", {
+    staticClass: "form-label"
+  }, [_c("p", [_vm._v("Nozzle 1")])])]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-3"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "initial reading"
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-3"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "End reading"
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-2"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "sale on nozzle 2"
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-2"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "Amount "
+    }
+  })])])])])]), _vm._v(" "), _c("div", {
+    staticClass: "section-content production"
+  }, [_c("div", {
+    staticClass: "card"
+  }, [_c("div", {
+    staticClass: "card-header"
+  }, [_c("h5", {
+    staticClass: "card-title"
+  }, [_vm._v("CNG")])]), _vm._v(" "), _c("div", {
+    staticClass: "card-body"
+  }, [_c("div", {
+    staticClass: "row"
+  }, [_c("div", {
+    staticClass: "mb-3 col-md-2"
+  }, [_c("label", {
+    staticClass: "form-label"
+  }, [_c("p", [_vm._v("Oll Stock ")])])]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-3"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "Previous Reading "
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-3"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "Final Reading"
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-2"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "Consumption "
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-2"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "Amount"
+    }
+  })])])])]), _vm._v(" "), _c("div", {
+    staticClass: "card"
+  }, [_c("div", {
+    staticClass: "card-header"
+  }, [_c("h5", {
+    staticClass: "card-title"
+  }, [_vm._v("Dispenser-1")])]), _vm._v(" "), _c("div", {
+    staticClass: "card-body"
+  }, [_c("div", {
+    staticClass: "row"
+  }, [_c("div", {
+    staticClass: "mb-3 col-md-2"
+  }, [_c("label", {
+    staticClass: "form-label"
+  }, [_c("p", [_vm._v("Nozzle 1")])])]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-3"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "initial reading"
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-3"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      placeholder: "End reading"
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-2"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "sale on nozzle 1"
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-2"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "Amount "
+    }
+  })])]), _vm._v(" "), _c("div", {
+    staticClass: "row"
+  }, [_c("div", {
+    staticClass: "mb-3 col-md-2"
+  }, [_c("label", {
+    staticClass: "form-label"
+  }, [_c("p", [_vm._v("Nozzle 1")])])]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-3"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "initial reading"
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-3"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "End reading"
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-2"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "sale on nozzle 2"
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-2"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "Amount "
+    }
+  })])])])]), _vm._v(" "), _c("div", {
+    staticClass: "card"
+  }, [_c("div", {
+    staticClass: "card-header"
+  }, [_c("h5", {
+    staticClass: "card-title"
+  }, [_vm._v("Dispenser-2")])]), _vm._v(" "), _c("div", {
+    staticClass: "card-body"
+  }, [_c("div", {
+    staticClass: "row"
+  }, [_c("div", {
+    staticClass: "mb-3 col-md-2"
+  }, [_c("label", {
+    staticClass: "form-label"
+  }, [_c("p", [_vm._v("Nozzle 1")])])]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-3"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "initial reading"
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-3"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "End reading"
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-2"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "sale on nozzle 1"
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-2"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "Amount "
+    }
+  })])]), _vm._v(" "), _c("div", {
+    staticClass: "row"
+  }, [_c("div", {
+    staticClass: "mb-3 col-md-2"
+  }, [_c("label", {
+    staticClass: "form-label"
+  }, [_c("p", [_vm._v("Nozzle 1")])])]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-3"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "initial reading"
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-3"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "End reading"
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-2"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "sale on nozzle 2"
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-2"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "Amount "
+    }
+  })])])])])]), _vm._v(" "), _c("div", {
+    staticClass: "section-content analysis"
+  }, [_c("div", {
+    staticClass: "card"
+  }, [_c("div", {
+    staticClass: "card-header"
+  }, [_c("h5", {
+    staticClass: "card-title"
+  }, [_vm._v("Summary")])]), _vm._v(" "), _c("div", {
+    staticClass: "card-body"
+  }, [_c("div", {
+    staticClass: "row"
+  }, [_c("div", {
+    staticClass: "mb-3 col-md-2"
+  }, [_c("label", {
+    staticClass: "form-label"
+  }, [_c("p", [_vm._v("Oll Stock ")])])]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-3"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "Previous Reading "
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-3"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "Final Reading"
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-2"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "Consumption "
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-2"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "Amount"
+    }
+  })])])])]), _vm._v(" "), _c("div", {
+    staticClass: "card"
+  }, [_c("div", {
+    staticClass: "card-header"
+  }, [_c("h5", {
+    staticClass: "card-title"
+  }, [_vm._v("Dispenser-1")])]), _vm._v(" "), _c("div", {
+    staticClass: "card-body"
+  }, [_c("div", {
+    staticClass: "row"
+  }, [_c("div", {
+    staticClass: "mb-3 col-md-2"
+  }, [_c("label", {
+    staticClass: "form-label"
+  }, [_c("p", [_vm._v("Nozzle 1")])])]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-3"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "intial reading"
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-3"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "End reading"
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-2"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "sale on nozzle 1"
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-2"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "Amount "
+    }
+  })])]), _vm._v(" "), _c("div", {
+    staticClass: "row"
+  }, [_c("div", {
+    staticClass: "mb-3 col-md-2"
+  }, [_c("label", {
+    staticClass: "form-label"
+  }, [_c("p", [_vm._v("Nozzle 1")])])]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-3"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "initial reading"
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-3"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "End reading"
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-2"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "sale on nozzle 2"
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-2"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "Amount "
+    }
+  })])])])]), _vm._v(" "), _c("div", {
+    staticClass: "card"
+  }, [_c("div", {
+    staticClass: "card-header"
+  }, [_c("h5", {
+    staticClass: "card-title"
+  }, [_vm._v("Dispenser-2")])]), _vm._v(" "), _c("div", {
+    staticClass: "card-body"
+  }, [_c("div", {
+    staticClass: "row"
+  }, [_c("div", {
+    staticClass: "mb-3 col-md-2"
+  }, [_c("label", {
+    staticClass: "form-label"
+  }, [_c("p", [_vm._v("Nozzle 1")])])]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-3"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "initial reading"
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-3"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "End reading"
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-2"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "sale on nozzle 1"
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-2"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "Amount "
+    }
+  })])]), _vm._v(" "), _c("div", {
+    staticClass: "row"
+  }, [_c("div", {
+    staticClass: "mb-3 col-md-2"
+  }, [_c("label", {
+    staticClass: "form-label"
+  }, [_c("p", [_vm._v("Nozzle 1")])])]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-3"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "initial reading"
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-3"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "End reading"
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-2"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "sale on nozzle 2"
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-2"
+  }, [_c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      value: "Amount "
+    }
+  })])])])])])])])])])])]);
 }];
 render._withStripped = true;
 
@@ -11540,7 +12806,7 @@ exports = module.exports = __webpack_require__(/*! ../../../../node_modules/css-
 
 
 // module
-exports.push([module.i, "\n.w-85[data-v-0b95009a]{\r\n    width: 85%;\n}\r\n", ""]);
+exports.push([module.i, "\n.w-85[data-v-0b95009a]{\n    width: 85%;\n}\n", ""]);
 
 // exports
 
@@ -11559,7 +12825,7 @@ exports = module.exports = __webpack_require__(/*! ../../../../node_modules/css-
 
 
 // module
-exports.push([module.i, "\nul {\r\n    list-style: none;\n}\na {\r\n    text-decoration: none;\r\n    color: #000;\r\n    font-weight: 400;\n}\r\n\r\n\r\n/* main content start here  */\r\n\r\n\r\n/* popup area start  */\n.popup-wrapper {\r\n    display: block;\r\n    position: absolute;\r\n    background: #fff;\r\n    box-shadow: 0px 0px 4px #00000047;\r\n    z-index: 9;\r\n    display: none;\n}\n.popup-wrapper.active {\r\n    display: block;\n}\n.popup-wrapper ul li a {\r\n    display: block;\r\n    padding: 7px 25px 7px 15px;\r\n    font-size: 14px;\r\n    transition: all .3s;\n}\n.popup-wrapper ul li a:hover {\r\n    color: #01987a;\n}\r\n\r\n/* popup area end */\r\n\r\n\r\n/* new account area start  */\n.new-account-form-wrapper {\r\n    width: 100%;\r\n    height: 100%;\r\n    position: absolute;\r\n    top: 0;\r\n    left: 0;\r\n    z-index: 9;\r\n    background: #00000070;\r\n    justify-content: center;\r\n    align-items: center;\r\n    display: none;\n}\n.new-account-form-wrapper.active {\r\n    display: flex;\n}\n.new-account-form-wrapper form {\r\n    padding: 30px 20px;\r\n    row-gap: 10px;\r\n    background: #fff;\r\n    border-radius: 5px;\r\n    display: flex;\r\n    flex-direction: column;\n}\n.new-account-form-wrapper form .input-wrapper {\r\n    display: flex;\r\n    justify-content: space-between;\r\n    align-items: center;\n}\n.new-account-form-wrapper form input,\r\ntextarea,\r\nselect {\r\n    border: 1px solid #d2d2d2;\r\n    outline: none;\r\n    padding: 10px;\r\n    width: 70%;\r\n    border-radius: 4px;\n}\n.new-account-form-wrapper form label {\r\n    margin-right: 10px;\n}\n.desc-label,\r\n.notes-label {\r\n    align-self: flex-start;\n}\nform .btn-wrapper {\r\n    display: flex;\r\n    align-items: center;\r\n    justify-content: flex-end;\r\n    column-gap: 10px;\n}\n.btn-wrapper button {\r\n    padding: 10px;\r\n    border: none;\r\n    background-color: red;\r\n    color: #fff;\r\n    cursor: pointer;\n}\n.btn-wrapper button:first-child {\r\n    background-color: rgb(0, 140, 255);\r\n    color: #fff;\r\n    border: none;\r\n    outline: none;\n}\r\n\r\n/* new account area end  */\n.accordion-wrapper .accordion-heading-wrapper {\r\n    display: flex;\r\n    justify-content: space-between;\r\n    border-bottom: 1px solid #d1d1d1;\r\n    margin-bottom: 10px;\r\n    padding: 5px;\n}\n.accordion-wrapper .accordion-heading-wrapper h4 {\r\n    font-size: 18px;\r\n    font-weight: 600;\r\n    color: #a7a7a7;\n}\n.accordion-wrapper {\n}\n.accordion-wrapper li a {\r\n    display: flex;\r\n    justify-content: space-between;\r\n    padding: 5px;\r\n    text-decoration: none;\r\n    color: #000;\r\n    font-size: 18px;\n}\n.accordion-wrapper ul {\r\n    padding-left: 50px;\n}\n.accordion-wrapper .accordion-btn img {\r\n    width: 10px;\r\n    margin-right: 10px;\r\n    transition: .4s ease;\n}\n.accordion {\r\n    display: none;\n}\n.accordion.open {\r\n    display: block;\n}\n.accordion-btn.active img {\r\n    transform: rotate(90deg);\n}\nul.accordion-wrapper a span:nth-child(2),\r\nul.accordion a span:nth-child(2) {\r\n    position: absolute;\r\n    left: 66rem;\n}\r\n\r\n/* main content end here  */\r\n", ""]);
+exports.push([module.i, "\nul {\n    list-style: none;\n}\na {\n    text-decoration: none;\n    color: #000;\n    font-weight: 400;\n}\n\n\n/* main content start here  */\n\n\n/* popup area start  */\n.popup-wrapper {\n    display: block;\n    position: absolute;\n    background: #fff;\n    box-shadow: 0px 0px 4px #00000047;\n    z-index: 9;\n    display: none;\n}\n.popup-wrapper.active {\n    display: block;\n}\n.popup-wrapper ul li a {\n    display: block;\n    padding: 7px 25px 7px 15px;\n    font-size: 14px;\n    transition: all .3s;\n}\n.popup-wrapper ul li a:hover {\n    color: #01987a;\n}\n\n/* popup area end */\n\n\n/* new account area start  */\n.new-account-form-wrapper {\n    width: 100%;\n    height: 100%;\n    position: absolute;\n    top: 0;\n    left: 0;\n    z-index: 9;\n    background: #00000070;\n    justify-content: center;\n    align-items: center;\n    display: none;\n}\n.new-account-form-wrapper.active {\n    display: flex;\n}\n.new-account-form-wrapper form {\n    padding: 30px 20px;\n    row-gap: 10px;\n    background: #fff;\n    border-radius: 5px;\n    display: flex;\n    flex-direction: column;\n}\n.new-account-form-wrapper form .input-wrapper {\n    display: flex;\n    justify-content: space-between;\n    align-items: center;\n}\n.new-account-form-wrapper form input,\ntextarea,\nselect {\n    border: 1px solid #d2d2d2;\n    outline: none;\n    padding: 10px;\n    width: 70%;\n    border-radius: 4px;\n}\n.new-account-form-wrapper form label {\n    margin-right: 10px;\n}\n.desc-label,\n.notes-label {\n    align-self: flex-start;\n}\nform .btn-wrapper {\n    display: flex;\n    align-items: center;\n    justify-content: flex-end;\n    column-gap: 10px;\n}\n.btn-wrapper button {\n    padding: 10px;\n    border: none;\n    background-color: red;\n    color: #fff;\n    cursor: pointer;\n}\n.btn-wrapper button:first-child {\n    background-color: rgb(0, 140, 255);\n    color: #fff;\n    border: none;\n    outline: none;\n}\n\n/* new account area end  */\n.accordion-wrapper .accordion-heading-wrapper {\n    display: flex;\n    justify-content: space-between;\n    border-bottom: 1px solid #d1d1d1;\n    margin-bottom: 10px;\n    padding: 5px;\n}\n.accordion-wrapper .accordion-heading-wrapper h4 {\n    font-size: 18px;\n    font-weight: 600;\n    color: #a7a7a7;\n}\n.accordion-wrapper {\n}\n.accordion-wrapper li a {\n    display: flex;\n    justify-content: space-between;\n    padding: 5px;\n    text-decoration: none;\n    color: #000;\n    font-size: 18px;\n}\n.accordion-wrapper ul {\n    padding-left: 50px;\n}\n.accordion-wrapper .accordion-btn img {\n    width: 10px;\n    margin-right: 10px;\n    transition: .4s ease;\n}\n.accordion {\n    display: none;\n}\n.accordion.open {\n    display: block;\n}\n.accordion-btn.active img {\n    transform: rotate(90deg);\n}\nul.accordion-wrapper a span:nth-child(2),\nul.accordion a span:nth-child(2) {\n    position: absolute;\n    left: 66rem;\n}\n\n/* main content end here  */\n", ""]);
 
 // exports
 
@@ -46820,6 +48086,75 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./resources/js/Pages/ShiftSale/ShiftSaleAdd.vue":
+/*!*******************************************************!*\
+  !*** ./resources/js/Pages/ShiftSale/ShiftSaleAdd.vue ***!
+  \*******************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _ShiftSaleAdd_vue_vue_type_template_id_716b8b32_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ShiftSaleAdd.vue?vue&type=template&id=716b8b32&scoped=true& */ "./resources/js/Pages/ShiftSale/ShiftSaleAdd.vue?vue&type=template&id=716b8b32&scoped=true&");
+/* harmony import */ var _ShiftSaleAdd_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./ShiftSaleAdd.vue?vue&type=script&lang=js& */ "./resources/js/Pages/ShiftSale/ShiftSaleAdd.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+/* normalize component */
+
+var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _ShiftSaleAdd_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _ShiftSaleAdd_vue_vue_type_template_id_716b8b32_scoped_true___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _ShiftSaleAdd_vue_vue_type_template_id_716b8b32_scoped_true___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  false,
+  null,
+  "716b8b32",
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/Pages/ShiftSale/ShiftSaleAdd.vue"
+/* harmony default export */ __webpack_exports__["default"] = (component.exports);
+
+/***/ }),
+
+/***/ "./resources/js/Pages/ShiftSale/ShiftSaleAdd.vue?vue&type=script&lang=js&":
+/*!********************************************************************************!*\
+  !*** ./resources/js/Pages/ShiftSale/ShiftSaleAdd.vue?vue&type=script&lang=js& ***!
+  \********************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_ShiftSaleAdd_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib??ref--4-0!../../../../node_modules/vue-loader/lib??vue-loader-options!./ShiftSaleAdd.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/Pages/ShiftSale/ShiftSaleAdd.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_ShiftSaleAdd_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/js/Pages/ShiftSale/ShiftSaleAdd.vue?vue&type=template&id=716b8b32&scoped=true&":
+/*!**************************************************************************************************!*\
+  !*** ./resources/js/Pages/ShiftSale/ShiftSaleAdd.vue?vue&type=template&id=716b8b32&scoped=true& ***!
+  \**************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ref_6_node_modules_vue_loader_lib_index_js_vue_loader_options_ShiftSaleAdd_vue_vue_type_template_id_716b8b32_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib??ref--4-0!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??ref--6!../../../../node_modules/vue-loader/lib??vue-loader-options!./ShiftSaleAdd.vue?vue&type=template&id=716b8b32&scoped=true& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/Pages/ShiftSale/ShiftSaleAdd.vue?vue&type=template&id=716b8b32&scoped=true&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ref_6_node_modules_vue_loader_lib_index_js_vue_loader_options_ShiftSaleAdd_vue_vue_type_template_id_716b8b32_scoped_true___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ref_6_node_modules_vue_loader_lib_index_js_vue_loader_options_ShiftSaleAdd_vue_vue_type_template_id_716b8b32_scoped_true___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+
+
+
+/***/ }),
+
 /***/ "./resources/js/Pages/Transaction/Transaction.vue":
 /*!********************************************************!*\
   !*** ./resources/js/Pages/Transaction/Transaction.vue ***!
@@ -47032,11 +48367,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Pages_Fuel_NozzleReading_List__WEBPACK_IMPORTED_MODULE_25__ = __webpack_require__(/*! ../Pages/Fuel/NozzleReading/List */ "./resources/js/Pages/Fuel/NozzleReading/List.vue");
 /* harmony import */ var _Pages_Fuel_NozzleReading_Add__WEBPACK_IMPORTED_MODULE_26__ = __webpack_require__(/*! ../Pages/Fuel/NozzleReading/Add */ "./resources/js/Pages/Fuel/NozzleReading/Add.vue");
 /* harmony import */ var _Pages_Fuel_NozzleReading_Edit__WEBPACK_IMPORTED_MODULE_27__ = __webpack_require__(/*! ../Pages/Fuel/NozzleReading/Edit */ "./resources/js/Pages/Fuel/NozzleReading/Edit.vue");
+/* harmony import */ var _Pages_ShiftSale_ShiftSaleAdd__WEBPACK_IMPORTED_MODULE_28__ = __webpack_require__(/*! ../Pages/ShiftSale/ShiftSaleAdd */ "./resources/js/Pages/ShiftSale/ShiftSaleAdd.vue");
 
 
 
 
 vue__WEBPACK_IMPORTED_MODULE_0___default.a.use(vuex__WEBPACK_IMPORTED_MODULE_2__["default"]);
+
 
 
 
@@ -47166,6 +48503,10 @@ var router = new vue_router__WEBPACK_IMPORTED_MODULE_1__["default"]({
       path: ROOT_URL + "/nozzle/reading/edit/:id",
       name: "NozzleReadingEdit",
       component: _Pages_Fuel_NozzleReading_Edit__WEBPACK_IMPORTED_MODULE_27__["default"]
+    }, {
+      path: ROOT_URL + "/shift/sale/start",
+      name: "ShiftSaleStart",
+      component: _Pages_ShiftSale_ShiftSaleAdd__WEBPACK_IMPORTED_MODULE_28__["default"]
     }]
   }]
 });
@@ -47500,7 +48841,7 @@ var app = new vue__WEBPACK_IMPORTED_MODULE_1___default.a({
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! D:\xampp7.4\htdocs\fuelmatix\resources\js\app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! E:\xampp8\htdocs\projects\fuelmatix\resources\js\app.js */"./resources/js/app.js");
 
 
 /***/ })

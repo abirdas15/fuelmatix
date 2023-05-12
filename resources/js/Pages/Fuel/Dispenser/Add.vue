@@ -40,7 +40,6 @@
                                             <option value="">Select Product</option>
                                             <option v-for="d in listData" :value="d.id">{{d.name}}</option>
                                         </select>
-                                        <input type="text" class="form-control" name="serial" v-model="param.serial">
                                         <div class="invalid-feedback"></div>
                                     </div>
                                 </div>
@@ -73,6 +72,7 @@ export default {
                 dispenser_name: '',
                 brand: '',
                 serial: '',
+                product_id: '',
             },
             loading: false,
             listData: [],
