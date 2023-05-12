@@ -34,6 +34,15 @@
                                         <input type="text" class="form-control" name="serial" v-model="param.serial">
                                         <div class="invalid-feedback"></div>
                                     </div>
+                                    <div class="mb-3 form-group col-md-6">
+                                        <label class="form-label">Select Product:</label>
+                                        <select class="form-control" name="product_id" id="product_id"  v-model="param.product_id">
+                                            <option value="">Select Product</option>
+                                            <option v-for="d in listData" :value="d.id">{{d.name}}</option>
+                                        </select>
+                                        <input type="text" class="form-control" name="serial" v-model="param.serial">
+                                        <div class="invalid-feedback"></div>
+                                    </div>
                                 </div>
                                 <div class="row" style="text-align: right;">
                                     <div class="mb-3 col-md-6">
@@ -66,9 +75,18 @@ export default {
                 serial: '',
             },
             loading: false,
+            listData: [],
         }
     },
     methods: {
+        getProduct: function () {
+            ApiService.POST(ApiRoutes.ProductList, {limit: 5000, page: 1},res => {
+                this.TableLoading = false
+                if (parseInt(res.status) === 200) {
+                    this.listData = res.data.data;
+                }
+            });
+        },
         save: function () {
             ApiService.ClearErrorHandler;
             this.loading = true
@@ -83,6 +101,9 @@ export default {
                 }
             });
         },
+    },
+    created() {
+        this.getProduct()
     },
     mounted() {
         $('#dashboard_bar').text('Dispenser Add')

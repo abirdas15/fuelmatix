@@ -2568,18 +2568,31 @@ __webpack_require__.r(__webpack_exports__);
         brand: '',
         serial: ''
       },
-      loading: false
+      loading: false,
+      listData: []
     };
   },
   methods: {
-    save: function save() {
+    getProduct: function getProduct() {
       var _this = this;
+      _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].ProductList, {
+        limit: 5000,
+        page: 1
+      }, function (res) {
+        _this.TableLoading = false;
+        if (parseInt(res.status) === 200) {
+          _this.listData = res.data.data;
+        }
+      });
+    },
+    save: function save() {
+      var _this2 = this;
       _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].ClearErrorHandler;
       this.loading = true;
       _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].DispenserAdd, this.param, function (res) {
-        _this.loading = false;
+        _this2.loading = false;
         if (parseInt(res.status) === 200) {
-          _this.$router.push({
+          _this2.$router.push({
             name: 'Dispenser'
           });
         } else {
@@ -2587,6 +2600,9 @@ __webpack_require__.r(__webpack_exports__);
         }
       });
     }
+  },
+  created: function created() {
+    this.getProduct();
   },
   mounted: function mounted() {
     $('#dashboard_bar').text('Dispenser Add');
@@ -5866,6 +5882,66 @@ var render = function render() {
   }, [_c("label", {
     staticClass: "form-label"
   }, [_vm._v("Serial:")]), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.param.serial,
+      expression: "param.serial"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      name: "serial"
+    },
+    domProps: {
+      value: _vm.param.serial
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.param, "serial", $event.target.value);
+      }
+    }
+  }), _vm._v(" "), _c("div", {
+    staticClass: "invalid-feedback"
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 form-group col-md-6"
+  }, [_c("label", {
+    staticClass: "form-label"
+  }, [_vm._v("Select Product:")]), _vm._v(" "), _c("select", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.param.product_id,
+      expression: "param.product_id"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      name: "product_id",
+      id: "product_id"
+    },
+    on: {
+      change: function change($event) {
+        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
+          return o.selected;
+        }).map(function (o) {
+          var val = "_value" in o ? o._value : o.value;
+          return val;
+        });
+        _vm.$set(_vm.param, "product_id", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
+      }
+    }
+  }, [_c("option", {
+    attrs: {
+      value: ""
+    }
+  }, [_vm._v("Select Product")]), _vm._v(" "), _vm._l(_vm.listData, function (d) {
+    return _c("option", {
+      domProps: {
+        value: d.id
+      }
+    }, [_vm._v(_vm._s(d.name))]);
+  })], 2), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
