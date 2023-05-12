@@ -9474,7 +9474,7 @@ var staticRenderFns = [function () {
     }
   }, [_c("img", {
     attrs: {
-      src: "images/fuelBL.jpeg",
+      src: "/images/fuelBL.jpeg",
       alt: ""
     }
   })]), _vm._v(" "), _c("div", {
