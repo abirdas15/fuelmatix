@@ -15,22 +15,10 @@
                         </div>
                         <div class="card-body">
                             <div class="process-wrapper">
-                                <div id="progress-bar-container">
+                                <div id="progress-bar-container" v-if="listData.length > 0">
                                     <ul>
-                                        <li class="step step01 active">
-                                            <div class="step-inner">Octane</div>
-                                        </li>
-                                        <li class="step step02">
-                                            <div class="step-inner">Petrol </div>
-                                        </li>
-                                        <li class="step step03">
-                                            <div class="step-inner">LPG</div>
-                                        </li>
-                                        <li class="step step04">
-                                            <div class="step-inner">CNG</div>
-                                        </li>
-                                        <li class="step step05">
-                                            <div class="step-inner">Summary</div>
+                                        <li class="step step01" :class="{'active': p.id == product_id}" v-for="p in listData" @click="getProductDispenser(p.id)">
+                                            <div class="step-inner">{{p.name}}</div>
                                         </li>
                                     </ul>
 
@@ -38,12 +26,13 @@
                                         <div id="line-progress"></div>
                                     </div>
                                 </div>
+                                <div class="text-center" v-else>No Product Found</div>
 
-                                <div id="progress-content-section">
+                                <div id="progress-content-section" v-if="listDispenser">
                                     <div class="section-content discovery active">
                                         <div class="card">
                                             <div class="card-header">
-                                                <h5 class="card-title">Octane</h5>
+                                                <h5 class="card-title">{{listDispenser.shift_sale.product_name}}</h5>
                                             </div>
                                             <div class="card-body">
                                                 <div class="row">
@@ -54,722 +43,51 @@
 
                                                     </div>
                                                     <div class="mb-3 col-md-3">
-                                                        <input type="text" class="form-control"
-                                                               value="Previous Reading ">
+                                                        <input type="text" class="form-control" v-model="listDispenser.shift_sale.start_reading" @change="calculateAmount">
                                                     </div>
                                                     <div class="mb-3 col-md-3">
-                                                        <input type="text" class="form-control"
-                                                               value="Final Reading">
+                                                        <input type="text" class="form-control" v-model="listDispenser.shift_sale.end_reading" @change="calculateAmount">
                                                     </div>
 
                                                     <div class="mb-3 col-md-2">
-
-                                                        <input type="text" class="form-control"
-                                                               value="Consumption ">
+                                                        <input type="text" class="form-control" v-model="listDispenser.shift_sale.consumption">
                                                     </div>
                                                     <div class="mb-3 col-md-2">
-                                                        <input type="text" class="form-control"
-                                                               value="Amount">
+                                                        <input type="text" class="form-control" v-model="listDispenser.shift_sale.amount">
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="card">
+                                        <div class="card" v-if="listDispenser.summary.length > 0" v-for="(d, dIndex) in listDispenser.summary">
                                             <div class="card-header">
-                                                <h5 class="card-title">Dispenser-1</h5>
+                                                <h5 class="card-title">{{d.dispenser_name}}</h5>
                                             </div>
-                                            <div class="card-body">
-                                                <div class="row">
+                                            <div class="card-body" v-if="d.nozzle.length > 0">
+                                                <div class="row" v-for="(n, nIndex) in d.nozzle">
                                                     <div class="mb-3 col-md-2">
                                                         <label class="form-label">
-                                                            <p>Nozzle 1</p>
+                                                            <p>{{ n.name }}</p>
                                                         </label>
                                                     </div>
                                                     <div class="mb-3 col-md-3">
-                                                        <input type="text" class="form-control"
-                                                               value="initial reading">
+                                                        <input type="text" class="form-control" v-model="n.start_reading" @change="calculateAmountNozzle(dIndex, nIndex)">
                                                     </div>
                                                     <div class="mb-3 col-md-3">
-                                                        <input type="text" class="form-control"
-                                                               value="End reading">
-                                                    </div>
-                                                    <div class="mb-3 col-md-2">
-                                                        <input type="text" class="form-control"
-                                                               value="sale on nozzle 1">
-                                                    </div>
-                                                    <div class="mb-3 col-md-2">
-
-                                                        <input type="text" class="form-control"
-                                                               value="Amount ">
-                                                    </div>
-                                                </div>
-                                                <div class="row">
-                                                    <div class="mb-3 col-md-2">
-                                                        <label class="form-label">
-                                                            <p>Nozzle 1</p>
-                                                        </label>
-                                                    </div>
-                                                    <div class="mb-3 col-md-3">
-                                                        <input type="text" class="form-control"
-                                                               value="initial reading">
-                                                    </div>
-                                                    <div class="mb-3 col-md-3">
-                                                        <input type="text" class="form-control"
-                                                               value="End reading">
-                                                    </div>
-                                                    <div class="mb-3 col-md-2">
-                                                        <input type="text" class="form-control"
-                                                               value="sale on nozzle 2">
-                                                    </div>
-                                                    <div class="mb-3 col-md-2">
-
-                                                        <input type="text" class="form-control"
-                                                               value="Amount ">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="card">
-                                            <div class="card-header">
-                                                <h5 class="card-title">Dispenser-2</h5>
-                                            </div>
-                                            <div class="card-body">
-                                                <div class="row">
-                                                    <div class="mb-3 col-md-2">
-                                                        <label class="form-label">
-                                                            <p>Nozzle 1</p>
-                                                        </label>
-                                                    </div>
-                                                    <div class="mb-3 col-md-3">
-                                                        <input type="text" class="form-control"
-                                                               value="initial reading">
-                                                    </div>
-                                                    <div class="mb-3 col-md-3">
-                                                        <input type="text" class="form-control"
-                                                               value="End reading">
-                                                    </div>
-                                                    <div class="mb-3 col-md-2">
-                                                        <input type="text" class="form-control"
-                                                               value="sale on nozzle 1">
-                                                    </div>
-                                                    <div class="mb-3 col-md-2">
-
-                                                        <input type="text" class="form-control"
-                                                               value="Amount ">
-                                                    </div>
-                                                </div>
-                                                <div class="row">
-                                                    <div class="mb-3 col-md-2">
-                                                        <label class="form-label">
-                                                            <p>Nozzle 1</p>
-                                                        </label>
-                                                    </div>
-                                                    <div class="mb-3 col-md-3">
-                                                        <input type="text" class="form-control"
-                                                               value="initial reading">
-                                                    </div>
-                                                    <div class="mb-3 col-md-3">
-                                                        <input type="text" class="form-control"
-                                                               value="End reading">
-                                                    </div>
-                                                    <div class="mb-3 col-md-2">
-                                                        <input type="text" class="form-control"
-                                                               value="sale on nozzle 2">
-                                                    </div>
-                                                    <div class="mb-3 col-md-2">
-
-                                                        <input type="text" class="form-control"
-                                                               value="Amount ">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="section-content strategy">
-                                        <div class="card">
-                                            <div class="card-header">
-                                                <h5 class="card-title">Petrol</h5>
-                                            </div>
-                                            <div class="card-body">
-                                                <div class="row">
-                                                    <div class="mb-3 col-md-2">
-                                                        <label class="form-label">
-                                                            <p>Oll Stock </p>
-                                                        </label>
-
-                                                    </div>
-                                                    <div class="mb-3 col-md-3">
-                                                        <input type="text" class="form-control"
-                                                               value="Previous Reading ">
-                                                    </div>
-                                                    <div class="mb-3 col-md-3">
-                                                        <input type="text" class="form-control"
-                                                               value="Final Reading">
+                                                        <input type="text" class="form-control" v-model="n.end_reading" @change="calculateAmountNozzle(dIndex, nIndex)">
                                                     </div>
 
                                                     <div class="mb-3 col-md-2">
-
-                                                        <input type="text" class="form-control"
-                                                               value="Consumption ">
+                                                        <input type="text" class="form-control" v-model="n.consumption">
                                                     </div>
                                                     <div class="mb-3 col-md-2">
-                                                        <input type="text" class="form-control"
-                                                               value="Amount">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="card">
-                                            <div class="card-header">
-                                                <h5 class="card-title">Dispenser-1</h5>
-                                            </div>
-                                            <div class="card-body">
-                                                <div class="row">
-                                                    <div class="mb-3 col-md-2">
-                                                        <label class="form-label">
-                                                            <p>Nozzle 1</p>
-                                                        </label>
-                                                    </div>
-                                                    <div class="mb-3 col-md-3">
-                                                        <input type="text" class="form-control"
-                                                               value="initial reading">
-                                                    </div>
-                                                    <div class="mb-3 col-md-3">
-                                                        <input type="text" class="form-control"
-                                                               value="End reading">
-                                                    </div>
-                                                    <div class="mb-3 col-md-2">
-                                                        <input type="text" class="form-control"
-                                                               value="sale on nozzle 1">
-                                                    </div>
-                                                    <div class="mb-3 col-md-2">
-
-                                                        <input type="text" class="form-control"
-                                                               value="Amount ">
-                                                    </div>
-                                                </div>
-                                                <div class="row">
-                                                    <div class="mb-3 col-md-2">
-                                                        <label class="form-label">
-                                                            <p>Nozzle 1</p>
-                                                        </label>
-                                                    </div>
-                                                    <div class="mb-3 col-md-3">
-                                                        <input type="text" class="form-control"
-                                                               value="initial reading">
-                                                    </div>
-                                                    <div class="mb-3 col-md-3">
-                                                        <input type="text" class="form-control"
-                                                               value="End reading">
-                                                    </div>
-                                                    <div class="mb-3 col-md-2">
-                                                        <input type="text" class="form-control"
-                                                               value="sale on nozzle 2">
-                                                    </div>
-                                                    <div class="mb-3 col-md-2">
-
-                                                        <input type="text" class="form-control"
-                                                               value="Amount ">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="card">
-                                            <div class="card-header">
-                                                <h5 class="card-title">Dispenser-2</h5>
-                                            </div>
-                                            <div class="card-body">
-                                                <div class="row">
-                                                    <div class="mb-3 col-md-2">
-                                                        <label class="form-label">
-                                                            <p>Nozzle 1</p>
-                                                        </label>
-                                                    </div>
-                                                    <div class="mb-3 col-md-3">
-                                                        <input type="text" class="form-control"
-                                                               value="initial reading">
-                                                    </div>
-                                                    <div class="mb-3 col-md-3">
-                                                        <input type="text" class="form-control"
-                                                               value="End reading">
-                                                    </div>
-                                                    <div class="mb-3 col-md-2">
-                                                        <input type="text" class="form-control"
-                                                               value="sale on nozzle 1">
-                                                    </div>
-                                                    <div class="mb-3 col-md-2">
-
-                                                        <input type="text" class="form-control"
-                                                               value="Amount ">
-                                                    </div>
-                                                </div>
-                                                <div class="row">
-                                                    <div class="mb-3 col-md-2">
-                                                        <label class="form-label">
-                                                            <p>Nozzle 1</p>
-                                                        </label>
-                                                    </div>
-                                                    <div class="mb-3 col-md-3">
-                                                        <input type="text" class="form-control"
-                                                               value="initial reading">
-                                                    </div>
-                                                    <div class="mb-3 col-md-3">
-                                                        <input type="text" class="form-control"
-                                                               value="End reading">
-                                                    </div>
-                                                    <div class="mb-3 col-md-2">
-                                                        <input type="text" class="form-control"
-                                                               value="sale on nozzle 2">
-                                                    </div>
-                                                    <div class="mb-3 col-md-2">
-
-                                                        <input type="text" class="form-control"
-                                                               value="Amount ">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="section-content creative">
-                                        <div class="card">
-                                            <div class="card-header">
-                                                <h5 class="card-title">LPG</h5>
-                                            </div>
-                                            <div class="card-body">
-                                                <div class="row">
-                                                    <div class="mb-3 col-md-2">
-                                                        <label class="form-label">
-                                                            <p>Oll Stock </p>
-                                                        </label>
-
-                                                    </div>
-                                                    <div class="mb-3 col-md-3">
-                                                        <input type="text" class="form-control"
-                                                               value="Previous Reading ">
-                                                    </div>
-                                                    <div class="mb-3 col-md-3">
-                                                        <input type="text" class="form-control"
-                                                               value="Final Reading">
-                                                    </div>
-
-                                                    <div class="mb-3 col-md-2">
-
-                                                        <input type="text" class="form-control"
-                                                               value="Consumption ">
-                                                    </div>
-                                                    <div class="mb-3 col-md-2">
-                                                        <input type="text" class="form-control"
-                                                               value="Amount">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="card">
-                                            <div class="card-header">
-                                                <h5 class="card-title">Dispenser-1</h5>
-                                            </div>
-                                            <div class="card-body">
-                                                <div class="row">
-                                                    <div class="mb-3 col-md-2">
-                                                        <label class="form-label">
-                                                            <p>Nozzle 1</p>
-                                                        </label>
-                                                    </div>
-                                                    <div class="mb-3 col-md-3">
-                                                        <input type="text" class="form-control"
-                                                               value="initial reading">
-                                                    </div>
-                                                    <div class="mb-3 col-md-3">
-                                                        <input type="text" class="form-control"
-                                                               value="End reading">
-                                                    </div>
-                                                    <div class="mb-3 col-md-2">
-                                                        <input type="text" class="form-control"
-                                                               value="sale on nozzle 1">
-                                                    </div>
-                                                    <div class="mb-3 col-md-2">
-
-                                                        <input type="text" class="form-control"
-                                                               value="Amount ">
-                                                    </div>
-                                                </div>
-                                                <div class="row">
-                                                    <div class="mb-3 col-md-2">
-                                                        <label class="form-label">
-                                                            <p>Nozzle 1</p>
-                                                        </label>
-                                                    </div>
-                                                    <div class="mb-3 col-md-3">
-                                                        <input type="text" class="form-control"
-                                                               value="initial reading">
-                                                    </div>
-                                                    <div class="mb-3 col-md-3">
-                                                        <input type="text" class="form-control"
-                                                               value="End reading">
-                                                    </div>
-                                                    <div class="mb-3 col-md-2">
-                                                        <input type="text" class="form-control"
-                                                               value="sale on nozzle 2">
-                                                    </div>
-                                                    <div class="mb-3 col-md-2">
-
-                                                        <input type="text" class="form-control"
-                                                               value="Amount ">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="card">
-                                            <div class="card-header">
-                                                <h5 class="card-title">Dispenser-2</h5>
-                                            </div>
-                                            <div class="card-body">
-                                                <div class="row">
-                                                    <div class="mb-3 col-md-2">
-                                                        <label class="form-label">
-                                                            <p>Nozzle 1</p>
-                                                        </label>
-                                                    </div>
-                                                    <div class="mb-3 col-md-3">
-                                                        <input type="text" class="form-control"
-                                                               value="initial reading">
-                                                    </div>
-                                                    <div class="mb-3 col-md-3">
-                                                        <input type="text" class="form-control"
-                                                               value="End reading">
-                                                    </div>
-                                                    <div class="mb-3 col-md-2">
-                                                        <input type="text" class="form-control"
-                                                               value="sale on nozzle 1">
-                                                    </div>
-                                                    <div class="mb-3 col-md-2">
-
-                                                        <input type="text" class="form-control"
-                                                               value="Amount ">
-                                                    </div>
-                                                </div>
-                                                <div class="row">
-                                                    <div class="mb-3 col-md-2">
-                                                        <label class="form-label">
-                                                            <p>Nozzle 1</p>
-                                                        </label>
-                                                    </div>
-                                                    <div class="mb-3 col-md-3">
-                                                        <input type="text" class="form-control"
-                                                               value="initial reading">
-                                                    </div>
-                                                    <div class="mb-3 col-md-3">
-                                                        <input type="text" class="form-control"
-                                                               value="End reading">
-                                                    </div>
-                                                    <div class="mb-3 col-md-2">
-                                                        <input type="text" class="form-control"
-                                                               value="sale on nozzle 2">
-                                                    </div>
-                                                    <div class="mb-3 col-md-2">
-
-                                                        <input type="text" class="form-control"
-                                                               value="Amount ">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="section-content production">
-                                        <div class="card">
-                                            <div class="card-header">
-                                                <h5 class="card-title">CNG</h5>
-                                            </div>
-                                            <div class="card-body">
-                                                <div class="row">
-                                                    <div class="mb-3 col-md-2">
-                                                        <label class="form-label">
-                                                            <p>Oll Stock </p>
-                                                        </label>
-
-                                                    </div>
-                                                    <div class="mb-3 col-md-3">
-                                                        <input type="text" class="form-control"
-                                                               value="Previous Reading ">
-                                                    </div>
-                                                    <div class="mb-3 col-md-3">
-                                                        <input type="text" class="form-control"
-                                                               value="Final Reading">
-                                                    </div>
-
-                                                    <div class="mb-3 col-md-2">
-
-                                                        <input type="text" class="form-control"
-                                                               value="Consumption ">
-                                                    </div>
-                                                    <div class="mb-3 col-md-2">
-                                                        <input type="text" class="form-control"
-                                                               value="Amount">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="card">
-                                            <div class="card-header">
-                                                <h5 class="card-title">Dispenser-1</h5>
-                                            </div>
-                                            <div class="card-body">
-                                                <div class="row">
-                                                    <div class="mb-3 col-md-2">
-                                                        <label class="form-label">
-                                                            <p>Nozzle 1</p>
-                                                        </label>
-                                                    </div>
-                                                    <div class="mb-3 col-md-3">
-                                                        <input type="text" class="form-control"
-                                                               value="initial reading">
-                                                    </div>
-                                                    <div class="mb-3 col-md-3">
-                                                        <input type="text" class="form-control"
-                                                               placeholder="End reading">
-                                                    </div>
-                                                    <div class="mb-3 col-md-2">
-                                                        <input type="text" class="form-control"
-                                                               value="sale on nozzle 1">
-                                                    </div>
-                                                    <div class="mb-3 col-md-2">
-
-                                                        <input type="text" class="form-control"
-                                                               value="Amount ">
-                                                    </div>
-                                                </div>
-                                                <div class="row">
-                                                    <div class="mb-3 col-md-2">
-                                                        <label class="form-label">
-                                                            <p>Nozzle 1</p>
-                                                        </label>
-                                                    </div>
-                                                    <div class="mb-3 col-md-3">
-                                                        <input type="text" class="form-control"
-                                                               value="initial reading">
-                                                    </div>
-                                                    <div class="mb-3 col-md-3">
-                                                        <input type="text" class="form-control"
-                                                               value="End reading">
-                                                    </div>
-                                                    <div class="mb-3 col-md-2">
-                                                        <input type="text" class="form-control"
-                                                               value="sale on nozzle 2">
-                                                    </div>
-                                                    <div class="mb-3 col-md-2">
-
-                                                        <input type="text" class="form-control"
-                                                               value="Amount ">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="card">
-                                            <div class="card-header">
-                                                <h5 class="card-title">Dispenser-2</h5>
-                                            </div>
-                                            <div class="card-body">
-                                                <div class="row">
-                                                    <div class="mb-3 col-md-2">
-                                                        <label class="form-label">
-                                                            <p>Nozzle 1</p>
-                                                        </label>
-                                                    </div>
-                                                    <div class="mb-3 col-md-3">
-                                                        <input type="text" class="form-control"
-                                                               value="initial reading">
-                                                    </div>
-                                                    <div class="mb-3 col-md-3">
-                                                        <input type="text" class="form-control"
-                                                               value="End reading">
-                                                    </div>
-                                                    <div class="mb-3 col-md-2">
-                                                        <input type="text" class="form-control"
-                                                               value="sale on nozzle 1">
-                                                    </div>
-                                                    <div class="mb-3 col-md-2">
-
-                                                        <input type="text" class="form-control"
-                                                               value="Amount ">
-                                                    </div>
-                                                </div>
-                                                <div class="row">
-                                                    <div class="mb-3 col-md-2">
-                                                        <label class="form-label">
-                                                            <p>Nozzle 1</p>
-                                                        </label>
-                                                    </div>
-                                                    <div class="mb-3 col-md-3">
-                                                        <input type="text" class="form-control"
-                                                               value="initial reading">
-                                                    </div>
-                                                    <div class="mb-3 col-md-3">
-                                                        <input type="text" class="form-control"
-                                                               value="End reading">
-                                                    </div>
-                                                    <div class="mb-3 col-md-2">
-                                                        <input type="text" class="form-control"
-                                                               value="sale on nozzle 2">
-                                                    </div>
-                                                    <div class="mb-3 col-md-2">
-
-                                                        <input type="text" class="form-control"
-                                                               value="Amount ">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="section-content analysis">
-                                        <div class="card">
-                                            <div class="card-header">
-                                                <h5 class="card-title">Summary</h5>
-                                            </div>
-                                            <div class="card-body">
-                                                <div class="row">
-                                                    <div class="mb-3 col-md-2">
-                                                        <label class="form-label">
-                                                            <p>Oll Stock </p>
-                                                        </label>
-
-                                                    </div>
-                                                    <div class="mb-3 col-md-3">
-                                                        <input type="text" class="form-control"
-                                                               value="Previous Reading ">
-                                                    </div>
-                                                    <div class="mb-3 col-md-3">
-                                                        <input type="text" class="form-control"
-                                                               value="Final Reading">
-                                                    </div>
-
-                                                    <div class="mb-3 col-md-2">
-
-                                                        <input type="text" class="form-control"
-                                                               value="Consumption ">
-                                                    </div>
-                                                    <div class="mb-3 col-md-2">
-                                                        <input type="text" class="form-control"
-                                                               value="Amount">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="card">
-                                            <div class="card-header">
-                                                <h5 class="card-title">Dispenser-1</h5>
-                                            </div>
-                                            <div class="card-body">
-                                                <div class="row">
-                                                    <div class="mb-3 col-md-2">
-                                                        <label class="form-label">
-                                                            <p>Nozzle 1</p>
-                                                        </label>
-                                                    </div>
-                                                    <div class="mb-3 col-md-3">
-                                                        <input type="text" class="form-control"
-                                                               value="intial reading">
-                                                    </div>
-                                                    <div class="mb-3 col-md-3">
-                                                        <input type="text" class="form-control"
-                                                               value="End reading">
-                                                    </div>
-                                                    <div class="mb-3 col-md-2">
-                                                        <input type="text" class="form-control"
-                                                               value="sale on nozzle 1">
-                                                    </div>
-                                                    <div class="mb-3 col-md-2">
-
-                                                        <input type="text" class="form-control"
-                                                               value="Amount ">
-                                                    </div>
-                                                </div>
-                                                <div class="row">
-                                                    <div class="mb-3 col-md-2">
-                                                        <label class="form-label">
-                                                            <p>Nozzle 1</p>
-                                                        </label>
-                                                    </div>
-                                                    <div class="mb-3 col-md-3">
-                                                        <input type="text" class="form-control"
-                                                               value="initial reading">
-                                                    </div>
-                                                    <div class="mb-3 col-md-3">
-                                                        <input type="text" class="form-control"
-                                                               value="End reading">
-                                                    </div>
-                                                    <div class="mb-3 col-md-2">
-                                                        <input type="text" class="form-control"
-                                                               value="sale on nozzle 2">
-                                                    </div>
-                                                    <div class="mb-3 col-md-2">
-
-                                                        <input type="text" class="form-control"
-                                                               value="Amount ">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="card">
-                                            <div class="card-header">
-                                                <h5 class="card-title">Dispenser-2</h5>
-                                            </div>
-                                            <div class="card-body">
-                                                <div class="row">
-                                                    <div class="mb-3 col-md-2">
-                                                        <label class="form-label">
-                                                            <p>Nozzle 1</p>
-                                                        </label>
-                                                    </div>
-                                                    <div class="mb-3 col-md-3">
-                                                        <input type="text" class="form-control"
-                                                               value="initial reading">
-                                                    </div>
-                                                    <div class="mb-3 col-md-3">
-                                                        <input type="text" class="form-control"
-                                                               value="End reading">
-                                                    </div>
-                                                    <div class="mb-3 col-md-2">
-                                                        <input type="text" class="form-control"
-                                                               value="sale on nozzle 1">
-                                                    </div>
-                                                    <div class="mb-3 col-md-2">
-
-                                                        <input type="text" class="form-control"
-                                                               value="Amount ">
-                                                    </div>
-                                                </div>
-                                                <div class="row">
-                                                    <div class="mb-3 col-md-2">
-                                                        <label class="form-label">
-                                                            <p>Nozzle 1</p>
-                                                        </label>
-                                                    </div>
-                                                    <div class="mb-3 col-md-3">
-                                                        <input type="text" class="form-control"
-                                                               value="initial reading">
-                                                    </div>
-                                                    <div class="mb-3 col-md-3">
-                                                        <input type="text" class="form-control"
-                                                               value="End reading">
-                                                    </div>
-                                                    <div class="mb-3 col-md-2">
-                                                        <input type="text" class="form-control"
-                                                               value="sale on nozzle 2">
-                                                    </div>
-                                                    <div class="mb-3 col-md-2">
-
-                                                        <input type="text" class="form-control"
-                                                               value="Amount ">
+                                                        <input type="text" class="form-control" v-model="n.amount">
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
+                                <div class="text-center" v-else>Please Select any product</div>
                             </div>
                         </div>
                     </div>
@@ -780,7 +98,66 @@
 </template>
 
 <script>
+import ApiService from "../../Services/ApiService";
+import ApiRoutes from "../../Services/ApiRoutes";
+
 export default {
+    data() {
+        return {
+            param: {
+                dispenser_name: '',
+                brand: '',
+                serial: '',
+                product_id: '',
+            },
+            loading: false,
+            listData: [],
+            listDispenser: null,
+            product_id: '',
+        }
+    },
+    methods: {
+        calculateAmount: function () {
+            this.listDispenser.shift_sale.amount = Number(this.listDispenser.shift_sale.end_reading) - Number(this.listDispenser.shift_sale.start_reading)
+        },
+        calculateAmountNozzle: function (dIndex, nIndex) {
+            this.listDispenser.summary[dIndex].nozzle[nIndex].amount = Number(this.listDispenser.summary[dIndex].nozzle[nIndex].end_reading) - Number(this.listDispenser.summary[dIndex].nozzle[nIndex].start_reading)
+        },
+        getProduct: function () {
+            ApiService.POST(ApiRoutes.ProductList, {limit: 5000, page: 1, order_mode:'ASC'},res => {
+                this.TableLoading = false
+                if (parseInt(res.status) === 200) {
+                    this.listData = res.data.data;
+                }
+            });
+        },
+        getProductDispenser: function (id) {
+            this.product_id = id
+            ApiService.POST(ApiRoutes.ProductDispenser, {product_id: this.product_id},res => {
+                this.TableLoading = false
+                if (parseInt(res.status) === 200) {
+                    this.listDispenser = res;
+                }
+            });
+        },
+        save: function () {
+            ApiService.ClearErrorHandler;
+            this.loading = true
+            ApiService.POST(ApiRoutes.DispenserAdd, this.param,res => {
+                this.loading = false
+                if (parseInt(res.status) === 200) {
+                    this.$router.push({
+                        name: 'Dispenser'
+                    })
+                } else {
+                    ApiService.ErrorHandler(res.errors);
+                }
+            });
+        },
+    },
+    created() {
+        this.getProduct()
+    },
     mounted() {
         $('#dashboard_bar').text('Shift Sale Start')
     }

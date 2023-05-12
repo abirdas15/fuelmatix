@@ -36,6 +36,7 @@ const ApiRoutes = {
     ProductList: ApiVersion + '/product/list',
     ProductSingle: ApiVersion + '/product/single',
     ProductType: ApiVersion + '/product/type/list',
+    ProductDispenser: ApiVersion + '/product/dispenser',
     //Dispenser
     DispenserAdd: ApiVersion + '/dispenser/save',
     DispenserEdit: ApiVersion + '/dispenser/update',
@@ -54,6 +55,12 @@ const ApiRoutes = {
     NozzleReadingDelete: ApiVersion + '/nozzle/reading/delete',
     NozzleReadingList: ApiVersion + '/nozzle/reading/list',
     NozzleReadingSingle: ApiVersion + '/nozzle/reading/single',
+    //Shift Sale
+    ShiftSaleAdd: ApiVersion + '/shift/sale/save',
+    ShiftSaleEdit: ApiVersion + '/shift/sale/update',
+    ShiftSaleDelete: ApiVersion + '/shift/sale/delete',
+    ShiftSaleList: ApiVersion + '/shift/sale/list',
+    ShiftSaleSingle: ApiVersion + '/shift/sale/single',
 
 };
 

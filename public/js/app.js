@@ -4012,7 +4012,76 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../Services/ApiService */ "./resources/js/Services/ApiService.js");
+/* harmony import */ var _Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../Services/ApiRoutes */ "./resources/js/Services/ApiRoutes.js");
+
+
 /* harmony default export */ __webpack_exports__["default"] = ({
+  data: function data() {
+    return {
+      param: {
+        dispenser_name: '',
+        brand: '',
+        serial: '',
+        product_id: ''
+      },
+      loading: false,
+      listData: [],
+      listDispenser: null,
+      product_id: ''
+    };
+  },
+  methods: {
+    calculateAmount: function calculateAmount() {
+      this.listDispenser.shift_sale.amount = Number(this.listDispenser.shift_sale.end_reading) - Number(this.listDispenser.shift_sale.start_reading);
+    },
+    calculateAmountNozzle: function calculateAmountNozzle(dIndex, nIndex) {
+      this.listDispenser.summary[dIndex].nozzle[nIndex].amount = Number(this.listDispenser.summary[dIndex].nozzle[nIndex].end_reading) - Number(this.listDispenser.summary[dIndex].nozzle[nIndex].start_reading);
+    },
+    getProduct: function getProduct() {
+      var _this = this;
+      _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].ProductList, {
+        limit: 5000,
+        page: 1,
+        order_mode: 'ASC'
+      }, function (res) {
+        _this.TableLoading = false;
+        if (parseInt(res.status) === 200) {
+          _this.listData = res.data.data;
+        }
+      });
+    },
+    getProductDispenser: function getProductDispenser(id) {
+      var _this2 = this;
+      this.product_id = id;
+      _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].ProductDispenser, {
+        product_id: this.product_id
+      }, function (res) {
+        _this2.TableLoading = false;
+        if (parseInt(res.status) === 200) {
+          _this2.listDispenser = res;
+        }
+      });
+    },
+    save: function save() {
+      var _this3 = this;
+      _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].ClearErrorHandler;
+      this.loading = true;
+      _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].DispenserAdd, this.param, function (res) {
+        _this3.loading = false;
+        if (parseInt(res.status) === 200) {
+          _this3.$router.push({
+            name: 'Dispenser'
+          });
+        } else {
+          _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].ErrorHandler(res.errors);
+        }
+      });
+    }
+  },
+  created: function created() {
+    this.getProduct();
+  },
   mounted: function mounted() {
     $('#dashboard_bar').text('Shift Sale Start');
   }
@@ -11054,7 +11123,257 @@ var render = function render() {
         name: "Dashboard"
       }
     }
-  }, [_vm._v("Home")])], 1), _vm._v(" "), _vm._m(0)])]), _vm._v(" "), _vm._m(1)])]);
+  }, [_vm._v("Home")])], 1), _vm._v(" "), _vm._m(0)])]), _vm._v(" "), _c("div", {
+    staticClass: "row"
+  }, [_c("div", {
+    staticClass: "col-xl-12 col-lg-12"
+  }, [_c("div", {
+    staticClass: "card"
+  }, [_vm._m(1), _vm._v(" "), _c("div", {
+    staticClass: "card-body"
+  }, [_c("div", {
+    staticClass: "process-wrapper"
+  }, [_vm.listData.length > 0 ? _c("div", {
+    attrs: {
+      id: "progress-bar-container"
+    }
+  }, [_c("ul", _vm._l(_vm.listData, function (p) {
+    return _c("li", {
+      staticClass: "step step01",
+      "class": {
+        active: p.id == _vm.product_id
+      },
+      on: {
+        click: function click($event) {
+          return _vm.getProductDispenser(p.id);
+        }
+      }
+    }, [_c("div", {
+      staticClass: "step-inner"
+    }, [_vm._v(_vm._s(p.name))])]);
+  }), 0), _vm._v(" "), _vm._m(2)]) : _c("div", {
+    staticClass: "text-center"
+  }, [_vm._v("No Product Found")]), _vm._v(" "), _vm.listDispenser ? _c("div", {
+    attrs: {
+      id: "progress-content-section"
+    }
+  }, [_c("div", {
+    staticClass: "section-content discovery active"
+  }, [_c("div", {
+    staticClass: "card"
+  }, [_c("div", {
+    staticClass: "card-header"
+  }, [_c("h5", {
+    staticClass: "card-title"
+  }, [_vm._v(_vm._s(_vm.listDispenser.shift_sale.product_name))])]), _vm._v(" "), _c("div", {
+    staticClass: "card-body"
+  }, [_c("div", {
+    staticClass: "row"
+  }, [_vm._m(3), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-3"
+  }, [_c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.listDispenser.shift_sale.start_reading,
+      expression: "listDispenser.shift_sale.start_reading"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      type: "text"
+    },
+    domProps: {
+      value: _vm.listDispenser.shift_sale.start_reading
+    },
+    on: {
+      change: _vm.calculateAmount,
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.listDispenser.shift_sale, "start_reading", $event.target.value);
+      }
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-3"
+  }, [_c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.listDispenser.shift_sale.end_reading,
+      expression: "listDispenser.shift_sale.end_reading"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      type: "text"
+    },
+    domProps: {
+      value: _vm.listDispenser.shift_sale.end_reading
+    },
+    on: {
+      change: _vm.calculateAmount,
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.listDispenser.shift_sale, "end_reading", $event.target.value);
+      }
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-2"
+  }, [_c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.listDispenser.shift_sale.consumption,
+      expression: "listDispenser.shift_sale.consumption"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      type: "text"
+    },
+    domProps: {
+      value: _vm.listDispenser.shift_sale.consumption
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.listDispenser.shift_sale, "consumption", $event.target.value);
+      }
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-2"
+  }, [_c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.listDispenser.shift_sale.amount,
+      expression: "listDispenser.shift_sale.amount"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      type: "text"
+    },
+    domProps: {
+      value: _vm.listDispenser.shift_sale.amount
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.listDispenser.shift_sale, "amount", $event.target.value);
+      }
+    }
+  })])])])]), _vm._v(" "), _vm._l(_vm.listDispenser.summary, function (d, dIndex) {
+    return _vm.listDispenser.summary.length > 0 ? _c("div", {
+      staticClass: "card"
+    }, [_c("div", {
+      staticClass: "card-header"
+    }, [_c("h5", {
+      staticClass: "card-title"
+    }, [_vm._v(_vm._s(d.dispenser_name))])]), _vm._v(" "), d.nozzle.length > 0 ? _c("div", {
+      staticClass: "card-body"
+    }, _vm._l(d.nozzle, function (n, nIndex) {
+      return _c("div", {
+        staticClass: "row"
+      }, [_c("div", {
+        staticClass: "mb-3 col-md-2"
+      }, [_c("label", {
+        staticClass: "form-label"
+      }, [_c("p", [_vm._v(_vm._s(n.name))])])]), _vm._v(" "), _c("div", {
+        staticClass: "mb-3 col-md-3"
+      }, [_c("input", {
+        directives: [{
+          name: "model",
+          rawName: "v-model",
+          value: n.start_reading,
+          expression: "n.start_reading"
+        }],
+        staticClass: "form-control",
+        attrs: {
+          type: "text"
+        },
+        domProps: {
+          value: n.start_reading
+        },
+        on: {
+          change: function change($event) {
+            return _vm.calculateAmountNozzle(dIndex, nIndex);
+          },
+          input: function input($event) {
+            if ($event.target.composing) return;
+            _vm.$set(n, "start_reading", $event.target.value);
+          }
+        }
+      })]), _vm._v(" "), _c("div", {
+        staticClass: "mb-3 col-md-3"
+      }, [_c("input", {
+        directives: [{
+          name: "model",
+          rawName: "v-model",
+          value: n.end_reading,
+          expression: "n.end_reading"
+        }],
+        staticClass: "form-control",
+        attrs: {
+          type: "text"
+        },
+        domProps: {
+          value: n.end_reading
+        },
+        on: {
+          change: function change($event) {
+            return _vm.calculateAmountNozzle(dIndex, nIndex);
+          },
+          input: function input($event) {
+            if ($event.target.composing) return;
+            _vm.$set(n, "end_reading", $event.target.value);
+          }
+        }
+      })]), _vm._v(" "), _c("div", {
+        staticClass: "mb-3 col-md-2"
+      }, [_c("input", {
+        directives: [{
+          name: "model",
+          rawName: "v-model",
+          value: n.consumption,
+          expression: "n.consumption"
+        }],
+        staticClass: "form-control",
+        attrs: {
+          type: "text"
+        },
+        domProps: {
+          value: n.consumption
+        },
+        on: {
+          input: function input($event) {
+            if ($event.target.composing) return;
+            _vm.$set(n, "consumption", $event.target.value);
+          }
+        }
+      })]), _vm._v(" "), _c("div", {
+        staticClass: "mb-3 col-md-2"
+      }, [_c("input", {
+        directives: [{
+          name: "model",
+          rawName: "v-model",
+          value: n.amount,
+          expression: "n.amount"
+        }],
+        staticClass: "form-control",
+        attrs: {
+          type: "text"
+        },
+        domProps: {
+          value: n.amount
+        },
+        on: {
+          input: function input($event) {
+            if ($event.target.composing) return;
+            _vm.$set(n, "amount", $event.target.value);
+          }
+        }
+      })])]);
+    }), 0) : _vm._e()]) : _vm._e();
+  })], 2)]) : _c("div", {
+    staticClass: "text-center"
+  }, [_vm._v("Please Select any product")])])])])])])])]);
 };
 var staticRenderFns = [function () {
   var _vm = this,
@@ -11070,44 +11389,14 @@ var staticRenderFns = [function () {
   var _vm = this,
     _c = _vm._self._c;
   return _c("div", {
-    staticClass: "row"
-  }, [_c("div", {
-    staticClass: "col-xl-12 col-lg-12"
-  }, [_c("div", {
-    staticClass: "card"
-  }, [_c("div", {
     staticClass: "card-header"
   }, [_c("h4", {
     staticClass: "card-title"
-  }, [_vm._v("Shift Sale Start")])]), _vm._v(" "), _c("div", {
-    staticClass: "card-body"
-  }, [_c("div", {
-    staticClass: "process-wrapper"
-  }, [_c("div", {
-    attrs: {
-      id: "progress-bar-container"
-    }
-  }, [_c("ul", [_c("li", {
-    staticClass: "step step01 active"
-  }, [_c("div", {
-    staticClass: "step-inner"
-  }, [_vm._v("Octane")])]), _vm._v(" "), _c("li", {
-    staticClass: "step step02"
-  }, [_c("div", {
-    staticClass: "step-inner"
-  }, [_vm._v("Petrol ")])]), _vm._v(" "), _c("li", {
-    staticClass: "step step03"
-  }, [_c("div", {
-    staticClass: "step-inner"
-  }, [_vm._v("LPG")])]), _vm._v(" "), _c("li", {
-    staticClass: "step step04"
-  }, [_c("div", {
-    staticClass: "step-inner"
-  }, [_vm._v("CNG")])]), _vm._v(" "), _c("li", {
-    staticClass: "step step05"
-  }, [_c("div", {
-    staticClass: "step-inner"
-  }, [_vm._v("Summary")])])]), _vm._v(" "), _c("div", {
+  }, [_vm._v("Shift Sale Start")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
     attrs: {
       id: "line"
     }
@@ -11115,1091 +11404,15 @@ var staticRenderFns = [function () {
     attrs: {
       id: "line-progress"
     }
-  })])]), _vm._v(" "), _c("div", {
-    attrs: {
-      id: "progress-content-section"
-    }
-  }, [_c("div", {
-    staticClass: "section-content discovery active"
-  }, [_c("div", {
-    staticClass: "card"
-  }, [_c("div", {
-    staticClass: "card-header"
-  }, [_c("h5", {
-    staticClass: "card-title"
-  }, [_vm._v("Octane")])]), _vm._v(" "), _c("div", {
-    staticClass: "card-body"
-  }, [_c("div", {
-    staticClass: "row"
-  }, [_c("div", {
+  })]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
     staticClass: "mb-3 col-md-2"
   }, [_c("label", {
     staticClass: "form-label"
-  }, [_c("p", [_vm._v("Oll Stock ")])])]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-3"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "Previous Reading "
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-3"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "Final Reading"
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-2"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "Consumption "
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-2"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "Amount"
-    }
-  })])])])]), _vm._v(" "), _c("div", {
-    staticClass: "card"
-  }, [_c("div", {
-    staticClass: "card-header"
-  }, [_c("h5", {
-    staticClass: "card-title"
-  }, [_vm._v("Dispenser-1")])]), _vm._v(" "), _c("div", {
-    staticClass: "card-body"
-  }, [_c("div", {
-    staticClass: "row"
-  }, [_c("div", {
-    staticClass: "mb-3 col-md-2"
-  }, [_c("label", {
-    staticClass: "form-label"
-  }, [_c("p", [_vm._v("Nozzle 1")])])]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-3"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "initial reading"
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-3"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "End reading"
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-2"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "sale on nozzle 1"
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-2"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "Amount "
-    }
-  })])]), _vm._v(" "), _c("div", {
-    staticClass: "row"
-  }, [_c("div", {
-    staticClass: "mb-3 col-md-2"
-  }, [_c("label", {
-    staticClass: "form-label"
-  }, [_c("p", [_vm._v("Nozzle 1")])])]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-3"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "initial reading"
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-3"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "End reading"
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-2"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "sale on nozzle 2"
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-2"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "Amount "
-    }
-  })])])])]), _vm._v(" "), _c("div", {
-    staticClass: "card"
-  }, [_c("div", {
-    staticClass: "card-header"
-  }, [_c("h5", {
-    staticClass: "card-title"
-  }, [_vm._v("Dispenser-2")])]), _vm._v(" "), _c("div", {
-    staticClass: "card-body"
-  }, [_c("div", {
-    staticClass: "row"
-  }, [_c("div", {
-    staticClass: "mb-3 col-md-2"
-  }, [_c("label", {
-    staticClass: "form-label"
-  }, [_c("p", [_vm._v("Nozzle 1")])])]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-3"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "initial reading"
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-3"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "End reading"
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-2"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "sale on nozzle 1"
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-2"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "Amount "
-    }
-  })])]), _vm._v(" "), _c("div", {
-    staticClass: "row"
-  }, [_c("div", {
-    staticClass: "mb-3 col-md-2"
-  }, [_c("label", {
-    staticClass: "form-label"
-  }, [_c("p", [_vm._v("Nozzle 1")])])]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-3"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "initial reading"
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-3"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "End reading"
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-2"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "sale on nozzle 2"
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-2"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "Amount "
-    }
-  })])])])])]), _vm._v(" "), _c("div", {
-    staticClass: "section-content strategy"
-  }, [_c("div", {
-    staticClass: "card"
-  }, [_c("div", {
-    staticClass: "card-header"
-  }, [_c("h5", {
-    staticClass: "card-title"
-  }, [_vm._v("Petrol")])]), _vm._v(" "), _c("div", {
-    staticClass: "card-body"
-  }, [_c("div", {
-    staticClass: "row"
-  }, [_c("div", {
-    staticClass: "mb-3 col-md-2"
-  }, [_c("label", {
-    staticClass: "form-label"
-  }, [_c("p", [_vm._v("Oll Stock ")])])]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-3"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "Previous Reading "
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-3"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "Final Reading"
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-2"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "Consumption "
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-2"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "Amount"
-    }
-  })])])])]), _vm._v(" "), _c("div", {
-    staticClass: "card"
-  }, [_c("div", {
-    staticClass: "card-header"
-  }, [_c("h5", {
-    staticClass: "card-title"
-  }, [_vm._v("Dispenser-1")])]), _vm._v(" "), _c("div", {
-    staticClass: "card-body"
-  }, [_c("div", {
-    staticClass: "row"
-  }, [_c("div", {
-    staticClass: "mb-3 col-md-2"
-  }, [_c("label", {
-    staticClass: "form-label"
-  }, [_c("p", [_vm._v("Nozzle 1")])])]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-3"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "initial reading"
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-3"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "End reading"
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-2"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "sale on nozzle 1"
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-2"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "Amount "
-    }
-  })])]), _vm._v(" "), _c("div", {
-    staticClass: "row"
-  }, [_c("div", {
-    staticClass: "mb-3 col-md-2"
-  }, [_c("label", {
-    staticClass: "form-label"
-  }, [_c("p", [_vm._v("Nozzle 1")])])]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-3"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "initial reading"
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-3"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "End reading"
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-2"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "sale on nozzle 2"
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-2"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "Amount "
-    }
-  })])])])]), _vm._v(" "), _c("div", {
-    staticClass: "card"
-  }, [_c("div", {
-    staticClass: "card-header"
-  }, [_c("h5", {
-    staticClass: "card-title"
-  }, [_vm._v("Dispenser-2")])]), _vm._v(" "), _c("div", {
-    staticClass: "card-body"
-  }, [_c("div", {
-    staticClass: "row"
-  }, [_c("div", {
-    staticClass: "mb-3 col-md-2"
-  }, [_c("label", {
-    staticClass: "form-label"
-  }, [_c("p", [_vm._v("Nozzle 1")])])]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-3"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "initial reading"
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-3"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "End reading"
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-2"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "sale on nozzle 1"
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-2"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "Amount "
-    }
-  })])]), _vm._v(" "), _c("div", {
-    staticClass: "row"
-  }, [_c("div", {
-    staticClass: "mb-3 col-md-2"
-  }, [_c("label", {
-    staticClass: "form-label"
-  }, [_c("p", [_vm._v("Nozzle 1")])])]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-3"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "initial reading"
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-3"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "End reading"
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-2"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "sale on nozzle 2"
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-2"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "Amount "
-    }
-  })])])])])]), _vm._v(" "), _c("div", {
-    staticClass: "section-content creative"
-  }, [_c("div", {
-    staticClass: "card"
-  }, [_c("div", {
-    staticClass: "card-header"
-  }, [_c("h5", {
-    staticClass: "card-title"
-  }, [_vm._v("LPG")])]), _vm._v(" "), _c("div", {
-    staticClass: "card-body"
-  }, [_c("div", {
-    staticClass: "row"
-  }, [_c("div", {
-    staticClass: "mb-3 col-md-2"
-  }, [_c("label", {
-    staticClass: "form-label"
-  }, [_c("p", [_vm._v("Oll Stock ")])])]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-3"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "Previous Reading "
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-3"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "Final Reading"
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-2"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "Consumption "
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-2"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "Amount"
-    }
-  })])])])]), _vm._v(" "), _c("div", {
-    staticClass: "card"
-  }, [_c("div", {
-    staticClass: "card-header"
-  }, [_c("h5", {
-    staticClass: "card-title"
-  }, [_vm._v("Dispenser-1")])]), _vm._v(" "), _c("div", {
-    staticClass: "card-body"
-  }, [_c("div", {
-    staticClass: "row"
-  }, [_c("div", {
-    staticClass: "mb-3 col-md-2"
-  }, [_c("label", {
-    staticClass: "form-label"
-  }, [_c("p", [_vm._v("Nozzle 1")])])]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-3"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "initial reading"
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-3"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "End reading"
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-2"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "sale on nozzle 1"
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-2"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "Amount "
-    }
-  })])]), _vm._v(" "), _c("div", {
-    staticClass: "row"
-  }, [_c("div", {
-    staticClass: "mb-3 col-md-2"
-  }, [_c("label", {
-    staticClass: "form-label"
-  }, [_c("p", [_vm._v("Nozzle 1")])])]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-3"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "initial reading"
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-3"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "End reading"
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-2"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "sale on nozzle 2"
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-2"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "Amount "
-    }
-  })])])])]), _vm._v(" "), _c("div", {
-    staticClass: "card"
-  }, [_c("div", {
-    staticClass: "card-header"
-  }, [_c("h5", {
-    staticClass: "card-title"
-  }, [_vm._v("Dispenser-2")])]), _vm._v(" "), _c("div", {
-    staticClass: "card-body"
-  }, [_c("div", {
-    staticClass: "row"
-  }, [_c("div", {
-    staticClass: "mb-3 col-md-2"
-  }, [_c("label", {
-    staticClass: "form-label"
-  }, [_c("p", [_vm._v("Nozzle 1")])])]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-3"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "initial reading"
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-3"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "End reading"
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-2"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "sale on nozzle 1"
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-2"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "Amount "
-    }
-  })])]), _vm._v(" "), _c("div", {
-    staticClass: "row"
-  }, [_c("div", {
-    staticClass: "mb-3 col-md-2"
-  }, [_c("label", {
-    staticClass: "form-label"
-  }, [_c("p", [_vm._v("Nozzle 1")])])]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-3"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "initial reading"
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-3"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "End reading"
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-2"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "sale on nozzle 2"
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-2"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "Amount "
-    }
-  })])])])])]), _vm._v(" "), _c("div", {
-    staticClass: "section-content production"
-  }, [_c("div", {
-    staticClass: "card"
-  }, [_c("div", {
-    staticClass: "card-header"
-  }, [_c("h5", {
-    staticClass: "card-title"
-  }, [_vm._v("CNG")])]), _vm._v(" "), _c("div", {
-    staticClass: "card-body"
-  }, [_c("div", {
-    staticClass: "row"
-  }, [_c("div", {
-    staticClass: "mb-3 col-md-2"
-  }, [_c("label", {
-    staticClass: "form-label"
-  }, [_c("p", [_vm._v("Oll Stock ")])])]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-3"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "Previous Reading "
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-3"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "Final Reading"
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-2"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "Consumption "
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-2"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "Amount"
-    }
-  })])])])]), _vm._v(" "), _c("div", {
-    staticClass: "card"
-  }, [_c("div", {
-    staticClass: "card-header"
-  }, [_c("h5", {
-    staticClass: "card-title"
-  }, [_vm._v("Dispenser-1")])]), _vm._v(" "), _c("div", {
-    staticClass: "card-body"
-  }, [_c("div", {
-    staticClass: "row"
-  }, [_c("div", {
-    staticClass: "mb-3 col-md-2"
-  }, [_c("label", {
-    staticClass: "form-label"
-  }, [_c("p", [_vm._v("Nozzle 1")])])]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-3"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "initial reading"
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-3"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      placeholder: "End reading"
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-2"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "sale on nozzle 1"
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-2"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "Amount "
-    }
-  })])]), _vm._v(" "), _c("div", {
-    staticClass: "row"
-  }, [_c("div", {
-    staticClass: "mb-3 col-md-2"
-  }, [_c("label", {
-    staticClass: "form-label"
-  }, [_c("p", [_vm._v("Nozzle 1")])])]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-3"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "initial reading"
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-3"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "End reading"
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-2"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "sale on nozzle 2"
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-2"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "Amount "
-    }
-  })])])])]), _vm._v(" "), _c("div", {
-    staticClass: "card"
-  }, [_c("div", {
-    staticClass: "card-header"
-  }, [_c("h5", {
-    staticClass: "card-title"
-  }, [_vm._v("Dispenser-2")])]), _vm._v(" "), _c("div", {
-    staticClass: "card-body"
-  }, [_c("div", {
-    staticClass: "row"
-  }, [_c("div", {
-    staticClass: "mb-3 col-md-2"
-  }, [_c("label", {
-    staticClass: "form-label"
-  }, [_c("p", [_vm._v("Nozzle 1")])])]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-3"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "initial reading"
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-3"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "End reading"
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-2"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "sale on nozzle 1"
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-2"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "Amount "
-    }
-  })])]), _vm._v(" "), _c("div", {
-    staticClass: "row"
-  }, [_c("div", {
-    staticClass: "mb-3 col-md-2"
-  }, [_c("label", {
-    staticClass: "form-label"
-  }, [_c("p", [_vm._v("Nozzle 1")])])]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-3"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "initial reading"
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-3"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "End reading"
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-2"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "sale on nozzle 2"
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-2"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "Amount "
-    }
-  })])])])])]), _vm._v(" "), _c("div", {
-    staticClass: "section-content analysis"
-  }, [_c("div", {
-    staticClass: "card"
-  }, [_c("div", {
-    staticClass: "card-header"
-  }, [_c("h5", {
-    staticClass: "card-title"
-  }, [_vm._v("Summary")])]), _vm._v(" "), _c("div", {
-    staticClass: "card-body"
-  }, [_c("div", {
-    staticClass: "row"
-  }, [_c("div", {
-    staticClass: "mb-3 col-md-2"
-  }, [_c("label", {
-    staticClass: "form-label"
-  }, [_c("p", [_vm._v("Oll Stock ")])])]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-3"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "Previous Reading "
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-3"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "Final Reading"
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-2"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "Consumption "
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-2"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "Amount"
-    }
-  })])])])]), _vm._v(" "), _c("div", {
-    staticClass: "card"
-  }, [_c("div", {
-    staticClass: "card-header"
-  }, [_c("h5", {
-    staticClass: "card-title"
-  }, [_vm._v("Dispenser-1")])]), _vm._v(" "), _c("div", {
-    staticClass: "card-body"
-  }, [_c("div", {
-    staticClass: "row"
-  }, [_c("div", {
-    staticClass: "mb-3 col-md-2"
-  }, [_c("label", {
-    staticClass: "form-label"
-  }, [_c("p", [_vm._v("Nozzle 1")])])]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-3"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "intial reading"
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-3"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "End reading"
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-2"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "sale on nozzle 1"
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-2"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "Amount "
-    }
-  })])]), _vm._v(" "), _c("div", {
-    staticClass: "row"
-  }, [_c("div", {
-    staticClass: "mb-3 col-md-2"
-  }, [_c("label", {
-    staticClass: "form-label"
-  }, [_c("p", [_vm._v("Nozzle 1")])])]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-3"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "initial reading"
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-3"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "End reading"
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-2"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "sale on nozzle 2"
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-2"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "Amount "
-    }
-  })])])])]), _vm._v(" "), _c("div", {
-    staticClass: "card"
-  }, [_c("div", {
-    staticClass: "card-header"
-  }, [_c("h5", {
-    staticClass: "card-title"
-  }, [_vm._v("Dispenser-2")])]), _vm._v(" "), _c("div", {
-    staticClass: "card-body"
-  }, [_c("div", {
-    staticClass: "row"
-  }, [_c("div", {
-    staticClass: "mb-3 col-md-2"
-  }, [_c("label", {
-    staticClass: "form-label"
-  }, [_c("p", [_vm._v("Nozzle 1")])])]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-3"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "initial reading"
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-3"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "End reading"
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-2"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "sale on nozzle 1"
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-2"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "Amount "
-    }
-  })])]), _vm._v(" "), _c("div", {
-    staticClass: "row"
-  }, [_c("div", {
-    staticClass: "mb-3 col-md-2"
-  }, [_c("label", {
-    staticClass: "form-label"
-  }, [_c("p", [_vm._v("Nozzle 1")])])]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-3"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "initial reading"
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-3"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "End reading"
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-2"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "sale on nozzle 2"
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-2"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      value: "Amount "
-    }
-  })])])])])])])])])])])]);
+  }, [_c("p", [_vm._v("Oll Stock ")])])]);
 }];
 render._withStripped = true;
 
@@ -48561,6 +47774,7 @@ var ApiRoutes = {
   ProductList: ApiVersion + '/product/list',
   ProductSingle: ApiVersion + '/product/single',
   ProductType: ApiVersion + '/product/type/list',
+  ProductDispenser: ApiVersion + '/product/dispenser',
   //Dispenser
   DispenserAdd: ApiVersion + '/dispenser/save',
   DispenserEdit: ApiVersion + '/dispenser/update',
@@ -48578,7 +47792,13 @@ var ApiRoutes = {
   NozzleReadingEdit: ApiVersion + '/nozzle/reading/update',
   NozzleReadingDelete: ApiVersion + '/nozzle/reading/delete',
   NozzleReadingList: ApiVersion + '/nozzle/reading/list',
-  NozzleReadingSingle: ApiVersion + '/nozzle/reading/single'
+  NozzleReadingSingle: ApiVersion + '/nozzle/reading/single',
+  //Shift Sale
+  ShiftSaleAdd: ApiVersion + '/shift/sale/save',
+  ShiftSaleEdit: ApiVersion + '/shift/sale/update',
+  ShiftSaleDelete: ApiVersion + '/shift/sale/delete',
+  ShiftSaleList: ApiVersion + '/shift/sale/list',
+  ShiftSaleSingle: ApiVersion + '/shift/sale/single'
 };
 /* harmony default export */ __webpack_exports__["default"] = (ApiRoutes);
 
