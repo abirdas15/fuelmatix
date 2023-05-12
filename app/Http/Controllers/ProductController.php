@@ -132,8 +132,11 @@ class ProductController extends Controller
                 'start_reading' => 0,
                 'end_reading' => 0,
                 'consumption' => null,
-                'amount' => 0
+                'amount' => 0,
+                'status' => 'start'
             ];
+        } else {
+            $shitSale['status'] = 'end';
         }
         $shitSaleSummary = ShiftSummary::select('id', 'nozzle_id', 'start_reading', 'end_reading', 'consumption', 'amount')
             ->where('shift_sale_id', $shitSale['id'])
