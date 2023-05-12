@@ -72,6 +72,7 @@ Route::group(['prefix' => 'product'], function() {
     Route::post('single', [ProductController::class, 'single']);
     Route::post('update', [ProductController::class, 'update']);
     Route::post('delete', [ProductController::class, 'delete']);
+    Route::post('dispenser', [ProductController::class, 'getDispenser']);
 });
 Route::group(['prefix' => 'dispenser'], function() {
     Route::post('save', [DispenserController::class, 'save']);
@@ -93,6 +94,13 @@ Route::group(['prefix' => 'nozzle'], function() {
         Route::post('update', [NozzleController::class, 'readingUpdate']);
         Route::post('delete', [NozzleController::class, 'readingDelete']);
     });
+});
+Route::group(['prefix' => 'shift/sale'], function() {
+    Route::post('save', [DispenserController::class, 'save']);
+    Route::post('list', [DispenserController::class, 'list']);
+    Route::post('single', [DispenserController::class, 'single']);
+    Route::post('update', [DispenserController::class, 'update']);
+    Route::post('delete', [DispenserController::class, 'delete']);
 });
 
 
