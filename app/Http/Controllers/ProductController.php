@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Dispenser;
 use App\Models\Product;
+use App\Models\ShiftSale;
+use App\Models\ShiftSummary;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -108,5 +111,49 @@ class ProductController extends Controller
         }
         Product::where('id', $inputData['id'])->delete();
         return response()->json(['status' => 200, 'message' => 'Successfully delete product.']);
+    }
+    public function getDispenser(Request $request)
+    {
+        $inputData = $request->all();
+        $validator = Validator::make($inputData, [
+            'product_id' => 'required'
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['status' => 500, 'errors' => $validator->errors()]);
+        }
+        $shitSale = ShiftSale::select('id', 'start_reading', 'end_reading', 'consumption', 'amount')
+            ->where('product_id', $inputData['product_id'])
+            ->where('status', 'start')
+            ->orderBy('id', 'DESC')
+            ->first();
+        if ($shitSale == null) {
+            $shitSale = [
+                'id' => '',
+                'start_reading' => 0,
+                'end_reading' => 0,
+                'consumption' => null,
+                'amount' => 0
+            ];
+        }
+        $shitSaleSummary = ShiftSummary::select('id', 'nozzle_id', 'start_reading', 'end_reading', 'consumption', 'amount')
+            ->where('shift_sale_id', $shitSale['id'])
+            ->get()
+            ->keyBy('nozzle_id');
+        $dispensers = Dispenser::select('id', 'dispenser_name')
+            ->where('product_id', $inputData['product_id'])
+            ->with(['nozzle' => function($q) {
+                $q->select('nozzles.id', 'nozzles.dispenser_id', 'nozzles.name');
+            }])
+            ->get()
+            ->toArray();
+        foreach ($dispensers as &$dispenser) {
+            foreach ($dispenser['nozzle'] as &$nozzle) {
+                $nozzle['start_reading'] = isset($shitSaleSummary[$nozzle['id']]) ? $shitSaleSummary[$nozzle['id']]['start_reading'] : 0;
+                $nozzle['end_reading'] = isset($shitSaleSummary[$nozzle['id']]) ? $shitSaleSummary[$nozzle['id']]['end_reading'] : 0;
+                $nozzle['consumption'] = isset($shitSaleSummary[$nozzle['id']]) ? $shitSaleSummary[$nozzle['id']]['consumption'] : null;
+                $nozzle['amount'] = isset($shitSaleSummary[$nozzle['id']]) ? $shitSaleSummary[$nozzle['id']]['amount'] : 0;
+            }
+        }
+        return response()->json(['status' => 200, 'dispenser' => $dispensers, 'product' => $shitSale]);
     }
 }
