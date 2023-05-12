@@ -482,3 +482,7 @@ h1 {
 .content-body{
     margin-left: 17.563rem;
 }
+.form-control:disabled, .form-control[readonly] {
+    background: #e5e5e5;
+    opacity: 1;
+}

@@ -4033,10 +4033,10 @@ __webpack_require__.r(__webpack_exports__);
   },
   methods: {
     calculateAmount: function calculateAmount() {
-      this.listDispenser.shift_sale.amount = Number(this.listDispenser.shift_sale.end_reading) - Number(this.listDispenser.shift_sale.start_reading);
+      this.listDispenser.shift_sale.amount = parseFloat(this.listDispenser.shift_sale.end_reading) - parseFloat(this.listDispenser.shift_sale.start_reading);
     },
     calculateAmountNozzle: function calculateAmountNozzle(dIndex, nIndex) {
-      this.listDispenser.summary[dIndex].nozzle[nIndex].amount = Number(this.listDispenser.summary[dIndex].nozzle[nIndex].end_reading) - Number(this.listDispenser.summary[dIndex].nozzle[nIndex].start_reading);
+      this.listDispenser.summary[dIndex].nozzle[nIndex].amount = parseFloat(this.listDispenser.summary[dIndex].nozzle[nIndex].end_reading) - parseFloat(this.listDispenser.summary[dIndex].nozzle[nIndex].start_reading);
     },
     getProduct: function getProduct() {
       var _this = this;
@@ -4051,9 +4051,8 @@ __webpack_require__.r(__webpack_exports__);
         }
       });
     },
-    getProductDispenser: function getProductDispenser(id) {
+    getProductDispenser: function getProductDispenser() {
       var _this2 = this;
-      this.product_id = id;
       _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].ProductDispenser, {
         product_id: this.product_id
       }, function (res) {
@@ -4067,12 +4066,11 @@ __webpack_require__.r(__webpack_exports__);
       var _this3 = this;
       _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].ClearErrorHandler;
       this.loading = true;
-      _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].DispenserAdd, this.param, function (res) {
+      _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].ShiftSaleAdd, this.listDispenser, function (res) {
         _this3.loading = false;
         if (parseInt(res.status) === 200) {
-          _this3.$router.push({
-            name: 'Dispenser'
-          });
+          _this3.$toast.success(res.message);
+          _this3.getProductDispenser();
         } else {
           _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].ErrorHandler(res.errors);
         }
@@ -11129,7 +11127,14 @@ var render = function render() {
     staticClass: "col-xl-12 col-lg-12"
   }, [_c("div", {
     staticClass: "card"
-  }, [_vm._m(1), _vm._v(" "), _c("div", {
+  }, [_vm._m(1), _vm._v(" "), _c("form", {
+    on: {
+      submit: function submit($event) {
+        $event.preventDefault();
+        return _vm.save.apply(null, arguments);
+      }
+    }
+  }, [_c("div", {
     staticClass: "card-body"
   }, [_c("div", {
     staticClass: "process-wrapper"
@@ -11145,7 +11150,8 @@ var render = function render() {
       },
       on: {
         click: function click($event) {
-          return _vm.getProductDispenser(p.id);
+          _vm.product_id = p.id;
+          _vm.getProductDispenser();
         }
       }
     }, [_c("div", {
@@ -11165,7 +11171,7 @@ var render = function render() {
     staticClass: "card-header"
   }, [_c("h5", {
     staticClass: "card-title"
-  }, [_vm._v(_vm._s(_vm.listDispenser.shift_sale.product_name))])]), _vm._v(" "), _c("div", {
+  }, [_vm._v("\n                                                    " + _vm._s(_vm.listDispenser.shift_sale.product_name))])]), _vm._v(" "), _c("div", {
     staticClass: "card-body"
   }, [_c("div", {
     staticClass: "row"
@@ -11180,17 +11186,19 @@ var render = function render() {
     }],
     staticClass: "form-control",
     attrs: {
+      disabled: _vm.listDispenser.shift_sale.status == "end",
       type: "text"
     },
     domProps: {
       value: _vm.listDispenser.shift_sale.start_reading
     },
     on: {
-      change: _vm.calculateAmount,
-      input: function input($event) {
+      input: [function ($event) {
         if ($event.target.composing) return;
         _vm.$set(_vm.listDispenser.shift_sale, "start_reading", $event.target.value);
-      }
+      }, function ($event) {
+        _vm.listDispenser.shift_sale.status == "end" ? _vm.calculateAmount() : "";
+      }]
     }
   })]), _vm._v(" "), _c("div", {
     staticClass: "mb-3 col-md-3"
@@ -11203,17 +11211,19 @@ var render = function render() {
     }],
     staticClass: "form-control",
     attrs: {
+      disabled: _vm.listDispenser.shift_sale.status == "start",
       type: "text"
     },
     domProps: {
       value: _vm.listDispenser.shift_sale.end_reading
     },
     on: {
-      change: _vm.calculateAmount,
-      input: function input($event) {
+      input: [function ($event) {
         if ($event.target.composing) return;
         _vm.$set(_vm.listDispenser.shift_sale, "end_reading", $event.target.value);
-      }
+      }, function ($event) {
+        _vm.listDispenser.shift_sale.status == "end" ? _vm.calculateAmount() : "";
+      }]
     }
   })]), _vm._v(" "), _c("div", {
     staticClass: "mb-3 col-md-2"
@@ -11248,7 +11258,8 @@ var render = function render() {
     }],
     staticClass: "form-control",
     attrs: {
-      type: "text"
+      type: "text",
+      disabled: ""
     },
     domProps: {
       value: _vm.listDispenser.shift_sale.amount
@@ -11286,19 +11297,19 @@ var render = function render() {
         }],
         staticClass: "form-control",
         attrs: {
-          type: "text"
+          type: "text",
+          disabled: _vm.listDispenser.shift_sale.status == "end"
         },
         domProps: {
           value: n.start_reading
         },
         on: {
-          change: function change($event) {
-            return _vm.calculateAmountNozzle(dIndex, nIndex);
-          },
-          input: function input($event) {
+          input: [function ($event) {
             if ($event.target.composing) return;
             _vm.$set(n, "start_reading", $event.target.value);
-          }
+          }, function ($event) {
+            _vm.listDispenser.shift_sale.status == "end" ? _vm.calculateAmountNozzle(dIndex, nIndex) : "";
+          }]
         }
       })]), _vm._v(" "), _c("div", {
         staticClass: "mb-3 col-md-3"
@@ -11311,19 +11322,19 @@ var render = function render() {
         }],
         staticClass: "form-control",
         attrs: {
-          type: "text"
+          type: "text",
+          disabled: _vm.listDispenser.shift_sale.status == "start"
         },
         domProps: {
           value: n.end_reading
         },
         on: {
-          change: function change($event) {
-            return _vm.calculateAmountNozzle(dIndex, nIndex);
-          },
-          input: function input($event) {
+          input: [function ($event) {
             if ($event.target.composing) return;
             _vm.$set(n, "end_reading", $event.target.value);
-          }
+          }, function ($event) {
+            _vm.listDispenser.shift_sale.status == "end" ? _vm.calculateAmountNozzle(dIndex, nIndex) : "";
+          }]
         }
       })]), _vm._v(" "), _c("div", {
         staticClass: "mb-3 col-md-2"
@@ -11358,7 +11369,8 @@ var render = function render() {
         }],
         staticClass: "form-control",
         attrs: {
-          type: "text"
+          type: "text",
+          disabled: ""
         },
         domProps: {
           value: n.amount
@@ -11373,7 +11385,26 @@ var render = function render() {
     }), 0) : _vm._e()]) : _vm._e();
   })], 2)]) : _c("div", {
     staticClass: "text-center"
-  }, [_vm._v("Please Select any product")])])])])])])])]);
+  }, [_vm._v("Please Select any product")])]), _vm._v(" "), _vm.product_id ? _c("div", {
+    staticClass: "row",
+    staticStyle: {
+      "text-align": "right"
+    }
+  }, [_c("div", {
+    staticClass: "mb-3 col-md-6"
+  }), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-6"
+  }, [!_vm.loading ? _c("button", {
+    staticClass: "btn btn-primary",
+    attrs: {
+      type: "submit"
+    }
+  }, [_vm._v("Submit")]) : _vm._e(), _vm._v(" "), _vm.loading ? _c("button", {
+    staticClass: "btn btn-primary",
+    attrs: {
+      type: "button"
+    }
+  }, [_vm._v("Submitting...")]) : _vm._e()])]) : _vm._e()])])])])])])]);
 };
 var staticRenderFns = [function () {
   var _vm = this,
