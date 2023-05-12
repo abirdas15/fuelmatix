@@ -18,6 +18,7 @@ class ShiftSaleController extends Controller
                 $shiftSale = new ShiftSale();
                 $shiftSale->product_id = $inputData['shift_sale']['product_id'];
                 $shiftSale->start_date = Carbon::now();
+                $shiftSale->end_date = null;
             } else if ($inputData['shift_sale']['status'] == 'end') {
                 $shiftSale = ShiftSale::find($inputData['shift_sale']['id']);
                 $shiftSale->end_date = Carbon::now();
