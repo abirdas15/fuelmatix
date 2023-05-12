@@ -12,6 +12,7 @@ class DispenserController extends Controller
     {
         $inputData = $request->all();
         $validator = Validator::make($inputData, [
+            'product_id' => 'required',
             'dispenser_name' => 'required',
             'brand' => 'required',
             'serial' => 'required'
@@ -20,6 +21,7 @@ class DispenserController extends Controller
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
         $dispenser = new Dispenser();
+        $dispenser->product_id = $inputData['product_id'];
         $dispenser->dispenser_name = $inputData['dispenser_name'];
         $dispenser->brand = $inputData['brand'];
         $dispenser->serial = $inputData['serial'];
@@ -33,14 +35,15 @@ class DispenserController extends Controller
         $inputData = $request->all();
         $limit = isset($inputData['limit']) ? $inputData['limit'] : 10;
         $keyword = isset($inputData['keyword']) ? $inputData['keyword'] : '';
-        $order_by = isset($inputData['order_by']) ? $inputData['order_by'] : 'id';
+        $order_by = isset($inputData['order_by']) ? $inputData['order_by'] : 'dispensers.id';
         $order_mode = isset($inputData['order_mode']) ? $inputData['order_mode'] : 'DESC';
-        $result = Dispenser::select('*');
+        $result = Dispenser::select('dispensers.*', 'products.name as product_name')
+            ->leftJoin('products', 'products.id', '=', 'dispensers.product_id');
         if (!empty($keyword)) {
             $result->where(function($q) use ($keyword) {
-                $q->where('dispenser_name', 'LIKE', '%'.$keyword.'%');
-                $q->orWhere('brand', 'LIKE', '%'.$keyword.'%');
-                $q->orWhere('serial', 'LIKE', '%'.$keyword.'%');
+                $q->where('dispensers.dispenser_name', 'LIKE', '%'.$keyword.'%');
+                $q->orWhere('dispensers.brand', 'LIKE', '%'.$keyword.'%');
+                $q->orWhere('dispensers.serial', 'LIKE', '%'.$keyword.'%');
             });
         }
         $result = $result->orderBy($order_by, $order_mode)
@@ -64,6 +67,7 @@ class DispenserController extends Controller
         $inputData = $request->all();
         $validator = Validator::make($inputData, [
             'id' => 'required',
+            'product_id' => 'required',
             'dispenser_name' => 'required',
             'brand' => 'required',
             'serial' => 'required'
@@ -75,6 +79,7 @@ class DispenserController extends Controller
         if ($dispenser == null) {
             return response()->json(['status' => 500, 'error' => 'Cannot find dispenser..']);
         }
+        $dispenser->product_id = $inputData['product_id'];
         $dispenser->dispenser_name = $inputData['dispenser_name'];
         $dispenser->brand = $inputData['brand'];
         $dispenser->serial = $inputData['serial'];
