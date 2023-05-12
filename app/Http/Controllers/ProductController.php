@@ -157,6 +157,6 @@ class ProductController extends Controller
                 $nozzle['amount'] = isset($shitSaleSummary[$nozzle['id']]) ? $shitSaleSummary[$nozzle['id']]['amount'] : 0;
             }
         }
-        return response()->json(['status' => 200, 'dispenser' => $dispensers, 'product' => $shitSale]);
+        return response()->json(['status' => 200, 'summary' => $dispensers, 'shift_sale' => $shitSale]);
     }
 }
