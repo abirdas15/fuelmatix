@@ -121,14 +121,16 @@ class ProductController extends Controller
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
-        $shitSale = ShiftSale::select('id', 'start_reading', 'end_reading', 'consumption', 'amount')
+        $shitSale = ShiftSale::select('id', 'product_id', 'start_reading', 'end_reading', 'consumption', 'amount')
             ->where('product_id', $inputData['product_id'])
             ->where('status', 'start')
             ->orderBy('id', 'DESC')
             ->first();
+        $product = Product::select('name')->find($inputData['product_id']);
         if ($shitSale == null) {
             $shitSale = [
                 'id' => '',
+                'product_id' => $inputData['product_id'],
                 'start_reading' => 0,
                 'end_reading' => 0,
                 'consumption' => null,
@@ -138,6 +140,7 @@ class ProductController extends Controller
         } else {
             $shitSale['status'] = 'end';
         }
+        $shitSale['product_name'] = $product->name;
         $shitSaleSummary = ShiftSummary::select('id', 'nozzle_id', 'start_reading', 'end_reading', 'consumption', 'amount')
             ->where('shift_sale_id', $shitSale['id'])
             ->get()
