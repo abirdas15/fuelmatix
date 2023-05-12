@@ -16,6 +16,7 @@ use App\Http\Controllers\ProductTypeController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\DispenserController;
 use App\Http\Controllers\NozzleController;
+use App\Http\Controllers\ShiftSaleController;
 
 /*
 |--------------------------------------------------------------------------
@@ -96,11 +97,7 @@ Route::group(['prefix' => 'nozzle'], function() {
     });
 });
 Route::group(['prefix' => 'shift/sale'], function() {
-    Route::post('save', [DispenserController::class, 'save']);
-    Route::post('list', [DispenserController::class, 'list']);
-    Route::post('single', [DispenserController::class, 'single']);
-    Route::post('update', [DispenserController::class, 'update']);
-    Route::post('delete', [DispenserController::class, 'delete']);
+    Route::post('save', [ShiftSaleController::class, 'save']);
 });
 
 
