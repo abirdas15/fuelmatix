@@ -4028,10 +4028,17 @@ __webpack_require__.r(__webpack_exports__);
       loading: false,
       listData: [],
       listDispenser: null,
-      product_id: ''
+      product_id: '',
+      productIndex: 0
     };
   },
   methods: {
+    calculateLineProgress: function calculateLineProgress() {
+      var _this$listData;
+      var progress = 100;
+      var eachProgress = Math.round(progress / (((_this$listData = this.listData) === null || _this$listData === void 0 ? void 0 : _this$listData.length) - 1));
+      return eachProgress * this.productIndex;
+    },
     calculateAmount: function calculateAmount() {
       this.listDispenser.shift_sale.amount = parseFloat(this.listDispenser.shift_sale.end_reading) - parseFloat(this.listDispenser.shift_sale.start_reading);
     },
@@ -11142,7 +11149,7 @@ var render = function render() {
     attrs: {
       id: "progress-bar-container"
     }
-  }, [_c("ul", _vm._l(_vm.listData, function (p) {
+  }, [_c("ul", _vm._l(_vm.listData, function (p, pIndex) {
     return _c("li", {
       staticClass: "step step01",
       "class": {
@@ -11151,13 +11158,25 @@ var render = function render() {
       on: {
         click: function click($event) {
           _vm.product_id = p.id;
+          _vm.productIndex = pIndex;
           _vm.getProductDispenser();
         }
       }
     }, [_c("div", {
       staticClass: "step-inner"
     }, [_vm._v(_vm._s(p.name))])]);
-  }), 0), _vm._v(" "), _vm._m(2)]) : _c("div", {
+  }), 0), _vm._v(" "), _c("div", {
+    attrs: {
+      id: "line"
+    }
+  }, [_c("div", {
+    style: {
+      width: _vm.calculateLineProgress() + "%"
+    },
+    attrs: {
+      id: "line-progress"
+    }
+  })])]) : _c("div", {
     staticClass: "text-center"
   }, [_vm._v("No Product Found")]), _vm._v(" "), _vm.listDispenser ? _c("div", {
     attrs: {
@@ -11175,7 +11194,7 @@ var render = function render() {
     staticClass: "card-body"
   }, [_c("div", {
     staticClass: "row"
-  }, [_vm._m(3), _vm._v(" "), _c("div", {
+  }, [_vm._m(2), _vm._v(" "), _c("div", {
     staticClass: "mb-3 col-md-3"
   }, [_c("input", {
     directives: [{
@@ -11424,18 +11443,6 @@ var staticRenderFns = [function () {
   }, [_c("h4", {
     staticClass: "card-title"
   }, [_vm._v("Shift Sale Start")])]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("div", {
-    attrs: {
-      id: "line"
-    }
-  }, [_c("div", {
-    attrs: {
-      id: "line-progress"
-    }
-  })]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;

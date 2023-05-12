@@ -21,13 +21,13 @@
                                     <div id="progress-bar-container" v-if="listData.length > 0">
                                         <ul>
                                             <li class="step step01" :class="{'active': p.id == product_id}"
-                                                v-for="p in listData" @click="product_id = p.id; getProductDispenser()">
+                                                v-for="(p, pIndex) in listData" @click="product_id = p.id; productIndex = pIndex; getProductDispenser()">
                                                 <div class="step-inner">{{ p.name }}</div>
                                             </li>
                                         </ul>
 
                                         <div id="line">
-                                            <div id="line-progress"></div>
+                                            <div id="line-progress" :style="{'width': calculateLineProgress() + '%'}"></div>
                                         </div>
                                     </div>
                                     <div class="text-center" v-else>No Product Found</div>
@@ -148,9 +148,15 @@ export default {
             listData: [],
             listDispenser: null,
             product_id: '',
+            productIndex: 0,
         }
     },
     methods: {
+        calculateLineProgress: function () {
+            let progress = 100
+            let eachProgress = Math.round(progress / (this.listData?.length - 1))
+            return (eachProgress * this.productIndex)
+        },
         calculateAmount: function () {
             this.listDispenser.shift_sale.amount = parseFloat(this.listDispenser.shift_sale.end_reading) - parseFloat(this.listDispenser.shift_sale.start_reading)
         },

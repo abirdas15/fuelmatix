@@ -223,20 +223,22 @@ h1 {
 
 #progress-bar-container {
     position:relative;
-    width:90%;
     margin:auto;
-    height: 80px;
+    height: 120px;
     margin-top: 30px;
 }
 
 #progress-bar-container ul {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     padding:0;
     margin:0;
     padding-top:15px;
     z-index:9999;
-    position:absolute;
     width:100%;
-    margin-top:-40px
+    margin-top:-40px;
+    position: relative;
 }
 
 #progress-bar-container li:before {
@@ -259,8 +261,7 @@ h1 {
 
 #progress-bar-container li {
     list-style:none;
-    float:left;
-    width:20%;
+    width:180px;
     text-align:center;
     color:#aaa;
     text-transform:uppercase;
@@ -308,13 +309,13 @@ h1 {
 }
 
 #progress-bar-container #line {
-    width:80%;
+    width:84%;
     margin:auto;
     background: #eee;
     height:6px;
     position:absolute;
-    left:10%;
-    top:50px;
+    left:8%;
+    top:89px;
     z-index:1;
     border-radius:50px;
     transition:all ease 0.9s;
@@ -322,7 +323,7 @@ h1 {
 
 #progress-bar-container #line-progress {
     content:" ";
-    width:3%;
+    width:0;
     height:100%;
     background: #207893;
     background: #207893;
