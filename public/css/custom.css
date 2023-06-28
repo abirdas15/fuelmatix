@@ -453,6 +453,7 @@ h1 {
 /* width */
 ::-webkit-scrollbar {
     width: 5px;
+    height: 5px;
     border-radius: 10px;
 }
 

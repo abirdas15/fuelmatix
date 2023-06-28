@@ -20,6 +20,7 @@
                         <li><a href="#">Item Sale</a></li>
                         <li><a href="#">Bill</a></li>
                         <li><a href="./creditSaleDetailEntry.html">Credit Sale Detail Entry</a></li>
+                        <li><router-link :to="{name: 'Pos'}" >POS</router-link></li>
                     </ul>
                 </li>
                 <li><a class="has-arrow " href="javascript:void()" aria-expanded="false">
