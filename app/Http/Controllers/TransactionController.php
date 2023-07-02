@@ -188,4 +188,39 @@ class TransactionController extends Controller
         self::updateCategoryBalance($category, $balance);
         return true;
     }
+    public static function deleteTransaction($id)
+    {
+        $transaction = Transaction::find($id);
+        $category = Category::with('parent')->where('id', $transaction->account_id)->first();
+        $balance = 0;
+        if ($category['type'] == 'expenses') {
+            $balance = $transaction['debit_amount'] - $transaction['credit_amount'];
+        } else if ($category['type'] == 'income') {
+            $balance = $transaction['credit_amount'] - $transaction['debit_amount'];
+        }  else if ($category['type'] == 'assets') {
+            $balance = $transaction['debit_amount'] - $transaction['credit_amount'];
+        } else if ($category['type'] == 'liabilities') {
+            $balance = $transaction['credit_amount'] - $transaction['debit_amount'];
+        } else if ($category['type'] == 'equity') {
+            $balance = $transaction['credit_amount'] - $transaction['debit_amount'];
+        }
+        self::updateCategoryBalance($category, $balance);
+        Transaction::where('id', $transaction->id)->delete();
+        $transaction = Transaction::where('relation', $id)->first();
+        $category = Category::with('parent')->where('id', $transaction->account_id)->first();
+        $balance = 0;
+        if ($category['type'] == 'expenses') {
+            $balance = $transaction['debit_amount'] - $transaction['credit_amount'];
+        } else if ($category['type'] == 'income') {
+            $balance = $transaction['credit_amount'] - $transaction['debit_amount'];
+        }  else if ($category['type'] == 'assets') {
+            $balance = $transaction['debit_amount'] - $transaction['credit_amount'];
+        } else if ($category['type'] == 'liabilities') {
+            $balance = $transaction['credit_amount'] - $transaction['debit_amount'];
+        } else if ($category['type'] == 'equity') {
+            $balance = $transaction['credit_amount'] - $transaction['debit_amount'];
+        }
+        self::updateCategoryBalance($category, $balance);
+        Transaction::where('id', $transaction->id)->delete();
+    }
 }
