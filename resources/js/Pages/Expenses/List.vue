@@ -37,15 +37,17 @@
                                         <table class="display  dataTable no-footer" style="min-width: 845px">
                                             <thead>
                                             <tr class="text-white" style="background-color: #4886EE;color:#ffffff">
-                                                <th class="text-white" @click="sortData('name')" :class="sortClass('name')">Expense Name</th>
-                                                <th class="text-white" @click="sortData('dispenser_name')" :class="sortClass('dispenser_name')">Dispenser Name</th>
+                                                <th class="text-white" @click="sortData('name')" :class="sortClass('expense')">Expense Name</th>
+                                                <th class="text-white" @click="sortData('dispenser_name')" :class="sortClass('amount')">Amount Name</th>
+                                                <th class="text-white" @click="sortData('dispenser_name')" :class="sortClass('payment')">Payment Name</th>
                                                 <th class="text-white" >Action</th>
                                             </tr>
                                             </thead>
                                             <tbody v-if="listData.length > 0 && TableLoading == false">
                                             <tr v-for="f in listData">
-                                                <td >{{f.name}}</td>
-                                                <td><a href="javascript:void(0);">{{f.dispenser_name}}</a></td>
+                                                <td >{{f.expense}}</td>
+                                                <td><a href="javascript:void(0);">{{f.amount}}</a></td>
+                                                <td><a href="javascript:void(0);">{{f.payment}}</a></td>
                                                 <td>
                                                     <div class="d-flex justify-content-end">
                                                         <router-link :to="{name: 'ExpenseEdit', params: { id: f.id }}" class=" btn btn-primary shadow btn-xs sharp me-1">

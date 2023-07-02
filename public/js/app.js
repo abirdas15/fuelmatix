@@ -6853,7 +6853,7 @@ var render = function render() {
     }
   }, [_c("th", {
     staticClass: "text-white",
-    "class": _vm.sortClass("name"),
+    "class": _vm.sortClass("expense"),
     on: {
       click: function click($event) {
         return _vm.sortData("name");
@@ -6861,20 +6861,32 @@ var render = function render() {
     }
   }, [_vm._v("Expense Name")]), _vm._v(" "), _c("th", {
     staticClass: "text-white",
-    "class": _vm.sortClass("dispenser_name"),
+    "class": _vm.sortClass("amount"),
     on: {
       click: function click($event) {
         return _vm.sortData("dispenser_name");
       }
     }
-  }, [_vm._v("Dispenser Name")]), _vm._v(" "), _c("th", {
+  }, [_vm._v("Amount Name")]), _vm._v(" "), _c("th", {
+    staticClass: "text-white",
+    "class": _vm.sortClass("payment"),
+    on: {
+      click: function click($event) {
+        return _vm.sortData("dispenser_name");
+      }
+    }
+  }, [_vm._v("Payment Name")]), _vm._v(" "), _c("th", {
     staticClass: "text-white"
   }, [_vm._v("Action")])])]), _vm._v(" "), _vm.listData.length > 0 && _vm.TableLoading == false ? _c("tbody", _vm._l(_vm.listData, function (f) {
-    return _c("tr", [_c("td", [_vm._v(_vm._s(f.name))]), _vm._v(" "), _c("td", [_c("a", {
+    return _c("tr", [_c("td", [_vm._v(_vm._s(f.expense))]), _vm._v(" "), _c("td", [_c("a", {
       attrs: {
         href: "javascript:void(0);"
       }
-    }, [_vm._v(_vm._s(f.dispenser_name))])]), _vm._v(" "), _c("td", [_c("div", {
+    }, [_vm._v(_vm._s(f.amount))])]), _vm._v(" "), _c("td", [_c("a", {
+      attrs: {
+        href: "javascript:void(0);"
+      }
+    }, [_vm._v(_vm._s(f.payment))])]), _vm._v(" "), _c("td", [_c("div", {
       staticClass: "d-flex justify-content-end"
     }, [_c("router-link", {
       staticClass: "btn btn-primary shadow btn-xs sharp me-1",
