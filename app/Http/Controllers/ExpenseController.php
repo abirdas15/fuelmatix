@@ -113,10 +113,12 @@ class ExpenseController extends Controller
         $expense->remarks = $inputData['remarks'] ?? null;
         if ($expense->save()) {
             $transaction = Transaction::where('type_id', $inputData['id'])->first();
-            $data['id'] = $transaction->id;
-            $data['debit_amount'] = $inputData['amount'];
-            $data['credit_amount'] = 0;
-            TransactionController::updateTransaction($data);
+            if ($transaction != null) {
+                $data['id'] = $transaction->id;
+                $data['debit_amount'] = $inputData['amount'];
+                $data['credit_amount'] = 0;
+                TransactionController::updateTransaction($data);
+            }
             return response()->json(['status' => 200, 'message' => 'Successfully updated expense.']);
         }
         return response()->json(['status' => 500, 'message' => 'Cannot updated expense.']);
@@ -125,7 +127,16 @@ class ExpenseController extends Controller
     {
         $inputData = $request->all();
         $validator = Validator::make($inputData, [
-            ''
+            'id' => 'required'
         ]);
+        if ($validator->fails()) {
+            return response()->json(['status' => 500, 'errors' => $validator->errors()]);
+        }
+        Expense::where('id', $inputData['id'])->delete();
+        $transaction = Transaction::where('type_id', $inputData['id'])->first();
+        if ($transaction != null) {
+            TransactionController::deleteTransaction($transaction->id);
+        }
+        return response()->json(['status' => 200, 'message' => 'Successfully deleted expenses.']);
     }
 }
