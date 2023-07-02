@@ -20,15 +20,22 @@ class TransactionController extends Controller
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
+        self::saveTransaction($inputData);
+        return response()->json(['status' => 200, 'message' => 'Successfully save transaction.']);
+    }
+    public static function saveTransaction($inputData)
+    {
         foreach ($inputData['transaction'] as $transaction) {
             $newTransaction = new Transaction();
             $newTransaction->date = $transaction['date'];
-            $newTransaction->description = $transaction['description'];
+            $newTransaction->description = $transaction['description'] ?? null;
             $newTransaction->account_id = $transaction['account_id'];
             $newTransaction->debit_amount = $transaction['debit_amount'] ?? 0;
             $newTransaction->credit_amount = $transaction['credit_amount'] ?? 0;
             $newTransaction->linked_id = $inputData['linked_id'];
             $newTransaction->added_by = Auth::user()->id;
+            $newTransaction->type = $transaction['type'] ?? null;
+            $newTransaction->type_id = $transaction['type_id'] ?? null;
             $newTransaction->save();
 
             $category = Category::with('parent')->where('id', $newTransaction->account_id)->first();
@@ -56,6 +63,8 @@ class TransactionController extends Controller
             $newTransaction->credit_amount = $transaction['debit_amount'] ?? 0;
             $newTransaction->linked_id = $transaction['account_id'];
             $newTransaction->added_by = Auth::user()->id;
+            $newTransaction->type = $transaction['type'] ?? null;
+            $newTransaction->type_id = $transaction['type_id'] ?? null;
             $newTransaction->save();
 
             $category = Category::with('parent')->where('id', $newTransaction->account_id)->first();
@@ -74,7 +83,7 @@ class TransactionController extends Controller
             }
             self::updateCategoryBalance($category, $balance);
         }
-        return response()->json(['status' => 200, 'message' => 'Successfully save transaction.']);
+        return true;
     }
     public static function updateCategoryBalance($category, $balance)
     {
