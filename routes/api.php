@@ -17,6 +17,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\DispenserController;
 use App\Http\Controllers\NozzleController;
 use App\Http\Controllers\ShiftSaleController;
+use App\Http\Controllers\ExpenseController;
 
 /*
 |--------------------------------------------------------------------------
@@ -98,6 +99,9 @@ Route::group(['prefix' => 'nozzle'], function() {
 });
 Route::group(['prefix' => 'shift/sale'], function() {
     Route::post('save', [ShiftSaleController::class, 'save']);
+});
+Route::group(['prefix' => 'expense'], function() {
+    Route::post('save', [ExpenseController::class, 'save']);
 });
 
 
