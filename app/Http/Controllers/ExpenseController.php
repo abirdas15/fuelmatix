@@ -37,12 +37,47 @@ class ExpenseController extends Controller
         $expense->remarks = $inputData['remarks'] ?? null;
         if ($expense->save()) {
             $data['transaction'] = [
-                ['date' => date('Y-m-d'), 'account_id' => $inputData['payment_id'], 'debit_amount' => $inputData['amount'], 'credit_amount' => 0, 'type' => 'expenses', 'type_id' => $expense->id]
+                ['date' => date('Y-m-d'), 'description' => $inputData['remarks'], 'account_id' => $inputData['payment_id'], 'debit_amount' => $inputData['amount'], 'credit_amount' => 0, 'type' => 'expenses', 'type_id' => $expense->id]
             ];
             $data['linked_id'] = $inputData['category_id'];
             TransactionController::saveTransaction($data);
             return response()->json(['status' => 200, 'message' => 'Successfully save expense.']);
         }
         return response()->json(['status' => 500, 'message' => 'Cannot save expense.']);
+    }
+    public function list(Request $request)
+    {
+        $inputData = $request->all();
+        $limit = isset($inputData['limit']) ? $inputData['limit'] : 10;
+        $keyword = isset($inputData['keyword']) ? $inputData['keyword'] : '';
+        $order_by = isset($inputData['order_by']) ? $inputData['order_by'] : 'expense.id';
+        $order_mode = isset($inputData['order_mode']) ? $inputData['order_mode'] : 'DESC';
+        $result = Expense::select('expense.id', 'expense.date','expense.amount', 'c.category as expense', 'c1.category as payment')
+            ->leftJoin('categories as c', 'c.id', 'expense.category_id')
+            ->leftJoin('categories as c1', 'c1.id', 'expense.payment_id');
+        if (!empty($keyword)) {
+            $result->where(function($q) use ($keyword) {
+                $q->where('c.category', 'LIKE', '%'.$keyword.'%');
+                $q->orWhere('c1.category', 'LIKE', '%'.$keyword.'%');
+            });
+        }
+        $result = $result->orderBy($order_by, $order_mode)
+            ->paginate($limit);
+        foreach ($result as &$data) {
+            $data['date'] = date('d/m/Y', strtotime($data['date']));
+        }
+        return response()->json(['status' => 200, 'data' => $result]);
+    }
+    public function single(Request $request)
+    {
+        $inputData = $request->all();
+        $validator = Validator::make($inputData, [
+            'id' => 'required'
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['status' => 500, 'errors' => $validator->errors()]);
+        }
+        $result = Expense::find($inputData['id']);
+        return response()->json(['status' => 200, 'data' => $result]);
     }
 }
