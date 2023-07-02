@@ -82,7 +82,7 @@ export default {
             });
         },
         save: function () {
-            ApiService.ClearErrorHandler;
+            ApiService.ClearErrorHandler();
             this.loading = true
             ApiService.POST(ApiRoutes.NozzleEdit, this.param,res => {
                 this.loading = false

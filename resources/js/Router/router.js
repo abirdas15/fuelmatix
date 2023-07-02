@@ -31,6 +31,9 @@ import NozzleReadingAdd from "../Pages/Fuel/NozzleReading/Add";
 import NozzleReadingEdit from "../Pages/Fuel/NozzleReading/Edit";
 import ShiftSaleStart from "../Pages/ShiftSale/ShiftSaleAdd";
 import Pos from "../Pages/Pos/Pos";
+import Expense from "../Pages/Expenses/List";
+import ExpenseAdd from "../Pages/Expenses/Add";
+import ExpenseEdit from "../Pages/Expenses/Edit";
 
 const ROOT_URL = "";
 const router = new VueRouter({
@@ -69,6 +72,9 @@ const router = new VueRouter({
                 { path: ROOT_URL + "/nozzle/reading/edit/:id", name: "NozzleReadingEdit", component: NozzleReadingEdit},
                 { path: ROOT_URL + "/shift/sale/start", name: "ShiftSaleStart", component: ShiftSaleStart},
                 { path: ROOT_URL + "/pos", name: "Pos", component: Pos},
+                { path: ROOT_URL + "/expense", name: "Expense", component: Expense},
+                { path: ROOT_URL + "/expense/add", name: "ExpenseAdd", component: ExpenseAdd},
+                { path: ROOT_URL + "/expense/edit/:id", name: "ExpenseEdit", component: ExpenseEdit},
             ],
         },
     ],

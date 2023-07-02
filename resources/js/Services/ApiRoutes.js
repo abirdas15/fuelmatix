@@ -61,6 +61,12 @@ const ApiRoutes = {
     ShiftSaleDelete: ApiVersion + '/shift/sale/delete',
     ShiftSaleList: ApiVersion + '/shift/sale/list',
     ShiftSaleSingle: ApiVersion + '/shift/sale/single',
+    //expense
+    ExpenseAdd: ApiVersion + '/expense/save',
+    ExpenseEdit: ApiVersion + '/expense/update',
+    ExpenseDelete: ApiVersion + '/expense/delete',
+    ExpenseList: ApiVersion + '/expense/list',
+    ExpenseSingle: ApiVersion + '/expense/single',
 
 };
 

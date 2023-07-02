@@ -4,7 +4,7 @@
             <div class="row page-titles">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item active"><router-link :to="{name: 'Dashboard'}">Home</router-link></li>
-                    <li class="breadcrumb-item active"><router-link :to="{name: 'Product'}">Product</router-link></li>
+                    <li class="breadcrumb-item active"><router-link :to="{name: 'Expense'}">Expense</router-link></li>
                     <li class="breadcrumb-item"><a href="javascript:void(0)">Edit</a></li>
 
                 </ol>
@@ -13,43 +13,48 @@
             <div class="col-xl-12 col-lg-12">
                 <div class="card">
                     <div class="card-header">
-                        <h4 class="card-title">Product</h4>
+                        <h4 class="card-title">Expense</h4>
                     </div>
                     <div class="card-body">
                         <div class="basic-form">
                             <form @submit.prevent="save">
                                 <div class="row">
                                     <div class="mb-3 form-group col-md-6">
-                                        <label class="form-label">Product:</label>
-                                        <input type="text" class="form-control" name="name" v-model="param.name">
+                                        <label class="form-label">Expense:</label>
+                                        <select class="form-control" name="category_id" id="category_id"  v-model="param.category_id">
+                                            <option value="">Select Expense</option>
+                                            <option v-for="d in expenseData" :value="d.id">{{d.category}}</option>
+                                        </select>
                                         <div class="invalid-feedback"></div>
                                     </div>
                                     <div class="mb-3 form-group col-md-6">
-                                        <label class="form-label">Product Type:</label>
-                                        <select class="form-control wide" name="type_id" v-model="param.type_id">
-                                            <option value="">Select Type</option>
-                                            <option v-for="t of productType" :value="t.id">{{t.name}}</option>
+                                        <label class="form-label">Amount:</label>
+                                        <input type="text" class="form-control" name="amount" v-model="param.amount">
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                    <div class="mb-3 form-group col-md-6">
+                                        <label class="form-label">Remarks:</label>
+                                        <input type="text" class="form-control" name="remarks" v-model="param.remarks">
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                    <div class="mb-3 form-group col-md-6">
+                                        <label class="form-label">Payment:</label>
+                                        <select class="form-control" name="payment_id" id="payment_id"  v-model="param.payment_id">
+                                            <option value="">Select Payment</option>
+                                            <option v-for="d in paymentData" :value="d.id">{{d.category}}</option>
                                         </select>
                                         <div class="invalid-feedback"></div>
                                     </div>
 
                                     <div class="mb-3 form-group col-md-6">
-                                        <label class="form-label">Buying Price: </label>
-                                        <input type="number" class="form-control" name="buying_price" v-model="param.buying_price">
-                                        <div class="invalid-feedback"></div>
+                                        <div class="input-group">
+                                            <div class="form-file">
+                                                <input type="file" class="form-file-input form-control"  @change="onFileChange" name="sound_file">
+                                                <div class="invalid-feedback"></div>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="mb-3 form-group col-md-6">
-                                        <label class="form-label">Selling Price: </label>
-                                        <input type="number" class="form-control" name="selling_price" v-model="param.selling_price">
-                                        <div class="invalid-feedback"></div>
-                                    </div>
-                                    <div class="mb-3 form-group col-md-6">
-                                        <label class="form-label">Unit:</label>
-                                        <select class="form-control wide" name="unit" v-model="param.unit">
-                                            <option value="1">Liter</option>
-                                        </select>
-                                        <div class="invalid-feedback"></div>
-                                    </div>
+
                                 </div>
                                 <div class="row" style="text-align: right;">
                                     <div class="mb-3 col-md-6">
@@ -58,7 +63,7 @@
                                     <div class="mb-3 col-md-6">
                                         <button type="submit" class="btn btn-primary" v-if="!loading">Submit</button>
                                         <button type="button" class="btn btn-primary" v-if="loading">Submitting...</button>
-                                        <router-link :to="{name: 'Product'}" type="button" class="btn btn-primary">Cancel</router-link>
+                                        <router-link :to="{name: 'Expense'}" type="button" class="btn btn-primary">Cancel</router-link>
                                     </div>
                                 </div>
                             </form>
@@ -78,13 +83,38 @@ export default {
         return {
             param: {},
             loading: false,
-            productType: [],
             id: '',
+            expenseData: [],
+            paymentData: [],
         }
     },
     methods: {
+        getExpenseCategory: function () {
+            ApiService.POST(ApiRoutes.CategoryParent, {type: 'expenses'},res => {
+                if (parseInt(res.status) === 200) {
+                    this.expenseData = res.data;
+                } else {
+                    ApiService.ErrorHandler(res.error);
+                }
+            });
+        },
+        getPaymentCategory: function () {
+            ApiService.POST(ApiRoutes.CategoryParent, {type: 'expenses'},res => {
+                if (parseInt(res.status) === 200) {
+                    this.paymentData = res.data;
+                } else {
+                    ApiService.ErrorHandler(res.error);
+                }
+            });
+        },
+        onFileChange(e) {
+            let files = e.target.files || e.dataTransfer.files;
+            if (!files.length)
+                return;
+            this.param.file = files[0];
+        },
         getSingle: function () {
-            ApiService.POST(ApiRoutes.ProductSingle, {id: this.id},res => {
+            ApiService.POST(ApiRoutes.ExpenseSingle, {id: this.id},res => {
                 if (parseInt(res.status) === 200) {
                     this.param = res.data
                 }
@@ -93,32 +123,25 @@ export default {
         save: function () {
             ApiService.ClearErrorHandler();
             this.loading = true
-            ApiService.POST(ApiRoutes.ProductEdit, this.param,res => {
+            ApiService.POST(ApiRoutes.ExpenseEdit, this.param,res => {
                 this.loading = false
                 if (parseInt(res.status) === 200) {
                     this.$router.push({
-                        name: 'Product'
+                        name: 'Expense'
                     })
                 } else {
                     ApiService.ErrorHandler(res.errors);
                 }
             });
         },
-        getProductType: function () {
-            ApiService.POST(ApiRoutes.ProductType, {},res => {
-                if (parseInt(res.status) === 200) {
-                    this.productType = res.data
-                }
-            });
-        }
     },
     created() {
         this.id = this.$route.params.id
-        this.getProductType()
         this.getSingle()
+        this.dispenserList()
     },
     mounted() {
-        $('#dashboard_bar').text('Product Edit')
+        $('#dashboard_bar').text('Expense Edit')
     }
 }
 </script>

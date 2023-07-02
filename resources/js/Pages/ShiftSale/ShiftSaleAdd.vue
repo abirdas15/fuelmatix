@@ -180,7 +180,7 @@ export default {
             });
         },
         save: function () {
-            ApiService.ClearErrorHandler;
+            ApiService.ClearErrorHandler();
             this.loading = true
             ApiService.POST(ApiRoutes.ShiftSaleAdd, this.listDispenser, res => {
                 this.loading = false

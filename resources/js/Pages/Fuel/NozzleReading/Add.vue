@@ -87,7 +87,7 @@ export default {
             });
         },
         save: function () {
-            ApiService.ClearErrorHandler;
+            ApiService.ClearErrorHandler();
             if (this.param.date == '') {
                 this.param.date = moment().format('YYYY-MM-DD')
             }
