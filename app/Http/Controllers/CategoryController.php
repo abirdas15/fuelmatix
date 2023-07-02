@@ -21,12 +21,18 @@ class CategoryController extends Controller
     }
     public function parent(Request $request)
     {
-        $result = Category::select('id', 'category_hericy', 'type')
-            ->get()
+        $inputData = $request->all();
+        $result = Category::select('id', 'category_hericy', 'type');
+        if (isset($inputData['type']) && !empty($inputData['type'])) {
+            $result->where(function($q) use ($inputData) {
+                $q->where('type', $inputData['type']);
+            });
+        }
+        $result = $result->get()
             ->toArray();
         foreach ($result as &$data) {
             $category = json_decode($data['category_hericy']);
-            $data['category'] = implode('-->', $category);
+            $data['category'] = implode(' --> ', $category);
             unset($data['category_hericy']);
         }
         usort($result, function ($item1, $item2) {
