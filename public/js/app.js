@@ -2698,6 +2698,10 @@ __webpack_require__.r(__webpack_exports__);
       }, function (res) {
         if (parseInt(res.status) === 200) {
           _this3.param = res.data;
+          if (_this3.param.file != null) {
+            _this3.param.file_name = (' ' + _this3.param.file).slice(1);
+            _this3.param.file = '';
+          }
         }
       });
     },
@@ -6667,7 +6671,13 @@ var render = function render() {
     }
   }), _vm._v(" "), _c("div", {
     staticClass: "invalid-feedback"
-  })])])])]), _vm._v(" "), _c("div", {
+  })])]), _vm._v(" "), _vm.param.file_path != null ? _c("div", {
+    staticClass: "mt-3"
+  }, [_c("a", {
+    attrs: {
+      href: _vm.param.file_path
+    }
+  }, [_vm._v(_vm._s(_vm.param.file_name))])]) : _vm._e()])]), _vm._v(" "), _c("div", {
     staticClass: "row",
     staticStyle: {
       "text-align": "right"

@@ -53,6 +53,7 @@
                                                 <div class="invalid-feedback"></div>
                                             </div>
                                         </div>
+                                        <div class="mt-3" v-if="param.file_path != null"><a :href="param.file_path">{{param.file_name}}</a> </div>
                                     </div>
 
                                 </div>
@@ -117,6 +118,10 @@ export default {
             ApiService.POST(ApiRoutes.ExpenseSingle, {id: this.id},res => {
                 if (parseInt(res.status) === 200) {
                     this.param = res.data
+                    if (this.param.file != null) {
+                        this.param.file_name = (' ' + this.param.file).slice(1);
+                        this.param.file = ''
+                    }
                 }
             });
         },

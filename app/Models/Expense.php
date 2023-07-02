@@ -19,7 +19,7 @@ class Expense extends Model
     public function getFilePathAttribute()
     {
         if ($this->file != null) {
-            return asset('uploads/'.$this->file_path);
+            return asset('uploads/'.$this->file);
         }
     }
 }
