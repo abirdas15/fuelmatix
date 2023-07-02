@@ -93,10 +93,7 @@
                     <span class="nav-text">Expenses</span>
                 </a>
                     <ul aria-expanded="false">
-                        <li><a href="./expense.html">Expense</a></li>
-                        <li><a href="./#">Salary Expense</a></li>
-                        <li><a href="./#">Machine Expense</a></li>
-                        <li><a href="./#">Mics Expense</a></li>
+                        <li><router-link :to="{name:'Expense'}">Expense</router-link></li>
                     </ul>
                 </li>
                 <li><a class="has-arrow " href="javascript:void()" aria-expanded="false">

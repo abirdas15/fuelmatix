@@ -76,8 +76,8 @@
 </template>
 
 <script>
-import ApiService from "../../../Services/ApiService";
-import ApiRoutes from "../../../Services/ApiRoutes";
+import ApiService from "../../Services/ApiService";
+import ApiRoutes from "../../Services/ApiRoutes";
 export default {
     data() {
         return {
@@ -99,7 +99,7 @@ export default {
             });
         },
         getPaymentCategory: function () {
-            ApiService.POST(ApiRoutes.CategoryParent, {type: 'expenses'},res => {
+            ApiService.POST(ApiRoutes.CategoryParent, {type: 'assets'},res => {
                 if (parseInt(res.status) === 200) {
                     this.paymentData = res.data;
                 } else {
@@ -138,7 +138,8 @@ export default {
     created() {
         this.id = this.$route.params.id
         this.getSingle()
-        this.dispenserList()
+        this.getExpenseCategory()
+        this.getPaymentCategory()
     },
     mounted() {
         $('#dashboard_bar').text('Expense Edit')

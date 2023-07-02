@@ -89,9 +89,9 @@
 
 <script>
 import Swal from 'sweetalert2/dist/sweetalert2.js'
-import ApiService from "../../../Services/ApiService";
-import ApiRoutes from "../../../Services/ApiRoutes";
-import Pagination from "../../../Helpers/Pagination";
+import ApiService from "../../Services/ApiService";
+import ApiRoutes from "../../Services/ApiRoutes";
+import Pagination from "../../Helpers/Pagination";
 export default {
     components: {
         Pagination,

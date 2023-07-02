@@ -2556,8 +2556,8 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-!(function webpackMissingModule() { var e = new Error("Cannot find module '../../../Services/ApiService'"); e.code = 'MODULE_NOT_FOUND'; throw e; }());
-!(function webpackMissingModule() { var e = new Error("Cannot find module '../../../Services/ApiRoutes'"); e.code = 'MODULE_NOT_FOUND'; throw e; }());
+/* harmony import */ var _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../Services/ApiService */ "./resources/js/Services/ApiService.js");
+/* harmony import */ var _Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../Services/ApiRoutes */ "./resources/js/Services/ApiRoutes.js");
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -2578,25 +2578,25 @@ __webpack_require__.r(__webpack_exports__);
   methods: {
     getExpenseCategory: function getExpenseCategory() {
       var _this = this;
-      !(function webpackMissingModule() { var e = new Error("Cannot find module '../../../Services/ApiService'"); e.code = 'MODULE_NOT_FOUND'; throw e; }()).POST(!(function webpackMissingModule() { var e = new Error("Cannot find module '../../../Services/ApiRoutes'"); e.code = 'MODULE_NOT_FOUND'; throw e; }()).CategoryParent, {
+      _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].CategoryParent, {
         type: 'expenses'
       }, function (res) {
         if (parseInt(res.status) === 200) {
           _this.expenseData = res.data;
         } else {
-          !(function webpackMissingModule() { var e = new Error("Cannot find module '../../../Services/ApiService'"); e.code = 'MODULE_NOT_FOUND'; throw e; }()).ErrorHandler(res.error);
+          _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].ErrorHandler(res.error);
         }
       });
     },
     getPaymentCategory: function getPaymentCategory() {
       var _this2 = this;
-      !(function webpackMissingModule() { var e = new Error("Cannot find module '../../../Services/ApiService'"); e.code = 'MODULE_NOT_FOUND'; throw e; }()).POST(!(function webpackMissingModule() { var e = new Error("Cannot find module '../../../Services/ApiRoutes'"); e.code = 'MODULE_NOT_FOUND'; throw e; }()).CategoryParent, {
-        type: 'expenses'
+      _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].CategoryParent, {
+        type: 'assets'
       }, function (res) {
         if (parseInt(res.status) === 200) {
           _this2.paymentData = res.data;
         } else {
-          !(function webpackMissingModule() { var e = new Error("Cannot find module '../../../Services/ApiService'"); e.code = 'MODULE_NOT_FOUND'; throw e; }()).ErrorHandler(res.error);
+          _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].ErrorHandler(res.error);
         }
       });
     },
@@ -2607,7 +2607,7 @@ __webpack_require__.r(__webpack_exports__);
     },
     save: function save() {
       var _this3 = this;
-      !(function webpackMissingModule() { var e = new Error("Cannot find module '../../../Services/ApiService'"); e.code = 'MODULE_NOT_FOUND'; throw e; }()).ClearErrorHandler();
+      _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].ClearErrorHandler();
       this.loading = true;
       var formData = new FormData();
       formData.append('category_id', this.param.category_id);
@@ -2615,14 +2615,14 @@ __webpack_require__.r(__webpack_exports__);
       formData.append('amount', this.param.amount);
       formData.append('remarks', this.param.remarks);
       formData.append('file', this.param.file);
-      !(function webpackMissingModule() { var e = new Error("Cannot find module '../../../Services/ApiService'"); e.code = 'MODULE_NOT_FOUND'; throw e; }()).POST(!(function webpackMissingModule() { var e = new Error("Cannot find module '../../../Services/ApiRoutes'"); e.code = 'MODULE_NOT_FOUND'; throw e; }()).ExpenseAdd, formData, function (res) {
+      _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].ExpenseAdd, formData, function (res) {
         _this3.loading = false;
         if (parseInt(res.status) === 200) {
           _this3.$router.push({
             name: 'Expense'
           });
         } else {
-          !(function webpackMissingModule() { var e = new Error("Cannot find module '../../../Services/ApiService'"); e.code = 'MODULE_NOT_FOUND'; throw e; }()).ErrorHandler(res.errors);
+          _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].ErrorHandler(res.errors);
         }
       });
     }
@@ -2647,8 +2647,8 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-!(function webpackMissingModule() { var e = new Error("Cannot find module '../../../Services/ApiService'"); e.code = 'MODULE_NOT_FOUND'; throw e; }());
-!(function webpackMissingModule() { var e = new Error("Cannot find module '../../../Services/ApiRoutes'"); e.code = 'MODULE_NOT_FOUND'; throw e; }());
+/* harmony import */ var _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../Services/ApiService */ "./resources/js/Services/ApiService.js");
+/* harmony import */ var _Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../Services/ApiRoutes */ "./resources/js/Services/ApiRoutes.js");
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -2664,25 +2664,25 @@ __webpack_require__.r(__webpack_exports__);
   methods: {
     getExpenseCategory: function getExpenseCategory() {
       var _this = this;
-      !(function webpackMissingModule() { var e = new Error("Cannot find module '../../../Services/ApiService'"); e.code = 'MODULE_NOT_FOUND'; throw e; }()).POST(!(function webpackMissingModule() { var e = new Error("Cannot find module '../../../Services/ApiRoutes'"); e.code = 'MODULE_NOT_FOUND'; throw e; }()).CategoryParent, {
+      _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].CategoryParent, {
         type: 'expenses'
       }, function (res) {
         if (parseInt(res.status) === 200) {
           _this.expenseData = res.data;
         } else {
-          !(function webpackMissingModule() { var e = new Error("Cannot find module '../../../Services/ApiService'"); e.code = 'MODULE_NOT_FOUND'; throw e; }()).ErrorHandler(res.error);
+          _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].ErrorHandler(res.error);
         }
       });
     },
     getPaymentCategory: function getPaymentCategory() {
       var _this2 = this;
-      !(function webpackMissingModule() { var e = new Error("Cannot find module '../../../Services/ApiService'"); e.code = 'MODULE_NOT_FOUND'; throw e; }()).POST(!(function webpackMissingModule() { var e = new Error("Cannot find module '../../../Services/ApiRoutes'"); e.code = 'MODULE_NOT_FOUND'; throw e; }()).CategoryParent, {
-        type: 'expenses'
+      _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].CategoryParent, {
+        type: 'assets'
       }, function (res) {
         if (parseInt(res.status) === 200) {
           _this2.paymentData = res.data;
         } else {
-          !(function webpackMissingModule() { var e = new Error("Cannot find module '../../../Services/ApiService'"); e.code = 'MODULE_NOT_FOUND'; throw e; }()).ErrorHandler(res.error);
+          _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].ErrorHandler(res.error);
         }
       });
     },
@@ -2693,7 +2693,7 @@ __webpack_require__.r(__webpack_exports__);
     },
     getSingle: function getSingle() {
       var _this3 = this;
-      !(function webpackMissingModule() { var e = new Error("Cannot find module '../../../Services/ApiService'"); e.code = 'MODULE_NOT_FOUND'; throw e; }()).POST(!(function webpackMissingModule() { var e = new Error("Cannot find module '../../../Services/ApiRoutes'"); e.code = 'MODULE_NOT_FOUND'; throw e; }()).ExpenseSingle, {
+      _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].ExpenseSingle, {
         id: this.id
       }, function (res) {
         if (parseInt(res.status) === 200) {
@@ -2703,16 +2703,16 @@ __webpack_require__.r(__webpack_exports__);
     },
     save: function save() {
       var _this4 = this;
-      !(function webpackMissingModule() { var e = new Error("Cannot find module '../../../Services/ApiService'"); e.code = 'MODULE_NOT_FOUND'; throw e; }()).ClearErrorHandler();
+      _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].ClearErrorHandler();
       this.loading = true;
-      !(function webpackMissingModule() { var e = new Error("Cannot find module '../../../Services/ApiService'"); e.code = 'MODULE_NOT_FOUND'; throw e; }()).POST(!(function webpackMissingModule() { var e = new Error("Cannot find module '../../../Services/ApiRoutes'"); e.code = 'MODULE_NOT_FOUND'; throw e; }()).ExpenseEdit, this.param, function (res) {
+      _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].ExpenseEdit, this.param, function (res) {
         _this4.loading = false;
         if (parseInt(res.status) === 200) {
           _this4.$router.push({
             name: 'Expense'
           });
         } else {
-          !(function webpackMissingModule() { var e = new Error("Cannot find module '../../../Services/ApiService'"); e.code = 'MODULE_NOT_FOUND'; throw e; }()).ErrorHandler(res.errors);
+          _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].ErrorHandler(res.errors);
         }
       });
     }
@@ -2720,7 +2720,8 @@ __webpack_require__.r(__webpack_exports__);
   created: function created() {
     this.id = this.$route.params.id;
     this.getSingle();
-    this.dispenserList();
+    this.getExpenseCategory();
+    this.getPaymentCategory();
   },
   mounted: function mounted() {
     $('#dashboard_bar').text('Expense Edit');
@@ -2740,16 +2741,16 @@ __webpack_require__.r(__webpack_exports__);
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var sweetalert2_dist_sweetalert2_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! sweetalert2/dist/sweetalert2.js */ "./node_modules/sweetalert2/dist/sweetalert2.js");
 /* harmony import */ var sweetalert2_dist_sweetalert2_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(sweetalert2_dist_sweetalert2_js__WEBPACK_IMPORTED_MODULE_0__);
-!(function webpackMissingModule() { var e = new Error("Cannot find module '../../../Services/ApiService'"); e.code = 'MODULE_NOT_FOUND'; throw e; }());
-!(function webpackMissingModule() { var e = new Error("Cannot find module '../../../Services/ApiRoutes'"); e.code = 'MODULE_NOT_FOUND'; throw e; }());
-!(function webpackMissingModule() { var e = new Error("Cannot find module '../../../Helpers/Pagination'"); e.code = 'MODULE_NOT_FOUND'; throw e; }());
+/* harmony import */ var _Services_ApiService__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../Services/ApiService */ "./resources/js/Services/ApiService.js");
+/* harmony import */ var _Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../Services/ApiRoutes */ "./resources/js/Services/ApiRoutes.js");
+/* harmony import */ var _Helpers_Pagination__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../Helpers/Pagination */ "./resources/js/Helpers/Pagination.vue");
 
 
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   components: {
-    Pagination: !(function webpackMissingModule() { var e = new Error("Cannot find module '../../../Helpers/Pagination'"); e.code = 'MODULE_NOT_FOUND'; throw e; }())
+    Pagination: _Helpers_Pagination__WEBPACK_IMPORTED_MODULE_3__["default"]
   },
   data: function data() {
     return {
@@ -2805,26 +2806,26 @@ __webpack_require__.r(__webpack_exports__);
       }
       this.Param.page = page.page;
       this.TableLoading = true;
-      !(function webpackMissingModule() { var e = new Error("Cannot find module '../../../Services/ApiService'"); e.code = 'MODULE_NOT_FOUND'; throw e; }()).POST(!(function webpackMissingModule() { var e = new Error("Cannot find module '../../../Services/ApiRoutes'"); e.code = 'MODULE_NOT_FOUND'; throw e; }()).ExpenseList, this.Param, function (res) {
+      _Services_ApiService__WEBPACK_IMPORTED_MODULE_1__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_2__["default"].ExpenseList, this.Param, function (res) {
         _this2.TableLoading = false;
         if (parseInt(res.status) === 200) {
           _this2.paginateData = res.data;
           _this2.listData = res.data.data;
         } else {
-          !(function webpackMissingModule() { var e = new Error("Cannot find module '../../../Services/ApiService'"); e.code = 'MODULE_NOT_FOUND'; throw e; }()).ErrorHandler(res.error);
+          _Services_ApiService__WEBPACK_IMPORTED_MODULE_1__["default"].ErrorHandler(res.error);
         }
       });
     },
     Delete: function Delete(data) {
       var _this3 = this;
-      !(function webpackMissingModule() { var e = new Error("Cannot find module '../../../Services/ApiService'"); e.code = 'MODULE_NOT_FOUND'; throw e; }()).POST(!(function webpackMissingModule() { var e = new Error("Cannot find module '../../../Services/ApiRoutes'"); e.code = 'MODULE_NOT_FOUND'; throw e; }()).ExpenseDelete, {
+      _Services_ApiService__WEBPACK_IMPORTED_MODULE_1__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_2__["default"].ExpenseDelete, {
         id: data.id
       }, function (res) {
         if (parseInt(res.status) === 200) {
           _this3.$toast.success(res.message);
           _this3.list();
         } else {
-          !(function webpackMissingModule() { var e = new Error("Cannot find module '../../../Services/ApiService'"); e.code = 'MODULE_NOT_FOUND'; throw e; }()).ErrorHandler(res.error);
+          _Services_ApiService__WEBPACK_IMPORTED_MODULE_1__["default"].ErrorHandler(res.error);
         }
       });
     },
@@ -11540,7 +11541,17 @@ var render = function render() {
         name: "Product"
       }
     }
-  }, [_vm._v("Product List")])], 1)])]), _vm._v(" "), _vm._m(17), _vm._v(" "), _vm._m(18), _vm._v(" "), _vm._m(19), _vm._v(" "), _vm._m(20), _vm._v(" "), _vm._m(21), _vm._v(" "), _vm._m(22), _vm._v(" "), _vm._m(23), _vm._v(" "), _c("li", [_vm._m(24), _vm._v(" "), _c("ul", {
+  }, [_vm._v("Product List")])], 1)])]), _vm._v(" "), _vm._m(17), _vm._v(" "), _vm._m(18), _vm._v(" "), _vm._m(19), _vm._v(" "), _vm._m(20), _vm._v(" "), _c("li", [_vm._m(21), _vm._v(" "), _c("ul", {
+    attrs: {
+      "aria-expanded": "false"
+    }
+  }, [_c("li", [_c("router-link", {
+    attrs: {
+      to: {
+        name: "Expense"
+      }
+    }
+  }, [_vm._v("Expense")])], 1)])]), _vm._v(" "), _vm._m(22), _vm._v(" "), _vm._m(23), _vm._v(" "), _c("li", [_vm._m(24), _vm._v(" "), _c("ul", {
     attrs: {
       "aria-expanded": "false"
     }
@@ -11863,7 +11874,7 @@ var staticRenderFns = [function () {
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
-  return _c("li", [_c("a", {
+  return _c("a", {
     staticClass: "has-arrow",
     attrs: {
       href: "javascript:void()",
@@ -11873,27 +11884,7 @@ var staticRenderFns = [function () {
     staticClass: "fa-solid fa-money-bill"
   }), _vm._v(" "), _c("span", {
     staticClass: "nav-text"
-  }, [_vm._v("Expenses")])]), _vm._v(" "), _c("ul", {
-    attrs: {
-      "aria-expanded": "false"
-    }
-  }, [_c("li", [_c("a", {
-    attrs: {
-      href: "./expense.html"
-    }
-  }, [_vm._v("Expense")])]), _vm._v(" "), _c("li", [_c("a", {
-    attrs: {
-      href: "./#"
-    }
-  }, [_vm._v("Salary Expense")])]), _vm._v(" "), _c("li", [_c("a", {
-    attrs: {
-      href: "./#"
-    }
-  }, [_vm._v("Machine Expense")])]), _vm._v(" "), _c("li", [_c("a", {
-    attrs: {
-      href: "./#"
-    }
-  }, [_vm._v("Mics Expense")])])])]);
+  }, [_vm._v("Expenses")])]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
