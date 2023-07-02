@@ -104,6 +104,8 @@ Route::group(['prefix' => 'expense'], function() {
     Route::post('save', [ExpenseController::class, 'save']);
     Route::post('list', [ExpenseController::class, 'list']);
     Route::post('single', [ExpenseController::class, 'single']);
+    Route::post('update', [ExpenseController::class, 'update']);
+    Route::post('delete', [ExpenseController::class, 'delete']);
 });
 
 

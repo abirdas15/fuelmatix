@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Expense;
+use App\Models\Transaction;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -41,9 +42,9 @@ class ExpenseController extends Controller
             ];
             $data['linked_id'] = $inputData['category_id'];
             TransactionController::saveTransaction($data);
-            return response()->json(['status' => 200, 'message' => 'Successfully save expense.']);
+            return response()->json(['status' => 200, 'message' => 'Successfully saved expense.']);
         }
-        return response()->json(['status' => 500, 'message' => 'Cannot save expense.']);
+        return response()->json(['status' => 500, 'message' => 'Cannot saved expense.']);
     }
     public function list(Request $request)
     {
@@ -79,5 +80,52 @@ class ExpenseController extends Controller
         }
         $result = Expense::find($inputData['id']);
         return response()->json(['status' => 200, 'data' => $result]);
+    }
+    public function update(Request $request)
+    {
+        $inputData = $request->all();
+        $validator = Validator::make($inputData, [
+            'id' => 'required',
+            'category_id' => 'required',
+            'amount' => 'required',
+            'payment_id' => 'required'
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['status' => 500, 'errors' => $validator->errors()]);
+        }
+        $expense = Expense::find($inputData['id']);
+        if ($expense == null) {
+            return response()->json(['status' => 500, 'error' => 'Cannot find expense.']);
+        }
+        $file_path = $expense->file;
+        if ($request->file('file')) {
+            $file = $_FILES;
+            $file = $file['file'];
+            $destinationPath = public_path('uploads');
+            $file_path = $request->file('file')->getClientOriginalName();
+            move_uploaded_file($file["tmp_name"], $destinationPath.'/'.$file_path);
+        }
+        $expense->date = Carbon::now();
+        $expense->category_id = $inputData['category_id'];
+        $expense->amount = $inputData['amount'];
+        $expense->payment_id = $inputData['payment_id'];
+        $expense->file = $file_path;
+        $expense->remarks = $inputData['remarks'] ?? null;
+        if ($expense->save()) {
+            $transaction = Transaction::where('type_id', $inputData['id'])->first();
+            $data['id'] = $transaction->id;
+            $data['debit_amount'] = $inputData['amount'];
+            $data['credit_amount'] = 0;
+            TransactionController::updateTransaction($data);
+            return response()->json(['status' => 200, 'message' => 'Successfully updated expense.']);
+        }
+        return response()->json(['status' => 500, 'message' => 'Cannot updated expense.']);
+    }
+    public function delete(Request $request)
+    {
+        $inputData = $request->all();
+        $validator = Validator::make($inputData, [
+            ''
+        ]);
     }
 }
