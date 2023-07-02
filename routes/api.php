@@ -102,6 +102,8 @@ Route::group(['prefix' => 'shift/sale'], function() {
 });
 Route::group(['prefix' => 'expense'], function() {
     Route::post('save', [ExpenseController::class, 'save']);
+    Route::post('list', [ExpenseController::class, 'list']);
+    Route::post('single', [ExpenseController::class, 'single']);
 });
 
 
