@@ -42,6 +42,7 @@
                         <li><router-link :to="{name: 'NozzleReading'}">Nozzle Reading History</router-link></li>
                         <li><router-link :to="{name: 'TankAdd'}"> Add Tank</router-link></li>
                         <li><router-link :to="{name: 'Tank'}"> Tank List</router-link></li>
+                        <li><router-link :to="{name: 'TankVisual'}"> Tank Visual</router-link></li>
                         <li><router-link :to="{name: 'TankReadingAdd'}">Tank Reading</router-link></li>
                         <li><router-link :to="{name: 'TankReading'}">Tank Reading History</router-link></li>
                         <li><router-link :to="{name: 'ProductAdd'}">Product</router-link></li>
