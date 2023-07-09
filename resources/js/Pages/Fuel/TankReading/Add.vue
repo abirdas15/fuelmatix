@@ -4,7 +4,7 @@
             <div class="row page-titles">
                 <ol class="breadcrumb align-items-center ">
                     <li class="breadcrumb-item active"><router-link :to="{name: 'Dashboard'}">Home</router-link></li>
-                    <li class="breadcrumb-item active"><router-link :to="{name: 'DispenserReading'}">Dispenser</router-link></li>
+                    <li class="breadcrumb-item active"><router-link :to="{name: 'TankReading'}">Tank</router-link></li>
                     <li class="breadcrumb-item"><a href="javascript:void(0)">Reading</a></li>
 
                 </ol>
@@ -13,17 +13,17 @@
             <div class="col-xl-12 col-lg-12">
                 <div class="card">
                     <div class="card-header">
-                        <h4 class="card-title">Dispenser Reading</h4>
+                        <h4 class="card-title">Tank Reading</h4>
                     </div>
                     <div class="card-body">
                         <div class="basic-form">
                             <form @submit.prevent="save">
                                 <div class="row">
                                     <div class="mb-3 form-group col-md-6">
-                                        <label class="form-label">Dispenser ID:</label>
-                                        <select class="form-control" name="dispenser_id" id="dispenser_id"  v-model="param.dispenser_id">
-                                            <option value="">Select Dispenser</option>
-                                            <option v-for="d in listData" :value="d.id">{{d.dispenser_name}}</option>
+                                        <label class="form-label">Tank ID:</label>
+                                        <select class="form-control" name="tank_id" id="tank_id"  v-model="param.tank_id">
+                                            <option value="">Select Tank</option>
+                                            <option v-for="d in listData" :value="d.id">{{d.tank_name}}</option>
                                         </select>
                                         <div class="invalid-feedback"></div>
                                     </div>
@@ -33,13 +33,13 @@
                                         <div class="invalid-feedback"></div>
                                     </div>
                                     <div class="mb-3 form-group col-md-6">
-                                        <label class="form-label">Reading:</label>
-                                        <input type="text" class="form-control" name="reading" v-model="param.reading">
+                                        <label class="form-label">Height:</label>
+                                        <input type="text" class="form-control" name="height" v-model="param.height">
                                         <div class="invalid-feedback"></div>
                                     </div>
                                     <div class="mb-3 form-group col-md-6">
-                                        <label class="form-label">Litter:</label>
-                                        <input type="text" class="form-control" name="litter" v-model="param.litter">
+                                        <label class="form-label">Water Height:</label>
+                                        <input type="text" class="form-control" name="water_height" v-model="param.water_height">
                                         <div class="invalid-feedback"></div>
                                     </div>
                                 </div>
@@ -50,7 +50,7 @@
                                     <div class="mb-3 col-md-6">
                                         <button type="submit" class="btn btn-primary" v-if="!loading">Submit</button>
                                         <button type="button" class="btn btn-primary" v-if="loading">Submitting...</button>
-                                        <router-link :to="{name: 'DispenserReading'}" type="button" class="btn btn-primary">Cancel</router-link>
+                                        <router-link :to="{name: 'TankReading'}" type="button" class="btn btn-primary">Cancel</router-link>
                                     </div>
                                 </div>
                             </form>
@@ -69,18 +69,18 @@ export default {
     data() {
         return {
             param: {
-                dispenser_id: '',
+                tank_id: '',
                 date: '',
-                reading: '',
-                litter: '',
+                height: '',
+                water_height: '',
             },
             loading: false,
             listData: [],
         }
     },
     methods: {
-        getDispenser: function () {
-            ApiService.POST(ApiRoutes.DispenserList, {limit: 5000, page: 1},res => {
+        getTank: function () {
+            ApiService.POST(ApiRoutes.TankList, {limit: 5000, page: 1},res => {
                 this.TableLoading = false
                 if (parseInt(res.status) === 200) {
                     this.listData = res.data.data;
@@ -93,11 +93,11 @@ export default {
                 this.param.date = moment().format('YYYY-MM-DD')
             }
             this.loading = true
-            ApiService.POST(ApiRoutes.DispenserReadingAdd, this.param,res => {
+            ApiService.POST(ApiRoutes.TankReadingAdd, this.param,res => {
                 this.loading = false
                 if (parseInt(res.status) === 200) {
                     this.$router.push({
-                        name: 'DispenserReading'
+                        name: 'TankReading'
                     })
                 } else {
                     ApiService.ErrorHandler(res.errors);
@@ -106,7 +106,7 @@ export default {
         },
     },
     created() {
-        this.getDispenser()
+        this.getTank()
     },
     mounted() {
         setTimeout(() => {
@@ -120,7 +120,7 @@ export default {
                 }
             })
         }, 1000)
-        $('#dashboard_bar').text('Dispenser Reading')
+        $('#dashboard_bar').text('Tank Reading')
     }
 }
 </script>

@@ -4,15 +4,15 @@
             <div class="row page-titles">
                 <ol class="breadcrumb align-items-center ">
                     <li class="breadcrumb-item active"><router-link :to="{name: 'Dashboard'}">Home</router-link></li>
-                    <li class="breadcrumb-item"><a href="javascript:void(0)">Dispenser Reading List</a></li>
-                    <li style="margin-left: auto;"><router-link :to="{name: 'DispenserReadingAdd'}"><i class="fa-solid fa-plus"></i> New Dispenser Reading</router-link></li>
+                    <li class="breadcrumb-item"><a href="javascript:void(0)">Tank Reading List</a></li>
+                    <li style="margin-left: auto;"><router-link :to="{name: 'TankReadingAdd'}"><i class="fa-solid fa-plus"></i> New Tank Reading</router-link></li>
                 </ol>
             </div>
             <div class="row">
                 <div class="col-12">
                     <div class="card">
                         <div class="card-header bg-secondary">
-                            <h4 class="card-title">Dispenser Reading History</h4>
+                            <h4 class="card-title">Tank Reading History</h4>
                         </div>
                         <div class="card-body">
                             <div class="row mt-4">
@@ -38,19 +38,21 @@
                                             <thead>
                                             <tr class="text-white" style="background-color: #4886EE;color:#ffffff">
                                                 <th class="text-white" @click="sortData('date')" :class="sortClass('date')">Date</th>
-                                                <th class="text-white" @click="sortData('dispenser_name')" :class="sortClass('dispenser_name')">Dispenser ID</th>
-                                                <th class="text-white" @click="sortData('reading')" :class="sortClass('reading')">Reading</th>
+                                                <th class="text-white" @click="sortData('tank_name')" :class="sortClass('tank_name')">Tank ID</th>
+                                                <th class="text-white" @click="sortData('height')" :class="sortClass('height')">Height</th>
+                                                <th class="text-white" @click="sortData('water_height')" :class="sortClass('water_height')">Height Height</th>
                                                 <th class="text-white" >Action</th>
                                             </tr>
                                             </thead>
                                             <tbody v-if="listData.length > 0 && TableLoading == false">
                                             <tr v-for="f in listData">
                                                 <td >{{f.date}}</td>
-                                                <td><a href="javascript:void(0);">{{f.dispenser_name}}</a></td>
-                                                <td><a href="javascript:void(0);">{{f?.reading}}</a></td>
+                                                <td><a href="javascript:void(0);">{{f.tank_name}}</a></td>
+                                                <td><a href="javascript:void(0);">{{f?.height}}</a></td>
+                                                <td><a href="javascript:void(0);">{{f?.water_height}}</a></td>
                                                 <td>
                                                     <div class="d-flex justify-content-end">
-                                                        <router-link :to="{name: 'DispenserReadingEdit', params: { id: f.id }}" class=" btn btn-primary shadow btn-xs sharp me-1">
+                                                        <router-link :to="{name: 'TankReadingEdit', params: { id: f.id }}" class=" btn btn-primary shadow btn-xs sharp me-1">
                                                             <i class="fas fa-pencil-alt"></i>
                                                         </router-link>
                                                         <a  href="javascript:void(0)"  @click="openModalDelete(f)" class="btn btn-danger shadow btn-xs sharp">
@@ -150,7 +152,7 @@ export default {
             }
             this.Param.page = page.page;
             this.TableLoading = true
-            ApiService.POST(ApiRoutes.DispenserReadingList, this.Param,res => {
+            ApiService.POST(ApiRoutes.TankReadingList, this.Param,res => {
                 this.TableLoading = false
                 if (parseInt(res.status) === 200) {
                     this.paginateData = res.data;
@@ -161,7 +163,7 @@ export default {
             });
         },
         Delete: function (data) {
-            ApiService.POST(ApiRoutes.DispenserReadingDelete, {id: data.id },res => {
+            ApiService.POST(ApiRoutes.TankReadingDelete, {id: data.id },res => {
                 if (parseInt(res.status) === 200) {
                     this.$toast.success(res.message);
                     this.list()
@@ -190,7 +192,7 @@ export default {
 
     },
     mounted() {
-        $('#dashboard_bar').text('Dispenser Reading History')
+        $('#dashboard_bar').text('Tank Reading History')
     }
 }
 </script>

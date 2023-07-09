@@ -82,7 +82,13 @@ export default {
         save: function () {
             ApiService.ClearErrorHandler();
             this.loading = true
-            ApiService.POST(ApiRoutes.TankEdit, this.param,res => {
+            let formData = new FormData()
+            formData.append('id', this.param.id)
+            formData.append('tank_name', this.param.tank_name)
+            formData.append('capacity', this.param.capacity)
+            formData.append('height', this.param.height)
+            formData.append('file', this.param.file)
+            ApiService.POST(ApiRoutes.TankEdit, formData,res => {
                 this.loading = false
                 if (parseInt(res.status) === 200) {
                     this.$router.push({

@@ -4281,8 +4281,13 @@ __webpack_require__.r(__webpack_exports__);
     save: function save() {
       var _this = this;
       _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].ClearErrorHandler();
+      var formData = new FormData();
+      formData.append('tank_name', this.param.tank_name);
+      formData.append('capacity', this.param.capacity);
+      formData.append('height', this.param.height);
+      formData.append('file', this.param.file);
       this.loading = true;
-      _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].TankAdd, this.param, function (res) {
+      _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].TankAdd, formData, function (res) {
         _this.loading = false;
         if (parseInt(res.status) === 200) {
           _this.$router.push({
@@ -4338,7 +4343,13 @@ __webpack_require__.r(__webpack_exports__);
       var _this2 = this;
       _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].ClearErrorHandler();
       this.loading = true;
-      _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].TankEdit, this.param, function (res) {
+      var formData = new FormData();
+      formData.append('id', this.param.id);
+      formData.append('tank_name', this.param.tank_name);
+      formData.append('capacity', this.param.capacity);
+      formData.append('height', this.param.height);
+      formData.append('file', this.param.file);
+      _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].TankEdit, formData, function (res) {
         _this2.loading = false;
         if (parseInt(res.status) === 200) {
           _this2.$router.push({
@@ -4506,19 +4517,19 @@ __webpack_require__.r(__webpack_exports__);
   data: function data() {
     return {
       param: {
-        dispenser_id: '',
+        tank_id: '',
         date: '',
-        reading: '',
-        litter: ''
+        height: '',
+        water_height: ''
       },
       loading: false,
       listData: []
     };
   },
   methods: {
-    getDispenser: function getDispenser() {
+    getTank: function getTank() {
       var _this = this;
-      _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].DispenserList, {
+      _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].TankList, {
         limit: 5000,
         page: 1
       }, function (res) {
@@ -4535,11 +4546,11 @@ __webpack_require__.r(__webpack_exports__);
         this.param.date = moment().format('YYYY-MM-DD');
       }
       this.loading = true;
-      _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].DispenserReadingAdd, this.param, function (res) {
+      _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].TankReadingAdd, this.param, function (res) {
         _this2.loading = false;
         if (parseInt(res.status) === 200) {
           _this2.$router.push({
-            name: 'DispenserReading'
+            name: 'TankReading'
           });
         } else {
           _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].ErrorHandler(res.errors);
@@ -4548,7 +4559,7 @@ __webpack_require__.r(__webpack_exports__);
     }
   },
   created: function created() {
-    this.getDispenser();
+    this.getTank();
   },
   mounted: function mounted() {
     var _this3 = this;
@@ -4563,7 +4574,7 @@ __webpack_require__.r(__webpack_exports__);
         }
       });
     }, 1000);
-    $('#dashboard_bar').text('Dispenser Reading');
+    $('#dashboard_bar').text('Tank Reading');
   }
 });
 
@@ -4594,7 +4605,7 @@ __webpack_require__.r(__webpack_exports__);
   methods: {
     getSingle: function getSingle() {
       var _this = this;
-      _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].DispenserReadingSingle, {
+      _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].TankReadingSingle, {
         id: this.id
       }, function (res) {
         if (parseInt(res.status) === 200) {
@@ -4606,20 +4617,20 @@ __webpack_require__.r(__webpack_exports__);
       var _this2 = this;
       _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].ClearErrorHandler();
       this.loading = true;
-      _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].DispenserReadingEdit, this.param, function (res) {
+      _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].TankReadingEdit, this.param, function (res) {
         _this2.loading = false;
         if (parseInt(res.status) === 200) {
           _this2.$router.push({
-            name: 'DispenserReading'
+            name: 'TankReading'
           });
         } else {
           _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].ErrorHandler(res.errors);
         }
       });
     },
-    getDispenser: function getDispenser() {
+    getTank: function getTank() {
       var _this3 = this;
-      _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].DispenserList, {
+      _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].TankList, {
         limit: 5000,
         page: 1
       }, function (res) {
@@ -4633,7 +4644,7 @@ __webpack_require__.r(__webpack_exports__);
   created: function created() {
     this.id = this.$route.params.id;
     this.getSingle();
-    this.getDispenser();
+    this.getTank();
   },
   mounted: function mounted() {
     var _this4 = this;
@@ -4648,7 +4659,7 @@ __webpack_require__.r(__webpack_exports__);
         }
       });
     }, 1000);
-    $('#dashboard_bar').text('Dispenser Reading Edit');
+    $('#dashboard_bar').text('Tank Reading Edit');
   }
 });
 
@@ -4730,7 +4741,7 @@ __webpack_require__.r(__webpack_exports__);
       }
       this.Param.page = page.page;
       this.TableLoading = true;
-      _Services_ApiService__WEBPACK_IMPORTED_MODULE_1__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_2__["default"].DispenserReadingList, this.Param, function (res) {
+      _Services_ApiService__WEBPACK_IMPORTED_MODULE_1__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_2__["default"].TankReadingList, this.Param, function (res) {
         _this2.TableLoading = false;
         if (parseInt(res.status) === 200) {
           _this2.paginateData = res.data;
@@ -4742,7 +4753,7 @@ __webpack_require__.r(__webpack_exports__);
     },
     Delete: function Delete(data) {
       var _this3 = this;
-      _Services_ApiService__WEBPACK_IMPORTED_MODULE_1__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_2__["default"].DispenserReadingDelete, {
+      _Services_ApiService__WEBPACK_IMPORTED_MODULE_1__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_2__["default"].TankReadingDelete, {
         id: data.id
       }, function (res) {
         if (parseInt(res.status) === 200) {
@@ -4771,7 +4782,7 @@ __webpack_require__.r(__webpack_exports__);
     }
   },
   mounted: function mounted() {
-    $('#dashboard_bar').text('Dispenser Reading History');
+    $('#dashboard_bar').text('Tank Reading History');
   }
 });
 
@@ -12089,10 +12100,10 @@ var render = function render() {
   }, [_c("router-link", {
     attrs: {
       to: {
-        name: "DispenserReading"
+        name: "TankReading"
       }
     }
-  }, [_vm._v("Dispenser")])], 1), _vm._v(" "), _vm._m(0)])]), _vm._v(" "), _c("div", {
+  }, [_vm._v("Tank")])], 1), _vm._v(" "), _vm._m(0)])]), _vm._v(" "), _c("div", {
     staticClass: "col-xl-12 col-lg-12"
   }, [_c("div", {
     staticClass: "card"
@@ -12113,17 +12124,17 @@ var render = function render() {
     staticClass: "mb-3 form-group col-md-6"
   }, [_c("label", {
     staticClass: "form-label"
-  }, [_vm._v("Dispenser ID:")]), _vm._v(" "), _c("select", {
+  }, [_vm._v("Tank ID:")]), _vm._v(" "), _c("select", {
     directives: [{
       name: "model",
       rawName: "v-model",
-      value: _vm.param.dispenser_id,
-      expression: "param.dispenser_id"
+      value: _vm.param.tank_id,
+      expression: "param.tank_id"
     }],
     staticClass: "form-control",
     attrs: {
-      name: "dispenser_id",
-      id: "dispenser_id"
+      name: "tank_id",
+      id: "tank_id"
     },
     on: {
       change: function change($event) {
@@ -12133,19 +12144,19 @@ var render = function render() {
           var val = "_value" in o ? o._value : o.value;
           return val;
         });
-        _vm.$set(_vm.param, "dispenser_id", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
+        _vm.$set(_vm.param, "tank_id", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
       }
     }
   }, [_c("option", {
     attrs: {
       value: ""
     }
-  }, [_vm._v("Select Dispenser")]), _vm._v(" "), _vm._l(_vm.listData, function (d) {
+  }, [_vm._v("Select Tank")]), _vm._v(" "), _vm._l(_vm.listData, function (d) {
     return _c("option", {
       domProps: {
         value: d.id
       }
-    }, [_vm._v(_vm._s(d.dispenser_name))]);
+    }, [_vm._v(_vm._s(d.tank_name))]);
   })], 2), _vm._v(" "), _c("div", {
     staticClass: "invalid-feedback"
   })]), _vm._v(" "), _c("div", {
@@ -12179,25 +12190,25 @@ var render = function render() {
     staticClass: "mb-3 form-group col-md-6"
   }, [_c("label", {
     staticClass: "form-label"
-  }, [_vm._v("Reading:")]), _vm._v(" "), _c("input", {
+  }, [_vm._v("Height:")]), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
-      value: _vm.param.reading,
-      expression: "param.reading"
+      value: _vm.param.height,
+      expression: "param.height"
     }],
     staticClass: "form-control",
     attrs: {
       type: "text",
-      name: "reading"
+      name: "height"
     },
     domProps: {
-      value: _vm.param.reading
+      value: _vm.param.height
     },
     on: {
       input: function input($event) {
         if ($event.target.composing) return;
-        _vm.$set(_vm.param, "reading", $event.target.value);
+        _vm.$set(_vm.param, "height", $event.target.value);
       }
     }
   }), _vm._v(" "), _c("div", {
@@ -12206,25 +12217,25 @@ var render = function render() {
     staticClass: "mb-3 form-group col-md-6"
   }, [_c("label", {
     staticClass: "form-label"
-  }, [_vm._v("Litter:")]), _vm._v(" "), _c("input", {
+  }, [_vm._v("Water Height:")]), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
-      value: _vm.param.litter,
-      expression: "param.litter"
+      value: _vm.param.water_height,
+      expression: "param.water_height"
     }],
     staticClass: "form-control",
     attrs: {
       type: "text",
-      name: "litter"
+      name: "water_height"
     },
     domProps: {
-      value: _vm.param.litter
+      value: _vm.param.water_height
     },
     on: {
       input: function input($event) {
         if ($event.target.composing) return;
-        _vm.$set(_vm.param, "litter", $event.target.value);
+        _vm.$set(_vm.param, "water_height", $event.target.value);
       }
     }
   }), _vm._v(" "), _c("div", {
@@ -12252,7 +12263,7 @@ var render = function render() {
     staticClass: "btn btn-primary",
     attrs: {
       to: {
-        name: "DispenserReading"
+        name: "TankReading"
       },
       type: "button"
     }
@@ -12275,7 +12286,7 @@ var staticRenderFns = [function () {
     staticClass: "card-header"
   }, [_c("h4", {
     staticClass: "card-title"
-  }, [_vm._v("Dispenser Reading")])]);
+  }, [_vm._v("Tank Reading")])]);
 }];
 render._withStripped = true;
 
@@ -12317,10 +12328,10 @@ var render = function render() {
   }, [_c("router-link", {
     attrs: {
       to: {
-        name: "DispenserReading"
+        name: "TankReading"
       }
     }
-  }, [_vm._v("Dispenser Reading")])], 1), _vm._v(" "), _vm._m(0)])]), _vm._v(" "), _c("div", {
+  }, [_vm._v("Tank Reading")])], 1), _vm._v(" "), _vm._m(0)])]), _vm._v(" "), _c("div", {
     staticClass: "col-xl-12 col-lg-12"
   }, [_c("div", {
     staticClass: "card"
@@ -12341,17 +12352,17 @@ var render = function render() {
     staticClass: "mb-3 form-group col-md-6"
   }, [_c("label", {
     staticClass: "form-label"
-  }, [_vm._v("Dispenser ID:")]), _vm._v(" "), _c("select", {
+  }, [_vm._v("Tank ID:")]), _vm._v(" "), _c("select", {
     directives: [{
       name: "model",
       rawName: "v-model",
-      value: _vm.param.dispenser_id,
-      expression: "param.dispenser_id"
+      value: _vm.param.tank_id,
+      expression: "param.tank_id"
     }],
     staticClass: "form-control",
     attrs: {
-      name: "dispenser_id",
-      id: "dispenser_id"
+      name: "tank_id",
+      id: "tank_id"
     },
     on: {
       change: function change($event) {
@@ -12361,19 +12372,19 @@ var render = function render() {
           var val = "_value" in o ? o._value : o.value;
           return val;
         });
-        _vm.$set(_vm.param, "dispenser_id", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
+        _vm.$set(_vm.param, "tank_id", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
       }
     }
   }, [_c("option", {
     attrs: {
       value: ""
     }
-  }, [_vm._v("Select Dispenser")]), _vm._v(" "), _vm._l(_vm.listData, function (d) {
+  }, [_vm._v("Select Tank")]), _vm._v(" "), _vm._l(_vm.listData, function (d) {
     return _c("option", {
       domProps: {
         value: d.id
       }
-    }, [_vm._v(_vm._s(d.dispenser_name))]);
+    }, [_vm._v(_vm._s(d.tank_name))]);
   })], 2), _vm._v(" "), _c("div", {
     staticClass: "invalid-feedback"
   })]), _vm._v(" "), _c("div", {
@@ -12407,25 +12418,25 @@ var render = function render() {
     staticClass: "mb-3 form-group col-md-6"
   }, [_c("label", {
     staticClass: "form-label"
-  }, [_vm._v("Reading:")]), _vm._v(" "), _c("input", {
+  }, [_vm._v("Height:")]), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
-      value: _vm.param.reading,
-      expression: "param.reading"
+      value: _vm.param.height,
+      expression: "param.height"
     }],
     staticClass: "form-control",
     attrs: {
       type: "text",
-      name: "reading"
+      name: "height"
     },
     domProps: {
-      value: _vm.param.reading
+      value: _vm.param.height
     },
     on: {
       input: function input($event) {
         if ($event.target.composing) return;
-        _vm.$set(_vm.param, "reading", $event.target.value);
+        _vm.$set(_vm.param, "height", $event.target.value);
       }
     }
   }), _vm._v(" "), _c("div", {
@@ -12434,25 +12445,25 @@ var render = function render() {
     staticClass: "mb-3 form-group col-md-6"
   }, [_c("label", {
     staticClass: "form-label"
-  }, [_vm._v("Litter:")]), _vm._v(" "), _c("input", {
+  }, [_vm._v("Water Height:")]), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
-      value: _vm.param.litter,
-      expression: "param.litter"
+      value: _vm.param.water_height,
+      expression: "param.water_height"
     }],
     staticClass: "form-control",
     attrs: {
       type: "text",
-      name: "litter"
+      name: "water_height"
     },
     domProps: {
-      value: _vm.param.litter
+      value: _vm.param.water_height
     },
     on: {
       input: function input($event) {
         if ($event.target.composing) return;
-        _vm.$set(_vm.param, "litter", $event.target.value);
+        _vm.$set(_vm.param, "water_height", $event.target.value);
       }
     }
   }), _vm._v(" "), _c("div", {
@@ -12480,7 +12491,7 @@ var render = function render() {
     staticClass: "btn btn-primary",
     attrs: {
       to: {
-        name: "DispenserReading"
+        name: "TankReading"
       },
       type: "button"
     }
@@ -12503,7 +12514,7 @@ var staticRenderFns = [function () {
     staticClass: "card-header"
   }, [_c("h4", {
     staticClass: "card-title"
-  }, [_vm._v("Dispenser Reading Edit")])]);
+  }, [_vm._v("Tank Reading Edit")])]);
 }];
 render._withStripped = true;
 
@@ -12547,12 +12558,12 @@ var render = function render() {
   }, [_c("router-link", {
     attrs: {
       to: {
-        name: "DispenserReadingAdd"
+        name: "TankReadingAdd"
       }
     }
   }, [_c("i", {
     staticClass: "fa-solid fa-plus"
-  }), _vm._v(" New Dispenser Reading")])], 1)])]), _vm._v(" "), _c("div", {
+  }), _vm._v(" New Tank Reading")])], 1)])]), _vm._v(" "), _c("div", {
     staticClass: "row"
   }, [_c("div", {
     staticClass: "col-12"
@@ -12651,38 +12662,50 @@ var render = function render() {
     }
   }, [_vm._v("Date")]), _vm._v(" "), _c("th", {
     staticClass: "text-white",
-    "class": _vm.sortClass("dispenser_name"),
+    "class": _vm.sortClass("tank_name"),
     on: {
       click: function click($event) {
-        return _vm.sortData("dispenser_name");
+        return _vm.sortData("tank_name");
       }
     }
-  }, [_vm._v("Dispenser ID")]), _vm._v(" "), _c("th", {
+  }, [_vm._v("Tank ID")]), _vm._v(" "), _c("th", {
     staticClass: "text-white",
-    "class": _vm.sortClass("reading"),
+    "class": _vm.sortClass("height"),
     on: {
       click: function click($event) {
-        return _vm.sortData("reading");
+        return _vm.sortData("height");
       }
     }
-  }, [_vm._v("Reading")]), _vm._v(" "), _c("th", {
+  }, [_vm._v("Height")]), _vm._v(" "), _c("th", {
+    staticClass: "text-white",
+    "class": _vm.sortClass("water_height"),
+    on: {
+      click: function click($event) {
+        return _vm.sortData("water_height");
+      }
+    }
+  }, [_vm._v("Height Height")]), _vm._v(" "), _c("th", {
     staticClass: "text-white"
   }, [_vm._v("Action")])])]), _vm._v(" "), _vm.listData.length > 0 && _vm.TableLoading == false ? _c("tbody", _vm._l(_vm.listData, function (f) {
     return _c("tr", [_c("td", [_vm._v(_vm._s(f.date))]), _vm._v(" "), _c("td", [_c("a", {
       attrs: {
         href: "javascript:void(0);"
       }
-    }, [_vm._v(_vm._s(f.dispenser_name))])]), _vm._v(" "), _c("td", [_c("a", {
+    }, [_vm._v(_vm._s(f.tank_name))])]), _vm._v(" "), _c("td", [_c("a", {
       attrs: {
         href: "javascript:void(0);"
       }
-    }, [_vm._v(_vm._s(f === null || f === void 0 ? void 0 : f.reading))])]), _vm._v(" "), _c("td", [_c("div", {
+    }, [_vm._v(_vm._s(f === null || f === void 0 ? void 0 : f.height))])]), _vm._v(" "), _c("td", [_c("a", {
+      attrs: {
+        href: "javascript:void(0);"
+      }
+    }, [_vm._v(_vm._s(f === null || f === void 0 ? void 0 : f.water_height))])]), _vm._v(" "), _c("td", [_c("div", {
       staticClass: "d-flex justify-content-end"
     }, [_c("router-link", {
       staticClass: "btn btn-primary shadow btn-xs sharp me-1",
       attrs: {
         to: {
-          name: "DispenserReadingEdit",
+          name: "TankReadingEdit",
           params: {
             id: f.id
           }
@@ -12731,7 +12754,7 @@ var staticRenderFns = [function () {
     attrs: {
       href: "javascript:void(0)"
     }
-  }, [_vm._v("Dispenser Reading List")])]);
+  }, [_vm._v("Tank Reading List")])]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
@@ -12739,7 +12762,7 @@ var staticRenderFns = [function () {
     staticClass: "card-header bg-secondary"
   }, [_c("h4", {
     staticClass: "card-title"
-  }, [_vm._v("Dispenser Reading History")])]);
+  }, [_vm._v("Tank Reading History")])]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
