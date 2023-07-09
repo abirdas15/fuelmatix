@@ -29,33 +29,25 @@ class ExpenseController extends Controller
             $file_path = $request->file('file')->getClientOriginalName();
             move_uploaded_file($file["tmp_name"], $destinationPath.'/'.$file_path);
         }
-        $expense = new Expense();
-        $expense->date = Carbon::now();
-        $expense->category_id = $inputData['category_id'];
-        $expense->amount = $inputData['amount'];
-        $expense->payment_id = $inputData['payment_id'];
-        $expense->file = $file_path;
-        $expense->remarks = $inputData['remarks'] ?? null;
-        if ($expense->save()) {
-            $data['transaction'] = [
-                ['date' => date('Y-m-d'), 'description' => $inputData['remarks'], 'account_id' => $inputData['payment_id'], 'debit_amount' => $inputData['amount'], 'credit_amount' => 0, 'type' => 'expenses', 'type_id' => $expense->id]
-            ];
-            $data['linked_id'] = $inputData['category_id'];
-            TransactionController::saveTransaction($data);
-            return response()->json(['status' => 200, 'message' => 'Successfully saved expense.']);
-        }
-        return response()->json(['status' => 500, 'message' => 'Cannot saved expense.']);
+        $data['transaction'] = [
+            ['date' => date('Y-m-d'), 'description' => $inputData['remarks'], 'account_id' => $inputData['payment_id'], 'debit_amount' => $inputData['amount'], 'credit_amount' => 0, 'module' => 'expense', 'file' => $file_path]
+        ];
+        $data['linked_id'] = $inputData['category_id'];
+        TransactionController::saveTransaction($data);
+        return response()->json(['status' => 200, 'message' => 'Successfully save expense.']);
     }
     public function list(Request $request)
     {
         $inputData = $request->all();
         $limit = isset($inputData['limit']) ? $inputData['limit'] : 10;
         $keyword = isset($inputData['keyword']) ? $inputData['keyword'] : '';
-        $order_by = isset($inputData['order_by']) ? $inputData['order_by'] : 'expense.id';
+        $order_by = isset($inputData['order_by']) ? $inputData['order_by'] : 'id';
         $order_mode = isset($inputData['order_mode']) ? $inputData['order_mode'] : 'DESC';
-        $result = Expense::select('expense.id', 'expense.date','expense.amount', 'c.category as expense', 'c1.category as payment')
-            ->leftJoin('categories as c', 'c.id', 'expense.category_id')
-            ->leftJoin('categories as c1', 'c1.id', 'expense.payment_id');
+        $result = Transaction::select('transactions.id', 'transactions.date', 'transactions.debit_amount as amount',  'c.category as expense', 'c1.category as payment')
+            ->leftJoin('categories as c', 'c.id', 'transactions.linked_id')
+            ->leftJoin('categories as c1', 'c1.id', 'transactions.account_id')
+            ->where('transactions.module', 'expense')
+            ->where('transactions.debit_amount', '>', 0);
         if (!empty($keyword)) {
             $result->where(function($q) use ($keyword) {
                 $q->where('c.category', 'LIKE', '%'.$keyword.'%');
@@ -78,7 +70,9 @@ class ExpenseController extends Controller
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
-        $result = Expense::find($inputData['id']);
+        $result = Transaction::select('id', 'debit_amount as amount', 'linked_id as category_id', 'account_id as payment_id', 'file', 'description as remarks')
+            ->where('id', $inputData['id'])
+            ->first();
         return response()->json(['status' => 200, 'data' => $result]);
     }
     public function update(Request $request)
@@ -93,11 +87,11 @@ class ExpenseController extends Controller
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
-        $expense = Expense::find($inputData['id']);
-        if ($expense == null) {
+        $transaction = Transaction::find($inputData['id']);
+        if ($transaction == null) {
             return response()->json(['status' => 500, 'error' => 'Cannot find expense.']);
         }
-        $file_path = $expense->file;
+        $file_path = $transaction->file;
         if ($request->file('file')) {
             $file = $_FILES;
             $file = $file['file'];
@@ -105,23 +99,13 @@ class ExpenseController extends Controller
             $file_path = $request->file('file')->getClientOriginalName();
             move_uploaded_file($file["tmp_name"], $destinationPath.'/'.$file_path);
         }
-        $expense->date = Carbon::now();
-        $expense->category_id = $inputData['category_id'];
-        $expense->amount = $inputData['amount'];
-        $expense->payment_id = $inputData['payment_id'];
-        $expense->file = $file_path;
-        $expense->remarks = $inputData['remarks'] ?? null;
-        if ($expense->save()) {
-            $transaction = Transaction::where('type_id', $inputData['id'])->first();
-            if ($transaction != null) {
-                $data['id'] = $transaction->id;
-                $data['debit_amount'] = $inputData['amount'];
-                $data['credit_amount'] = 0;
-                TransactionController::updateTransaction($data);
-            }
-            return response()->json(['status' => 200, 'message' => 'Successfully updated expense.']);
-        }
-        return response()->json(['status' => 500, 'message' => 'Cannot updated expense.']);
+        $data['id'] = $transaction->id;
+        $data['debit_amount'] = $inputData['amount'];
+        $data['credit_amount'] = 0;
+        $data['description'] = $inputData['remarks'];
+        $data['file'] = $file_path;
+        TransactionController::updateTransaction($data);
+        return response()->json(['status' => 200, 'message' => 'Successfully updated expense.']);
     }
     public function delete(Request $request)
     {
@@ -132,10 +116,9 @@ class ExpenseController extends Controller
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
-        Expense::where('id', $inputData['id'])->delete();
-        $transaction = Transaction::where('type_id', $inputData['id'])->first();
+        $transaction = Transaction::where('id', $inputData['id'])->first();
         if ($transaction != null) {
-            TransactionController::deleteTransaction($transaction->id);
+            TransactionController::deleteTransaction($inputData['id']);
         }
         return response()->json(['status' => 200, 'message' => 'Successfully deleted expenses.']);
     }

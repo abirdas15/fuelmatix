@@ -32,10 +32,10 @@ class TransactionController extends Controller
             $newTransaction->account_id = $transaction['account_id'];
             $newTransaction->debit_amount = $transaction['debit_amount'] ?? 0;
             $newTransaction->credit_amount = $transaction['credit_amount'] ?? 0;
+            $newTransaction->file = $transaction['file'] ?? null;
             $newTransaction->linked_id = $inputData['linked_id'];
             $newTransaction->added_by = Auth::user()->id;
-            $newTransaction->type = $transaction['type'] ?? null;
-            $newTransaction->type_id = $transaction['type_id'] ?? null;
+            $newTransaction->module = $transaction['module'] ?? 'accounting';
             if ($newTransaction->save()) {
                 $id = $newTransaction->id;
                 $category = Category::with('parent')->where('id', $newTransaction->account_id)->first();
@@ -63,12 +63,11 @@ class TransactionController extends Controller
                 $newTransaction->credit_amount = $transaction['debit_amount'] ?? 0;
                 $newTransaction->linked_id = $transaction['account_id'];
                 $newTransaction->added_by = Auth::user()->id;
-                $newTransaction->type = $transaction['type'] ?? null;
-                $newTransaction->type_id = $transaction['type_id'] ?? null;
-                $newTransaction->relation = $id;
+                $newTransaction->module = $transaction['module'] ?? 'accounting';
+                $newTransaction->parent_id = $id;
                 $newTransaction->save();
                 $previous = Transaction::find($id);
-                $previous->relation = $newTransaction->id;
+                $previous->parent_id = $newTransaction->id;
                 $previous->save();
 
                 $category = Category::with('parent')->where('id', $newTransaction->account_id)->first();
@@ -148,6 +147,8 @@ class TransactionController extends Controller
         $transaction = Transaction::find($inputData['id']);
         $transaction->debit_amount = $inputData['debit_amount'];
         $transaction->credit_amount = $inputData['credit_amount'];
+        $transaction->description = $inputData['description'] ?? null;
+        $transaction->file = $inputData['file'] ?? null;
         $credit_amount = $transaction->getOriginal('credit_amount') - $transaction->getAttribute('credit_amount');
         $debit_amount = $transaction->getOriginal('debit_amount') - $transaction->getAttribute('debit_amount');
         $transaction->save();
@@ -166,7 +167,7 @@ class TransactionController extends Controller
         }
         self::updateCategoryBalance($category, $balance);
 
-        $transaction = Transaction::where('relation', $inputData['id'])->first();
+        $transaction = Transaction::where('parent_id', $inputData['id'])->first();
         $transaction->debit_amount = $inputData['credit_amount'];
         $transaction->credit_amount = $inputData['debit_amount'];
         $credit_amount = $transaction->getOriginal('credit_amount') - $transaction->getAttribute('credit_amount');
@@ -206,7 +207,7 @@ class TransactionController extends Controller
         }
         self::updateCategoryBalance($category, $balance);
         Transaction::where('id', $transaction->id)->delete();
-        $transaction = Transaction::where('relation', $id)->first();
+        $transaction = Transaction::where('parent_id', $id)->first();
         $category = Category::with('parent')->where('id', $transaction->account_id)->first();
         $balance = 0;
         if ($category['type'] == 'expenses') {
