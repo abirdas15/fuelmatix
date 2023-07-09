@@ -2,10 +2,10 @@
     <div class="content-body">
         <div class="container-fluid">
             <div class="row page-titles">
-                <ol class="breadcrumb">
+                <ol class="breadcrumb align-items-center ">
                     <li class="breadcrumb-item active"><router-link :to="{name: 'Dashboard'}">Home</router-link></li>
                     <li class="breadcrumb-item"><a href="javascript:void(0)">Product List</a></li>
-                    <li style="margin-left: 66%;"><router-link :to="{name: 'ProductAdd'}"><i class="fa-solid fa-plus"></i> Add New Product</router-link></li>
+                    <li style="margin-left: auto;"><router-link :to="{name: 'ProductAdd'}"><i class="fa-solid fa-plus"></i> Add New Product</router-link></li>
                 </ol>
             </div>
             <div class="row">

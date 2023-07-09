@@ -33,9 +33,9 @@
                         <li><a href="./fuelRefillVoucher.html">Fuel Refill Voucher</a></li>
                         <li><a href="./refillHistroyDetails.html">Refill Histroy Details</a></li>
                         <li><router-link :to="{name: 'DispenserAdd'}">Add Dispenser</router-link></li>
-                        <li><router-link :to="{name: 'Dispenser'}" href="./dispenserList.html">Dispenser List</router-link></li>
-                        <li><a href="./dispenserReading.html">Dispenser Reading</a></li>
-                        <li><a href="./dispenserReadingHistory.html">Dispenser Reading History</a></li>
+                        <li><router-link :to="{name: 'Dispenser'}">Dispenser List</router-link></li>
+                        <li><router-link :to="{name: 'DispenserReadingAdd'}" >Dispenser Reading</router-link></li>
+                        <li><router-link :to="{name: 'DispenserReading'}">Dispenser Reading History</router-link></li>
                         <li><router-link :to="{name: 'NozzleAdd'}">Add Nozzle</router-link></li>
                         <li><router-link :to="{name: 'Nozzle'}">Nozzle List</router-link></li>
                         <li><router-link :to="{name: 'NozzleReadingAdd'}">Nozzle Reading</router-link></li>

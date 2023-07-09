@@ -2,7 +2,7 @@
     <div class="content-body">
         <div class="container-fluid">
             <div class="row page-titles">
-                <ol class="breadcrumb">
+                <ol class="breadcrumb align-items-center ">
                     <li class="breadcrumb-item active"><router-link :to="{name: 'Dashboard'}">Home</router-link></li>
                     <li class="breadcrumb-item active"><router-link :to="{name: 'NozzleReading'}">Nozzle Reading</router-link></li>
                     <li class="breadcrumb-item"><a href="javascript:void(0)">Add</a></li>
@@ -29,7 +29,7 @@
                                     </div>
                                     <div class="mb-3 form-group col-md-6">
                                         <label class="form-label">Date:</label>
-                                        <input type="text" class="form-control date" name="date">
+                                        <input type="text" class="form-control date bg-white" name="date">
                                         <div class="invalid-feedback"></div>
                                     </div>
                                     <div class="mb-3 form-group col-md-6">

@@ -2,7 +2,7 @@
     <div class="content-body">
         <div class="container-fluid">
             <div class="row page-titles">
-                <ol class="breadcrumb">
+                <ol class="breadcrumb align-items-center ">
                     <li class="breadcrumb-item active"><router-link :to="{name: 'Dashboard'}">Home</router-link></li>
                     <li class="breadcrumb-item active"><router-link :to="{name: 'Dispenser'}">Dispenser</router-link></li>
                     <li class="breadcrumb-item"><a href="javascript:void(0)">Edit</a></li>

@@ -2,9 +2,9 @@
     <div class="content-body">
         <div class="container-fluid">
             <div class="row page-titles">
-                <ol class="breadcrumb">
+                <ol class="breadcrumb align-items-center ">
                     <li class="breadcrumb-item active"><router-link :to="{name: 'Dashboard'}">Home</router-link></li>
-                    <li class="breadcrumb-item active"><router-link :to="{name: 'Dispenser'}">Dispenser</router-link></li>
+                    <li class="breadcrumb-item active"><router-link :to="{name: 'DispenserReading'}">Dispenser Reading</router-link></li>
                     <li class="breadcrumb-item"><a href="javascript:void(0)">Edit</a></li>
 
                 </ol>
@@ -13,33 +13,33 @@
             <div class="col-xl-12 col-lg-12">
                 <div class="card">
                     <div class="card-header">
-                        <h4 class="card-title">Dispenser</h4>
+                        <h4 class="card-title">Dispenser Reading Edit</h4>
                     </div>
                     <div class="card-body">
                         <div class="basic-form">
                             <form @submit.prevent="save">
                                 <div class="row">
                                     <div class="mb-3 form-group col-md-6">
-                                        <label class="form-label">Dispenser Name:</label>
-                                        <input type="text" class="form-control" name="dispenser_name" v-model="param.dispenser_name">
-                                        <div class="invalid-feedback"></div>
-                                    </div>
-                                    <div class="mb-3 form-group col-md-6">
-                                        <label class="form-label">Dispenser Brand:</label>
-                                        <input type="text" class="form-control" name="brand" v-model="param.brand">
-                                        <div class="invalid-feedback"></div>
-                                    </div>
-                                    <div class="mb-3 form-group col-md-6">
-                                        <label class="form-label">Serial:</label>
-                                        <input type="text" class="form-control" name="serial" v-model="param.serial">
-                                        <div class="invalid-feedback"></div>
-                                    </div>
-                                    <div class="mb-3 form-group col-md-6">
-                                        <label class="form-label">Select Product:</label>
-                                        <select class="form-control" name="product_id" id="product_id"  v-model="param.product_id">
-                                            <option value="">Select Product</option>
-                                            <option v-for="d in listData" :value="d.id">{{d.name}}</option>
+                                        <label class="form-label">Dispenser ID:</label>
+                                        <select class="form-control" name="dispenser_id" id="dispenser_id"  v-model="param.dispenser_id">
+                                            <option value="">Select Dispenser</option>
+                                            <option v-for="d in listData" :value="d.id">{{d.dispenser_name}}</option>
                                         </select>
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                    <div class="mb-3 form-group col-md-6">
+                                        <label class="form-label">Date:</label>
+                                        <input type="text" class="form-control date bg-white" name="date" v-model="param.date">
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                    <div class="mb-3 form-group col-md-6">
+                                        <label class="form-label">Reading:</label>
+                                        <input type="text" class="form-control" name="reading" v-model="param.reading">
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                    <div class="mb-3 form-group col-md-6">
+                                        <label class="form-label">Litter:</label>
+                                        <input type="text" class="form-control" name="litter" v-model="param.litter">
                                         <div class="invalid-feedback"></div>
                                     </div>
                                 </div>
@@ -50,7 +50,7 @@
                                     <div class="mb-3 col-md-6">
                                         <button type="submit" class="btn btn-primary" v-if="!loading">Submit</button>
                                         <button type="button" class="btn btn-primary" v-if="loading">Submitting...</button>
-                                        <router-link :to="{name: 'Dispenser'}" type="button" class="btn btn-primary">Cancel</router-link>
+                                        <router-link :to="{name: 'DispenserReading'}" type="button" class="btn btn-primary">Cancel</router-link>
                                     </div>
                                 </div>
                             </form>
@@ -76,7 +76,7 @@ export default {
     },
     methods: {
         getSingle: function () {
-            ApiService.POST(ApiRoutes.DispenserSingle, {id: this.id},res => {
+            ApiService.POST(ApiRoutes.DispenserReadingSingle, {id: this.id},res => {
                 if (parseInt(res.status) === 200) {
                     this.param = res.data
                 }
@@ -85,19 +85,19 @@ export default {
         save: function () {
             ApiService.ClearErrorHandler();
             this.loading = true
-            ApiService.POST(ApiRoutes.DispenserEdit, this.param,res => {
+            ApiService.POST(ApiRoutes.DispenserReadingEdit, this.param,res => {
                 this.loading = false
                 if (parseInt(res.status) === 200) {
                     this.$router.push({
-                        name: 'Dispenser'
+                        name: 'DispenserReading'
                     })
                 } else {
                     ApiService.ErrorHandler(res.errors);
                 }
             });
         },
-        getProduct: function () {
-            ApiService.POST(ApiRoutes.ProductList, {limit: 5000, page: 1},res => {
+        getDispenser: function () {
+            ApiService.POST(ApiRoutes.DispenserList, {limit: 5000, page: 1},res => {
                 this.TableLoading = false
                 if (parseInt(res.status) === 200) {
                     this.listData = res.data.data;
@@ -108,10 +108,21 @@ export default {
     created() {
         this.id = this.$route.params.id
         this.getSingle()
-        this.getProduct()
+        this.getDispenser()
     },
     mounted() {
-        $('#dashboard_bar').text('Dispenser Edit')
+        setTimeout(() => {
+            $('.date').flatpickr({
+                altInput: true,
+                altFormat: "d/m/Y",
+                dateFormat: "Y-m-d",
+                defaultDate: 'today',
+                onChange: (dateStr, date) => {
+                    this.param.date = date
+                }
+            })
+        }, 1000)
+        $('#dashboard_bar').text('Dispenser Reading Edit')
     }
 }
 </script>

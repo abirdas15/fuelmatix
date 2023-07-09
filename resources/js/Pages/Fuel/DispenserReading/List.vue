@@ -2,17 +2,17 @@
     <div class="content-body">
         <div class="container-fluid">
             <div class="row page-titles">
-                <ol class="breadcrumb">
+                <ol class="breadcrumb align-items-center ">
                     <li class="breadcrumb-item active"><router-link :to="{name: 'Dashboard'}">Home</router-link></li>
-                    <li class="breadcrumb-item"><a href="javascript:void(0)">Dispenser List</a></li>
-                    <li style="margin-left: 66%;"><router-link :to="{name: 'DispenserAdd'}"><i class="fa-solid fa-plus"></i> Add New Dispenser</router-link></li>
+                    <li class="breadcrumb-item"><a href="javascript:void(0)">Dispenser Reading List</a></li>
+                    <li style="margin-left: auto;"><router-link :to="{name: 'DispenserReadingAdd'}"><i class="fa-solid fa-plus"></i> New Dispenser Reading</router-link></li>
                 </ol>
             </div>
             <div class="row">
                 <div class="col-12">
                     <div class="card">
                         <div class="card-header bg-secondary">
-                            <h4 class="card-title">Dispenser List</h4>
+                            <h4 class="card-title">Dispenser Reading History</h4>
                         </div>
                         <div class="card-body">
                             <div class="row mt-4">
@@ -37,22 +37,20 @@
                                         <table class="display  dataTable no-footer" style="min-width: 845px">
                                             <thead>
                                             <tr class="text-white" style="background-color: #4886EE;color:#ffffff">
-                                                <th class="text-white" @click="sortData('serial')" :class="sortClass('serial')">Dispenser Serial</th>
-                                                <th class="text-white" @click="sortData('dispenser_name')" :class="sortClass('dispenser_name')">Dispenser Name</th>
-                                                <th class="text-white" @click="sortData('brand')" :class="sortClass('brand')">Dispenser Brand</th>
-                                                <th class="text-white" @click="sortData('product_name')" :class="sortClass('product_name')">Product Name</th>
+                                                <th class="text-white" @click="sortData('date')" :class="sortClass('date')">Date</th>
+                                                <th class="text-white" @click="sortData('dispenser_name')" :class="sortClass('dispenser_name')">Dispenser ID</th>
+                                                <th class="text-white" @click="sortData('reading')" :class="sortClass('reading')">Reading</th>
                                                 <th class="text-white" >Action</th>
                                             </tr>
                                             </thead>
                                             <tbody v-if="listData.length > 0 && TableLoading == false">
                                             <tr v-for="f in listData">
-                                                <td >{{f.serial}}</td>
+                                                <td >{{f.date}}</td>
                                                 <td><a href="javascript:void(0);">{{f.dispenser_name}}</a></td>
-                                                <td><a href="javascript:void(0);">{{f?.brand}}</a></td>
-                                                <td><a href="javascript:void(0);">{{f?.product_name}}</a></td>
+                                                <td><a href="javascript:void(0);">{{f?.reading}}</a></td>
                                                 <td>
                                                     <div class="d-flex justify-content-end">
-                                                        <router-link :to="{name: 'DispenserEdit', params: { id: f.id }}" class=" btn btn-primary shadow btn-xs sharp me-1">
+                                                        <router-link :to="{name: 'DispenserReadingEdit', params: { id: f.id }}" class=" btn btn-primary shadow btn-xs sharp me-1">
                                                             <i class="fas fa-pencil-alt"></i>
                                                         </router-link>
                                                         <a  href="javascript:void(0)"  @click="openModalDelete(f)" class="btn btn-danger shadow btn-xs sharp">
@@ -152,7 +150,7 @@ export default {
             }
             this.Param.page = page.page;
             this.TableLoading = true
-            ApiService.POST(ApiRoutes.DispenserList, this.Param,res => {
+            ApiService.POST(ApiRoutes.DispenserReadingList, this.Param,res => {
                 this.TableLoading = false
                 if (parseInt(res.status) === 200) {
                     this.paginateData = res.data;
@@ -163,7 +161,7 @@ export default {
             });
         },
         Delete: function (data) {
-            ApiService.POST(ApiRoutes.DispenserDelete, {id: data.id },res => {
+            ApiService.POST(ApiRoutes.DispenserReadingDelete, {id: data.id },res => {
                 if (parseInt(res.status) === 200) {
                     this.$toast.success(res.message);
                     this.list()
@@ -192,7 +190,7 @@ export default {
 
     },
     mounted() {
-        $('#dashboard_bar').text('Dispenser List')
+        $('#dashboard_bar').text('Dispenser Reading History')
     }
 }
 </script>
