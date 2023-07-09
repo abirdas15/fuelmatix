@@ -73,6 +73,18 @@ const ApiRoutes = {
     ExpenseDelete: ApiVersion + '/expense/delete',
     ExpenseList: ApiVersion + '/expense/list',
     ExpenseSingle: ApiVersion + '/expense/single',
+    //Tank
+    TankAdd: ApiVersion + '/tank/save',
+    TankEdit: ApiVersion + '/tank/update',
+    TankDelete: ApiVersion + '/tank/delete',
+    TankList: ApiVersion + '/tank/list',
+    TankSingle: ApiVersion + '/tank/single',
+    //Tank Reading
+    TankReadingAdd: ApiVersion + '/tank/reading/save',
+    TankReadingEdit: ApiVersion + '/tank/reading/update',
+    TankReadingDelete: ApiVersion + '/tank/reading/delete',
+    TankReadingList: ApiVersion + '/tank/reading/list',
+    TankReadingSingle: ApiVersion + '/tank/reading/single',
 
 };
 

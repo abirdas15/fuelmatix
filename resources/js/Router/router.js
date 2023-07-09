@@ -37,6 +37,12 @@ import Pos from "../Pages/Pos/Pos";
 import Expense from "../Pages/Expenses/List";
 import ExpenseAdd from "../Pages/Expenses/Add";
 import ExpenseEdit from "../Pages/Expenses/Edit";
+import Tank from "../Pages/Fuel/Tank/List";
+import TankAdd from "../Pages/Fuel/Tank/Add";
+import TankEdit from "../Pages/Fuel/Tank/Edit";
+import TankReading from "../Pages/Fuel/TankReading/List";
+import TankReadingAdd from "../Pages/Fuel/TankReading/Add";
+import TankReadingEdit from "../Pages/Fuel/TankReading/Edit";
 
 const ROOT_URL = "";
 const router = new VueRouter({
@@ -81,6 +87,12 @@ const router = new VueRouter({
                 { path: ROOT_URL + "/expense", name: "Expense", component: Expense},
                 { path: ROOT_URL + "/expense/add", name: "ExpenseAdd", component: ExpenseAdd},
                 { path: ROOT_URL + "/expense/edit/:id", name: "ExpenseEdit", component: ExpenseEdit},
+                { path: ROOT_URL + "/tank", name: "Tank", component: Tank},
+                { path: ROOT_URL + "/tank/add", name: "TankAdd", component: TankAdd},
+                { path: ROOT_URL + "/tank/edit/:id", name: "TankEdit", component: TankEdit},
+                { path: ROOT_URL + "/tank/reading", name: "TankReading", component: TankReading},
+                { path: ROOT_URL + "/tank/reading/add", name: "TankReadingAdd", component: TankReadingAdd},
+                { path: ROOT_URL + "/tank/reading/edit/:id", name: "TankReadingEdit", component: TankReadingEdit},
             ],
         },
     ],
