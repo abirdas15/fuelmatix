@@ -57,18 +57,23 @@ class TankController extends Controller
         $keyword = isset($inputData['keyword']) ? $inputData['keyword'] : '';
         $order_by = isset($inputData['order_by']) ? $inputData['order_by'] : 'id';
         $order_mode = isset($inputData['order_mode']) ? $inputData['order_mode'] : 'DESC';
-        $result = Tank::select('tank.id' ,'tank.tank_name', 'tank.height', DB::raw('MAX(tank_log.id) as tank_log_id'), 'tank.capacity', 'tank_log.height as tank_log_height', 'tank_log.water_height as tank_log_water_height')
-            ->leftJoin('tank_log' ,function ($q) {
-                $q->on('tank_log.tank_id', '=', 'tank.id');
-                $q->orderBy('tank_log.id', 'DESC');
-                $q->groupBy('tank_log.tank_id');
+        $count = Tank::count();
+        $result = Tank::select('tank.id' ,'tank.tank_name', 'tank.height', 'tank.capacity')
+            ->with('last_reading', function($query) use ($count) {
+                return $query->select('id', 'tank_id', 'height', 'water_height')->orderBy('id', 'DESC')->take($count);
             });
-        $result = $result->groupBy('tank_log.tank_id')
+        $result = $result->orderBy($order_by, $order_mode)
             ->paginate($limit);
         foreach ($result as &$data) {
-            $data['percent'] = 0;
-            if ($data['capacity'] > 0 && $data['tank_log_height'] > 0) {
-                $data['percent'] = number_format(($data['tank_log_height'] / $data['capacity']) * 100, 2);
+            $data['fuel_percent'] = 0;
+            $data['water_percent'] = 0;
+            if ($data['last_reading'] != null) {
+                if ($data['capacity'] > 0 && $data['last_reading']['height'] > 0) {
+                    $data['fuel_percent'] = number_format(($data['last_reading']['height'] / $data['capacity']) * 100, 2);
+                }
+                if ($data['capacity'] > 0 && $data['last_reading']['water_height'] > 0) {
+                    $data['water_percent'] = number_format(($data['last_reading']['water_height'] / $data['capacity']) * 100, 2);
+                }
             }
         }
         return response()->json(['status' => 200, 'data' => $result]);

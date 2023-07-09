@@ -12,6 +12,6 @@ class Tank extends Model
     public $timestamps = false;
     public function last_reading()
     {
-        return $this->hasOne(TankLog::class, 'tank_id', 'id')->latest();
+        return $this->hasOne(TankLog::class, 'tank_id', 'id');
     }
 }
