@@ -57,11 +57,20 @@ class TankController extends Controller
         $keyword = isset($inputData['keyword']) ? $inputData['keyword'] : '';
         $order_by = isset($inputData['order_by']) ? $inputData['order_by'] : 'id';
         $order_mode = isset($inputData['order_mode']) ? $inputData['order_mode'] : 'DESC';
-        $result = Tank::select('tank.id' ,'tank.tank_name', 'tank.height', 'tank.capacity', 'tank_log.height as tank_log_height', 'tank_log.water_height as tank_log_water_height')
-            ->leftJoin('tank_log', 'tank_log.tank_id', '=', 'tank.id');
-        $result = $result->orderBy('tank_log.id', 'DESC')
-            ->groupBy('tank.id')
+        $result = Tank::select('tank.id' ,'tank.tank_name', 'tank.height', DB::raw('MAX(tank_log.id) as tank_log_id'), 'tank.capacity', 'tank_log.height as tank_log_height', 'tank_log.water_height as tank_log_water_height')
+            ->leftJoin('tank_log' ,function ($q) {
+                $q->on('tank_log.tank_id', '=', 'tank.id');
+                $q->orderBy('tank_log.id', 'DESC');
+                $q->groupBy('tank_log.tank_id');
+            });
+        $result = $result->groupBy('tank_log.tank_id')
             ->paginate($limit);
+        foreach ($result as &$data) {
+            $data['percent'] = 0;
+            if ($data['capacity'] > 0 && $data['tank_log_height'] > 0) {
+                $data['percent'] = number_format(($data['tank_log_height'] / $data['capacity']) * 100, 2);
+            }
+        }
         return response()->json(['status' => 200, 'data' => $result]);
     }
     public function single(Request $request)
