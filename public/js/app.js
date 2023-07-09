@@ -4369,6 +4369,12 @@ __webpack_require__.r(__webpack_exports__);
     };
   },
   methods: {
+    disableInput: function disableInput(id) {
+      $('#' + id).prop('readonly', true);
+    },
+    enableInput: function enableInput(id) {
+      $('#' + id).prop('readonly', false);
+    },
     calculateLineProgress: function calculateLineProgress() {
       var _this$listData;
       var progress = 100;
@@ -5114,7 +5120,12 @@ var staticRenderFns = [function () {
     attrs: {
       href: "javascript:void(0)"
     }
-  }, [_c("h2", [_vm._v("Fuelmatix")])])]);
+  }, [_c("img", {
+    attrs: {
+      src: "/images/fuelBL.jpeg",
+      alt: ""
+    }
+  })])]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
@@ -12570,10 +12581,10 @@ var render = function render() {
   }, [_vm._v("\n                                                    " + _vm._s(_vm.listDispenser.shift_sale.product_name))])]), _vm._v(" "), _c("div", {
     staticClass: "card-body"
   }, [_c("div", {
-    staticClass: "row"
+    staticClass: "row align-items-center text-start"
   }, [_vm._m(2), _vm._v(" "), _c("div", {
     staticClass: "mb-3 col-md-3"
-  }, [_c("input", {
+  }, [_c("label", [_vm._v("Previous Reading ")]), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -12583,12 +12594,19 @@ var render = function render() {
     staticClass: "form-control",
     attrs: {
       disabled: _vm.listDispenser.shift_sale.status == "end",
+      id: "prReading",
       type: "text"
     },
     domProps: {
       value: _vm.listDispenser.shift_sale.start_reading
     },
     on: {
+      blur: function blur($event) {
+        return _vm.disableInput("prReading");
+      },
+      click: function click($event) {
+        return _vm.enableInput("prReading");
+      },
       input: [function ($event) {
         if ($event.target.composing) return;
         _vm.$set(_vm.listDispenser.shift_sale, "start_reading", $event.target.value);
@@ -12598,7 +12616,7 @@ var render = function render() {
     }
   })]), _vm._v(" "), _c("div", {
     staticClass: "mb-3 col-md-3"
-  }, [_c("input", {
+  }, [_c("label", [_vm._v("Final Reading ")]), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -12608,12 +12626,19 @@ var render = function render() {
     staticClass: "form-control",
     attrs: {
       disabled: _vm.listDispenser.shift_sale.status == "start",
+      id: "frReading",
       type: "text"
     },
     domProps: {
       value: _vm.listDispenser.shift_sale.end_reading
     },
     on: {
+      blur: function blur($event) {
+        return _vm.disableInput("frReading");
+      },
+      click: function click($event) {
+        return _vm.enableInput("frReading");
+      },
       input: [function ($event) {
         if ($event.target.composing) return;
         _vm.$set(_vm.listDispenser.shift_sale, "end_reading", $event.target.value);
@@ -12623,7 +12648,7 @@ var render = function render() {
     }
   })]), _vm._v(" "), _c("div", {
     staticClass: "mb-3 col-md-2"
-  }, [_c("input", {
+  }, [_c("label", [_vm._v("Consumption ")]), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -12632,12 +12657,19 @@ var render = function render() {
     }],
     staticClass: "form-control",
     attrs: {
-      type: "text"
+      type: "text",
+      id: "consumption"
     },
     domProps: {
       value: _vm.listDispenser.shift_sale.consumption
     },
     on: {
+      blur: function blur($event) {
+        return _vm.disableInput("consumption");
+      },
+      click: function click($event) {
+        return _vm.enableInput("consumption");
+      },
       input: function input($event) {
         if ($event.target.composing) return;
         _vm.$set(_vm.listDispenser.shift_sale, "consumption", $event.target.value);
@@ -12645,7 +12677,7 @@ var render = function render() {
     }
   })]), _vm._v(" "), _c("div", {
     staticClass: "mb-3 col-md-2"
-  }, [_c("input", {
+  }, [_c("label", [_vm._v("Amount ")]), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -12677,14 +12709,16 @@ var render = function render() {
       staticClass: "card-body"
     }, _vm._l(d.nozzle, function (n, nIndex) {
       return _c("div", {
-        staticClass: "row"
+        staticClass: "row align-items-center text-start"
       }, [_c("div", {
-        staticClass: "mb-3 col-md-2"
+        staticClass: "col-md-2"
       }, [_c("label", {
         staticClass: "form-label"
-      }, [_c("p", [_vm._v(_vm._s(n.name))])])]), _vm._v(" "), _c("div", {
+      }, [_c("p", {
+        staticClass: "m-0"
+      }, [_vm._v(_vm._s(n.name))])])]), _vm._v(" "), _c("div", {
         staticClass: "mb-3 col-md-3"
-      }, [_c("input", {
+      }, [_c("label", [_vm._v("Previous Reading ")]), _vm._v(" "), _c("input", {
         directives: [{
           name: "model",
           rawName: "v-model",
@@ -12694,12 +12728,19 @@ var render = function render() {
         staticClass: "form-control",
         attrs: {
           type: "text",
-          disabled: _vm.listDispenser.shift_sale.status == "end"
+          disabled: _vm.listDispenser.shift_sale.status == "end",
+          id: "prReading" + nIndex + dIndex
         },
         domProps: {
           value: n.start_reading
         },
         on: {
+          blur: function blur($event) {
+            return _vm.disableInput("prReading" + nIndex + dIndex);
+          },
+          click: function click($event) {
+            return _vm.enableInput("prReading" + nIndex + dIndex);
+          },
           input: [function ($event) {
             if ($event.target.composing) return;
             _vm.$set(n, "start_reading", $event.target.value);
@@ -12709,7 +12750,7 @@ var render = function render() {
         }
       })]), _vm._v(" "), _c("div", {
         staticClass: "mb-3 col-md-3"
-      }, [_c("input", {
+      }, [_c("label", [_vm._v("Final Reading ")]), _vm._v(" "), _c("input", {
         directives: [{
           name: "model",
           rawName: "v-model",
@@ -12719,12 +12760,19 @@ var render = function render() {
         staticClass: "form-control",
         attrs: {
           type: "text",
-          disabled: _vm.listDispenser.shift_sale.status == "start"
+          disabled: _vm.listDispenser.shift_sale.status == "start",
+          id: "frReading" + nIndex + dIndex
         },
         domProps: {
           value: n.end_reading
         },
         on: {
+          blur: function blur($event) {
+            return _vm.disableInput("frReading" + nIndex + dIndex);
+          },
+          click: function click($event) {
+            return _vm.enableInput("frReading" + nIndex + dIndex);
+          },
           input: [function ($event) {
             if ($event.target.composing) return;
             _vm.$set(n, "end_reading", $event.target.value);
@@ -12734,7 +12782,7 @@ var render = function render() {
         }
       })]), _vm._v(" "), _c("div", {
         staticClass: "mb-3 col-md-2"
-      }, [_c("input", {
+      }, [_c("label", [_vm._v("Consumption ")]), _vm._v(" "), _c("input", {
         directives: [{
           name: "model",
           rawName: "v-model",
@@ -12743,12 +12791,19 @@ var render = function render() {
         }],
         staticClass: "form-control",
         attrs: {
-          type: "text"
+          type: "text",
+          id: "consumption" + nIndex + dIndex
         },
         domProps: {
           value: n.consumption
         },
         on: {
+          blur: function blur($event) {
+            return _vm.disableInput("consumption" + nIndex + dIndex);
+          },
+          click: function click($event) {
+            return _vm.enableInput("consumption" + nIndex + dIndex);
+          },
           input: function input($event) {
             if ($event.target.composing) return;
             _vm.$set(n, "consumption", $event.target.value);
@@ -12756,7 +12811,7 @@ var render = function render() {
         }
       })]), _vm._v(" "), _c("div", {
         staticClass: "mb-3 col-md-2"
-      }, [_c("input", {
+      }, [_c("label", [_vm._v("Amount ")]), _vm._v(" "), _c("input", {
         directives: [{
           name: "model",
           rawName: "v-model",
@@ -12824,10 +12879,12 @@ var staticRenderFns = [function () {
   var _vm = this,
     _c = _vm._self._c;
   return _c("div", {
-    staticClass: "mb-3 col-md-2"
+    staticClass: "col-md-2"
   }, [_c("label", {
     staticClass: "form-label"
-  }, [_c("p", [_vm._v("Oll Stock ")])])]);
+  }, [_c("p", {
+    staticClass: "m-0"
+  }, [_vm._v("Oll Stock ")])])]);
 }];
 render._withStripped = true;
 

@@ -8,15 +8,15 @@
     <meta name="author" content="" />
     <meta name="robots" content="" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content="Fillow : Fillow Saas Admin  Bootstrap 5 Template" />
-    <meta property="og:title" content="Fillow : Fillow Saas Admin  Bootstrap 5 Template" />
-    <meta property="og:description" content="Fillow : Fillow Saas Admin  Bootstrap 5 Template" />
-    <meta property="og:image" content="https:/fillow.dexignlab.com/xhtml/social-image.png" />
+    <meta name="description" content="Fuelmatix" />
+    <meta property="og:title" content="Fuelmatix" />
+    <meta property="og:description" content="Fuelmatix" />
+    <meta property="og:image" content="{{asset('images/favicon.ico')}}" />
     <meta name="format-detection" content="telephone=no" />
 
-    <title>FuelMetrics</title>
+    <title>FuelMatix</title>
 
-    <link rel="shortcut icon" type="image/png" href="images/favicon.png" />
+    <link rel="shortcut icon" type="image/png" href="{{asset('images/favicon.ico')}}" />
     <link href="{{ asset('vendor/jquery-nice-select/css/nice-select.css') }}" rel="stylesheet" />
     <link href="{{ asset('vendor/owl-carousel/owl.carousel.css') }}" rel="stylesheet" />
     <link href="{{ asset('vendor/datatables/css/jquery.dataTables.min.css') }}" rel="stylesheet">

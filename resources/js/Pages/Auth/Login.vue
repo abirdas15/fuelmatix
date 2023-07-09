@@ -8,7 +8,9 @@
                             <div class="col-xl-12">
                                 <div class="auth-form">
                                     <div class="text-center mb-3">
-                                        <a href="javascript:void(0)"><h2>Fuelmatix</h2></a>
+                                        <a href="javascript:void(0)">
+                                            <img src="/images/fuelBL.jpeg"alt="">
+                                        </a>
                                     </div>
                                     <h4 class="text-center mb-4">Sign in your account</h4>
                                     <form @submit.prevent="Login">

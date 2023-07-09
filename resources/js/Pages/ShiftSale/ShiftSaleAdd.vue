@@ -40,32 +40,36 @@
                                                         {{ listDispenser.shift_sale.product_name }}</h5>
                                                 </div>
                                                 <div class="card-body">
-                                                    <div class="row">
-                                                        <div class="mb-3 col-md-2">
+                                                    <div class="row align-items-center text-start">
+                                                        <div class="col-md-2">
                                                             <label class="form-label">
-                                                                <p>Oll Stock </p>
+                                                                <p class="m-0">Oll Stock </p>
                                                             </label>
 
                                                         </div>
                                                         <div class="mb-3 col-md-3">
-                                                            <input :disabled="listDispenser.shift_sale.status == 'end'"
-                                                                   type="text" class="form-control"
+                                                            <label>Previous Reading </label>
+                                                            <input :disabled="listDispenser.shift_sale.status == 'end'" id="prReading" @blur="disableInput('prReading')"
+                                                                   type="text" class="form-control" @click="enableInput('prReading')"
                                                                    v-model="listDispenser.shift_sale.start_reading"
                                                                    @input="listDispenser.shift_sale.status == 'end' ? calculateAmount() : ''">
                                                         </div>
                                                         <div class="mb-3 col-md-3">
+                                                            <label>Final Reading </label>
                                                             <input
-                                                                :disabled="listDispenser.shift_sale.status == 'start'"
-                                                                type="text" class="form-control"
+                                                                :disabled="listDispenser.shift_sale.status == 'start'" id="frReading" @blur="disableInput('frReading')"
+                                                                type="text" class="form-control"  @click="enableInput('frReading')"
                                                                 v-model="listDispenser.shift_sale.end_reading"
                                                                 @input="listDispenser.shift_sale.status == 'end' ? calculateAmount() : ''">
                                                         </div>
 
                                                         <div class="mb-3 col-md-2">
-                                                            <input type="text" class="form-control"
+                                                            <label>Consumption </label>
+                                                            <input type="text" class="form-control" id="consumption" @blur="disableInput('consumption')"  @click="enableInput('consumption')"
                                                                    v-model="listDispenser.shift_sale.consumption">
                                                         </div>
                                                         <div class="mb-3 col-md-2">
+                                                            <label>Amount </label>
                                                             <input type="text" class="form-control" disabled
                                                                    v-model="listDispenser.shift_sale.amount">
                                                         </div>
@@ -78,30 +82,35 @@
                                                     <h5 class="card-title">{{ d.dispenser_name }}</h5>
                                                 </div>
                                                 <div class="card-body" v-if="d.nozzle.length > 0">
-                                                    <div class="row" v-for="(n, nIndex) in d.nozzle">
-                                                        <div class="mb-3 col-md-2">
+                                                    <div class="row align-items-center text-start" v-for="(n, nIndex) in d.nozzle">
+                                                        <div class=" col-md-2">
                                                             <label class="form-label">
-                                                                <p>{{ n.name }}</p>
+                                                                <p class="m-0">{{ n.name }}</p>
                                                             </label>
                                                         </div>
                                                         <div class="mb-3 col-md-3">
+                                                            <label>Previous Reading </label>
                                                             <input type="text" class="form-control"
-                                                                   :disabled="listDispenser.shift_sale.status == 'end'"
-                                                                   v-model="n.start_reading"
+                                                                   :disabled="listDispenser.shift_sale.status == 'end'" :id="'prReading'+nIndex+dIndex" @blur="disableInput('prReading'+nIndex+dIndex)"
+                                                                   v-model="n.start_reading" @click="enableInput('prReading'+nIndex+dIndex)"
                                                                    @input="listDispenser.shift_sale.status == 'end' ? calculateAmountNozzle(dIndex, nIndex) : ''">
                                                         </div>
                                                         <div class="mb-3 col-md-3">
+                                                            <label>Final Reading </label>
                                                             <input type="text" class="form-control"
-                                                                   :disabled="listDispenser.shift_sale.status == 'start'"
-                                                                   v-model="n.end_reading"
+                                                                   :disabled="listDispenser.shift_sale.status == 'start'" :id="'frReading'+nIndex+dIndex" @blur="disableInput('frReading'+nIndex+dIndex)"
+                                                                   v-model="n.end_reading" @click="enableInput('frReading'+nIndex+dIndex)"
                                                                    @input="listDispenser.shift_sale.status == 'end' ? calculateAmountNozzle(dIndex, nIndex) : ''">
                                                         </div>
 
                                                         <div class="mb-3 col-md-2">
-                                                            <input type="text" class="form-control"
+                                                            <label>Consumption </label>
+                                                            <input type="text" class="form-control" :id="'consumption'+nIndex+dIndex" @blur="disableInput('consumption'+nIndex+dIndex)"
+                                                                   @click="enableInput('consumption'+nIndex+dIndex)"
                                                                    v-model="n.consumption">
                                                         </div>
                                                         <div class="mb-3 col-md-2">
+                                                            <label>Amount </label>
                                                             <input type="text" class="form-control" disabled
                                                                    v-model="n.amount">
                                                         </div>
@@ -152,6 +161,12 @@ export default {
         }
     },
     methods: {
+        disableInput: function (id) {
+            $('#'+id).prop('readonly', true);
+        },
+        enableInput: function (id) {
+            $('#'+id).prop('readonly', false);
+        },
         calculateLineProgress: function () {
             let progress = 100
             let eachProgress = Math.round(progress / (this.listData?.length - 1))
