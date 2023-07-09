@@ -82,6 +82,13 @@ Route::group(['prefix' => 'dispenser'], function() {
     Route::post('single', [DispenserController::class, 'single']);
     Route::post('update', [DispenserController::class, 'update']);
     Route::post('delete', [DispenserController::class, 'delete']);
+    Route::group(['prefix' => 'reading'], function() {
+        Route::post('save', [DispenserController::class, 'readingSave']);
+        Route::post('list', [DispenserController::class, 'readingList']);
+        Route::post('single', [DispenserController::class, 'readingSingle']);
+        Route::post('update', [DispenserController::class, 'readingUpdate']);
+        Route::post('delete', [DispenserController::class, 'readingDelete']);
+    });
 });
 Route::group(['prefix' => 'nozzle'], function() {
     Route::post('save', [NozzleController::class, 'save']);
