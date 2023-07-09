@@ -18,6 +18,7 @@ use App\Http\Controllers\DispenserController;
 use App\Http\Controllers\NozzleController;
 use App\Http\Controllers\ShiftSaleController;
 use App\Http\Controllers\ExpenseController;
+use App\Http\Controllers\TankController;
 
 /*
 |--------------------------------------------------------------------------
@@ -113,6 +114,20 @@ Route::group(['prefix' => 'expense'], function() {
     Route::post('single', [ExpenseController::class, 'single']);
     Route::post('update', [ExpenseController::class, 'update']);
     Route::post('delete', [ExpenseController::class, 'delete']);
+});
+Route::group(['prefix' => 'tank'], function() {
+    Route::post('save', [TankController::class, 'save']);
+    Route::post('list', [TankController::class, 'list']);
+    Route::post('single', [TankController::class, 'single']);
+    Route::post('update', [TankController::class, 'update']);
+    Route::post('delete', [TankController::class, 'delete']);
+    Route::group(['prefix' => 'reading'], function() {
+        Route::post('save', [TankController::class, 'readingSave']);
+        Route::post('list', [TankController::class, 'readingList']);
+        Route::post('single', [TankController::class, 'readingSingle']);
+        Route::post('update', [TankController::class, 'readingUpdate']);
+        Route::post('delete', [TankController::class, 'readingDelete']);
+    });
 });
 
 
