@@ -57,8 +57,8 @@ class TankController extends Controller
         $keyword = isset($inputData['keyword']) ? $inputData['keyword'] : '';
         $order_by = isset($inputData['order_by']) ? $inputData['order_by'] : 'id';
         $order_mode = isset($inputData['order_mode']) ? $inputData['order_mode'] : 'DESC';
-        $result = TankLog::select('tank.id' ,'tank.tank_name', 'tank.height', 'tank.capacity', 'tank_log.height as tank_log_height', 'tank_log.water_height as tank_log_water_height')
-            ->leftJoin('tank', 'tank_log.tank_id', '=', 'tank.id');
+        $result = Tank::select('tank.id' ,'tank.tank_name', 'tank.height', 'tank.capacity', 'tank_log.height as tank_log_height', 'tank_log.water_height as tank_log_water_height')
+            ->leftJoin('tank_log', 'tank_log.tank_id', '=', 'tank.id');
         $result = $result->orderBy('tank_log.id', 'DESC')
             ->groupBy('tank.id')
             ->paginate($limit);
