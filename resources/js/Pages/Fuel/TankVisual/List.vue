@@ -15,25 +15,47 @@
                             <h4 class="card-title">Tank List</h4>
                         </div>
                         <div class="card-body">
+                            <div class="mt-3 mb-3">
+                                <div class="d-flex align-items-center">
+                                    <div class="text-height">Height</div>
+                                    <div class="line height"></div>
+                                </div>
+                                <div class="d-flex align-items-center">
+                                    <div class="text-capacity">Capacity</div>
+                                    <div class="line capacity"></div>
+                                </div>
+                                <div class="d-flex align-items-center">
+                                    <div class="text-fuel">Fuel</div>
+                                    <div class="line fuel"></div>
+                                </div>
+                                <div class="d-flex align-items-center">
+                                    <div class="text-water">Water</div>
+                                    <div class="line water"></div>
+                                </div>
+                            </div>
                             <div class="row mt-4">
                                 <div class="col-sm-4" v-for="f in listData">
                                     <div id="waterLevelDiags" class="water-tank">
                                         <div class="tank-height">
-                                            <div class="tank-attr">Tank Height</div>
-                                            <div class="height">500</div>
+                                            <div class="height">{{ f.height != null ? f.height : 'N/A' }}</div>
                                             <div class="height-line"></div>
                                         </div>
                                         <div class="tank-capacity">
-                                            <div class="tank-attr">Tank Capacity</div>
-                                            <div class="capacity">5000</div>
+                                            <div class="capacity">{{f.capacity}}</div>
                                             <div class="capacity-line"></div>
                                         </div>
                                         <div class="fuel-height">
-                                            <div class="fuel-capacity" style="bottom: 20%; height: 60%"></div>
-                                            <div class="water-capacity" style="bottom: 0; height: 20%"></div>
+                                            <div class="fuel-capacity" :style="{bottom: f.water_percent+'%', height: f.fuel_percent+'%'}">
+                                                <div class="fuel-attr">{{f.fuel_percent}}%</div>
+                                                <div class="fuel-line"></div>
+                                            </div>
+                                            <div class="water-capacity" :style="{bottom: 0, height: f.water_percent+'%'}">
+                                                <div class="water-attr">{{f.water_percent}}%</div>
+                                                <div class="water-line"></div>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div class="text-center fw-bold">
+                                    <div class="text-center mt-1 fw-bold">
                                         {{f.tank_name}}
                                     </div>
                                 </div>
@@ -169,9 +191,9 @@ export default {
         top: -21px;
         .height-line{
             height: 3px;
-            width: 130px;
+            width: 94px;
             background-image: linear-gradient(90deg, transparent, transparent 50%, #fff 50%, #fff 100%), linear-gradient(90deg, #369D6F, #369D6F, #369D6F, #369D6F, #369D6F);
-            background-size: 20px 3px, 100% 3px;
+            background-size: 12px 3px, 100% 3px;
             border: none;
         }
         .height{
@@ -192,16 +214,16 @@ export default {
         top: 1rem;
         .capacity-line{
             height: 3px;
-            width: 130px;
+            width: 100px;
             background-image: linear-gradient(90deg, transparent, transparent 50%, #fff 50%, #fff 100%), linear-gradient(90deg, red, red, red, red, red);
-            background-size: 20px 3px, 100% 3px;
+            background-size: 12px 3px, 100% 3px;
             border: none;
         }
         .capacity{
             color: red;
         }
         .tank-attr{
-            color: #red;
+            color: red;
             font-weight: bold;
             position: absolute;
             right: -7rem;
@@ -214,22 +236,87 @@ export default {
         bottom: 0;
         left: 0;
         right: 0;
+        text-align: center;
         .fuel-capacity{
             width: 100%;
             background-color: #FFC301;
             position: absolute;
             left: 0;
             right: 0;
+            text-align: center;
+            .fuel-line{
+                height: 2px;
+                width: 130px;
+                background-image: linear-gradient(90deg, transparent, transparent 50%, #fff 50%, #fff 100%), linear-gradient(90deg, #bf9201, #bf9201, #bf9201, #bf9201, #bf9201);
+                background-size: 14px 3px, 100% 3px;
+                border: none;
+                position: absolute;
+                top: -2px;
+            }
+            .fuel-attr{
+                color: #FFC301;
+                font-weight: bold;
+                position: absolute;
+                top: -12px;
+                right: -5.5rem;
+            }
         }
         .water-capacity{
             width: 100%;
-            background-color: #00B3FF;
+            background-color: #1fafed8c;
             position: absolute;
             left: 0;
             right: 0;
             border-bottom-left-radius: 8px;
             border-bottom-right-radius: 8px;
+            .water-line{
+                height: 2px;
+                width: 130px;
+                background-image: linear-gradient(90deg, transparent, transparent 50%, #fff 50%, #fff 100%), linear-gradient(90deg, #00B3FF, #00B3FF, #00B3FF, #00B3FF, #00B3FF);
+                background-size: 14px 3px, 100% 3px;
+                border: none;
+                position: absolute;
+                top: -2px;
+            }
+            .water-attr{
+                color: #00B3FF;
+                font-weight: bold;
+                position: absolute;
+                right: -5.5rem;
+                top: -12px;
+            }
         }
+    }
+}
+.text-height{
+    color: #369D6F;
+}
+.text-capacity{
+    color: red;
+}
+.text-fuel{
+    color: #bf9201;
+}
+.text-water{
+    color: #00B3FF;
+}
+.line{
+    height: 2px;
+    width: 80px;
+    background-size: 14px 3px, 100% 3px;
+    border: none;
+    margin-left: 20px;
+    &.height{
+        background-image: linear-gradient(90deg, transparent, transparent 50%, #fff 50%, #fff 100%), linear-gradient(90deg, #369D6F, #369D6F, #369D6F, #369D6F, #369D6F);
+    }
+    &.capacity{
+        background-image: linear-gradient(90deg, transparent, transparent 50%, #fff 50%, #fff 100%), linear-gradient(90deg, red, red, red, red, red);
+    }
+    &.fuel{
+        background-image: linear-gradient(90deg, transparent, transparent 50%, #fff 50%, #fff 100%), linear-gradient(90deg, #bf9201, #bf9201, #bf9201, #bf9201, #bf9201);
+    }
+    &.water{
+        background-image: linear-gradient(90deg, transparent, transparent 50%, #fff 50%, #fff 100%), linear-gradient(90deg, #00B3FF, #00B3FF, #00B3FF, #00B3FF, #00B3FF);
     }
 }
 </style>
