@@ -17,41 +17,41 @@
                         <div class="card-body">
                             <div class="mt-3 mb-3">
                                 <div class="d-flex align-items-center">
-                                    <div class="text-height">Height</div>
+                                    <div class="tt text-height">Height</div>
                                     <div class="line height"></div>
                                 </div>
                                 <div class="d-flex align-items-center">
-                                    <div class="text-capacity">Capacity</div>
+                                    <div class="tt text-capacity">Capacity</div>
                                     <div class="line capacity"></div>
                                 </div>
                                 <div class="d-flex align-items-center">
-                                    <div class="text-fuel">Fuel</div>
+                                    <div class="tt text-fuel">Fuel</div>
                                     <div class="line fuel"></div>
                                 </div>
                                 <div class="d-flex align-items-center">
-                                    <div class="text-water">Water</div>
+                                    <div class="tt text-water">Water</div>
                                     <div class="line water"></div>
                                 </div>
                             </div>
                             <div class="row mt-4">
-                                <div class="col-sm-4" v-for="f in listData">
+                                <div class="col-sm-4 mb-5" v-for="f in listData">
                                     <div id="waterLevelDiags" class="water-tank">
                                         <div class="tank-height">
                                             <div class="height">{{ f.height != null ? f.height : 'N/A' }}</div>
                                             <div class="height-line"></div>
                                         </div>
                                         <div class="tank-capacity">
-                                            <div class="capacity">{{f.capacity}}</div>
+                                            <div class="capacity">{{f.capacity != null ? f.capacity : 'N/A'}}</div>
                                             <div class="capacity-line"></div>
                                         </div>
                                         <div class="fuel-height">
                                             <div class="fuel-capacity" :style="{bottom: f.water_percent+'%', height: f.fuel_percent+'%'}">
-                                                <div class="fuel-attr">{{f.fuel_percent}}%</div>
-                                                <div class="fuel-line"></div>
+                                                <div class="fuel-attr" v-if="f.fuel_percent > 0">{{f.fuel_percent}}%</div>
+                                                <div class="fuel-line" v-if="f.fuel_percent > 0"></div>
                                             </div>
                                             <div class="water-capacity" :style="{bottom: 0, height: f.water_percent+'%'}">
-                                                <div class="water-attr">{{f.water_percent}}%</div>
-                                                <div class="water-line"></div>
+                                                <div class="water-attr" v-if="f.water_percent > 0">{{f.water_percent}}%</div>
+                                                <div class="water-line" v-if="f.water_percent > 0"></div>
                                             </div>
                                         </div>
                                     </div>
@@ -288,18 +288,22 @@ export default {
         }
     }
 }
-.text-height{
-    color: #369D6F;
+.tt{
+    width: 70px;
+    &.text-height{
+        color: #369D6F;
+    }
+    &.text-capacity{
+        color: red;
+    }
+    &.text-fuel{
+        color: #bf9201;
+    }
+    &.text-water{
+        color: #00B3FF;
+    }
 }
-.text-capacity{
-    color: red;
-}
-.text-fuel{
-    color: #bf9201;
-}
-.text-water{
-    color: #00B3FF;
-}
+
 .line{
     height: 2px;
     width: 80px;
