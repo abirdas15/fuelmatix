@@ -24,6 +24,8 @@ class NozzleController extends Controller
         $nozzle = new Nozzle();
         $nozzle->name = $inputData['name'];
         $nozzle->dispenser_id = $inputData['dispenser_id'];
+        $nozzle->opening_stock = $inputData['opening_stock'] ?? null;
+        $nozzle->client_company_id = $inputData['session_user']['client_company_id'];
         if ($nozzle->save()) {
             return response()->json(['status' => 200, 'message' => 'Successfully save nozzle.']);
         }
@@ -37,7 +39,8 @@ class NozzleController extends Controller
         $order_by = isset($inputData['order_by']) ? $inputData['order_by'] : 'id';
         $order_mode = isset($inputData['order_mode']) ? $inputData['order_mode'] : 'DESC';
         $result = Nozzle::select('nozzles.id', 'nozzles.name', 'dispensers.dispenser_name')
-            ->leftJoin('dispensers', 'dispensers.id', '=', 'nozzles.dispenser_id');
+            ->leftJoin('dispensers', 'dispensers.id', '=', 'nozzles.dispenser_id')
+            ->where('nozzles.client_company_id', $inputData['session_user']['client_company_id']);
         if (!empty($keyword)) {
             $result->where(function($q) use ($keyword) {
                 $q->where('nozzles.name', 'LIKE', '%'.$keyword.'%');
@@ -79,6 +82,7 @@ class NozzleController extends Controller
         }
         $nozzle->name = $inputData['name'];
         $nozzle->dispenser_id = $inputData['dispenser_id'];
+        $nozzle->opening_stock = $inputData['opening_stock'] ?? null;
         if ($nozzle->save()) {
             return response()->json(['status' => 200, 'message' => 'Successfully update nozzle.']);
         }
@@ -117,6 +121,7 @@ class NozzleController extends Controller
         $reading->date = $inputData['date'];
         $reading->nozzle_id = $inputData['nozzle_id'];
         $reading->reading = $inputData['reading'];
+        $reading->client_company_id = $inputData['session_user']['client_company_id'];
         if ($reading->save()) {
             return response()->json(['status' => 200, 'message' => 'Successfully save reading.']);
         }
@@ -130,7 +135,8 @@ class NozzleController extends Controller
         $order_by = isset($inputData['order_by']) ? $inputData['order_by'] : 'id';
         $order_mode = isset($inputData['order_mode']) ? $inputData['order_mode'] : 'DESC';
         $result = NozzleReading::select('nozzle_readings.id', 'nozzle_readings.date', 'nozzle_readings.reading', 'nozzles.name')
-            ->leftJoin('nozzles', 'nozzles.id', '=', 'nozzle_readings.nozzle_id');
+            ->leftJoin('nozzles', 'nozzles.id', '=', 'nozzle_readings.nozzle_id')
+            ->where('nozzle_readings.client_company_id', $inputData['session_user']['client_company_id']);
         if (!empty($keyword)) {
             $result->where(function($q) use ($keyword) {
                 $q->where('nozzles.name', 'LIKE', '%'.$keyword.'%');

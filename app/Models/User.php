@@ -46,6 +46,7 @@ class User extends Authenticatable
             'id' => $userInfo->id,
             'name' => $userInfo->name,
             'email' => $userInfo->email,
+            'client_company_id' => $userInfo->client_company_id,
             'permission' => []
         ];
     }

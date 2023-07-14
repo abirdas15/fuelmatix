@@ -18,7 +18,6 @@ class ProductController extends Controller
             'name' => 'required',
             'selling_price' => 'required',
             'type_id' => 'required',
-            'buying_price' => 'required',
             'unit' => 'required',
         ]);
         if ($validator->fails()) {
@@ -28,8 +27,10 @@ class ProductController extends Controller
         $product->name = $inputData['name'];
         $product->selling_price = $inputData['selling_price'];
         $product->type_id = $inputData['type_id'];
-        $product->buying_price = $inputData['buying_price'];
+        $product->buying_price = $inputData['buying_price'] ?? 0;
         $product->unit = $inputData['unit'];
+        $product->opening_stock = $inputData['opening_stock'] ?? null;
+        $product->client_company_id = $inputData['session_user']['client_company_id'];
         if ($product->save()) {
             return response()->json(['status' => 200, 'message' => 'Successfully save product.']);
         }
@@ -43,7 +44,8 @@ class ProductController extends Controller
         $order_by = isset($inputData['order_by']) ? $inputData['order_by'] : 'id';
         $order_mode = isset($inputData['order_mode']) ? $inputData['order_mode'] : 'DESC';
         $result = Product::select('products.*', 'product_types.name as product_type')
-            ->leftJoin('product_types', 'product_types.id', '=', 'products.type_id');
+            ->leftJoin('product_types', 'product_types.id', '=', 'products.type_id')
+            ->where('client_company_id', $inputData['session_user']['client_company_id']);
         if (!empty($keyword)) {
             $result->where(function($q) use ($keyword) {
                 $q->where('products.name', 'LIKE', '%'.$keyword.'%');
@@ -74,7 +76,6 @@ class ProductController extends Controller
         $validator = Validator::make($inputData, [
             'id' => 'required',
             'name' => 'required',
-            'selling_price' => 'required',
             'type_id' => 'required',
             'buying_price' => 'required',
             'unit' => 'required',
@@ -89,8 +90,9 @@ class ProductController extends Controller
         $product->name = $inputData['name'];
         $product->selling_price = $inputData['selling_price'];
         $product->type_id = $inputData['type_id'];
-        $product->buying_price = $inputData['buying_price'];
+        $product->buying_price = $inputData['buying_price'] ?? 0;
         $product->unit = $inputData['unit'];
+        $product->opening_stock = $inputData['opening_stock'] ?? null;
         if ($product->save()) {
             return response()->json(['status' => 200, 'message' => 'Successfully update product.']);
         }

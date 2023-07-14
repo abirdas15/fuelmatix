@@ -26,6 +26,8 @@ class DispenserController extends Controller
         $dispenser->dispenser_name = $inputData['dispenser_name'];
         $dispenser->brand = $inputData['brand'];
         $dispenser->serial = $inputData['serial'];
+        $dispenser->opening_stock = $inputData['opening_stock'] ?? null;
+        $dispenser->client_company_id = $inputData['session_user']['client_company_id'];
         if ($dispenser->save()) {
             return response()->json(['status' => 200, 'message' => 'Successfully save dispenser.']);
         }
@@ -39,7 +41,8 @@ class DispenserController extends Controller
         $order_by = isset($inputData['order_by']) ? $inputData['order_by'] : 'dispensers.id';
         $order_mode = isset($inputData['order_mode']) ? $inputData['order_mode'] : 'DESC';
         $result = Dispenser::select('dispensers.*', 'products.name as product_name')
-            ->leftJoin('products', 'products.id', '=', 'dispensers.product_id');
+            ->leftJoin('products', 'products.id', '=', 'dispensers.product_id')
+            ->where('dispensers.client_company_id', $inputData['session_user']['client_company_id']);
         if (!empty($keyword)) {
             $result->where(function($q) use ($keyword) {
                 $q->where('dispensers.dispenser_name', 'LIKE', '%'.$keyword.'%');
@@ -84,6 +87,7 @@ class DispenserController extends Controller
         $dispenser->dispenser_name = $inputData['dispenser_name'];
         $dispenser->brand = $inputData['brand'];
         $dispenser->serial = $inputData['serial'];
+        $dispenser->opening_stock = $inputData['opening_stock'] ?? null;
         if ($dispenser->save()) {
             return response()->json(['status' => 200, 'message' => 'Successfully update dispenser.']);
         }
@@ -121,6 +125,7 @@ class DispenserController extends Controller
         $reading->date = $inputData['date'];
         $reading->reading = $inputData['reading'];
         $reading->litter = $inputData['litter'] ?? null;
+        $reading->client_company_id = $inputData['session_user']['client_company_id'];
         if ($reading->save()) {
             return response()->json(['status' => 200, 'message' => 'Successfully saved dispenser reading.']);
         }
@@ -134,7 +139,8 @@ class DispenserController extends Controller
         $order_by = isset($inputData['order_by']) ? $inputData['order_by'] : 'id';
         $order_mode = isset($inputData['order_mode']) ? $inputData['order_mode'] : 'DESC';
         $result = DispenserReading::select('dispenser_reading.id', 'dispenser_reading.date', 'dispenser_reading.reading', 'dispensers.dispenser_name')
-            ->leftJoin('dispensers', 'dispensers.id', '=', 'dispenser_reading.dispenser_id');
+            ->leftJoin('dispensers', 'dispensers.id', '=', 'dispenser_reading.dispenser_id')
+            ->where('dispenser_reading.client_company_id', $inputData['session_user']['client_company_id']);
         if (!empty($keyword)) {
             $result->where(function($q) use ($keyword) {
                 $q->where('dispensers.dispenser_name', 'LIKE', '%'.$keyword.'%');
