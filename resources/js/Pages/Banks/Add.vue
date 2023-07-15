@@ -24,19 +24,6 @@
                                         <input type="text" class="form-control" name="name" v-model="param.name">
                                         <div class="invalid-feedback"></div>
                                     </div>
-                                    <div class="mb-3 form-group col-md-6">
-                                        <label class="form-label">Dispenser:</label>
-                                        <select class="form-control" name="dispenser_id" id="dispenser_id"  v-model="param.dispenser_id">
-                                            <option value="">Select Dispenser</option>
-                                            <option v-for="d in listData" :value="d.id">{{d.dispenser_name}}</option>
-                                        </select>
-                                        <div class="invalid-feedback"></div>
-                                    </div>
-                                    <div class="mb-3 form-group col-md-6">
-                                        <label class="form-label">Opening Stock:</label>
-                                        <input type="number" class="form-control" name="opening_stock" v-model="param.opening_stock">
-                                        <div class="invalid-feedback"></div>
-                                    </div>
                                 </div>
                                 <div class="row" style="text-align: right;">
                                     <div class="mb-3 col-md-6">
@@ -64,9 +51,7 @@ export default {
     data() {
         return {
             param: {
-                dispenser_id: '',
                 name: '',
-                opening_stock: '',
             },
             listParam: {
                 limit: 5000,
@@ -77,15 +62,6 @@ export default {
         }
     },
     methods: {
-        dispenserList: function () {
-            ApiService.POST(ApiRoutes.DispenserList, this.listParam,res => {
-                if (parseInt(res.status) === 200) {
-                    this.listData = res.data.data;
-                } else {
-                    ApiService.ErrorHandler(res.error);
-                }
-            });
-        },
         save: function () {
             ApiService.ClearErrorHandler();
             this.loading = true
@@ -102,7 +78,6 @@ export default {
         },
     },
     created() {
-        this.dispenserList()
     },
     mounted() {
         $('#dashboard_bar').text('Bank Add')

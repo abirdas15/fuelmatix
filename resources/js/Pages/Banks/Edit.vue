@@ -21,20 +21,7 @@
                                 <div class="row">
                                     <div class="mb-3 form-group col-md-6">
                                         <label class="form-label">Bank Name:</label>
-                                        <input type="text" class="form-control" name="dispenser_name" v-model="param.name">
-                                        <div class="invalid-feedback"></div>
-                                    </div>
-                                    <div class="mb-3 form-group col-md-6">
-                                        <label class="form-label">Dispenser:</label>
-                                        <select class="form-control" name="dispenser_id" id="dispenser_id"  v-model="param.dispenser_id">
-                                            <option value="">Select Dispenser</option>
-                                            <option v-for="d in listData" :value="d.id">{{d.dispenser_name}}</option>
-                                        </select>
-                                        <div class="invalid-feedback"></div>
-                                    </div>
-                                    <div class="mb-3 form-group col-md-6">
-                                        <label class="form-label">Opening Stock:</label>
-                                        <input type="number" class="form-control" name="opening_stock" v-model="param.opening_stock">
+                                        <input type="text" class="form-control" name="name" v-model="param.name">
                                         <div class="invalid-feedback"></div>
                                     </div>
                                 </div>
@@ -70,15 +57,6 @@ export default {
         }
     },
     methods: {
-        dispenserList: function () {
-            ApiService.POST(ApiRoutes.DispenserList, this.listParam,res => {
-                if (parseInt(res.status) === 200) {
-                    this.listData = res.data.data;
-                } else {
-                    ApiService.ErrorHandler(res.error);
-                }
-            });
-        },
         getSingle: function () {
             ApiService.POST(ApiRoutes.BankSingle, {id: this.id},res => {
                 if (parseInt(res.status) === 200) {
@@ -104,7 +82,6 @@ export default {
     created() {
         this.id = this.$route.params.id
         this.getSingle()
-        this.dispenserList()
     },
     mounted() {
         $('#dashboard_bar').text('Bank Edit')

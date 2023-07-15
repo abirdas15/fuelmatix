@@ -38,14 +38,12 @@
                                             <thead>
                                             <tr class="text-white" style="background-color: #4886EE;color:#ffffff">
                                                 <th class="text-white" @click="sortData('name')" :class="sortClass('name')">Bank Name</th>
-                                                <th class="text-white" @click="sortData('dispenser_name')" :class="sortClass('dispenser_name')">Dispenser Name</th>
                                                 <th class="text-white" >Action</th>
                                             </tr>
                                             </thead>
                                             <tbody v-if="listData.length > 0 && TableLoading == false">
                                             <tr v-for="f in listData">
                                                 <td >{{f.name}}</td>
-                                                <td><a href="javascript:void(0);">{{f.dispenser_name}}</a></td>
                                                 <td>
                                                     <div class="d-flex justify-content-end">
                                                         <router-link :to="{name: 'BankEdit', params: { id: f.id }}" class=" btn btn-primary shadow btn-xs sharp me-1">

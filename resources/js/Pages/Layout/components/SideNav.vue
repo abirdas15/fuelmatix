@@ -55,18 +55,18 @@
                     <span class="nav-text">Widget</span>
                 </a>
                 </li>
-                <li><a class="has-arrow " href="javascript:void()" aria-expanded="false">
+                <li><a class="has-arrow " href="javascript:void(0)" aria-expanded="false">
                     <i class="fa-solid fa-building-columns"></i>
                     <span class="nav-text">Banks</span>
                 </a>
                     <ul aria-expanded="false">
-                        <li><a href="./#">Bnaks </a></li>
+                        <li><router-link :to="{name: 'Bank'}">Bnaks </router-link></li>
                         <li><a href="./#">Personal Accounts</a></li>
                         <li><a href="./#">Transfer</a></li>
                         <li><a href="./#">Transaction</a></li>
                     </ul>
                 </li>
-                <li><a class="has-arrow " href="javascript:void()" aria-expanded="false">
+                <li><a class="has-arrow " href="javascript:void(0)" aria-expanded="false">
                     <i class="	fas fa-users"></i>
                     <span class="nav-text">Field</span>
                 </a>

@@ -2283,9 +2283,7 @@ __webpack_require__.r(__webpack_exports__);
   data: function data() {
     return {
       param: {
-        dispenser_id: '',
-        name: '',
-        opening_stock: ''
+        name: ''
       },
       listParam: {
         limit: 5000,
@@ -2296,24 +2294,14 @@ __webpack_require__.r(__webpack_exports__);
     };
   },
   methods: {
-    dispenserList: function dispenserList() {
-      var _this = this;
-      _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].DispenserList, this.listParam, function (res) {
-        if (parseInt(res.status) === 200) {
-          _this.listData = res.data.data;
-        } else {
-          _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].ErrorHandler(res.error);
-        }
-      });
-    },
     save: function save() {
-      var _this2 = this;
+      var _this = this;
       _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].ClearErrorHandler();
       this.loading = true;
       _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].BankAdd, this.param, function (res) {
-        _this2.loading = false;
+        _this.loading = false;
         if (parseInt(res.status) === 200) {
-          _this2.$router.push({
+          _this.$router.push({
             name: 'Bank'
           });
         } else {
@@ -2322,9 +2310,7 @@ __webpack_require__.r(__webpack_exports__);
       });
     }
   },
-  created: function created() {
-    this.dispenserList();
-  },
+  created: function created() {},
   mounted: function mounted() {
     $('#dashboard_bar').text('Bank Add');
   }
@@ -2355,34 +2341,24 @@ __webpack_require__.r(__webpack_exports__);
     };
   },
   methods: {
-    dispenserList: function dispenserList() {
-      var _this = this;
-      _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].DispenserList, this.listParam, function (res) {
-        if (parseInt(res.status) === 200) {
-          _this.listData = res.data.data;
-        } else {
-          _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].ErrorHandler(res.error);
-        }
-      });
-    },
     getSingle: function getSingle() {
-      var _this2 = this;
+      var _this = this;
       _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].BankSingle, {
         id: this.id
       }, function (res) {
         if (parseInt(res.status) === 200) {
-          _this2.param = res.data;
+          _this.param = res.data;
         }
       });
     },
     save: function save() {
-      var _this3 = this;
+      var _this2 = this;
       _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].ClearErrorHandler();
       this.loading = true;
       _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].BankEdit, this.param, function (res) {
-        _this3.loading = false;
+        _this2.loading = false;
         if (parseInt(res.status) === 200) {
-          _this3.$router.push({
+          _this2.$router.push({
             name: 'Bank'
           });
         } else {
@@ -2394,7 +2370,6 @@ __webpack_require__.r(__webpack_exports__);
   created: function created() {
     this.id = this.$route.params.id;
     this.getSingle();
-    this.dispenserList();
   },
   mounted: function mounted() {
     $('#dashboard_bar').text('Bank Edit');
@@ -6599,72 +6574,6 @@ var render = function render() {
     }
   }), _vm._v(" "), _c("div", {
     staticClass: "invalid-feedback"
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 form-group col-md-6"
-  }, [_c("label", {
-    staticClass: "form-label"
-  }, [_vm._v("Dispenser:")]), _vm._v(" "), _c("select", {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: _vm.param.dispenser_id,
-      expression: "param.dispenser_id"
-    }],
-    staticClass: "form-control",
-    attrs: {
-      name: "dispenser_id",
-      id: "dispenser_id"
-    },
-    on: {
-      change: function change($event) {
-        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
-          return o.selected;
-        }).map(function (o) {
-          var val = "_value" in o ? o._value : o.value;
-          return val;
-        });
-        _vm.$set(_vm.param, "dispenser_id", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
-      }
-    }
-  }, [_c("option", {
-    attrs: {
-      value: ""
-    }
-  }, [_vm._v("Select Dispenser")]), _vm._v(" "), _vm._l(_vm.listData, function (d) {
-    return _c("option", {
-      domProps: {
-        value: d.id
-      }
-    }, [_vm._v(_vm._s(d.dispenser_name))]);
-  })], 2), _vm._v(" "), _c("div", {
-    staticClass: "invalid-feedback"
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 form-group col-md-6"
-  }, [_c("label", {
-    staticClass: "form-label"
-  }, [_vm._v("Opening Stock:")]), _vm._v(" "), _c("input", {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: _vm.param.opening_stock,
-      expression: "param.opening_stock"
-    }],
-    staticClass: "form-control",
-    attrs: {
-      type: "number",
-      name: "opening_stock"
-    },
-    domProps: {
-      value: _vm.param.opening_stock
-    },
-    on: {
-      input: function input($event) {
-        if ($event.target.composing) return;
-        _vm.$set(_vm.param, "opening_stock", $event.target.value);
-      }
-    }
-  }), _vm._v(" "), _c("div", {
-    staticClass: "invalid-feedback"
   })])]), _vm._v(" "), _c("div", {
     staticClass: "row",
     staticStyle: {
@@ -6787,7 +6696,7 @@ var render = function render() {
     staticClass: "form-control",
     attrs: {
       type: "text",
-      name: "dispenser_name"
+      name: "name"
     },
     domProps: {
       value: _vm.param.name
@@ -6796,72 +6705,6 @@ var render = function render() {
       input: function input($event) {
         if ($event.target.composing) return;
         _vm.$set(_vm.param, "name", $event.target.value);
-      }
-    }
-  }), _vm._v(" "), _c("div", {
-    staticClass: "invalid-feedback"
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 form-group col-md-6"
-  }, [_c("label", {
-    staticClass: "form-label"
-  }, [_vm._v("Dispenser:")]), _vm._v(" "), _c("select", {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: _vm.param.dispenser_id,
-      expression: "param.dispenser_id"
-    }],
-    staticClass: "form-control",
-    attrs: {
-      name: "dispenser_id",
-      id: "dispenser_id"
-    },
-    on: {
-      change: function change($event) {
-        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
-          return o.selected;
-        }).map(function (o) {
-          var val = "_value" in o ? o._value : o.value;
-          return val;
-        });
-        _vm.$set(_vm.param, "dispenser_id", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
-      }
-    }
-  }, [_c("option", {
-    attrs: {
-      value: ""
-    }
-  }, [_vm._v("Select Dispenser")]), _vm._v(" "), _vm._l(_vm.listData, function (d) {
-    return _c("option", {
-      domProps: {
-        value: d.id
-      }
-    }, [_vm._v(_vm._s(d.dispenser_name))]);
-  })], 2), _vm._v(" "), _c("div", {
-    staticClass: "invalid-feedback"
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 form-group col-md-6"
-  }, [_c("label", {
-    staticClass: "form-label"
-  }, [_vm._v("Opening Stock:")]), _vm._v(" "), _c("input", {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: _vm.param.opening_stock,
-      expression: "param.opening_stock"
-    }],
-    staticClass: "form-control",
-    attrs: {
-      type: "number",
-      name: "opening_stock"
-    },
-    domProps: {
-      value: _vm.param.opening_stock
-    },
-    on: {
-      input: function input($event) {
-        if ($event.target.composing) return;
-        _vm.$set(_vm.param, "opening_stock", $event.target.value);
       }
     }
   }), _vm._v(" "), _c("div", {
@@ -7059,21 +6902,9 @@ var render = function render() {
       }
     }
   }, [_vm._v("Bank Name")]), _vm._v(" "), _c("th", {
-    staticClass: "text-white",
-    "class": _vm.sortClass("dispenser_name"),
-    on: {
-      click: function click($event) {
-        return _vm.sortData("dispenser_name");
-      }
-    }
-  }, [_vm._v("Dispenser Name")]), _vm._v(" "), _c("th", {
     staticClass: "text-white"
   }, [_vm._v("Action")])])]), _vm._v(" "), _vm.listData.length > 0 && _vm.TableLoading == false ? _c("tbody", _vm._l(_vm.listData, function (f) {
-    return _c("tr", [_c("td", [_vm._v(_vm._s(f.name))]), _vm._v(" "), _c("td", [_c("a", {
-      attrs: {
-        href: "javascript:void(0);"
-      }
-    }, [_vm._v(_vm._s(f.dispenser_name))])]), _vm._v(" "), _c("td", [_c("div", {
+    return _c("tr", [_c("td", [_vm._v(_vm._s(f.name))]), _vm._v(" "), _c("td", [_c("div", {
       staticClass: "d-flex justify-content-end"
     }, [_c("router-link", {
       staticClass: "btn btn-primary shadow btn-xs sharp me-1",
@@ -16026,7 +15857,17 @@ var render = function render() {
         name: "Product"
       }
     }
-  }, [_vm._v("Product")])], 1)])]), _vm._v(" "), _vm._m(11), _vm._v(" "), _vm._m(12), _vm._v(" "), _vm._m(13), _vm._v(" "), _vm._m(14), _vm._v(" "), _c("li", [_vm._m(15), _vm._v(" "), _c("ul", {
+  }, [_vm._v("Product")])], 1)])]), _vm._v(" "), _vm._m(11), _vm._v(" "), _vm._m(12), _vm._v(" "), _c("li", [_vm._m(13), _vm._v(" "), _c("ul", {
+    attrs: {
+      "aria-expanded": "false"
+    }
+  }, [_c("li", [_c("router-link", {
+    attrs: {
+      to: {
+        name: "Bank"
+      }
+    }
+  }, [_vm._v("Bnaks ")])], 1), _vm._v(" "), _vm._m(14), _vm._v(" "), _vm._m(15), _vm._v(" "), _vm._m(16)])]), _vm._v(" "), _vm._m(17), _vm._v(" "), _c("li", [_vm._m(18), _vm._v(" "), _c("ul", {
     attrs: {
       "aria-expanded": "false"
     }
@@ -16036,7 +15877,7 @@ var render = function render() {
         name: "Expense"
       }
     }
-  }, [_vm._v("Expense")])], 1)])]), _vm._v(" "), _vm._m(16), _vm._v(" "), _vm._m(17), _vm._v(" "), _c("li", [_vm._m(18), _vm._v(" "), _c("ul", {
+  }, [_vm._v("Expense")])], 1)])]), _vm._v(" "), _vm._m(19), _vm._v(" "), _vm._m(20), _vm._v(" "), _c("li", [_vm._m(21), _vm._v(" "), _c("ul", {
     attrs: {
       "aria-expanded": "false"
     }
@@ -16231,44 +16072,48 @@ var staticRenderFns = [function () {
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
-  return _c("li", [_c("a", {
+  return _c("a", {
     staticClass: "has-arrow",
     attrs: {
-      href: "javascript:void()",
+      href: "javascript:void(0)",
       "aria-expanded": "false"
     }
   }, [_c("i", {
     staticClass: "fa-solid fa-building-columns"
   }), _vm._v(" "), _c("span", {
     staticClass: "nav-text"
-  }, [_vm._v("Banks")])]), _vm._v(" "), _c("ul", {
-    attrs: {
-      "aria-expanded": "false"
-    }
-  }, [_c("li", [_c("a", {
-    attrs: {
-      href: "./#"
-    }
-  }, [_vm._v("Bnaks ")])]), _vm._v(" "), _c("li", [_c("a", {
+  }, [_vm._v("Banks")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("li", [_c("a", {
     attrs: {
       href: "./#"
     }
-  }, [_vm._v("Personal Accounts")])]), _vm._v(" "), _c("li", [_c("a", {
+  }, [_vm._v("Personal Accounts")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("li", [_c("a", {
     attrs: {
       href: "./#"
     }
-  }, [_vm._v("Transfer")])]), _vm._v(" "), _c("li", [_c("a", {
+  }, [_vm._v("Transfer")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("li", [_c("a", {
     attrs: {
       href: "./#"
     }
-  }, [_vm._v("Transaction")])])])]);
+  }, [_vm._v("Transaction")])]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
   return _c("li", [_c("a", {
     staticClass: "has-arrow",
     attrs: {
-      href: "javascript:void()",
+      href: "javascript:void(0)",
       "aria-expanded": "false"
     }
   }, [_c("i", {
@@ -55376,7 +55221,7 @@ var app = new vue__WEBPACK_IMPORTED_MODULE_1___default.a({
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! D:\xampp7.4\htdocs\fuelmatix\resources\js\app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! D:\xampp\htdocs\projects\fuelmatix\resources\js\app.js */"./resources/js/app.js");
 
 
 /***/ })
