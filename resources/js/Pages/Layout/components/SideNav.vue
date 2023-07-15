@@ -47,7 +47,7 @@
                     <span class="nav-text">Payment</span>
                 </a>
                     <ul aria-expanded="false">
-                        <li><a href="./#">Vendors</a></li>
+                        <li><router-link :to="{name: 'Vendor'}">Vendors</router-link></li>
                     </ul>
                 </li>
                 <li><a href="widget-basic.html" class="" aria-expanded="false">

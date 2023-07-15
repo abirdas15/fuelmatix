@@ -4,7 +4,7 @@
             <div class="row page-titles">
                 <ol class="breadcrumb align-items-center ">
                     <li class="breadcrumb-item active"><router-link :to="{name: 'Dashboard'}">Home</router-link></li>
-                    <li class="breadcrumb-item active"><router-link :to="{name: 'Bank'}">Bank</router-link></li>
+                    <li class="breadcrumb-item active"><router-link :to="{name: 'Vendor'}">Vendor</router-link></li>
                     <li class="breadcrumb-item"><a href="javascript:void(0)">Add</a></li>
 
                 </ol>
@@ -13,14 +13,14 @@
             <div class="col-xl-12 col-lg-12">
                 <div class="card">
                     <div class="card-header">
-                        <h4 class="card-title">Bank</h4>
+                        <h4 class="card-title">Vendor</h4>
                     </div>
                     <div class="card-body">
                         <div class="basic-form">
                             <form @submit.prevent="save">
                                 <div class="row">
                                     <div class="mb-3 form-group col-md-6">
-                                        <label class="form-label">Bank Name:</label>
+                                        <label class="form-label">Vendor Name:</label>
                                         <input type="text" class="form-control" name="name" v-model="param.name">
                                         <div class="invalid-feedback"></div>
                                     </div>
@@ -29,7 +29,7 @@
                                     <div class="mb-3 col-md-6">
                                         <button type="submit" class="btn btn-primary" v-if="!loading">Submit</button>
                                         <button type="button" class="btn btn-primary" v-if="loading">Submitting...</button>
-                                        <router-link :to="{name: 'Bank'}" type="button" class="btn btn-primary">Cancel</router-link>
+                                        <router-link :to="{name: 'Vendor'}" type="button" class="btn btn-primary">Cancel</router-link>
                                     </div>
                                 </div>
                             </form>
@@ -62,11 +62,11 @@ export default {
         save: function () {
             ApiService.ClearErrorHandler();
             this.loading = true
-            ApiService.POST(ApiRoutes.BankAdd, this.param,res => {
+            ApiService.POST(ApiRoutes.VendorAdd, this.param,res => {
                 this.loading = false
                 if (parseInt(res.status) === 200) {
                     this.$router.push({
-                        name: 'Bank'
+                        name: 'Vendor'
                     })
                 } else {
                     ApiService.ErrorHandler(res.errors);
@@ -77,7 +77,7 @@ export default {
     created() {
     },
     mounted() {
-        $('#dashboard_bar').text('Bank Add')
+        $('#dashboard_bar').text('Vendor Add')
     }
 }
 </script>

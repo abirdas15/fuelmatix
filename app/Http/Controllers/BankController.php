@@ -108,6 +108,6 @@ class BankController extends Controller
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
         Category::where('id', $inputData['id'])->delete();
-        return response()-json(['status' => 200, 'message' => 'Successfully deleted bank.']);
+        return response()->json(['status' => 200, 'message' => 'Successfully deleted bank.']);
     }
 }

@@ -47,6 +47,9 @@ import TankReadingEdit from "../Pages/Fuel/TankReading/Edit";
 import Bank from "../Pages/Banks/List";
 import BankAdd from "../Pages/Banks/Add";
 import BankEdit from "../Pages/Banks/Edit";
+import Vendor from "../Pages/Vendors/List";
+import VendorAdd from "../Pages/Vendors/Add";
+import VendorEdit from "../Pages/Vendors/Edit";
 
 const ROOT_URL = "";
 const router = new VueRouter({
@@ -101,6 +104,9 @@ const router = new VueRouter({
                 { path: ROOT_URL + "/bank", name: "Bank", component: Bank},
                 { path: ROOT_URL + "/bank/add", name: "BankAdd", component: BankAdd},
                 { path: ROOT_URL + "/bank/edit/:id", name: "BankEdit", component: BankEdit},
+                { path: ROOT_URL + "/vendor", name: "Vendor", component: Vendor},
+                { path: ROOT_URL + "/vendor/add", name: "VendorAdd", component: VendorAdd},
+                { path: ROOT_URL + "/vendor/edit/:id", name: "VendorEdit", component: VendorEdit},
             ],
         },
     ],

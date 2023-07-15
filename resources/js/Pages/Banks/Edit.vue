@@ -27,9 +27,6 @@
                                 </div>
                                 <div class="row" style="text-align: right;">
                                     <div class="mb-3 col-md-6">
-
-                                    </div>
-                                    <div class="mb-3 col-md-6">
                                         <button type="submit" class="btn btn-primary" v-if="!loading">Submit</button>
                                         <button type="button" class="btn btn-primary" v-if="loading">Submitting...</button>
                                         <router-link :to="{name: 'Bank'}" type="button" class="btn btn-primary">Cancel</router-link>
