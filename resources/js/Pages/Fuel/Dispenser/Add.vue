@@ -42,6 +42,11 @@
                                         </select>
                                         <div class="invalid-feedback"></div>
                                     </div>
+                                    <div class="mb-3 form-group col-md-6">
+                                        <label class="form-label">Opening Stock:</label>
+                                        <input type="number" class="form-control" name="opening_stock" v-model="param.opening_stock">
+                                        <div class="invalid-feedback"></div>
+                                    </div>
                                 </div>
                                 <div class="row" style="text-align: right;">
                                     <div class="mb-3 col-md-6">
@@ -73,6 +78,7 @@ export default {
                 brand: '',
                 serial: '',
                 product_id: '',
+                opening_stock: ''
             },
             loading: false,
             listData: [],

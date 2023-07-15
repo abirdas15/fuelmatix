@@ -488,3 +488,7 @@ h1 {
     background: #e5e5e5;
     opacity: 1;
 }
+
+.form-control{
+    border: 1px solid #d0d0d0;
+}
