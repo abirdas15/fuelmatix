@@ -110,7 +110,8 @@ class NozzleController extends Controller
         $validator = Validator::make($inputData, [
             'nozzle_id' => 'required',
             'date' => 'required',
-            'reading' => 'required'
+            'reading' => 'required',
+            'type' => 'required',
         ],[
             'nozzle_id.required' => 'The nozzle field is required.'
         ]);
@@ -121,6 +122,7 @@ class NozzleController extends Controller
         $reading->date = $inputData['date'];
         $reading->nozzle_id = $inputData['nozzle_id'];
         $reading->reading = $inputData['reading'];
+        $reading->type = $inputData['type'];
         $reading->client_company_id = $inputData['session_user']['client_company_id'];
         if ($reading->save()) {
             return response()->json(['status' => 200, 'message' => 'Successfully save reading.']);
@@ -179,7 +181,8 @@ class NozzleController extends Controller
             'id' => 'required',
             'nozzle_id' => 'required',
             'date' => 'required',
-            'reading' => 'required'
+            'reading' => 'required',
+            'type' => 'required',
         ],[
             'nozzle_id.required' => 'The nozzle field is required.'
         ]);
@@ -193,6 +196,7 @@ class NozzleController extends Controller
         $reading->date = $inputData['date'];
         $reading->nozzle_id = $inputData['nozzle_id'];
         $reading->reading = $inputData['reading'];
+        $reading->type = $inputData['type'];
         if ($reading->save()) {
             return response()->json(['status' => 200, 'message' => 'Successfully udpate reading.']);
         }
