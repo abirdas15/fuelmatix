@@ -27,6 +27,7 @@ class TankController extends Controller
         $tank->tank_name = $inputData['tank_name'];
         $tank->capacity = $inputData['capacity'];
         $tank->height = $inputData['height'];
+        $tank->client_company_id = $inputData['session_user']['client_company_id'];
         if ($tank->save()) {
             if ($request->file('file')) {
                 $file = $request->file('file');
@@ -59,9 +60,15 @@ class TankController extends Controller
         $order_mode = isset($inputData['order_mode']) ? $inputData['order_mode'] : 'DESC';
         $count = Tank::count();
         $result = Tank::select('tank.id' ,'tank.tank_name', 'tank.height', 'tank.capacity')
+            ->where('client_company_id', $inputData['session_user']['client_company_id'])
             ->with('last_reading', function($query) use ($count) {
                 return $query->select('id', 'tank_id', 'height', 'water_height')->orderBy('id', 'DESC')->take($count);
             });
+        if (!empty($keyword)) {
+            $result->where(function($q) use ($keyword) {
+                $q->where('tank.tank_name', 'LIKE', '%'.$keyword.'%');
+            });
+        }
         $result = $result->orderBy($order_by, $order_mode)
             ->paginate($limit);
         foreach ($result as &$data) {
@@ -161,6 +168,7 @@ class TankController extends Controller
         $reading->height = $inputData['height'];
         $reading->water_height = $inputData['water_height'];
         $reading->volume = $bstiChart != null ? $bstiChart->volume : 0;
+        $reading->client_company_id = $inputData['session_user']['client_company_id'];
         if ($reading->save()) {
             return response()->json(['status' => 200, 'message' => 'Successfully saved tank reading.']);
         }
@@ -174,7 +182,8 @@ class TankController extends Controller
         $order_by = isset($inputData['order_by']) ? $inputData['order_by'] : 'tank_log.id';
         $order_mode = isset($inputData['order_mode']) ? $inputData['order_mode'] : 'DESC';
         $result = TankLog::select('tank_log.id', 'tank_log.date', 'tank_log.height', 'tank_log.water_height', 'tank_log.volume', 'tank.tank_name')
-            ->leftJoin('tank', 'tank.id', '=', 'tank_log.tank_id');
+            ->leftJoin('tank', 'tank.id', '=', 'tank_log.tank_id')
+            ->where('tank_log.client_company_id', $inputData['session_user']['client_company_id']);
         if (!empty($keyword)) {
             $result->where(function($q) use ($keyword) {
                 $q->where('tank.tank_name', 'LIKE', '%'.$keyword.'%');

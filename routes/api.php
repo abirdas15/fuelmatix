@@ -19,6 +19,7 @@ use App\Http\Controllers\NozzleController;
 use App\Http\Controllers\ShiftSaleController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\TankController;
+use App\Http\Controllers\BankController;
 
 /*
 |--------------------------------------------------------------------------
@@ -130,6 +131,13 @@ Route::group(['middleware' => 'AuthReqCheck'], function() {
             Route::post('update', [TankController::class, 'readingUpdate']);
             Route::post('delete', [TankController::class, 'readingDelete']);
         });
+    });
+    Route::group(['prefix' => 'bank'], function() {
+        Route::post('save', [BankController::class, 'save']);
+        Route::post('list', [BankController::class, 'list']);
+        Route::post('single', [BankController::class, 'single']);
+        Route::post('update', [BankController::class, 'update']);
+        Route::post('delete', [BankController::class, 'delete']);
     });
 });
 
