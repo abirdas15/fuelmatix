@@ -32,23 +32,14 @@
                         <li><a href="./tankRefillHistory.html">Tank Refill History</a></li>
                         <li><a href="./fuelRefillVoucher.html">Fuel Refill Voucher</a></li>
                         <li><a href="./refillHistroyDetails.html">Refill Histroy Details</a></li>
-                        <li><router-link :to="{name: 'DispenserAdd'}">Add Dispenser</router-link></li>
-                        <li><router-link :to="{name: 'Dispenser'}">Dispenser List</router-link></li>
-                        <li><router-link :to="{name: 'DispenserReadingAdd'}" >Dispenser Reading</router-link></li>
-                        <li><router-link :to="{name: 'DispenserReading'}">Dispenser Reading History</router-link></li>
-                        <li><router-link :to="{name: 'NozzleAdd'}">Add Nozzle</router-link></li>
-                        <li><router-link :to="{name: 'Nozzle'}">Nozzle List</router-link></li>
-                        <li><router-link :to="{name: 'NozzleReadingAdd'}">Nozzle Reading</router-link></li>
-                        <li><router-link :to="{name: 'NozzleReading'}">Nozzle Reading History</router-link></li>
-                        <li><router-link :to="{name: 'TankAdd'}"> Add Tank</router-link></li>
-                        <li><router-link :to="{name: 'Tank'}"> Tank List</router-link></li>
+                        <li><router-link :to="{name: 'Dispenser'}">Dispenser</router-link></li>
+                        <li><router-link :to="{name: 'DispenserReading'}">Dispenser Reading</router-link></li>
+                        <li><router-link :to="{name: 'Nozzle'}">Nozzle</router-link></li>
+                        <li><router-link :to="{name: 'NozzleReading'}">Nozzle Reading</router-link></li>
+                        <li><router-link :to="{name: 'Tank'}"> Tank</router-link></li>
                         <li><router-link :to="{name: 'TankVisual'}"> Tank Visual</router-link></li>
-                        <li><router-link :to="{name: 'TankReadingAdd'}">Tank Reading</router-link></li>
-                        <li><router-link :to="{name: 'TankReading'}">Tank Reading History</router-link></li>
-                        <li><router-link :to="{name: 'ProductAdd'}">Product</router-link></li>
-                        <li><router-link :to="{name: 'Product'}">Product List</router-link></li>
-
-
+                        <li><router-link :to="{name: 'TankReading'}">Tank Reading</router-link></li>
+                        <li><router-link :to="{name: 'Product'}">Product</router-link></li>
                     </ul>
                 </li>
                 <li><a class="has-arrow " href="javascript:void()" aria-expanded="false">

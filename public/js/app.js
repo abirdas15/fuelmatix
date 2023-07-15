@@ -2877,7 +2877,8 @@ __webpack_require__.r(__webpack_exports__);
         dispenser_name: '',
         brand: '',
         serial: '',
-        product_id: ''
+        product_id: '',
+        opening_stock: ''
       },
       loading: false,
       listData: []
@@ -3424,7 +3425,8 @@ __webpack_require__.r(__webpack_exports__);
     return {
       param: {
         dispenser_id: '',
-        name: ''
+        name: '',
+        opening_stock: ''
       },
       listParam: {
         limit: 5000,
@@ -4002,7 +4004,8 @@ __webpack_require__.r(__webpack_exports__);
         selling_price: '',
         type_id: '',
         buying_price: '',
-        unit: ''
+        unit: '',
+        opening_stock: ''
       },
       loading: false,
       productType: []
@@ -8122,6 +8125,33 @@ var render = function render() {
     }, [_vm._v(_vm._s(d.name))]);
   })], 2), _vm._v(" "), _c("div", {
     staticClass: "invalid-feedback"
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 form-group col-md-6"
+  }, [_c("label", {
+    staticClass: "form-label"
+  }, [_vm._v("Opening Stock:")]), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.param.opening_stock,
+      expression: "param.opening_stock"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      type: "number",
+      name: "opening_stock"
+    },
+    domProps: {
+      value: _vm.param.opening_stock
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.param, "opening_stock", $event.target.value);
+      }
+    }
+  }), _vm._v(" "), _c("div", {
+    staticClass: "invalid-feedback"
   })])]), _vm._v(" "), _c("div", {
     staticClass: "row",
     staticStyle: {
@@ -8349,6 +8379,33 @@ var render = function render() {
       }
     }, [_vm._v(_vm._s(d.name))]);
   })], 2), _vm._v(" "), _c("div", {
+    staticClass: "invalid-feedback"
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 form-group col-md-6"
+  }, [_c("label", {
+    staticClass: "form-label"
+  }, [_vm._v("Opening Stock:")]), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.param.opening_stock,
+      expression: "param.opening_stock"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      type: "number",
+      name: "opening_stock"
+    },
+    domProps: {
+      value: _vm.param.opening_stock
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.param, "opening_stock", $event.target.value);
+      }
+    }
+  }), _vm._v(" "), _c("div", {
     staticClass: "invalid-feedback"
   })])]), _vm._v(" "), _c("div", {
     staticClass: "row",
@@ -9500,6 +9557,33 @@ var render = function render() {
     }, [_vm._v(_vm._s(d.dispenser_name))]);
   })], 2), _vm._v(" "), _c("div", {
     staticClass: "invalid-feedback"
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 form-group col-md-6"
+  }, [_c("label", {
+    staticClass: "form-label"
+  }, [_vm._v("Opening Stock:")]), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.param.opening_stock,
+      expression: "param.opening_stock"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      type: "number",
+      name: "opening_stock"
+    },
+    domProps: {
+      value: _vm.param.opening_stock
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.param, "opening_stock", $event.target.value);
+      }
+    }
+  }), _vm._v(" "), _c("div", {
+    staticClass: "invalid-feedback"
   })])]), _vm._v(" "), _c("div", {
     staticClass: "row",
     staticStyle: {
@@ -9673,6 +9757,33 @@ var render = function render() {
       }
     }, [_vm._v(_vm._s(d.dispenser_name))]);
   })], 2), _vm._v(" "), _c("div", {
+    staticClass: "invalid-feedback"
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 form-group col-md-6"
+  }, [_c("label", {
+    staticClass: "form-label"
+  }, [_vm._v("Opening Stock:")]), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.param.opening_stock,
+      expression: "param.opening_stock"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      type: "number",
+      name: "opening_stock"
+    },
+    domProps: {
+      value: _vm.param.opening_stock
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.param, "opening_stock", $event.target.value);
+      }
+    }
+  }), _vm._v(" "), _c("div", {
     staticClass: "invalid-feedback"
   })])]), _vm._v(" "), _c("div", {
     staticClass: "row",
@@ -10876,6 +10987,33 @@ var render = function render() {
     }
   }, [_vm._v("Liter")])]), _vm._v(" "), _c("div", {
     staticClass: "invalid-feedback"
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 form-group col-md-6"
+  }, [_c("label", {
+    staticClass: "form-label"
+  }, [_vm._v("Opening Stock:")]), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.param.opening_stock,
+      expression: "param.opening_stock"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      type: "number",
+      name: "opening_stock"
+    },
+    domProps: {
+      value: _vm.param.opening_stock
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.param, "opening_stock", $event.target.value);
+      }
+    }
+  }), _vm._v(" "), _c("div", {
+    staticClass: "invalid-feedback"
   })])]), _vm._v(" "), _c("div", {
     staticClass: "row",
     staticStyle: {
@@ -11134,6 +11272,33 @@ var render = function render() {
       value: "1"
     }
   }, [_vm._v("Liter")])]), _vm._v(" "), _c("div", {
+    staticClass: "invalid-feedback"
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 form-group col-md-6"
+  }, [_c("label", {
+    staticClass: "form-label"
+  }, [_vm._v("Opening Stock:")]), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.param.opening_stock,
+      expression: "param.opening_stock"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      type: "number",
+      name: "opening_stock"
+    },
+    domProps: {
+      value: _vm.param.opening_stock
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.param, "opening_stock", $event.target.value);
+      }
+    }
+  }), _vm._v(" "), _c("div", {
     staticClass: "invalid-feedback"
   })])]), _vm._v(" "), _c("div", {
     staticClass: "row",
@@ -13749,7 +13914,10 @@ var render = function render() {
   }, [_vm._v("Inbox ")])]), _vm._v(" "), _c("a", {
     staticClass: "dropdown-item ai-icon",
     attrs: {
-      href: "./login.html"
+      href: "javascript:void(0)"
+    },
+    on: {
+      click: _vm.Logout
     }
   }, [_c("svg", {
     staticClass: "text-danger",
@@ -14729,64 +14897,34 @@ var render = function render() {
   }, [_vm._m(7), _vm._v(" "), _vm._m(8), _vm._v(" "), _vm._m(9), _vm._v(" "), _vm._m(10), _vm._v(" "), _c("li", [_c("router-link", {
     attrs: {
       to: {
-        name: "DispenserAdd"
-      }
-    }
-  }, [_vm._v("Add Dispenser")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
-    attrs: {
-      to: {
         name: "Dispenser"
       }
     }
-  }, [_vm._v("Dispenser List")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
-    attrs: {
-      to: {
-        name: "DispenserReadingAdd"
-      }
-    }
-  }, [_vm._v("Dispenser Reading")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
+  }, [_vm._v("Dispenser")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
     attrs: {
       to: {
         name: "DispenserReading"
       }
     }
-  }, [_vm._v("Dispenser Reading History")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
-    attrs: {
-      to: {
-        name: "NozzleAdd"
-      }
-    }
-  }, [_vm._v("Add Nozzle")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
+  }, [_vm._v("Dispenser Reading")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
     attrs: {
       to: {
         name: "Nozzle"
       }
     }
-  }, [_vm._v("Nozzle List")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
-    attrs: {
-      to: {
-        name: "NozzleReadingAdd"
-      }
-    }
-  }, [_vm._v("Nozzle Reading")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
+  }, [_vm._v("Nozzle")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
     attrs: {
       to: {
         name: "NozzleReading"
       }
     }
-  }, [_vm._v("Nozzle Reading History")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
-    attrs: {
-      to: {
-        name: "TankAdd"
-      }
-    }
-  }, [_vm._v(" Add Tank")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
+  }, [_vm._v("Nozzle Reading")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
     attrs: {
       to: {
         name: "Tank"
       }
     }
-  }, [_vm._v(" Tank List")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
+  }, [_vm._v(" Tank")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
     attrs: {
       to: {
         name: "TankVisual"
@@ -14795,28 +14933,16 @@ var render = function render() {
   }, [_vm._v(" Tank Visual")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
     attrs: {
       to: {
-        name: "TankReadingAdd"
+        name: "TankReading"
       }
     }
   }, [_vm._v("Tank Reading")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
     attrs: {
       to: {
-        name: "TankReading"
-      }
-    }
-  }, [_vm._v("Tank Reading History")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
-    attrs: {
-      to: {
-        name: "ProductAdd"
-      }
-    }
-  }, [_vm._v("Product")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
-    attrs: {
-      to: {
         name: "Product"
       }
     }
-  }, [_vm._v("Product List")])], 1)])]), _vm._v(" "), _vm._m(11), _vm._v(" "), _vm._m(12), _vm._v(" "), _vm._m(13), _vm._v(" "), _vm._m(14), _vm._v(" "), _c("li", [_vm._m(15), _vm._v(" "), _c("ul", {
+  }, [_vm._v("Product")])], 1)])]), _vm._v(" "), _vm._m(11), _vm._v(" "), _vm._m(12), _vm._v(" "), _vm._m(13), _vm._v(" "), _vm._m(14), _vm._v(" "), _c("li", [_vm._m(15), _vm._v(" "), _c("ul", {
     attrs: {
       "aria-expanded": "false"
     }
@@ -53703,7 +53829,7 @@ vue__WEBPACK_IMPORTED_MODULE_0___default.a.use(vuex__WEBPACK_IMPORTED_MODULE_1__
 vue__WEBPACK_IMPORTED_MODULE_0___default.a.use(vue_axios__WEBPACK_IMPORTED_MODULE_3__["default"], axios__WEBPACK_IMPORTED_MODULE_2___default.a);
 var headers = {
   'Content-Type': 'application/json; charset=utf-8',
-  'x-api-key': '_@@jbbrd2023crmatix@@_'
+  'x-api-key': '_@@jbbrd2023fuelmatix@@_'
 };
 var ApiService = {
   POST: function POST(url, param, callback) {
@@ -53935,7 +54061,7 @@ var app = new vue__WEBPACK_IMPORTED_MODULE_1___default.a({
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! D:\xampp7.4\htdocs\fuelmatix\resources\js\app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! D:\xampp\htdocs\projects\fuelmatix\resources\js\app.js */"./resources/js/app.js");
 
 
 /***/ })
