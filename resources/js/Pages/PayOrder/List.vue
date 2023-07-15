@@ -4,15 +4,15 @@
             <div class="row page-titles">
                 <ol class="breadcrumb align-items-center ">
                     <li class="breadcrumb-item active"><router-link :to="{name: 'Dashboard'}">Home</router-link></li>
-                    <li class="breadcrumb-item"><a href="javascript:void(0)">Tank Reading List</a></li>
-                    <li style="margin-left: auto;"><router-link :to="{name: 'TankReadingAdd'}"><i class="fa-solid fa-plus"></i> New Tank Reading</router-link></li>
+                    <li class="breadcrumb-item"><a href="javascript:void(0)">Pay Order List</a></li>
+                    <li style="margin-left: auto;"><router-link :to="{name: 'PayOrderAdd'}"><i class="fa-solid fa-plus"></i> Add New Pay Order</router-link></li>
                 </ol>
             </div>
             <div class="row">
                 <div class="col-12">
                     <div class="card">
                         <div class="card-header bg-secondary">
-                            <h4 class="card-title">Tank Reading History</h4>
+                            <h4 class="card-title">Pay Order List</h4>
                         </div>
                         <div class="card-body">
                             <div class="row mt-4">
@@ -37,22 +37,24 @@
                                         <table class="display  dataTable no-footer" style="min-width: 845px">
                                             <thead>
                                             <tr class="text-white" style="background-color: #4886EE;color:#ffffff">
-                                                <th class="text-white" @click="sortData('date')" :class="sortClass('date')">Date</th>
-                                                <th class="text-white" @click="sortData('tank_name')" :class="sortClass('tank_name')">Tank ID</th>
-                                                <th class="text-white" @click="sortData('height')" :class="sortClass('height')">Height</th>
-                                                <th class="text-white" @click="sortData('water_height')" :class="sortClass('water_height')">Height Height</th>
+                                                <th class="text-white" @click="sortData('number')" :class="sortClass('number')">Number</th>
+                                                <th class="text-white" @click="sortData('bank_name')" :class="sortClass('bank_name')">Bank</th>
+                                                <th class="text-white" @click="sortData('vendor_name')" :class="sortClass('vendor_name')">Vendor</th>
+                                                <th class="text-white" @click="sortData('amount')" :class="sortClass('amount')">Amount</th>
+                                                <th class="text-white" @click="sortData('quantity')" :class="sortClass('quantity')">Quantity</th>
                                                 <th class="text-white" >Action</th>
                                             </tr>
                                             </thead>
                                             <tbody v-if="listData.length > 0 && TableLoading == false">
                                             <tr v-for="f in listData">
-                                                <td >{{f.date}}</td>
-                                                <td><a href="javascript:void(0);">{{f.tank_name}}</a></td>
-                                                <td><a href="javascript:void(0);">{{f?.height}}</a></td>
-                                                <td><a href="javascript:void(0);">{{f?.water_height}}</a></td>
+                                                <td >{{f.number}}</td>
+                                                <td >{{f.bank_name}}</td>
+                                                <td >{{f.vendor_name}}</td>
+                                                <td >{{f.amount}}</td>
+                                                <td >{{f.quantity}}</td>
                                                 <td>
                                                     <div class="d-flex justify-content-end">
-                                                        <router-link :to="{name: 'TankReadingEdit', params: { id: f.id }}" class=" btn btn-primary shadow btn-xs sharp me-1">
+                                                        <router-link :to="{name: 'PayOrderEdit', params: { id: f.id }}" class=" btn btn-primary shadow btn-xs sharp me-1">
                                                             <i class="fas fa-pencil-alt"></i>
                                                         </router-link>
                                                         <a  href="javascript:void(0)"  @click="openModalDelete(f)" class="btn btn-danger shadow btn-xs sharp">
@@ -78,7 +80,7 @@
                                         </div>
 
                                         <div class="dataTables_paginate paging_simple_numbers" id="example3_paginate">
-                                            <Pagination :data="paginateData" :onChange="list" :btn-big="true"></Pagination>
+                                            <Pagination :data="paginateData" :onChange="list"></Pagination>
                                         </div>
                                     </div>
                                 </div>
@@ -93,9 +95,9 @@
 
 <script>
 import Swal from 'sweetalert2/dist/sweetalert2.js'
-import ApiService from "../../../Services/ApiService";
-import ApiRoutes from "../../../Services/ApiRoutes";
-import Pagination from "../../../Helpers/Pagination";
+import ApiService from "../../Services/ApiService";
+import ApiRoutes from "../../Services/ApiRoutes";
+import Pagination from "../../Helpers/Pagination";
 export default {
     components: {
         Pagination,
@@ -152,7 +154,7 @@ export default {
             }
             this.Param.page = page.page;
             this.TableLoading = true
-            ApiService.POST(ApiRoutes.TankReadingList, this.Param,res => {
+            ApiService.POST(ApiRoutes.PayOrderList, this.Param,res => {
                 this.TableLoading = false
                 if (parseInt(res.status) === 200) {
                     this.paginateData = res.data;
@@ -163,7 +165,7 @@ export default {
             });
         },
         Delete: function (data) {
-            ApiService.POST(ApiRoutes.TankReadingDelete, {id: data.id },res => {
+            ApiService.POST(ApiRoutes.PayOrderDelete, {id: data.id },res => {
                 if (parseInt(res.status) === 200) {
                     this.$toast.success(res.message);
                     this.list()
@@ -192,7 +194,7 @@ export default {
 
     },
     mounted() {
-        $('#dashboard_bar').text('Tank Reading History')
+        $('#dashboard_bar').text('Pay Order List')
     }
 }
 </script>

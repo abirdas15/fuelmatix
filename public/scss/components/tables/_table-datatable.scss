@@ -118,6 +118,9 @@ table.dataTable tfoot th{
 		line-height:54px;
 		display:inline-block;
 		color:var(--primary)!important;
+        &.big{
+            width:68px;
+        }
 		i{
 			font-size: 20px;
 		}
@@ -154,6 +157,9 @@ table.dataTable tfoot th{
 				width:50px;
 				line-height:50px;
 			}
+            &.big{
+                width:68px;
+            }
 			&.current,&:hover{
 				color: var(--primary) !important;
 				background: $white;
@@ -219,14 +225,14 @@ table.dataTable.no-footer{
     }
 }
 
-.dataTables_wrapper .dataTables_paginate .paginate_button.disabled, 
-.dataTables_wrapper .dataTables_paginate .paginate_button.disabled:hover, 
+.dataTables_wrapper .dataTables_paginate .paginate_button.disabled,
+.dataTables_wrapper .dataTables_paginate .paginate_button.disabled:hover,
 .dataTables_wrapper .dataTables_paginate .paginate_button.disabled:active{
 	color: $body-color !important;
 }
-.dataTables_wrapper .dataTables_length, 
-.dataTables_wrapper .dataTables_filter, 
-.dataTables_wrapper .dataTables_processing, 
+.dataTables_wrapper .dataTables_length,
+.dataTables_wrapper .dataTables_filter,
+.dataTables_wrapper .dataTables_processing,
 .dataTables_wrapper .dataTables_paginate {
     color: $body-color;
 	border-radius:1rem;
@@ -243,9 +249,9 @@ table.dataTable.no-footer{
 
 
 
-table.dataTable.row-border tbody th, 
-table.dataTable.row-border tbody td, 
-table.dataTable.display tbody th, 
+table.dataTable.row-border tbody th,
+table.dataTable.row-border tbody td,
+table.dataTable.display tbody th,
 table.dataTable.display tbody td {
     border-color: $border-color;
     @at-root [data-theme-version="dark"] & {

@@ -44,6 +44,15 @@ import TankEdit from "../Pages/Fuel/Tank/Edit";
 import TankReading from "../Pages/Fuel/TankReading/List";
 import TankReadingAdd from "../Pages/Fuel/TankReading/Add";
 import TankReadingEdit from "../Pages/Fuel/TankReading/Edit";
+import Bank from "../Pages/Banks/List";
+import BankAdd from "../Pages/Banks/Add";
+import BankEdit from "../Pages/Banks/Edit";
+import Vendor from "../Pages/Vendors/List";
+import VendorAdd from "../Pages/Vendors/Add";
+import VendorEdit from "../Pages/Vendors/Edit";
+import PayOrder from "../Pages/PayOrder/List";
+import PayOrderAdd from "../Pages/PayOrder/Add";
+import PayOrderEdit from "../Pages/PayOrder/Edit";
 
 const ROOT_URL = "";
 const router = new VueRouter({
@@ -95,6 +104,15 @@ const router = new VueRouter({
                 { path: ROOT_URL + "/tank/reading", name: "TankReading", component: TankReading},
                 { path: ROOT_URL + "/tank/reading/add", name: "TankReadingAdd", component: TankReadingAdd},
                 { path: ROOT_URL + "/tank/reading/edit/:id", name: "TankReadingEdit", component: TankReadingEdit},
+                { path: ROOT_URL + "/bank", name: "Bank", component: Bank},
+                { path: ROOT_URL + "/bank/add", name: "BankAdd", component: BankAdd},
+                { path: ROOT_URL + "/bank/edit/:id", name: "BankEdit", component: BankEdit},
+                { path: ROOT_URL + "/vendor", name: "Vendor", component: Vendor},
+                { path: ROOT_URL + "/vendor/add", name: "VendorAdd", component: VendorAdd},
+                { path: ROOT_URL + "/vendor/edit/:id", name: "VendorEdit", component: VendorEdit},
+                { path: ROOT_URL + "/pay/order", name: "PayOrder", component: PayOrder},
+                { path: ROOT_URL + "/pay/order/add", name: "PayOrderAdd", component: PayOrderAdd},
+                { path: ROOT_URL + "/pay/order/edit/:id", name: "PayOrderEdit", component: PayOrderEdit},
             ],
         },
     ],

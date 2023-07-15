@@ -4,11 +4,11 @@
             <i class="fa fa-angle-double-left"></i>
         </a>
         <span>
-        <a class="paginate_button" v-if="start > button_divider"  @click="pageChange(1)">1</a>
-        <a class="paginate_button" v-if="start > button_divider">...</a>
-        <a class="paginate_button " :class="{'current': page === current_page}" v-for="page in total_pages"  v-if="page >= start && page <= end" @click="pageChange(page)">{{ page }}</a>
-        <a class="paginate_button" v-if="end < (total_pages-button_divider)">...</a>
-        <a class="paginate_button" @click="pageChange(total_pages)" v-if="end < (total_pages-button_divider)">{{total_pages}}</a>
+        <a class="paginate_button" :class="{'big': btnBig}" v-if="start > button_divider"  @click="pageChange(1)">1</a>
+        <a class="paginate_button" :class="{'big': btnBig}" v-if="start > button_divider">...</a>
+        <a class="paginate_button" :class="{'current': page === current_page, 'big': btnBig}" v-for="page in total_pages"  v-if="page >= start && page <= end" @click="pageChange(page)">{{ page }}</a>
+        <a class="paginate_button" :class="{'big': btnBig}" v-if="end < (total_pages-button_divider)">...</a>
+        <a class="paginate_button" :class="{'big': btnBig}" @click="pageChange(total_pages)" v-if="end < (total_pages-button_divider)">{{total_pages}}</a>
     </span>
         <a class="paginate_button next"  :class="{'disabled' : data.prev_page_url == null}" @click="nextPage" :disabled="data.prev_page_url == null">
             <i class="fa fa-angle-double-right" aria-hidden="true"></i>
@@ -32,7 +32,7 @@ export default {
         }
     },
     name: 'App',
-    props: ['data', 'onChange'],
+    props: ['data', 'onChange', 'btnBig'],
     components: {},
     methods: {
         prevPage() {

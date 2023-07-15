@@ -85,6 +85,25 @@ const ApiRoutes = {
     TankReadingDelete: ApiVersion + '/tank/reading/delete',
     TankReadingList: ApiVersion + '/tank/reading/list',
     TankReadingSingle: ApiVersion + '/tank/reading/single',
+    //Bank
+    BankAdd: ApiVersion + '/bank/save',
+    BankEdit: ApiVersion + '/bank/update',
+    BankDelete: ApiVersion + '/bank/delete',
+    BankList: ApiVersion + '/bank/list',
+    BankSingle: ApiVersion + '/bank/single',
+    //Vendor
+    VendorAdd: ApiVersion + '/vendor/save',
+    VendorEdit: ApiVersion + '/vendor/update',
+    VendorDelete: ApiVersion + '/vendor/delete',
+    VendorList: ApiVersion + '/vendor/list',
+    VendorSingle: ApiVersion + '/vendor/single',
+    //Pay order
+    PayOrderAdd: ApiVersion + '/pay/order/save',
+    PayOrderEdit: ApiVersion + '/pay/order/update',
+    PayOrderDelete: ApiVersion + '/pay/order/delete',
+    PayOrderList: ApiVersion + '/pay/order/list',
+    PayOrderSingle: ApiVersion + '/pay/order/single',
+    PayOrderLatest: ApiVersion + '/pay/order/latest',
 
 };
 

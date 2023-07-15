@@ -28,8 +28,12 @@
                                         <div class="invalid-feedback"></div>
                                     </div>
                                     <div class="mb-3 form-group col-md-6">
-                                        <label class="form-label">Date:</label>
-                                        <input type="text" class="form-control date bg-white" name="date" v-model="param.date">
+                                        <label class="form-label">Type:</label>
+                                        <select class="form-control" name="type" id="type"  v-model="param.type">
+                                            <option value="">Select Type</option>
+                                            <option value="shift sell">Shift sell</option>
+                                            <option value="tank refill">Tank refill</option>
+                                        </select>
                                         <div class="invalid-feedback"></div>
                                     </div>
                                     <div class="mb-3 form-group col-md-6">
@@ -40,6 +44,11 @@
                                     <div class="mb-3 form-group col-md-6">
                                         <label class="form-label">Litter:</label>
                                         <input type="text" class="form-control" name="litter" v-model="param.litter">
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                    <div class="mb-3 form-group col-md-6">
+                                        <label class="form-label">Date:</label>
+                                        <input type="text" class="form-control date bg-white" name="date" v-model="param.date">
                                         <div class="invalid-feedback"></div>
                                     </div>
                                 </div>
@@ -70,6 +79,7 @@ export default {
         return {
             param: {
                 dispenser_id: '',
+                type: '',
                 date: '',
                 reading: '',
                 litter: '',
