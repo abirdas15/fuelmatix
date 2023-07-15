@@ -85,6 +85,12 @@ const ApiRoutes = {
     TankReadingDelete: ApiVersion + '/tank/reading/delete',
     TankReadingList: ApiVersion + '/tank/reading/list',
     TankReadingSingle: ApiVersion + '/tank/reading/single',
+    //Bank
+    BankAdd: ApiVersion + '/bank/save',
+    BankEdit: ApiVersion + '/bank/update',
+    BankDelete: ApiVersion + '/bank/delete',
+    BankList: ApiVersion + '/bank/list',
+    BankSingle: ApiVersion + '/bank/single',
 
 };
 

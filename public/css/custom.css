@@ -492,3 +492,15 @@ h1 {
 .form-control{
     border: 1px solid #d0d0d0;
 }
+.paginate_button.big{
+     width:68px!important;
+}
+.metismenu li .mm-collapse li a{
+    padding-left: 3rem!important;
+}
+.metismenu li .mm-collapse li a:hover{
+    padding-left: 4.5rem!important;
+}
+.metismenu li .mm-collapse li a::before{
+    left: 2rem!important;
+}
