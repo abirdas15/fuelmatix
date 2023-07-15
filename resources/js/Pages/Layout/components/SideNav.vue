@@ -49,6 +49,9 @@
                     <ul aria-expanded="false">
                         <li><router-link :to="{name: 'Vendor'}">Vendors</router-link></li>
                     </ul>
+                    <ul aria-expanded="false">
+                        <li><router-link :to="{name: 'PayOrder'}">Pay Orders</router-link></li>
+                    </ul>
                 </li>
                 <li><a href="widget-basic.html" class="" aria-expanded="false">
                     <i class="fas fa-user-check"></i>

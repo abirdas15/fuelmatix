@@ -16098,7 +16098,17 @@ var render = function render() {
         name: "Vendor"
       }
     }
-  }, [_vm._v("Vendors")])], 1)])]), _vm._v(" "), _vm._m(12), _vm._v(" "), _c("li", [_vm._m(13), _vm._v(" "), _c("ul", {
+  }, [_vm._v("Vendors")])], 1)]), _vm._v(" "), _c("ul", {
+    attrs: {
+      "aria-expanded": "false"
+    }
+  }, [_c("li", [_c("router-link", {
+    attrs: {
+      to: {
+        name: "PayOrder"
+      }
+    }
+  }, [_vm._v("Pay Orders")])], 1)])]), _vm._v(" "), _vm._m(12), _vm._v(" "), _c("li", [_vm._m(13), _vm._v(" "), _c("ul", {
     attrs: {
       "aria-expanded": "false"
     }
@@ -55804,6 +55814,18 @@ var router = new vue_router__WEBPACK_IMPORTED_MODULE_1__["default"]({
       path: ROOT_URL + "/vendor/edit/:id",
       name: "VendorEdit",
       component: _Pages_Vendors_Edit__WEBPACK_IMPORTED_MODULE_48__["default"]
+    }, {
+      path: ROOT_URL + "/pay/order",
+      name: "PayOrder",
+      component: PayOrder
+    }, {
+      path: ROOT_URL + "/pay/order/add",
+      name: "PayOrderAdd",
+      component: PayOrderAdd
+    }, {
+      path: ROOT_URL + "/pay/order/edit/:id",
+      name: "PayOrderEdit",
+      component: PayOrderEdit
     }]
   }]
 });
@@ -55913,12 +55935,18 @@ var ApiRoutes = {
   BankDelete: ApiVersion + '/bank/delete',
   BankList: ApiVersion + '/bank/list',
   BankSingle: ApiVersion + '/bank/single',
-  //Bank
+  //Vendor
   VendorAdd: ApiVersion + '/vendor/save',
   VendorEdit: ApiVersion + '/vendor/update',
   VendorDelete: ApiVersion + '/vendor/delete',
   VendorList: ApiVersion + '/vendor/list',
-  VendorSingle: ApiVersion + '/vendor/single'
+  VendorSingle: ApiVersion + '/vendor/single',
+  //Payorder
+  PayOrderAdd: ApiVersion + '/vendor/save',
+  PayOrderEdit: ApiVersion + '/vendor/update',
+  PayOrderDelete: ApiVersion + '/vendor/delete',
+  PayOrderList: ApiVersion + '/vendor/list',
+  PayOrderSingle: ApiVersion + '/vendor/single'
 };
 /* harmony default export */ __webpack_exports__["default"] = (ApiRoutes);
 

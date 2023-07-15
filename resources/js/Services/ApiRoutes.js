@@ -91,12 +91,18 @@ const ApiRoutes = {
     BankDelete: ApiVersion + '/bank/delete',
     BankList: ApiVersion + '/bank/list',
     BankSingle: ApiVersion + '/bank/single',
-    //Bank
+    //Vendor
     VendorAdd: ApiVersion + '/vendor/save',
     VendorEdit: ApiVersion + '/vendor/update',
     VendorDelete: ApiVersion + '/vendor/delete',
     VendorList: ApiVersion + '/vendor/list',
     VendorSingle: ApiVersion + '/vendor/single',
+    //Payorder
+    PayOrderAdd: ApiVersion + '/vendor/save',
+    PayOrderEdit: ApiVersion + '/vendor/update',
+    PayOrderDelete: ApiVersion + '/vendor/delete',
+    PayOrderList: ApiVersion + '/vendor/list',
+    PayOrderSingle: ApiVersion + '/vendor/single',
 
 };
 
