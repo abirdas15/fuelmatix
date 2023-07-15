@@ -3137,6 +3137,7 @@ __webpack_require__.r(__webpack_exports__);
     return {
       param: {
         dispenser_id: '',
+        type: '',
         date: '',
         reading: '',
         litter: ''
@@ -3686,7 +3687,8 @@ __webpack_require__.r(__webpack_exports__);
       param: {
         nozzle_id: '',
         reading: '',
-        date: ''
+        date: '',
+        type: ''
       },
       listParam: {
         limit: 5000,
@@ -8824,28 +8826,42 @@ var render = function render() {
     staticClass: "mb-3 form-group col-md-6"
   }, [_c("label", {
     staticClass: "form-label"
-  }, [_vm._v("Date:")]), _vm._v(" "), _c("input", {
+  }, [_vm._v("Type:")]), _vm._v(" "), _c("select", {
     directives: [{
       name: "model",
       rawName: "v-model",
-      value: _vm.param.date,
-      expression: "param.date"
+      value: _vm.param.type,
+      expression: "param.type"
     }],
-    staticClass: "form-control date bg-white",
+    staticClass: "form-control",
     attrs: {
-      type: "text",
-      name: "date"
-    },
-    domProps: {
-      value: _vm.param.date
+      name: "type",
+      id: "type"
     },
     on: {
-      input: function input($event) {
-        if ($event.target.composing) return;
-        _vm.$set(_vm.param, "date", $event.target.value);
+      change: function change($event) {
+        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
+          return o.selected;
+        }).map(function (o) {
+          var val = "_value" in o ? o._value : o.value;
+          return val;
+        });
+        _vm.$set(_vm.param, "type", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
       }
     }
-  }), _vm._v(" "), _c("div", {
+  }, [_c("option", {
+    attrs: {
+      value: ""
+    }
+  }, [_vm._v("Select Type")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "shift sell"
+    }
+  }, [_vm._v("Shift sell")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "tank refill"
+    }
+  }, [_vm._v("Tank refill")])]), _vm._v(" "), _c("div", {
     staticClass: "invalid-feedback"
   })]), _vm._v(" "), _c("div", {
     staticClass: "mb-3 form-group col-md-6"
@@ -8897,6 +8913,33 @@ var render = function render() {
       input: function input($event) {
         if ($event.target.composing) return;
         _vm.$set(_vm.param, "litter", $event.target.value);
+      }
+    }
+  }), _vm._v(" "), _c("div", {
+    staticClass: "invalid-feedback"
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 form-group col-md-6"
+  }, [_c("label", {
+    staticClass: "form-label"
+  }, [_vm._v("Date:")]), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.param.date,
+      expression: "param.date"
+    }],
+    staticClass: "form-control date bg-white",
+    attrs: {
+      type: "text",
+      name: "date"
+    },
+    domProps: {
+      value: _vm.param.date
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.param, "date", $event.target.value);
       }
     }
   }), _vm._v(" "), _c("div", {
@@ -9052,28 +9095,42 @@ var render = function render() {
     staticClass: "mb-3 form-group col-md-6"
   }, [_c("label", {
     staticClass: "form-label"
-  }, [_vm._v("Date:")]), _vm._v(" "), _c("input", {
+  }, [_vm._v("Type:")]), _vm._v(" "), _c("select", {
     directives: [{
       name: "model",
       rawName: "v-model",
-      value: _vm.param.date,
-      expression: "param.date"
+      value: _vm.param.type,
+      expression: "param.type"
     }],
-    staticClass: "form-control date bg-white",
+    staticClass: "form-control",
     attrs: {
-      type: "text",
-      name: "date"
-    },
-    domProps: {
-      value: _vm.param.date
+      name: "type",
+      id: "type"
     },
     on: {
-      input: function input($event) {
-        if ($event.target.composing) return;
-        _vm.$set(_vm.param, "date", $event.target.value);
+      change: function change($event) {
+        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
+          return o.selected;
+        }).map(function (o) {
+          var val = "_value" in o ? o._value : o.value;
+          return val;
+        });
+        _vm.$set(_vm.param, "type", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
       }
     }
-  }), _vm._v(" "), _c("div", {
+  }, [_c("option", {
+    attrs: {
+      value: ""
+    }
+  }, [_vm._v("Select Type")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "shift sell"
+    }
+  }, [_vm._v("Shift sell")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "tank refill"
+    }
+  }, [_vm._v("Tank refill")])]), _vm._v(" "), _c("div", {
     staticClass: "invalid-feedback"
   })]), _vm._v(" "), _c("div", {
     staticClass: "mb-3 form-group col-md-6"
@@ -9125,6 +9182,33 @@ var render = function render() {
       input: function input($event) {
         if ($event.target.composing) return;
         _vm.$set(_vm.param, "litter", $event.target.value);
+      }
+    }
+  }), _vm._v(" "), _c("div", {
+    staticClass: "invalid-feedback"
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 form-group col-md-6"
+  }, [_c("label", {
+    staticClass: "form-label"
+  }, [_vm._v("Date:")]), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.param.date,
+      expression: "param.date"
+    }],
+    staticClass: "form-control date bg-white",
+    attrs: {
+      type: "text",
+      name: "date"
+    },
+    domProps: {
+      value: _vm.param.date
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.param, "date", $event.target.value);
       }
     }
   }), _vm._v(" "), _c("div", {
@@ -10174,6 +10258,47 @@ var render = function render() {
     }, [_vm._v(_vm._s(d.name))]);
   })], 2), _vm._v(" "), _c("div", {
     staticClass: "invalid-feedback"
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 form-group col-md-6"
+  }, [_c("label", {
+    staticClass: "form-label"
+  }, [_vm._v("Type:")]), _vm._v(" "), _c("select", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.param.type,
+      expression: "param.type"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      name: "type",
+      id: "type"
+    },
+    on: {
+      change: function change($event) {
+        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
+          return o.selected;
+        }).map(function (o) {
+          var val = "_value" in o ? o._value : o.value;
+          return val;
+        });
+        _vm.$set(_vm.param, "type", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
+      }
+    }
+  }, [_c("option", {
+    attrs: {
+      value: ""
+    }
+  }, [_vm._v("Select Type")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "shift sell"
+    }
+  }, [_vm._v("Shift sell")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "tank refill"
+    }
+  }, [_vm._v("Tank refill")])]), _vm._v(" "), _c("div", {
+    staticClass: "invalid-feedback"
   })]), _vm._v(" "), _vm._m(2), _vm._v(" "), _c("div", {
     staticClass: "mb-3 form-group col-md-6"
   }, [_c("label", {
@@ -10363,6 +10488,47 @@ var render = function render() {
       }
     }, [_vm._v(_vm._s(d.name))]);
   })], 2), _vm._v(" "), _c("div", {
+    staticClass: "invalid-feedback"
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 form-group col-md-6"
+  }, [_c("label", {
+    staticClass: "form-label"
+  }, [_vm._v("Type:")]), _vm._v(" "), _c("select", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.param.type,
+      expression: "param.type"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      name: "type",
+      id: "type"
+    },
+    on: {
+      change: function change($event) {
+        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
+          return o.selected;
+        }).map(function (o) {
+          var val = "_value" in o ? o._value : o.value;
+          return val;
+        });
+        _vm.$set(_vm.param, "type", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
+      }
+    }
+  }, [_c("option", {
+    attrs: {
+      value: ""
+    }
+  }, [_vm._v("Select Type")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "shift sell"
+    }
+  }, [_vm._v("Shift sell")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "tank refill"
+    }
+  }, [_vm._v("Tank refill")])]), _vm._v(" "), _c("div", {
     staticClass: "invalid-feedback"
   })]), _vm._v(" "), _vm._m(2), _vm._v(" "), _c("div", {
     staticClass: "mb-3 form-group col-md-6"
