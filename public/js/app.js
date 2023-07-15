@@ -13914,7 +13914,10 @@ var render = function render() {
   }, [_vm._v("Inbox ")])]), _vm._v(" "), _c("a", {
     staticClass: "dropdown-item ai-icon",
     attrs: {
-      href: "./login.html"
+      href: "javascript:void(0)"
+    },
+    on: {
+      click: _vm.Logout
     }
   }, [_c("svg", {
     staticClass: "text-danger",
