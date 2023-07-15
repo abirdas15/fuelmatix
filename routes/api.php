@@ -20,6 +20,7 @@ use App\Http\Controllers\ShiftSaleController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\TankController;
 use App\Http\Controllers\BankController;
+use App\Http\Controllers\VendorController;
 
 /*
 |--------------------------------------------------------------------------
@@ -138,6 +139,13 @@ Route::group(['middleware' => 'AuthReqCheck'], function() {
         Route::post('single', [BankController::class, 'single']);
         Route::post('update', [BankController::class, 'update']);
         Route::post('delete', [BankController::class, 'delete']);
+    });
+    Route::group(['prefix' => 'vendor'], function() {
+        Route::post('save', [VendorController::class, 'save']);
+        Route::post('list', [VendorController::class, 'list']);
+        Route::post('single', [VendorController::class, 'single']);
+        Route::post('update', [VendorController::class, 'update']);
+        Route::post('delete', [VendorController::class, 'delete']);
     });
 });
 
