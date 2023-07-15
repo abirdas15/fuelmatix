@@ -115,7 +115,8 @@ class DispenserController extends Controller
         $validator = Validator::make($inputData, [
             'dispenser_id' => 'required',
             'date' => 'required',
-            'reading' => 'required'
+            'reading' => 'required',
+            'type' => 'required'
         ]);
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
@@ -125,6 +126,7 @@ class DispenserController extends Controller
         $reading->date = $inputData['date'];
         $reading->reading = $inputData['reading'];
         $reading->litter = $inputData['litter'] ?? null;
+        $reading->type = $inputData['type'];
         $reading->client_company_id = $inputData['session_user']['client_company_id'];
         if ($reading->save()) {
             return response()->json(['status' => 200, 'message' => 'Successfully saved dispenser reading.']);
@@ -183,7 +185,8 @@ class DispenserController extends Controller
             'id' => 'required',
             'dispenser_id' => 'required',
             'date' => 'required',
-            'reading' => 'required'
+            'reading' => 'required',
+            'type' => 'required'
         ]);
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
@@ -195,6 +198,7 @@ class DispenserController extends Controller
         $reading->dispenser_id = $inputData['dispenser_id'];
         $reading->date = $inputData['date'];
         $reading->reading = $inputData['reading'];
+        $reading->type = $inputData['type'];
         $reading->litter = $inputData['litter'] ?? null;
         if ($reading->save()) {
             return response()->json(['status' => 200, 'message' => 'Successfully updated dispenser reading.']);
