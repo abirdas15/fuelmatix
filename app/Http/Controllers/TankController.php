@@ -286,21 +286,6 @@ class TankController extends Controller
             ]
         ]);
     }
-    public function getTankByProductId(Request $request)
-    {
-        $inputData = $request->all();
-        $validator = Validator::make($inputData, [
-            'product_id' => 'required'
-        ]);
-        if ($validator->fails()) {
-            return response()->json(['status' => 500, 'errors' => $validator->errors()]);
-        }
-        $result = Tank::select('id', 'tank_id')
-            ->where('product_id', $inputData['product_id'])
-            ->get()
-            ->toArray();
-        return response()->json(['status' => 200, 'data' => $result]);
-    }
     public function getNozzle(Request $request)
     {
         $inputData = $request->all();

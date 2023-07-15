@@ -6,6 +6,7 @@ use App\Models\Dispenser;
 use App\Models\Product;
 use App\Models\ShiftSale;
 use App\Models\ShiftSummary;
+use App\Models\Tank;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -163,5 +164,20 @@ class ProductController extends Controller
             }
         }
         return response()->json(['status' => 200, 'summary' => $dispensers, 'shift_sale' => $shitSale]);
+    }
+    public function getTank(Request $request)
+    {
+        $inputData = $request->all();
+        $validator = Validator::make($inputData, [
+            'product_id' => 'required'
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['status' => 500, 'errors' => $validator->errors()]);
+        }
+        $result = Tank::select('id', 'tank_name')
+            ->where('product_id', $inputData['product_id'])
+            ->get()
+            ->toArray();
+        return response()->json(['status' => 200, 'data' => $result]);
     }
 }

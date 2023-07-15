@@ -81,6 +81,7 @@ Route::group(['middleware' => 'AuthReqCheck'], function() {
         Route::post('update', [ProductController::class, 'update']);
         Route::post('delete', [ProductController::class, 'delete']);
         Route::post('dispenser', [ProductController::class, 'getDispenser']);
+        Route::post('get/tank', [ProductController::class, 'getTank']);
     });
     Route::group(['prefix' => 'dispenser'], function() {
         Route::post('save', [DispenserController::class, 'save']);
@@ -126,7 +127,6 @@ Route::group(['middleware' => 'AuthReqCheck'], function() {
         Route::post('single', [TankController::class, 'single']);
         Route::post('update', [TankController::class, 'update']);
         Route::post('delete', [TankController::class, 'delete']);
-        Route::post('get/product', [TankController::class, 'getTankByProductId']);
         Route::post('get/nozzle', [TankController::class, 'getNozzle']);
         Route::group(['prefix' => 'reading'], function() {
             Route::post('save', [TankController::class, 'readingSave']);
