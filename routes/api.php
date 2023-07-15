@@ -33,6 +33,7 @@ use App\Http\Controllers\TankController;
 
 Route::group(['prefix' => 'auth'], function() {
     Route::post('login', [AuthController::class, 'login']);
+    Route::post('logout', [AuthController::class, 'logout'])->middleware('AuthReqCheck');
 });
 Route::group(['middleware' => 'AuthReqCheck'], function() {
     Route::group(['prefix' => 'category'], function() {
