@@ -3,8 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\BstiChart;
+use App\Models\Dispenser;
+use App\Models\NozzleReading;
 use App\Models\Tank;
 use App\Models\TankLog;
+use App\Models\TankRefill;
+use App\Models\TankRefillHistory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -16,6 +20,7 @@ class TankController extends Controller
     {
         $inputData = $request->all();
         $validator = Validator::make($inputData, [
+            'product_id' => 'required',
             'tank_name' => 'required',
             'capacity' => 'required',
             'height' => 'required'
@@ -24,6 +29,7 @@ class TankController extends Controller
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
         $tank = new Tank();
+        $tank->product_id = $inputData['product_id'];
         $tank->tank_name = $inputData['tank_name'];
         $tank->capacity = $inputData['capacity'];
         $tank->height = $inputData['height'];
@@ -59,8 +65,9 @@ class TankController extends Controller
         $order_by = isset($inputData['order_by']) ? $inputData['order_by'] : 'id';
         $order_mode = isset($inputData['order_mode']) ? $inputData['order_mode'] : 'DESC';
         $count = Tank::count();
-        $result = Tank::select('tank.id' ,'tank.tank_name', 'tank.height', 'tank.capacity')
-            ->where('client_company_id', $inputData['session_user']['client_company_id'])
+        $result = Tank::select('tank.id' ,'tank.tank_name', 'tank.height', 'tank.capacity', 'products.name as product_name')
+            ->leftJoin('products', 'products.id', 'tank.product_id')
+            ->where('tank.client_company_id', $inputData['session_user']['client_company_id'])
             ->with('last_reading', function($query) use ($count) {
                 return $query->select('id', 'tank_id', 'height', 'water_height')->orderBy('id', 'DESC')->take($count);
             });
@@ -98,7 +105,8 @@ class TankController extends Controller
             'id' => 'required',
             'tank_name' => 'required',
             'capacity' => 'required',
-            'height' => 'required'
+            'height' => 'required',
+            'product_id' => 'required',
         ]);
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
@@ -107,6 +115,7 @@ class TankController extends Controller
         if ($tank == null) {
             return response()->json(['status' => 500, 'error' => 'Cannot find tank.']);
         }
+        $tank->product_id = $inputData['product_id'];
         $tank->tank_name = $inputData['tank_name'];
         $tank->capacity = $inputData['capacity'];
         $tank->height = $inputData['height'];
@@ -252,5 +261,217 @@ class TankController extends Controller
         }
         TankLog::where('id', $inputData['id'])->delete();
         return response()->json(['status' => 200, 'message' => 'Successfully deleted tank reading.']);
+    }
+    public function latestReading(Request $request)
+    {
+        $inputData = $request->all();
+        $validator = Validator::make($inputData, [
+            'type' => 'required'
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['status' => 500, 'errors' => $validator->errors()]);
+        }
+        $result = TankLog::select('id', 'height')
+            ->where('type', $inputData['type'])
+            ->where('client_company_id', $inputData['session_user']['client_company_id'])
+            ->orderBy('id',  'DESC')
+            ->limit(2)
+            ->get()
+            ->toArray();
+        return response()->json([
+            'status' => 200,
+            'data' => [
+                'start_reading' => isset($result[1]) ? $result[1]['height'] : 0,
+                'end_reading' => isset($result[0]) ? $result[0]['height'] : 0,
+            ]
+        ]);
+    }
+    public function getTankByProductId(Request $request)
+    {
+        $inputData = $request->all();
+        $validator = Validator::make($inputData, [
+            'product_id' => 'required'
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['status' => 500, 'errors' => $validator->errors()]);
+        }
+        $result = Tank::select('id', 'tank_id')
+            ->where('product_id', $inputData['product_id'])
+            ->get()
+            ->toArray();
+        return response()->json(['status' => 200, 'data' => $result]);
+    }
+    public function getNozzle(Request $request)
+    {
+        $inputData = $request->all();
+        $validator = Validator::make($inputData, [
+            'tank_id' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['status' => 500, 'errors' => $validator->errors()]);
+        }
+        $dispensers = Dispenser::select('id', 'dispenser_name')
+            ->where('tank_id', $inputData['tank_id'])
+            ->with(['nozzle' => function($q) {
+                $q->select('nozzles.id', 'nozzles.dispenser_id', 'nozzles.name');
+            }])
+            ->get()
+            ->toArray();
+        foreach ($dispensers as &$dispenser) {
+            foreach ($dispenser['nozzle'] as &$nozzle) {
+                $reading = NozzleReading::select('reading')->where('nozzle_id', $nozzle['id'])->where('type', 'tank refill')->limit(2)->get()->toArray();
+                $nozzle['start_reading'] = isset($reading[0]) ? $reading[0]['reading'] : 0;
+                $nozzle['end_reading'] = isset($reading[1]) ? $reading[1]['reading'] : 0;
+                $nozzle['buy_price'] = 0;
+            }
+        }
+        return $dispensers;
+    }
+    public function refillSave(Request $request)
+    {
+        $inputData = $request->all();
+        $validator = Validator::make($inputData, [
+            'date' => 'required',
+            'tank_id' => 'required',
+            'pay_order_id' => 'required',
+            'quantity' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['status' => 500, 'errors' => $validator->errors()]);
+        }
+        $tankRefill = new TankRefill();
+        $tankRefill->date = $inputData['date'];
+        $tankRefill->tank_id = $inputData['tank_id'];
+        $tankRefill->pay_order_id = $inputData['pay_order_id'];
+        $tankRefill->quantity = $inputData['quantity'];
+        $tankRefill->start_reading = $inputData['start_reading'];
+        $tankRefill->end_reading = $inputData['end_reading'] ?? 0;
+        $tankRefill->buy_price = $inputData['buy_price'] ?? 0;
+        $tankRefill->net_profit = $inputData['net_profit'] ?? 0;
+        $tankRefill->client_company_id = $inputData['session_user']['client_company_id'];
+        if ($tankRefill->save()) {
+            if (isset($inputData['dispensers'])) {
+                foreach ($inputData['dispensers'] as $dispenser) {
+                    foreach ($dispenser['nozzle'] as $nozzle) {
+                        $tankRefillHistory = new TankRefillHistory();
+                        $tankRefillHistory->tank_refill_id = $tankRefill->id;
+                        $tankRefillHistory->nozzle_id = $nozzle['id'];
+                        $tankRefillHistory->start_reading = $nozzle['start_reading'];
+                        $tankRefillHistory->end_reading = $nozzle['end_reading'];
+                        $tankRefillHistory->buy_price = $nozzle['buy_price'];
+                        $tankRefillHistory->save();
+                    }
+                }
+            }
+            return response()->json(['status' => 200, 'message' => 'Successfully saved tank refill.']);
+        }
+        return response()->json(['status' => 500, 'error' => 'Cannot saved tank refill.']);
+    }
+    public function refillList(Request $request)
+    {
+        $inputData = $request->all();
+        $limit = isset($inputData['limit']) ? $inputData['limit'] : 10;
+        $keyword = isset($inputData['keyword']) ? $inputData['keyword'] : '';
+        $order_by = isset($inputData['order_by']) ? $inputData['order_by'] : 'tank_refill.id';
+        $order_mode = isset($inputData['order_mode']) ? $inputData['order_mode'] : 'DESC';
+        $result = TankRefill::select('tank_refill.id', 'tank_refill.date', 'tank_refill.start_reading', 'tank_refill.end_reading', 'tank_refill.net_profit', 'tank.tank_name', 'pay_order.amount')
+            ->leftJoin('tank', 'tank.id', 'tank_refill.tank_id')
+            ->leftJoin('pay_order', 'pay_order.id', 'tank_refill.pay_order_id')
+            ->where('tank_refill.client_company_id', $inputData['session_user']['client_company_id']);
+        if (!empty($keyword)) {
+            $result->where(function($q) use ($keyword) {
+                $q->where('tank.tank_name', 'LIKE', '%'.$keyword.'%');
+            });
+        }
+        $result = $result->orderBy($order_by, $order_mode)
+            ->paginate($limit);
+        foreach ($result as &$data) {
+            $data['date'] = date('d/m/Y', strtotime($data['date']));
+        }
+        return response()->json(['status' => 200, 'data' => $result]);
+    }
+    public function refillSingle(Request $request)
+    {
+        $inputData = $request->all();
+        $validator = Validator::make($inputData, [
+            'id' => 'required'
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['status' => 500, 'errors' => $validator->errors()]);
+        }
+        $result = TankRefill::find($inputData['id']);
+        $refillHistory = TankRefillHistory::where('tank_refill_id', $inputData['id'])->get()->keyBy('nozzle_id');
+        $dispensers = Dispenser::select('id', 'dispenser_name')
+            ->where('tank_id', $result['tank_id'])
+            ->with(['nozzle' => function($q) {
+                $q->select('nozzles.id', 'nozzles.dispenser_id', 'nozzles.name');
+            }])
+            ->get()
+            ->toArray();
+        foreach ($dispensers as &$dispenser) {
+            foreach ($dispenser['nozzle'] as &$nozzle) {
+                $nozzle['start_reading'] = isset($refillHistory[$nozzle['id']]) ? $refillHistory[$nozzle['id']]['start_reading'] : 0;
+                $nozzle['end_reading'] = isset($refillHistory[$nozzle['id']]) ? $refillHistory[$nozzle['id']]['end_reading'] : 0;
+                $nozzle['buy_price'] = isset($refillHistory[$nozzle['id']]) ? $refillHistory[$nozzle['id']]['buy_price'] : 0;
+            }
+        }
+        return response()->json(['sattus' => 200, 'data' => $result, 'dispensers' => $dispensers]);
+    }
+    public function refillUpdate(Request $request)
+    {
+        $inputData = $request->all();
+        $validator = Validator::make($inputData, [
+            'id' => 'required',
+            'date' => 'required',
+            'tank_id' => 'required',
+            'pay_order_id' => 'required',
+            'quantity' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['status' => 500, 'errors' => $validator->errors()]);
+        }
+        $tankRefill = TankRefill::find($inputData['id']);
+        if ($tankRefill == null) {
+            return response()->json(['status' => 500, 'error' => 'Cannot find tank refill.']);
+        }
+        $tankRefill->date = $inputData['date'];
+        $tankRefill->tank_id = $inputData['tank_id'];
+        $tankRefill->pay_order_id = $inputData['pay_order_id'];
+        $tankRefill->quantity = $inputData['quantity'];
+        $tankRefill->start_reading = $inputData['start_reading'];
+        $tankRefill->end_reading = $inputData['end_reading'] ?? 0;
+        $tankRefill->buy_price = $inputData['buy_price'] ?? 0;
+        $tankRefill->net_profit = $inputData['net_profit'] ?? 0;
+        if ($tankRefill->save()) {
+            if (isset($inputData['dispensers'])) {
+                TankRefillHistory::where('tank_refill_id', $inputData['id'])->delete();
+                foreach ($inputData['dispensers'] as $dispenser) {
+                    foreach ($dispenser['nozzle'] as $nozzle) {
+                        $tankRefillHistory = new TankRefillHistory();
+                        $tankRefillHistory->tank_refill_id = $inputData['id'];
+                        $tankRefillHistory->nozzle_id = $nozzle['id'];
+                        $tankRefillHistory->start_reading = $nozzle['start_reading'];
+                        $tankRefillHistory->end_reading = $nozzle['end_reading'];
+                        $tankRefillHistory->buy_price = $nozzle['buy_price'];
+                        $tankRefillHistory->save();
+                    }
+                }
+            }
+            return response()->json(['status' => 200, 'message' => 'Successfully updated tank refill.']);
+        }
+        return response()->json(['status' => 500, 'error' => 'Cannot updated tank refill.']);
+    }
+    public function refillDelete(Request $request)
+    {
+        $inputData = $request->all();
+        $validator = Validator::make($inputData, [
+            'id' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['status' => 500, 'errors' => $validator->errors()]);
+        }
+        TankRefill::where('id', $inputData['id'])->delete();
+        TankRefillHistory::where('tank_refill_id', $inputData['id'])->delete();
+        return response()->json(['status' => 200, 'message' => 'Successfully deleted tank refill.']);
     }
 }

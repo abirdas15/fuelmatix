@@ -14,6 +14,7 @@ class DispenserController extends Controller
         $inputData = $request->all();
         $validator = Validator::make($inputData, [
             'product_id' => 'required',
+            'tank_id' => 'required',
             'dispenser_name' => 'required',
             'brand' => 'required',
             'serial' => 'required'
@@ -23,6 +24,7 @@ class DispenserController extends Controller
         }
         $dispenser = new Dispenser();
         $dispenser->product_id = $inputData['product_id'];
+        $dispenser->tank_id = $inputData['tank_id'];
         $dispenser->dispenser_name = $inputData['dispenser_name'];
         $dispenser->brand = $inputData['brand'];
         $dispenser->serial = $inputData['serial'];
@@ -40,8 +42,9 @@ class DispenserController extends Controller
         $keyword = isset($inputData['keyword']) ? $inputData['keyword'] : '';
         $order_by = isset($inputData['order_by']) ? $inputData['order_by'] : 'dispensers.id';
         $order_mode = isset($inputData['order_mode']) ? $inputData['order_mode'] : 'DESC';
-        $result = Dispenser::select('dispensers.*', 'products.name as product_name')
+        $result = Dispenser::select('dispensers.*', 'products.name as product_name', 'tank.tank_name')
             ->leftJoin('products', 'products.id', '=', 'dispensers.product_id')
+            ->leftJoin('tank', 'tank.id', '=', 'dispensers.tank_id')
             ->where('dispensers.client_company_id', $inputData['session_user']['client_company_id']);
         if (!empty($keyword)) {
             $result->where(function($q) use ($keyword) {
@@ -72,6 +75,7 @@ class DispenserController extends Controller
         $validator = Validator::make($inputData, [
             'id' => 'required',
             'product_id' => 'required',
+            'tank_id' => 'required',
             'dispenser_name' => 'required',
             'brand' => 'required',
             'serial' => 'required'
@@ -84,6 +88,7 @@ class DispenserController extends Controller
             return response()->json(['status' => 500, 'error' => 'Cannot find dispenser..']);
         }
         $dispenser->product_id = $inputData['product_id'];
+        $dispenser->tank_id = $inputData['tank_id'];
         $dispenser->dispenser_name = $inputData['dispenser_name'];
         $dispenser->brand = $inputData['brand'];
         $dispenser->serial = $inputData['serial'];

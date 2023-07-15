@@ -126,12 +126,22 @@ Route::group(['middleware' => 'AuthReqCheck'], function() {
         Route::post('single', [TankController::class, 'single']);
         Route::post('update', [TankController::class, 'update']);
         Route::post('delete', [TankController::class, 'delete']);
+        Route::post('get/product', [TankController::class, 'getTankByProductId']);
+        Route::post('get/nozzle', [TankController::class, 'getNozzle']);
         Route::group(['prefix' => 'reading'], function() {
             Route::post('save', [TankController::class, 'readingSave']);
             Route::post('list', [TankController::class, 'readingList']);
             Route::post('single', [TankController::class, 'readingSingle']);
             Route::post('update', [TankController::class, 'readingUpdate']);
             Route::post('delete', [TankController::class, 'readingDelete']);
+            Route::post('latest', [TankController::class, 'latestReading']);
+        });
+        Route::group(['prefix' => 'refill'], function() {
+            Route::post('save', [TankController::class, 'refillSave']);
+            Route::post('list', [TankController::class, 'refillList']);
+            Route::post('single', [TankController::class, 'refillSingle']);
+            Route::post('update', [TankController::class, 'refillUpdate']);
+            Route::post('delete', [TankController::class, 'refillDelete']);
         });
     });
     Route::group(['prefix' => 'bank'], function() {
