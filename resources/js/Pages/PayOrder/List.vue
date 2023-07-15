@@ -37,13 +37,21 @@
                                         <table class="display  dataTable no-footer" style="min-width: 845px">
                                             <thead>
                                             <tr class="text-white" style="background-color: #4886EE;color:#ffffff">
-                                                <th class="text-white" @click="sortData('name')" :class="sortClass('name')">PayOrder Name</th>
+                                                <th class="text-white" @click="sortData('number')" :class="sortClass('number')">Number</th>
+                                                <th class="text-white" @click="sortData('bank_name')" :class="sortClass('bank_name')">Bank</th>
+                                                <th class="text-white" @click="sortData('vendor_name')" :class="sortClass('vendor_name')">Vendor</th>
+                                                <th class="text-white" @click="sortData('amount')" :class="sortClass('amount')">Amount</th>
+                                                <th class="text-white" @click="sortData('quantity')" :class="sortClass('quantity')">Quantity</th>
                                                 <th class="text-white" >Action</th>
                                             </tr>
                                             </thead>
                                             <tbody v-if="listData.length > 0 && TableLoading == false">
                                             <tr v-for="f in listData">
-                                                <td >{{f.name}}</td>
+                                                <td >{{f.number}}</td>
+                                                <td >{{f.bank_name}}</td>
+                                                <td >{{f.vendor_name}}</td>
+                                                <td >{{f.amount}}</td>
+                                                <td >{{f.quantity}}</td>
                                                 <td>
                                                     <div class="d-flex justify-content-end">
                                                         <router-link :to="{name: 'PayOrderEdit', params: { id: f.id }}" class=" btn btn-primary shadow btn-xs sharp me-1">

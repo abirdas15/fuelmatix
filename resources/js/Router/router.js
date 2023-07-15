@@ -50,6 +50,9 @@ import BankEdit from "../Pages/Banks/Edit";
 import Vendor from "../Pages/Vendors/List";
 import VendorAdd from "../Pages/Vendors/Add";
 import VendorEdit from "../Pages/Vendors/Edit";
+import PayOrder from "../Pages/PayOrder/List";
+import PayOrderAdd from "../Pages/PayOrder/Add";
+import PayOrderEdit from "../Pages/PayOrder/Edit";
 
 const ROOT_URL = "";
 const router = new VueRouter({

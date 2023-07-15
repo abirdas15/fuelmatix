@@ -97,12 +97,13 @@ const ApiRoutes = {
     VendorDelete: ApiVersion + '/vendor/delete',
     VendorList: ApiVersion + '/vendor/list',
     VendorSingle: ApiVersion + '/vendor/single',
-    //Payorder
-    PayOrderAdd: ApiVersion + '/vendor/save',
-    PayOrderEdit: ApiVersion + '/vendor/update',
-    PayOrderDelete: ApiVersion + '/vendor/delete',
-    PayOrderList: ApiVersion + '/vendor/list',
-    PayOrderSingle: ApiVersion + '/vendor/single',
+    //Pay order
+    PayOrderAdd: ApiVersion + '/pay/order/save',
+    PayOrderEdit: ApiVersion + '/pay/order/update',
+    PayOrderDelete: ApiVersion + '/pay/order/delete',
+    PayOrderList: ApiVersion + '/pay/order/list',
+    PayOrderSingle: ApiVersion + '/pay/order/single',
+    PayOrderLatest: ApiVersion + '/pay/order/latest',
 
 };
 
