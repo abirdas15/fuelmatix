@@ -44,6 +44,9 @@ import TankEdit from "../Pages/Fuel/Tank/Edit";
 import TankReading from "../Pages/Fuel/TankReading/List";
 import TankReadingAdd from "../Pages/Fuel/TankReading/Add";
 import TankReadingEdit from "../Pages/Fuel/TankReading/Edit";
+import TankRefill from "../Pages/Fuel/TankRefill/List";
+import TankRefillAdd from "../Pages/Fuel/TankRefill/Add";
+import TankRefillEdit from "../Pages/Fuel/TankRefill/Edit";
 import Bank from "../Pages/Banks/List";
 import BankAdd from "../Pages/Banks/Add";
 import BankEdit from "../Pages/Banks/Edit";
@@ -104,6 +107,9 @@ const router = new VueRouter({
                 { path: ROOT_URL + "/tank/reading", name: "TankReading", component: TankReading},
                 { path: ROOT_URL + "/tank/reading/add", name: "TankReadingAdd", component: TankReadingAdd},
                 { path: ROOT_URL + "/tank/reading/edit/:id", name: "TankReadingEdit", component: TankReadingEdit},
+                { path: ROOT_URL + "/tank/refill", name: "TankRefill", component: TankRefill},
+                { path: ROOT_URL + "/tank/refill/add", name: "TankRefillAdd", component: TankRefillAdd},
+                { path: ROOT_URL + "/tank/refill/edit/:id", name: "TankRefillEdit", component: TankRefillEdit},
                 { path: ROOT_URL + "/bank", name: "Bank", component: Bank},
                 { path: ROOT_URL + "/bank/add", name: "BankAdd", component: BankAdd},
                 { path: ROOT_URL + "/bank/edit/:id", name: "BankEdit", component: BankEdit},

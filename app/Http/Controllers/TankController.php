@@ -95,7 +95,7 @@ class TankController extends Controller
     public function single(Request $request)
     {
         $inputData = $request->all();
-        $result = Tank::select('id', 'tank_name', 'height', 'capacity')->find($inputData['id']);
+        $result = Tank::select('id', 'tank_name', 'height', 'capacity', 'product_id')->find($inputData['id']);
         return response()->json(['status' => 200, 'data' => $result]);
     }
     public function update(Request $request)
@@ -266,13 +266,14 @@ class TankController extends Controller
     {
         $inputData = $request->all();
         $validator = Validator::make($inputData, [
-            'type' => 'required'
+            'tank_id' => 'required'
         ]);
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
         $result = TankLog::select('id', 'height')
-            ->where('type', $inputData['type'])
+            ->where('type', 'tank refill')
+            ->where('tank_id', $inputData['tank_id'])
             ->where('client_company_id', $inputData['session_user']['client_company_id'])
             ->orderBy('id',  'DESC')
             ->limit(2)

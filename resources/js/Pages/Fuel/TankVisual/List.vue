@@ -58,6 +58,9 @@
                                     <div class="text-center mt-1 fw-bold">
                                         {{f.tank_name}}
                                     </div>
+                                    <div class="text-center">
+                                        ({{f.product_name}})
+                                    </div>
                                 </div>
                             </div>
                         </div>

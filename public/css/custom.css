@@ -495,12 +495,12 @@ h1 {
 .paginate_button.big{
      width:68px!important;
 }
-.metismenu li .mm-collapse li a{
+.metismenu li .bichi li a{
     padding-left: 3rem!important;
 }
-.metismenu li .mm-collapse li a:hover{
+.metismenu li .bichi li a:hover{
     padding-left: 4.5rem!important;
 }
-.metismenu li .mm-collapse li a::before{
+.metismenu li .bichi li a::before{
     left: 2rem!important;
 }

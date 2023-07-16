@@ -19,7 +19,7 @@
                                 <div class="col-xl-3 mb-3">
                                     <div class="example">
                                         <p class="mb-1">Select Date </p>
-                                        <input type="text" class="form-control date" name="date">
+                                        <input type="text" class="form-control date bg-white" name="date">
                                     </div>
                                 </div>
                                 <div class="col-xl-3 mb-3">

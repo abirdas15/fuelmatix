@@ -25,6 +25,14 @@
                                         <div class="invalid-feedback"></div>
                                     </div>
                                     <div class="mb-3 form-group col-md-6">
+                                        <label class="form-label">Tank Product:</label>
+                                        <select class="form-control" name="product_id" id="product_id"  v-model="param.product_id">
+                                            <option value="">Select Product</option>
+                                            <option v-for="d in listData" :value="d.id">{{d.name}}</option>
+                                        </select>
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                    <div class="mb-3 form-group col-md-6">
                                         <label class="form-label">Tank capacity:</label>
                                         <input type="text" class="form-control" name="capacity" v-model="param.capacity">
                                         <div class="invalid-feedback"></div>
@@ -69,9 +77,11 @@ export default {
             param: {
                 tank_name: '',
                 capacity: '',
+                product_id: '',
                 height: '',
                 file: '',
             },
+            listData: [],
             loading: false,
         }
     },
@@ -82,12 +92,21 @@ export default {
                 return;
             this.param.file = files[0];
         },
+        getProduct: function () {
+            ApiService.POST(ApiRoutes.ProductList, {limit: 5000, page: 1},res => {
+                this.TableLoading = false
+                if (parseInt(res.status) === 200) {
+                    this.listData = res.data.data;
+                }
+            });
+        },
         save: function () {
             ApiService.ClearErrorHandler();
             let formData = new FormData()
             formData.append('tank_name', this.param.tank_name)
             formData.append('capacity', this.param.capacity)
             formData.append('height', this.param.height)
+            formData.append('product_id', this.param.product_id)
             formData.append('file', this.param.file)
             this.loading = true
             ApiService.POST(ApiRoutes.TankAdd, formData,res => {
@@ -103,6 +122,7 @@ export default {
         },
     },
     created() {
+        this.getProduct()
     },
     mounted() {
         $('#dashboard_bar').text('Tank Add')

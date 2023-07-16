@@ -13,7 +13,7 @@
                     <i class="fa-solid fa-cart-shopping icon-style" aria-hidden="true"></i>
                     <span class="nav-text">Sales</span>
                 </a>
-                    <ul aria-expanded="false">
+                    <ul aria-expanded="false" class="bichi">
                         <li><router-link :to="{name: 'ShiftSaleStart'}">Shift Sale</router-link></li>
                         <li><a href="./sale.html">Sale</a></li>
                         <li><a href="./salesHistroy.html">Sale Histroy</a></li>
@@ -27,9 +27,8 @@
                     <i class="fa-solid fa-gas-pump"></i>
                     <span class="nav-text">Fule</span>
                 </a>
-                    <ul aria-expanded="false">
-                        <li><a href="./tankRefill.html">Refill</a></li>
-                        <li><a href="./tankRefillHistory.html">Tank Refill History</a></li>
+                    <ul aria-expanded="false" class="bichi">
+                        <li><router-link :to="{name: 'TankRefill'}">Refill</router-link></li>
                         <li><a href="./fuelRefillVoucher.html">Fuel Refill Voucher</a></li>
                         <li><a href="./refillHistroyDetails.html">Refill Histroy Details</a></li>
                         <li><router-link :to="{name: 'Dispenser'}">Dispenser</router-link></li>
@@ -46,10 +45,10 @@
                     <i class="fa-regular fa-money-bill-1"></i>
                     <span class="nav-text">Payment</span>
                 </a>
-                    <ul aria-expanded="false">
+                    <ul aria-expanded="false" class="bichi">
                         <li><router-link :to="{name: 'Vendor'}">Vendors</router-link></li>
                     </ul>
-                    <ul aria-expanded="false">
+                    <ul aria-expanded="false" class="bichi">
                         <li><router-link :to="{name: 'PayOrder'}">Pay Orders</router-link></li>
                     </ul>
                 </li>
@@ -62,7 +61,7 @@
                     <i class="fa-solid fa-building-columns"></i>
                     <span class="nav-text">Banks</span>
                 </a>
-                    <ul aria-expanded="false">
+                    <ul aria-expanded="false" class="bichi">
                         <li><router-link :to="{name: 'Bank'}">Bnaks </router-link></li>
                         <li><a href="./#">Personal Accounts</a></li>
                         <li><a href="./#">Transfer</a></li>
@@ -73,7 +72,7 @@
                     <i class="	fas fa-users"></i>
                     <span class="nav-text">Field</span>
                 </a>
-                    <ul aria-expanded="false">
+                    <ul aria-expanded="false" class="bichi">
                         <li><a href="./Field1.html">Field-1</a></li>
                         <li><a href="./Field217.html">Field-217</a></li>
                         <li><a href="./card.html">Shopping caed</a></li>
@@ -87,7 +86,7 @@
                     <i class="fa-solid fa-money-bill"></i>
                     <span class="nav-text">Expenses</span>
                 </a>
-                    <ul aria-expanded="false">
+                    <ul aria-expanded="false" class="bichi">
                         <li><router-link :to="{name:'Expense'}">Expense</router-link></li>
                     </ul>
                 </li>
@@ -95,7 +94,7 @@
                     <i class="	fas fa-users"></i>
                     <span class="nav-text">Setup</span>
                 </a>
-                    <ul aria-expanded="false">
+                    <ul aria-expanded="false" class="bichi">
                         <li><a href="./tank&NozzleSetup.html">Pump & Nozzle Setup</a></li>
                         <li><a href="./tank.html">Tank Setup</a></li>
                         <li><a href="./creditCompanySetup.html">Credit Company Setup </a></li>
@@ -108,7 +107,7 @@
                     <i class="	fas fa-users"></i>
                     <span class="nav-text">Report</span>
                 </a>
-                    <ul aria-expanded="false">
+                    <ul aria-expanded="false" class="bichi">
                         <li><a href="./#">General</a></li>
                         <li><a href="./#">Income Statement</a></li>
                         <li><a href="./#">Porfit & Loss</a></li>
@@ -120,7 +119,7 @@
                     <i class="fas fa-dollar-sign"></i>
                     <span class="nav-text">Accounting</span>
                 </a>
-                    <ul aria-expanded="false">
+                    <ul aria-expanded="false" class="bichi">
                         <li>
                             <router-link :to="{name: 'Accounts'}" >Accounting
                             </router-link>

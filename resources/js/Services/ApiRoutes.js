@@ -37,6 +37,7 @@ const ApiRoutes = {
     ProductSingle: ApiVersion + '/product/single',
     ProductType: ApiVersion + '/product/type/list',
     ProductDispenser: ApiVersion + '/product/dispenser',
+    ProductTank: ApiVersion + '/product/get/tank',
     //Dispenser
     DispenserAdd: ApiVersion + '/dispenser/save',
     DispenserEdit: ApiVersion + '/dispenser/update',
@@ -79,12 +80,20 @@ const ApiRoutes = {
     TankDelete: ApiVersion + '/tank/delete',
     TankList: ApiVersion + '/tank/list',
     TankSingle: ApiVersion + '/tank/single',
+    TankGetNozzle: ApiVersion + '/tank/get/nozzle',
     //Tank Reading
     TankReadingAdd: ApiVersion + '/tank/reading/save',
     TankReadingEdit: ApiVersion + '/tank/reading/update',
     TankReadingDelete: ApiVersion + '/tank/reading/delete',
     TankReadingList: ApiVersion + '/tank/reading/list',
     TankReadingSingle: ApiVersion + '/tank/reading/single',
+    TankReadingLatest: ApiVersion + '/tank/reading/latest',
+    //Tank Refill
+    TankRefillAdd: ApiVersion + '/tank/refill/save',
+    TankRefillEdit: ApiVersion + '/tank/refill/update',
+    TankRefillDelete: ApiVersion + '/tank/refill/delete',
+    TankRefillList: ApiVersion + '/tank/refill/list',
+    TankRefillSingle: ApiVersion + '/tank/refill/single',
     //Bank
     BankAdd: ApiVersion + '/bank/save',
     BankEdit: ApiVersion + '/bank/update',

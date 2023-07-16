@@ -30,16 +30,26 @@
                                         <div class="invalid-feedback"></div>
                                     </div>
                                     <div class="mb-3 form-group col-md-6">
-                                        <label class="form-label">Serial:</label>
-                                        <input type="text" class="form-control" name="serial" v-model="param.serial">
-                                        <div class="invalid-feedback"></div>
-                                    </div>
-                                    <div class="mb-3 form-group col-md-6">
                                         <label class="form-label">Select Product:</label>
                                         <select class="form-control" name="product_id" id="product_id"  v-model="param.product_id">
                                             <option value="">Select Product</option>
                                             <option v-for="d in listData" :value="d.id">{{d.name}}</option>
                                         </select>
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+
+                                    <div class="mb-3 form-group col-md-6">
+                                        <label class="form-label">Select Tank:</label>
+                                        <select class="form-control" name="tank_id" id="tank_id"  v-model="param.tank_id">
+                                            <option value="">Select Tank</option>
+                                            <option v-for="d in listDataTank" :value="d.id">{{d.tank_name}}</option>
+                                        </select>
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+
+                                    <div class="mb-3 form-group col-md-6">
+                                        <label class="form-label">Serial:</label>
+                                        <input type="text" class="form-control" name="serial" v-model="param.serial">
                                         <div class="invalid-feedback"></div>
                                     </div>
                                     <div class="mb-3 form-group col-md-6">
@@ -78,10 +88,17 @@ export default {
                 brand: '',
                 serial: '',
                 product_id: '',
+                tank_id: '',
                 opening_stock: ''
             },
             loading: false,
             listData: [],
+            listDataTank: [],
+        }
+    },
+    watch: {
+        'param.product_id': function () {
+            this.getTank()
         }
     },
     methods: {
@@ -90,6 +107,14 @@ export default {
                 this.TableLoading = false
                 if (parseInt(res.status) === 200) {
                     this.listData = res.data.data;
+                }
+            });
+        },
+        getTank: function () {
+            ApiService.POST(ApiRoutes.ProductTank, {product_id: this.param.product_id},res => {
+                this.TableLoading = false
+                if (parseInt(res.status) === 200) {
+                    this.listDataTank = res.data;
                 }
             });
         },

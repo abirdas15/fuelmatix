@@ -43,7 +43,7 @@
                                                     <div class="row align-items-center text-start">
                                                         <div class="col-md-2">
                                                             <label class="form-label">
-                                                                <p class="m-0">Oll Stock </p>
+                                                                <p class="m-0">OIL Stock </p>
                                                             </label>
 
                                                         </div>
