@@ -5119,7 +5119,7 @@ __webpack_require__.r(__webpack_exports__);
         quantity: 0,
         start_reading: 0,
         end_reading: 0,
-        buy_price: 0,
+        dip_sale: 0,
         amount: 0,
         net_profit: 0
       },
@@ -5186,7 +5186,7 @@ __webpack_require__.r(__webpack_exports__);
         _this3.tankReadingData = res;
         _this3.tankReadingData.forEach(function (v) {
           v.nozzle.forEach(function (nozzle) {
-            nozzle.buy_price = (nozzle.end_reading - nozzle.start_reading) * _this3.unit_price;
+            nozzle.sale = nozzle.end_reading - nozzle.start_reading;
             _this3.total_nozzle_buy_price += nozzle.buy_price;
           });
         });
@@ -15420,26 +15420,26 @@ var render = function render() {
     staticClass: "mb-3 form-group col-md-3"
   }, [_c("label", {
     staticClass: "form-label"
-  }, [_vm._v("DIP Sale:")]), _vm._v(" "), _c("input", {
+  }, [_vm._v("Tank Volume:")]), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
-      value: _vm.param.buy_price,
-      expression: "param.buy_price"
+      value: _vm.param.dip_sale,
+      expression: "param.dip_sale"
     }],
     staticClass: "form-control",
     attrs: {
       type: "text",
       disabled: "",
-      name: "end_reading"
+      name: "dip_sale"
     },
     domProps: {
-      value: _vm.param.buy_price
+      value: _vm.param.dip_sale
     },
     on: {
       input: function input($event) {
         if ($event.target.composing) return;
-        _vm.$set(_vm.param, "buy_price", $event.target.value);
+        _vm.$set(_vm.param, "dip_sale", $event.target.value);
       }
     }
   }), _vm._v(" "), _c("div", {
@@ -15516,8 +15516,8 @@ var render = function render() {
         directives: [{
           name: "model",
           rawName: "v-model",
-          value: n.buy_price,
-          expression: "n.buy_price"
+          value: n.sale,
+          expression: "n.sale"
         }],
         staticClass: "form-control",
         attrs: {
@@ -15526,12 +15526,12 @@ var render = function render() {
           id: "sorReading" + nIndex + dIndex
         },
         domProps: {
-          value: n.buy_price
+          value: n.sale
         },
         on: {
           input: function input($event) {
             if ($event.target.composing) return;
-            _vm.$set(n, "buy_price", $event.target.value);
+            _vm.$set(n, "sale", $event.target.value);
           }
         }
       })])]);
@@ -15543,6 +15543,29 @@ var render = function render() {
   }), _vm._v(" "), _c("div", {
     staticClass: "col-sm-4"
   }, [_c("div", {
+    staticClass: "text-right mb-4"
+  }, [_c("label", [_vm._v("Total refill volume")]), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.total_nozzle_buy_price,
+      expression: "total_nozzle_buy_price"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      disabled: ""
+    },
+    domProps: {
+      value: _vm.total_nozzle_buy_price
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.total_nozzle_buy_price = $event.target.value;
+      }
+    }
+  })]), _vm._v(" "), _c("div", {
     staticClass: "text-right mb-4"
   }, [_c("label", [_vm._v("Loss/Porfit")]), _vm._v(" "), _c("input", {
     directives: [{
@@ -59413,7 +59436,7 @@ var app = new vue__WEBPACK_IMPORTED_MODULE_1___default.a({
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! D:\xampp7.4\htdocs\fuelmatix\resources\js\app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! D:\xampp\htdocs\projects\fuelmatix\resources\js\app.js */"./resources/js/app.js");
 
 
 /***/ })

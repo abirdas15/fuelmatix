@@ -64,8 +64,8 @@
                                                 <div class="invalid-feedback"></div>
                                             </div>
                                             <div class="mb-3 form-group col-md-3">
-                                                <label class="form-label">DIP Sale:</label>
-                                                <input type="text" disabled class="form-control " name="end_reading" v-model="param.buy_price">
+                                                <label class="form-label">Tank Volume:</label>
+                                                <input type="text" disabled class="form-control " name="dip_sale" v-model="param.dip_sale">
                                                 <div class="invalid-feedback"></div>
                                             </div>
                                         </div>
@@ -98,7 +98,7 @@
                                                     <label>sale on {{ n.name }} </label>
                                                     <input type="text" class="form-control" disabled
                                                              :id="'sorReading'+nIndex+dIndex"
-                                                           v-model="n.buy_price">
+                                                           v-model="n.sale">
                                                 </div>
                                             </div>
                                         </div>
@@ -106,6 +106,10 @@
                                     <div class="row">
                                         <div class="col-sm-8"></div>
                                         <div class="col-sm-4">
+                                            <div class="text-right mb-4">
+                                                <label>Total refill volume</label>
+                                                <input type="text" class="form-control" disabled v-model="total_nozzle_buy_price">
+                                            </div>
                                             <div class="text-right mb-4">
                                                 <label>Loss/Porfit</label>
                                                 <input type="text" class="form-control" disabled v-model="total_nozzle_buy_price">
@@ -149,7 +153,7 @@ export default {
                 quantity: 0,
                 start_reading: 0,
                 end_reading: 0,
-                buy_price: 0,
+                dip_sale: 0,
                 amount: 0,
                 net_profit: 0,
             },
@@ -206,7 +210,7 @@ export default {
                 this.tankReadingData = res;
                 this.tankReadingData.forEach(v => {
                     v.nozzle.forEach(nozzle => {
-                        nozzle.buy_price = (nozzle.end_reading - nozzle.start_reading) * this.unit_price
+                        nozzle.sale = nozzle.end_reading - nozzle.start_reading
                         this.total_nozzle_buy_price += nozzle.buy_price;
                     })
                 })
