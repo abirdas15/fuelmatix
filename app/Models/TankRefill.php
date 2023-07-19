@@ -13,4 +13,11 @@ class TankRefill extends Model
     protected $hidden = [
         'client_company_id'
     ];
+    protected $appends = [
+        'sale_between'
+    ];
+    public function getSaleBetweenAttribute()
+    {
+        return TankRefillHistory::where('tank_refill_id', $this->id)->sum('sale');
+    }
 }
