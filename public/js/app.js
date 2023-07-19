@@ -5142,12 +5142,6 @@ __webpack_require__.r(__webpack_exports__);
     'param.tank_id': function paramTank_id() {
       this.getDispenserSingle();
       this.getTankReading();
-    },
-    'total_nozzle_buy_price': function total_nozzle_buy_price() {
-      this.param.net_profit = this.param.buy_price - this.total_nozzle_buy_price;
-    },
-    'param.buy_price': function paramBuy_price() {
-      this.param.net_profit = this.param.buy_price - this.total_nozzle_buy_price;
     }
   },
   methods: {
@@ -5218,6 +5212,7 @@ __webpack_require__.r(__webpack_exports__);
     },
     save: function save() {
       var _this6 = this;
+      this.loading = true;
       _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].ClearErrorHandler();
       if (this.param.date == '') {
         this.param.date = moment().format('YYYY-MM-DD');
@@ -5276,67 +5271,137 @@ __webpack_require__.r(__webpack_exports__);
       param: {},
       loading: false,
       id: '',
-      listData: []
+      listDataTank: [],
+      listDataPayOrder: [],
+      tankDispenserData: [],
+      tankReadingData: [],
+      singlePayOrder: []
     };
+  },
+  watch: {
+    'param.pay_order_id': function paramPay_order_id() {
+      this.getPayOderSingle();
+      this.getDispenserSingle();
+    },
+    'param.tank_id': function paramTank_id() {
+      this.getDispenserSingle();
+      this.getTankReading();
+    }
   },
   methods: {
     getSingle: function getSingle() {
       var _this = this;
-      _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].TankSingle, {
+      _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].TankRefillSingle, {
         id: this.id
       }, function (res) {
         if (parseInt(res.status) === 200) {
           _this.param = res.data;
-        }
-      });
-    },
-    getProduct: function getProduct() {
-      var _this2 = this;
-      _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].ProductList, {
-        limit: 5000,
-        page: 1
-      }, function (res) {
-        _this2.TableLoading = false;
-        if (parseInt(res.status) === 200) {
-          _this2.listData = res.data.data;
+          _this.param.dispensers = res.dispensers;
+          _this.getTank();
+          _this.getPayOrder();
         }
       });
     },
     save: function save() {
-      var _this3 = this;
+      var _this2 = this;
       _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].ClearErrorHandler();
       this.loading = true;
-      var formData = new FormData();
-      formData.append('id', this.param.id);
-      formData.append('tank_name', this.param.tank_name);
-      formData.append('capacity', this.param.capacity);
-      formData.append('height', this.param.height);
-      formData.append('product_id', this.param.product_id);
-      formData.append('file', this.param.file);
-      _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].TankEdit, formData, function (res) {
-        _this3.loading = false;
+      _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].TankRefillEdit, this.param, function (res) {
+        _this2.loading = false;
         if (parseInt(res.status) === 200) {
-          _this3.$router.push({
-            name: 'Tank'
+          _this2.$router.push({
+            name: 'TankRefill'
           });
         } else {
           _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].ErrorHandler(res.errors);
         }
       });
     },
-    onFileChange: function onFileChange(e) {
-      var files = e.target.files || e.dataTransfer.files;
-      if (!files.length) return;
-      this.param.file = files[0];
+    getTank: function getTank() {
+      var _this3 = this;
+      _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].TankList, {
+        limit: 5000,
+        page: 1
+      }, function (res) {
+        if (parseInt(res.status) === 200) {
+          _this3.listDataTank = res.data.data;
+        }
+      });
+    },
+    getTankReading: function getTankReading() {
+      var _this4 = this;
+      _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].TankReadingLatest, {
+        type: 'tank refill',
+        tank_id: this.param.tank_id
+      }, function (res) {
+        if (parseInt(res.status) === 200) {
+          _this4.tankDispenserData = res.data;
+          _this4.param.start_reading = res.data.start_reading;
+          _this4.param.end_reading = res.data.end_reading;
+          _this4.param.dip_sale = _this4.param.end_reading - _this4.param.start_reading;
+          if (_this4.unit_price > 0) {
+            _this4.param.buy_price = (_this4.param.end_reading - _this4.param.start_reading) * _this4.unit_price;
+          }
+        }
+      });
+    },
+    getDispenserSingle: function getDispenserSingle() {
+      var _this5 = this;
+      this["this"].param.total_refill_volume = 0;
+      _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].TankGetNozzle, {
+        tank_id: this.param.tank_id
+      }, function (res) {
+        _this5.param.dispensers = res;
+        _this5.param.dispensers.forEach(function (v) {
+          v.nozzle.forEach(function (nozzle) {
+            nozzle.sale = nozzle.end_reading - nozzle.start_reading;
+            _this5.param.total_refill_volume += nozzle.sale;
+          });
+        });
+        _this5.param.total_refill_volume += _this5.param.dip_sale;
+        _this5.param.net_profit = _this5.param.total_refill_volume - _this5.param.quantity;
+      });
+    },
+    getPayOrder: function getPayOrder() {
+      var _this6 = this;
+      _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].PayOrderLatest, {}, function (res) {
+        if (parseInt(res.status) === 200) {
+          _this6.listDataPayOrder = res.data;
+        }
+      });
+    },
+    getPayOderSingle: function getPayOderSingle() {
+      var _this7 = this;
+      _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].PayOrderSingle, {
+        id: this.param.pay_order_id
+      }, function (res) {
+        if (parseInt(res.status) === 200) {
+          _this7.singlePayOrder = res.data;
+          _this7.param.quantity = res.data.quantity;
+          _this7.param.amount = res.data.amount;
+          _this7.unit_price = _this7.param.amount / _this7.param.quantity;
+        }
+      });
     }
   },
   created: function created() {
     this.id = this.$route.params.id;
     this.getSingle();
-    this.getProduct();
   },
   mounted: function mounted() {
-    $('#dashboard_bar').text('Tank Edit');
+    var _this8 = this;
+    $('#dashboard_bar').text('Tank Refill Edit');
+    setTimeout(function () {
+      $('.date').flatpickr({
+        altInput: true,
+        altFormat: "d/m/Y",
+        dateFormat: "Y-m-d",
+        defaultDate: 'today',
+        onChange: function onChange(date, dateStr) {
+          _this8.param.date = dateStr;
+        }
+      });
+    }, 1000);
   }
 });
 
@@ -5430,7 +5495,7 @@ __webpack_require__.r(__webpack_exports__);
     },
     Delete: function Delete(data) {
       var _this3 = this;
-      _Services_ApiService__WEBPACK_IMPORTED_MODULE_1__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_2__["default"].TankDelete, {
+      _Services_ApiService__WEBPACK_IMPORTED_MODULE_1__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_2__["default"].TankRefillDelete, {
         id: data.id
       }, function (res) {
         if (parseInt(res.status) === 200) {
@@ -15233,7 +15298,7 @@ var render = function render() {
   }, [_c("router-link", {
     attrs: {
       to: {
-        name: "Tank"
+        name: "TankRefill"
       }
     }
   }, [_vm._v("Tank")])], 1), _vm._v(" "), _vm._m(0)])]), _vm._v(" "), _c("div", {
@@ -15711,10 +15776,10 @@ var render = function render() {
   }, [_c("router-link", {
     attrs: {
       to: {
-        name: "Tank"
+        name: "TankRefill"
       }
     }
-  }, [_vm._v("Tank")])], 1), _vm._v(" "), _vm._m(0)])]), _vm._v(" "), _c("div", {
+  }, [_vm._v("Tank Refill")])], 1), _vm._v(" "), _vm._m(0)])]), _vm._v(" "), _c("div", {
     staticClass: "col-xl-12 col-lg-12"
   }, [_c("div", {
     staticClass: "card"
@@ -15730,49 +15795,28 @@ var render = function render() {
       }
     }
   }, [_c("div", {
-    staticClass: "row"
+    staticClass: "card"
+  }, [_vm._m(2), _vm._v(" "), _c("div", {
+    staticClass: "card-body"
   }, [_c("div", {
-    staticClass: "mb-3 form-group col-md-6"
+    staticClass: "basic-form"
+  }, [_c("div", {
+    staticClass: "row align-items-center"
+  }, [_vm._m(3), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 form-group col-md-3"
   }, [_c("label", {
     staticClass: "form-label"
-  }, [_vm._v("Tank Name:")]), _vm._v(" "), _c("input", {
+  }, [_vm._v("Select Tank:")]), _vm._v(" "), _c("select", {
     directives: [{
       name: "model",
       rawName: "v-model",
-      value: _vm.param.tank_name,
-      expression: "param.tank_name"
+      value: _vm.param.tank_id,
+      expression: "param.tank_id"
     }],
     staticClass: "form-control",
     attrs: {
-      type: "text",
-      name: "tank_name"
-    },
-    domProps: {
-      value: _vm.param.tank_name
-    },
-    on: {
-      input: function input($event) {
-        if ($event.target.composing) return;
-        _vm.$set(_vm.param, "tank_name", $event.target.value);
-      }
-    }
-  }), _vm._v(" "), _c("div", {
-    staticClass: "invalid-feedback"
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 form-group col-md-6"
-  }, [_c("label", {
-    staticClass: "form-label"
-  }, [_vm._v("Tank Product:")]), _vm._v(" "), _c("select", {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: _vm.param.product_id,
-      expression: "param.product_id"
-    }],
-    staticClass: "form-control",
-    attrs: {
-      name: "product_id",
-      id: "product_id"
+      name: "tank_id",
+      id: "tank_id"
     },
     on: {
       change: function change($event) {
@@ -15782,92 +15826,317 @@ var render = function render() {
           var val = "_value" in o ? o._value : o.value;
           return val;
         });
-        _vm.$set(_vm.param, "product_id", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
+        _vm.$set(_vm.param, "tank_id", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
       }
     }
   }, [_c("option", {
     attrs: {
       value: ""
     }
-  }, [_vm._v("Select Product")]), _vm._v(" "), _vm._l(_vm.listData, function (d) {
+  }, [_vm._v("Select Tank")]), _vm._v(" "), _vm._l(_vm.listDataTank, function (d) {
     return _c("option", {
       domProps: {
         value: d.id
       }
-    }, [_vm._v(_vm._s(d.name))]);
+    }, [_vm._v(_vm._s(d.tank_name))]);
   })], 2), _vm._v(" "), _c("div", {
     staticClass: "invalid-feedback"
   })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 form-group col-md-6"
+    staticClass: "mb-3 form-group col-md-3"
   }, [_c("label", {
     staticClass: "form-label"
-  }, [_vm._v("Tank capacity:")]), _vm._v(" "), _c("input", {
+  }, [_vm._v("Select Pay order:")]), _vm._v(" "), _c("select", {
     directives: [{
       name: "model",
       rawName: "v-model",
-      value: _vm.param.capacity,
-      expression: "param.capacity"
+      value: _vm.param.pay_order_id,
+      expression: "param.pay_order_id"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      name: "pay_order_id",
+      id: "pay_order_id"
+    },
+    on: {
+      change: function change($event) {
+        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
+          return o.selected;
+        }).map(function (o) {
+          var val = "_value" in o ? o._value : o.value;
+          return val;
+        });
+        _vm.$set(_vm.param, "pay_order_id", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
+      }
+    }
+  }, [_c("option", {
+    attrs: {
+      value: ""
+    }
+  }, [_vm._v("Select Pay order")]), _vm._v(" "), _vm._l(_vm.listDataPayOrder, function (d) {
+    return _c("option", {
+      domProps: {
+        value: d.id
+      }
+    }, [_vm._v(_vm._s(d.number))]);
+  })], 2), _vm._v(" "), _c("div", {
+    staticClass: "invalid-feedback"
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 form-group col-md-3"
+  }, [_c("label", {
+    staticClass: "form-label"
+  }, [_vm._v("Paid for litter:")]), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.param.quantity,
+      expression: "param.quantity"
     }],
     staticClass: "form-control",
     attrs: {
       type: "text",
-      name: "capacity"
+      disabled: "",
+      name: "quantity"
     },
     domProps: {
-      value: _vm.param.capacity
+      value: _vm.param.quantity
     },
     on: {
       input: function input($event) {
         if ($event.target.composing) return;
-        _vm.$set(_vm.param, "capacity", $event.target.value);
+        _vm.$set(_vm.param, "quantity", $event.target.value);
+      }
+    }
+  }), _vm._v(" "), _c("div", {
+    staticClass: "invalid-feedback"
+  })]), _vm._v(" "), _vm._m(4), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 form-group col-md-3"
+  }, [_c("label", {
+    staticClass: "form-label"
+  }, [_vm._v("Reading before refill:")]), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.param.start_reading,
+      expression: "param.start_reading"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      disabled: "",
+      name: "start_reading"
+    },
+    domProps: {
+      value: _vm.param.start_reading
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.param, "start_reading", $event.target.value);
       }
     }
   }), _vm._v(" "), _c("div", {
     staticClass: "invalid-feedback"
   })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 form-group col-md-6"
+    staticClass: "mb-3 form-group col-md-3"
   }, [_c("label", {
     staticClass: "form-label"
-  }, [_vm._v("Height:")]), _vm._v(" "), _c("input", {
+  }, [_vm._v("Reading after refill:")]), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
-      value: _vm.param.height,
-      expression: "param.height"
+      value: _vm.param.end_reading,
+      expression: "param.end_reading"
     }],
     staticClass: "form-control",
     attrs: {
       type: "text",
-      name: "height"
+      disabled: "",
+      name: "end_reading"
     },
     domProps: {
-      value: _vm.param.height
+      value: _vm.param.end_reading
     },
     on: {
       input: function input($event) {
         if ($event.target.composing) return;
-        _vm.$set(_vm.param, "height", $event.target.value);
+        _vm.$set(_vm.param, "end_reading", $event.target.value);
       }
     }
   }), _vm._v(" "), _c("div", {
     staticClass: "invalid-feedback"
   })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 form-group col-md-6"
+    staticClass: "mb-3 form-group col-md-3"
   }, [_c("label", {
     staticClass: "form-label"
-  }, [_vm._v("BSTI Chart:")]), _vm._v(" "), _c("input", {
-    staticClass: "form-file-input form-control",
+  }, [_vm._v("Tank Volume:")]), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.param.dip_sale,
+      expression: "param.dip_sale"
+    }],
+    staticClass: "form-control",
     attrs: {
-      id: "fileInput",
-      type: "file",
-      name: "mediaFile"
+      type: "text",
+      disabled: "",
+      name: "dip_sale"
+    },
+    domProps: {
+      value: _vm.param.dip_sale
     },
     on: {
-      change: _vm.onFileChange
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.param, "dip_sale", $event.target.value);
+      }
     }
   }), _vm._v(" "), _c("div", {
     staticClass: "invalid-feedback"
-  })])]), _vm._v(" "), _c("div", {
+  })])])]), _vm._v(" "), _vm._l(_vm.param.dispensers, function (d, dIndex) {
+    return _vm.param.dispensers.length > 0 ? _c("div", {
+      staticClass: "card"
+    }, [_c("div", {
+      staticClass: "card-header"
+    }, [_c("h5", {
+      staticClass: "card-title"
+    }, [_vm._v(_vm._s(d.dispenser_name))])]), _vm._v(" "), d.nozzle.length > 0 ? _c("div", {
+      staticClass: "card-body"
+    }, _vm._l(d.nozzle, function (n, nIndex) {
+      return _c("div", {
+        staticClass: "row align-items-center text-start"
+      }, [_c("div", {
+        staticClass: "col-md-2"
+      }, [_c("label", {
+        staticClass: "form-label"
+      }, [_c("p", {
+        staticClass: "m-0"
+      }, [_vm._v(_vm._s(n.name))])])]), _vm._v(" "), _c("div", {
+        staticClass: "mb-3 col-md-3"
+      }, [_c("label", [_vm._v("Previous Reading ")]), _vm._v(" "), _c("input", {
+        directives: [{
+          name: "model",
+          rawName: "v-model",
+          value: n.start_reading,
+          expression: "n.start_reading"
+        }],
+        staticClass: "form-control",
+        attrs: {
+          type: "text",
+          disabled: "",
+          id: "prReading" + nIndex + dIndex
+        },
+        domProps: {
+          value: n.start_reading
+        },
+        on: {
+          input: function input($event) {
+            if ($event.target.composing) return;
+            _vm.$set(n, "start_reading", $event.target.value);
+          }
+        }
+      })]), _vm._v(" "), _c("div", {
+        staticClass: "mb-3 col-md-3"
+      }, [_c("label", [_vm._v("End reading ")]), _vm._v(" "), _c("input", {
+        directives: [{
+          name: "model",
+          rawName: "v-model",
+          value: n.end_reading,
+          expression: "n.end_reading"
+        }],
+        staticClass: "form-control",
+        attrs: {
+          type: "text",
+          disabled: "",
+          id: "trReading" + nIndex + dIndex
+        },
+        domProps: {
+          value: n.end_reading
+        },
+        on: {
+          input: function input($event) {
+            if ($event.target.composing) return;
+            _vm.$set(n, "end_reading", $event.target.value);
+          }
+        }
+      })]), _vm._v(" "), _c("div", {
+        staticClass: "mb-3 col-md-3"
+      }, [_c("label", [_vm._v("sale on " + _vm._s(n.name) + " ")]), _vm._v(" "), _c("input", {
+        directives: [{
+          name: "model",
+          rawName: "v-model",
+          value: n.sale,
+          expression: "n.sale"
+        }],
+        staticClass: "form-control",
+        attrs: {
+          type: "text",
+          disabled: "",
+          id: "sorReading" + nIndex + dIndex
+        },
+        domProps: {
+          value: n.sale
+        },
+        on: {
+          input: function input($event) {
+            if ($event.target.composing) return;
+            _vm.$set(n, "sale", $event.target.value);
+          }
+        }
+      })])]);
+    }), 0) : _vm._e()]) : _vm._e();
+  }), _vm._v(" "), _c("div", {
+    staticClass: "row"
+  }, [_c("div", {
+    staticClass: "col-sm-8"
+  }), _vm._v(" "), _c("div", {
+    staticClass: "col-sm-4"
+  }, [_c("div", {
+    staticClass: "text-right mb-4"
+  }, [_c("label", [_vm._v("Total refill volume")]), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.param.total_refill_volume,
+      expression: "param.total_refill_volume"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      disabled: ""
+    },
+    domProps: {
+      value: _vm.param.total_refill_volume
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.param, "total_refill_volume", $event.target.value);
+      }
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "text-right"
+  }, [_c("label", [_vm._v("Loss/Porfit")]), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.param.net_profit,
+      expression: "param.net_profit"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      disabled: ""
+    },
+    domProps: {
+      value: _vm.param.net_profit
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.param, "net_profit", $event.target.value);
+      }
+    }
+  })])])])], 2)]), _vm._v(" "), _c("div", {
     staticClass: "row",
     staticStyle: {
       "text-align": "right"
@@ -15890,7 +16159,7 @@ var render = function render() {
     staticClass: "btn btn-primary",
     attrs: {
       to: {
-        name: "Tank"
+        name: "TankRefill"
       },
       type: "button"
     }
@@ -15913,7 +16182,39 @@ var staticRenderFns = [function () {
     staticClass: "card-header"
   }, [_c("h4", {
     staticClass: "card-title"
-  }, [_vm._v("Tank")])]);
+  }, [_vm._v("Tank Refill Edit")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "card-header"
+  }, [_c("h4", {
+    staticClass: "card-title"
+  }, [_vm._v("DIP")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "mb-3 form-group col-md-3"
+  }, [_c("label", {
+    staticClass: "form-label"
+  }, [_vm._v("Date:")]), _vm._v(" "), _c("input", {
+    staticClass: "form-control date bg-white",
+    attrs: {
+      type: "text",
+      name: "date"
+    }
+  }), _vm._v(" "), _c("div", {
+    staticClass: "invalid-feedback"
+  })]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "mb-3 form-group col-md-3"
+  }, [_c("div", {
+    staticClass: "fs-3 m-0"
+  }, [_vm._v("DIP")])]);
 }];
 render._withStripped = true;
 
@@ -59440,7 +59741,7 @@ var app = new vue__WEBPACK_IMPORTED_MODULE_1___default.a({
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! D:\xampp7.4\htdocs\fuelmatix\resources\js\app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! D:\xampp\htdocs\projects\fuelmatix\resources\js\app.js */"./resources/js/app.js");
 
 
 /***/ })

@@ -415,7 +415,7 @@ class TankController extends Controller
                 $nozzle['sale'] = isset($refillHistory[$nozzle['id']]) ? $refillHistory[$nozzle['id']]['sale'] : 0;
             }
         }
-        return response()->json(['sattus' => 200, 'data' => $result, 'dispensers' => $dispensers]);
+        return response()->json(['status' => 200, 'data' => $result, 'dispensers' => $dispensers]);
     }
     public function refillUpdate(Request $request)
     {

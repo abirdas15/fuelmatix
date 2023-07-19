@@ -171,7 +171,7 @@ export default {
             });
         },
         Delete: function (data) {
-            ApiService.POST(ApiRoutes.TankDelete, {id: data.id },res => {
+            ApiService.POST(ApiRoutes.TankRefillDelete, {id: data.id },res => {
                 if (parseInt(res.status) === 200) {
                     this.$toast.success(res.message);
                     this.list()

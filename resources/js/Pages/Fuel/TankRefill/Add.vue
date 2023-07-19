@@ -4,7 +4,7 @@
             <div class="row page-titles">
                 <ol class="breadcrumb align-items-center ">
                     <li class="breadcrumb-item active"><router-link :to="{name: 'Dashboard'}">Home</router-link></li>
-                    <li class="breadcrumb-item active"><router-link :to="{name: 'Tank'}">Tank</router-link></li>
+                    <li class="breadcrumb-item active"><router-link :to="{name: 'TankRefill'}">Tank</router-link></li>
                     <li class="breadcrumb-item"><a href="javascript:void(0)">Refill</a></li>
 
                 </ol>
@@ -173,12 +173,6 @@ export default {
             this.getDispenserSingle()
             this.getTankReading()
         },
-        'total_nozzle_buy_price': function () {
-            this.param.net_profit = this.param.buy_price - this.total_nozzle_buy_price
-        },
-        'param.buy_price': function () {
-            this.param.net_profit = this.param.buy_price - this.total_nozzle_buy_price
-        }
     },
     methods: {
         getTank: function () {
@@ -233,6 +227,7 @@ export default {
             });
         },
         save: function () {
+            this.loading = true
             ApiService.ClearErrorHandler();
             if (this.param.date == '') {
                 this.param.date = moment().format('YYYY-MM-DD')
