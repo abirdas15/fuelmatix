@@ -5418,7 +5418,7 @@ __webpack_require__.r(__webpack_exports__);
       }
       this.Param.page = page.page;
       this.TableLoading = true;
-      _Services_ApiService__WEBPACK_IMPORTED_MODULE_1__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_2__["default"].TankList, this.Param, function (res) {
+      _Services_ApiService__WEBPACK_IMPORTED_MODULE_1__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_2__["default"].TankRefillList, this.Param, function (res) {
         _this2.TableLoading = false;
         if (parseInt(res.status) === 200) {
           _this2.paginateData = res.data;
@@ -5459,7 +5459,7 @@ __webpack_require__.r(__webpack_exports__);
     }
   },
   mounted: function mounted() {
-    $('#dashboard_bar').text('Tank List');
+    $('#dashboard_bar').text('Tank Refill History');
   }
 });
 
@@ -16053,6 +16053,14 @@ var render = function render() {
     }
   }, [_c("th", {
     staticClass: "text-white",
+    "class": _vm.sortClass("date"),
+    on: {
+      click: function click($event) {
+        return _vm.sortData("date");
+      }
+    }
+  }, [_vm._v("Date")]), _vm._v(" "), _c("th", {
+    staticClass: "text-white",
     "class": _vm.sortClass("tank_name"),
     on: {
       click: function click($event) {
@@ -16061,32 +16069,40 @@ var render = function render() {
     }
   }, [_vm._v("Tank Name")]), _vm._v(" "), _c("th", {
     staticClass: "text-white",
-    "class": _vm.sortClass("product_name"),
+    "class": _vm.sortClass("start_reading"),
     on: {
       click: function click($event) {
-        return _vm.sortData("product_name");
+        return _vm.sortData("start_reading");
       }
     }
-  }, [_vm._v("Tank Product")]), _vm._v(" "), _c("th", {
+  }, [_vm._v("Before Refill")]), _vm._v(" "), _c("th", {
     staticClass: "text-white",
-    "class": _vm.sortClass("capacity"),
+    "class": _vm.sortClass("end_reading"),
     on: {
       click: function click($event) {
-        return _vm.sortData("capacity");
+        return _vm.sortData("end_reading");
       }
     }
-  }, [_vm._v("Capacity")]), _vm._v(" "), _c("th", {
+  }, [_vm._v("After Refill")]), _vm._v(" "), _c("th", {
     staticClass: "text-white",
-    "class": _vm.sortClass("height"),
+    "class": _vm.sortClass("sale_between"),
     on: {
       click: function click($event) {
-        return _vm.sortData("height");
+        return _vm.sortData("sale_between");
       }
     }
-  }, [_vm._v("Height")]), _vm._v(" "), _c("th", {
+  }, [_vm._v("Sale In between")]), _vm._v(" "), _c("th", {
+    staticClass: "text-white",
+    "class": _vm.sortClass("quantity"),
+    on: {
+      click: function click($event) {
+        return _vm.sortData("quantity");
+      }
+    }
+  }, [_vm._v("Ordered Amount")]), _vm._v(" "), _c("th", {
     staticClass: "text-white"
   }, [_vm._v("Action")])])]), _vm._v(" "), _vm.listData.length > 0 && _vm.TableLoading == false ? _c("tbody", _vm._l(_vm.listData, function (f) {
-    return _c("tr", [_c("td", [_vm._v(_vm._s(f.tank_name))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(f.product_name))]), _vm._v(" "), _c("td", [_c("a", {
+    return _c("tr", [_c("td", [_vm._v(_vm._s(f.date))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(f.tank_name))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(f.start_reading))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(f.end_reading))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(f.sale_between))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(f.quantity))]), _vm._v(" "), _c("td", [_c("a", {
       attrs: {
         href: "javascript:void(0);"
       }
@@ -16100,7 +16116,7 @@ var render = function render() {
       staticClass: "btn btn-primary shadow btn-xs sharp me-1",
       attrs: {
         to: {
-          name: "TankEdit",
+          name: "TankRefillEdit",
           params: {
             id: f.id
           }

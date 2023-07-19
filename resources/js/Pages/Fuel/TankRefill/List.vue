@@ -37,22 +37,28 @@
                                         <table class="display  dataTable no-footer" style="min-width: 845px">
                                             <thead>
                                             <tr class="text-white" style="background-color: #4886EE;color:#ffffff">
+                                                <th class="text-white" @click="sortData('date')" :class="sortClass('date')">Date</th>
                                                 <th class="text-white" @click="sortData('tank_name')" :class="sortClass('tank_name')">Tank Name</th>
-                                                <th class="text-white" @click="sortData('product_name')" :class="sortClass('product_name')">Tank Product</th>
-                                                <th class="text-white" @click="sortData('capacity')" :class="sortClass('capacity')">Capacity</th>
-                                                <th class="text-white" @click="sortData('height')" :class="sortClass('height')">Height</th>
+                                                <th class="text-white" @click="sortData('start_reading')" :class="sortClass('start_reading')">Before Refill</th>
+                                                <th class="text-white" @click="sortData('end_reading')" :class="sortClass('end_reading')">After Refill</th>
+                                                <th class="text-white" @click="sortData('sale_between')" :class="sortClass('sale_between')">Sale In between</th>
+                                                <th class="text-white" @click="sortData('quantity')" :class="sortClass('quantity')">Ordered Amount</th>
                                                 <th class="text-white" >Action</th>
                                             </tr>
                                             </thead>
                                             <tbody v-if="listData.length > 0 && TableLoading == false">
                                             <tr v-for="f in listData">
+                                                <td >{{f.date}}</td>
                                                 <td >{{f.tank_name}}</td>
-                                                <td >{{f.product_name}}</td>
+                                                <td >{{f.start_reading}}</td>
+                                                <td >{{f.end_reading}}</td>
+                                                <td >{{f.sale_between}}</td>
+                                                <td >{{f.quantity}}</td>
                                                 <td><a href="javascript:void(0);">{{f.capacity}}</a></td>
                                                 <td><a href="javascript:void(0);">{{f?.height}}</a></td>
                                                 <td>
                                                     <div class="d-flex justify-content-end">
-                                                        <router-link :to="{name: 'TankEdit', params: { id: f.id }}" class=" btn btn-primary shadow btn-xs sharp me-1">
+                                                        <router-link :to="{name: 'TankRefillEdit', params: { id: f.id }}" class=" btn btn-primary shadow btn-xs sharp me-1">
                                                             <i class="fas fa-pencil-alt"></i>
                                                         </router-link>
                                                         <a  href="javascript:void(0)"  @click="openModalDelete(f)" class="btn btn-danger shadow btn-xs sharp">
@@ -152,7 +158,7 @@ export default {
             }
             this.Param.page = page.page;
             this.TableLoading = true
-            ApiService.POST(ApiRoutes.TankList, this.Param,res => {
+            ApiService.POST(ApiRoutes.TankRefillList, this.Param,res => {
                 this.TableLoading = false
                 if (parseInt(res.status) === 200) {
                     this.paginateData = res.data;
@@ -192,7 +198,7 @@ export default {
 
     },
     mounted() {
-        $('#dashboard_bar').text('Tank List')
+        $('#dashboard_bar').text('Tank Refill History')
     }
 }
 </script>
