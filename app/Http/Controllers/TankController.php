@@ -345,7 +345,8 @@ class TankController extends Controller
         $tankRefill->quantity = $inputData['quantity'];
         $tankRefill->start_reading = $inputData['start_reading'];
         $tankRefill->end_reading = $inputData['end_reading'] ?? 0;
-        $tankRefill->buy_price = $inputData['buy_price'] ?? 0;
+        $tankRefill->dip_sale = $inputData['dip_sale'] ?? 0;
+        $tankRefill->total_refill_volume = $inputData['total_refill_volume'] ?? 0;
         $tankRefill->net_profit = $inputData['net_profit'] ?? 0;
         $tankRefill->client_company_id = $inputData['session_user']['client_company_id'];
         if ($tankRefill->save()) {
@@ -357,7 +358,7 @@ class TankController extends Controller
                         $tankRefillHistory->nozzle_id = $nozzle['id'];
                         $tankRefillHistory->start_reading = $nozzle['start_reading'];
                         $tankRefillHistory->end_reading = $nozzle['end_reading'];
-                        $tankRefillHistory->buy_price = $nozzle['buy_price'];
+                        $tankRefillHistory->sale = $nozzle['sale'];
                         $tankRefillHistory->save();
                     }
                 }
@@ -373,7 +374,7 @@ class TankController extends Controller
         $keyword = isset($inputData['keyword']) ? $inputData['keyword'] : '';
         $order_by = isset($inputData['order_by']) ? $inputData['order_by'] : 'tank_refill.id';
         $order_mode = isset($inputData['order_mode']) ? $inputData['order_mode'] : 'DESC';
-        $result = TankRefill::select('tank_refill.id', 'tank_refill.date', 'tank_refill.start_reading', 'tank_refill.end_reading', 'tank_refill.net_profit', 'tank.tank_name', 'pay_order.amount')
+        $result = TankRefill::select('tank_refill.*', 'tank.tank_name', 'pay_order.amount')
             ->leftJoin('tank', 'tank.id', 'tank_refill.tank_id')
             ->leftJoin('pay_order', 'pay_order.id', 'tank_refill.pay_order_id')
             ->where('tank_refill.client_company_id', $inputData['session_user']['client_company_id']);
@@ -411,7 +412,7 @@ class TankController extends Controller
             foreach ($dispenser['nozzle'] as &$nozzle) {
                 $nozzle['start_reading'] = isset($refillHistory[$nozzle['id']]) ? $refillHistory[$nozzle['id']]['start_reading'] : 0;
                 $nozzle['end_reading'] = isset($refillHistory[$nozzle['id']]) ? $refillHistory[$nozzle['id']]['end_reading'] : 0;
-                $nozzle['buy_price'] = isset($refillHistory[$nozzle['id']]) ? $refillHistory[$nozzle['id']]['buy_price'] : 0;
+                $nozzle['sale'] = isset($refillHistory[$nozzle['id']]) ? $refillHistory[$nozzle['id']]['sale'] : 0;
             }
         }
         return response()->json(['sattus' => 200, 'data' => $result, 'dispensers' => $dispensers]);
@@ -439,7 +440,8 @@ class TankController extends Controller
         $tankRefill->quantity = $inputData['quantity'];
         $tankRefill->start_reading = $inputData['start_reading'];
         $tankRefill->end_reading = $inputData['end_reading'] ?? 0;
-        $tankRefill->buy_price = $inputData['buy_price'] ?? 0;
+        $tankRefill->dip_sale = $inputData['dip_sale'] ?? 0;
+        $tankRefill->total_refill_volume = $inputData['total_refill_volume'] ?? 0;
         $tankRefill->net_profit = $inputData['net_profit'] ?? 0;
         if ($tankRefill->save()) {
             if (isset($inputData['dispensers'])) {
@@ -451,7 +453,7 @@ class TankController extends Controller
                         $tankRefillHistory->nozzle_id = $nozzle['id'];
                         $tankRefillHistory->start_reading = $nozzle['start_reading'];
                         $tankRefillHistory->end_reading = $nozzle['end_reading'];
-                        $tankRefillHistory->buy_price = $nozzle['buy_price'];
+                        $tankRefillHistory->sale = $nozzle['sale'];
                         $tankRefillHistory->save();
                     }
                 }
