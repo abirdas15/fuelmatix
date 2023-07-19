@@ -108,15 +108,11 @@
                                         <div class="col-sm-4">
                                             <div class="text-right mb-4">
                                                 <label>Total refill volume</label>
-                                                <input type="text" class="form-control" disabled v-model="total_nozzle_buy_price">
-                                            </div>
-                                            <div class="text-right mb-4">
-                                                <label>Loss/Porfit</label>
-                                                <input type="text" class="form-control" disabled v-model="total_nozzle_buy_price">
+                                                <input type="text" class="form-control" disabled v-model="total_refill_volume">
                                             </div>
                                             <div class="text-right">
-                                                <label>Net Porfit</label>
-                                                <input type="text" class="form-control" disabled v-model="this.param.net_profit">
+                                                <label>Loss/Porfit</label>
+                                                <input type="text" class="form-control" disabled v-model="param.net_profit">
                                             </div>
                                         </div>
                                     </div>
@@ -158,7 +154,7 @@ export default {
                 net_profit: 0,
             },
             unit_price: 0,
-            total_nozzle_buy_price: 0,
+            total_refill_volume: 0,
             listDataTank: [],
             listDataPayOrder: [],
             tankDispenserData: [],
@@ -211,9 +207,11 @@ export default {
                 this.tankReadingData.forEach(v => {
                     v.nozzle.forEach(nozzle => {
                         nozzle.sale = nozzle.end_reading - nozzle.start_reading
-                        this.total_nozzle_buy_price += nozzle.buy_price;
+                        this.total_refill_volume += nozzle.sale;
                     })
                 })
+                this.total_refill_volume += this.param.dip_sale
+                this.param.net_profit = this.param.quantity - this.total_refill_volume
             });
         },
         getPayOrder: function () {

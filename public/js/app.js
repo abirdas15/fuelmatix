@@ -5124,7 +5124,7 @@ __webpack_require__.r(__webpack_exports__);
         net_profit: 0
       },
       unit_price: 0,
-      total_nozzle_buy_price: 0,
+      total_refill_volume: 0,
       listDataTank: [],
       listDataPayOrder: [],
       tankDispenserData: [],
@@ -5187,9 +5187,11 @@ __webpack_require__.r(__webpack_exports__);
         _this3.tankReadingData.forEach(function (v) {
           v.nozzle.forEach(function (nozzle) {
             nozzle.sale = nozzle.end_reading - nozzle.start_reading;
-            _this3.total_nozzle_buy_price += nozzle.buy_price;
+            _this3.total_refill_volume += nozzle.sale;
           });
         });
+        _this3.total_refill_volume += _this3.param.dip_sale;
+        _this3.param.net_profit = _this3.param.quantity - _this3.total_refill_volume;
       });
     },
     getPayOrder: function getPayOrder() {
@@ -15548,8 +15550,8 @@ var render = function render() {
     directives: [{
       name: "model",
       rawName: "v-model",
-      value: _vm.total_nozzle_buy_price,
-      expression: "total_nozzle_buy_price"
+      value: _vm.total_refill_volume,
+      expression: "total_refill_volume"
     }],
     staticClass: "form-control",
     attrs: {
@@ -15557,45 +15559,22 @@ var render = function render() {
       disabled: ""
     },
     domProps: {
-      value: _vm.total_nozzle_buy_price
+      value: _vm.total_refill_volume
     },
     on: {
       input: function input($event) {
         if ($event.target.composing) return;
-        _vm.total_nozzle_buy_price = $event.target.value;
-      }
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "text-right mb-4"
-  }, [_c("label", [_vm._v("Loss/Porfit")]), _vm._v(" "), _c("input", {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: _vm.total_nozzle_buy_price,
-      expression: "total_nozzle_buy_price"
-    }],
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      disabled: ""
-    },
-    domProps: {
-      value: _vm.total_nozzle_buy_price
-    },
-    on: {
-      input: function input($event) {
-        if ($event.target.composing) return;
-        _vm.total_nozzle_buy_price = $event.target.value;
+        _vm.total_refill_volume = $event.target.value;
       }
     }
   })]), _vm._v(" "), _c("div", {
     staticClass: "text-right"
-  }, [_c("label", [_vm._v("Net Porfit")]), _vm._v(" "), _c("input", {
+  }, [_c("label", [_vm._v("Loss/Porfit")]), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
-      value: this.param.net_profit,
-      expression: "this.param.net_profit"
+      value: _vm.param.net_profit,
+      expression: "param.net_profit"
     }],
     staticClass: "form-control",
     attrs: {
@@ -15603,12 +15582,12 @@ var render = function render() {
       disabled: ""
     },
     domProps: {
-      value: this.param.net_profit
+      value: _vm.param.net_profit
     },
     on: {
       input: function input($event) {
         if ($event.target.composing) return;
-        _vm.$set(this.param, "net_profit", $event.target.value);
+        _vm.$set(_vm.param, "net_profit", $event.target.value);
       }
     }
   })])])])], 2)]), _vm._v(" "), _c("div", {
