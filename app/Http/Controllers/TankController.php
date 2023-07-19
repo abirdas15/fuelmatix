@@ -280,19 +280,17 @@ class TankController extends Controller
             ->get()
             ->toArray();
 
+        $start_height = isset($result[1]) ? $result[1]['height'] : 0;
         $bstiChart = BstiChart::where('tank_id', $inputData['tank_id'])
-            ->get()
-            ->toArray();
-        $start_reading = isset($result[1]) ? $result[1]['height'] : 0;
-        $end_reading = isset($result[0]) ? $result[0]['height'] : 0;
-        foreach ($bstiChart as $chart) {
-            if ($chart['height'] >= $start_reading && $chart['height'] <= $start_reading) {
-                $start_reading = $chart['volume'];
-            }
-            if ($chart['height'] >= $end_reading && $chart['height'] <= $end_reading) {
-                $end_reading = $chart['volume'];
-            }
-        }
+            ->where('height', '=', floor($start_height))
+            ->first();
+        $start_reading = $bstiChart != null ? $bstiChart['volume'] : 0;
+
+        $end_height = isset($result[0]) ? $result[0]['height'] : 0;
+        $bstiChart = BstiChart::where('tank_id', $inputData['tank_id'])
+            ->where('height', '=', floor($end_height))
+            ->first();
+        $end_reading = $bstiChart != null ? $bstiChart['volume'] : 0;
 
         return response()->json([
             'status' => 200,
