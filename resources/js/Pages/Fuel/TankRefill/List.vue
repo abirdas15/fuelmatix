@@ -43,6 +43,8 @@
                                                 <th class="text-white" @click="sortData('end_reading')" :class="sortClass('end_reading')">After Refill</th>
                                                 <th class="text-white" @click="sortData('sale_between')" :class="sortClass('sale_between')">Sale In between</th>
                                                 <th class="text-white" @click="sortData('quantity')" :class="sortClass('quantity')">Ordered Amount</th>
+                                                <th class="text-white" @click="sortData('total_refill_volume')" :class="sortClass('total_refill_volume')">Adjust with sale</th>
+                                                <th class="text-white" @click="sortData('net_profit')" :class="sortClass('net_profit')">Loss/Profit</th>
                                                 <th class="text-white" >Action</th>
                                             </tr>
                                             </thead>
@@ -54,8 +56,8 @@
                                                 <td >{{f.end_reading}}</td>
                                                 <td >{{f.sale_between}}</td>
                                                 <td >{{f.quantity}}</td>
-                                                <td><a href="javascript:void(0);">{{f.capacity}}</a></td>
-                                                <td><a href="javascript:void(0);">{{f?.height}}</a></td>
+                                                <td >{{f.total_refill_volume}}</td>
+                                                <td >{{f.net_profit}}</td>
                                                 <td>
                                                     <div class="d-flex justify-content-end">
                                                         <router-link :to="{name: 'TankRefillEdit', params: { id: f.id }}" class=" btn btn-primary shadow btn-xs sharp me-1">

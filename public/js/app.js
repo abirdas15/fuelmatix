@@ -16100,17 +16100,25 @@ var render = function render() {
       }
     }
   }, [_vm._v("Ordered Amount")]), _vm._v(" "), _c("th", {
+    staticClass: "text-white",
+    "class": _vm.sortClass("total_refill_volume"),
+    on: {
+      click: function click($event) {
+        return _vm.sortData("total_refill_volume");
+      }
+    }
+  }, [_vm._v("Adjust with sale")]), _vm._v(" "), _c("th", {
+    staticClass: "text-white",
+    "class": _vm.sortClass("net_profit"),
+    on: {
+      click: function click($event) {
+        return _vm.sortData("net_profit");
+      }
+    }
+  }, [_vm._v("Loss/Profit")]), _vm._v(" "), _c("th", {
     staticClass: "text-white"
   }, [_vm._v("Action")])])]), _vm._v(" "), _vm.listData.length > 0 && _vm.TableLoading == false ? _c("tbody", _vm._l(_vm.listData, function (f) {
-    return _c("tr", [_c("td", [_vm._v(_vm._s(f.date))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(f.tank_name))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(f.start_reading))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(f.end_reading))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(f.sale_between))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(f.quantity))]), _vm._v(" "), _c("td", [_c("a", {
-      attrs: {
-        href: "javascript:void(0);"
-      }
-    }, [_vm._v(_vm._s(f.capacity))])]), _vm._v(" "), _c("td", [_c("a", {
-      attrs: {
-        href: "javascript:void(0);"
-      }
-    }, [_vm._v(_vm._s(f === null || f === void 0 ? void 0 : f.height))])]), _vm._v(" "), _c("td", [_c("div", {
+    return _c("tr", [_c("td", [_vm._v(_vm._s(f.date))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(f.tank_name))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(f.start_reading))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(f.end_reading))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(f.sale_between))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(f.quantity))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(f.total_refill_volume))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(f.net_profit))]), _vm._v(" "), _c("td", [_c("div", {
       staticClass: "d-flex justify-content-end"
     }, [_c("router-link", {
       staticClass: "btn btn-primary shadow btn-xs sharp me-1",
