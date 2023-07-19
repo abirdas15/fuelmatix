@@ -4827,7 +4827,8 @@ __webpack_require__.r(__webpack_exports__);
         tank_id: '',
         date: '',
         height: '',
-        water_height: ''
+        water_height: '',
+        type: ''
       },
       loading: false,
       listData: []
@@ -5115,12 +5116,15 @@ __webpack_require__.r(__webpack_exports__);
         date: '',
         tank_id: '',
         pay_order_id: '',
-        quantity: '',
-        start_reading: '',
-        end_reading: '',
-        buy_price: '',
-        net_profit: ''
+        quantity: 0,
+        start_reading: 0,
+        end_reading: 0,
+        buy_price: 0,
+        amount: 0,
+        net_profit: 0
       },
+      unit_price: 0,
+      total_nozzle_buy_price: 0,
       listDataTank: [],
       listDataPayOrder: [],
       tankDispenserData: [],
@@ -5132,10 +5136,17 @@ __webpack_require__.r(__webpack_exports__);
   watch: {
     'param.pay_order_id': function paramPay_order_id() {
       this.getPayOderSingle();
+      this.getDispenserSingle();
     },
     'param.tank_id': function paramTank_id() {
       this.getDispenserSingle();
       this.getTankReading();
+    },
+    'total_nozzle_buy_price': function total_nozzle_buy_price() {
+      this.param.net_profit = this.param.buy_price - this.total_nozzle_buy_price;
+    },
+    'param.buy_price': function paramBuy_price() {
+      this.param.net_profit = this.param.buy_price - this.total_nozzle_buy_price;
     }
   },
   methods: {
@@ -5160,6 +5171,10 @@ __webpack_require__.r(__webpack_exports__);
           _this2.tankDispenserData = res.data;
           _this2.param.start_reading = res.data.start_reading;
           _this2.param.end_reading = res.data.end_reading;
+          _this2.param.dip_sale = _this2.param.end_reading - _this2.param.start_reading;
+          if (_this2.unit_price > 0) {
+            _this2.param.buy_price = (_this2.param.end_reading - _this2.param.start_reading) * _this2.unit_price;
+          }
         }
       });
     },
@@ -5168,9 +5183,13 @@ __webpack_require__.r(__webpack_exports__);
       _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].TankGetNozzle, {
         tank_id: this.param.tank_id
       }, function (res) {
-        if (parseInt(res.status) === 200) {
-          _this3.tankReadingData = res.data;
-        }
+        _this3.tankReadingData = res;
+        _this3.tankReadingData.forEach(function (v) {
+          v.nozzle.forEach(function (nozzle) {
+            nozzle.buy_price = (nozzle.end_reading - nozzle.start_reading) * _this3.unit_price;
+            _this3.total_nozzle_buy_price += nozzle.buy_price;
+          });
+        });
       });
     },
     getPayOrder: function getPayOrder() {
@@ -5178,9 +5197,6 @@ __webpack_require__.r(__webpack_exports__);
       _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].PayOrderLatest, {}, function (res) {
         if (parseInt(res.status) === 200) {
           _this4.listDataPayOrder = res.data;
-          _this4.param.quantity = res.data.quantity;
-          _this4.param.buy_price = res.data.amount;
-          _this4.param.net_profit = (_this4.param.start_reading - _this4.param.end_reading) * (_this4.param.buy_price / _this4.param.quantity);
         }
       });
     },
@@ -5191,6 +5207,9 @@ __webpack_require__.r(__webpack_exports__);
       }, function (res) {
         if (parseInt(res.status) === 200) {
           _this5.singlePayOrder = res.data;
+          _this5.param.quantity = res.data.quantity;
+          _this5.param.amount = res.data.amount;
+          _this5.unit_price = _this5.param.amount / _this5.param.quantity;
         }
       });
     },
@@ -14469,6 +14488,47 @@ var render = function render() {
     staticClass: "mb-3 form-group col-md-6"
   }, [_c("label", {
     staticClass: "form-label"
+  }, [_vm._v("Type:")]), _vm._v(" "), _c("select", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.param.type,
+      expression: "param.type"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      name: "type",
+      id: "type"
+    },
+    on: {
+      change: function change($event) {
+        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
+          return o.selected;
+        }).map(function (o) {
+          var val = "_value" in o ? o._value : o.value;
+          return val;
+        });
+        _vm.$set(_vm.param, "type", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
+      }
+    }
+  }, [_c("option", {
+    attrs: {
+      value: ""
+    }
+  }, [_vm._v("Select Type")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "shift sell"
+    }
+  }, [_vm._v("Shift sell")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "tank refill"
+    }
+  }, [_vm._v("Tank refill")])]), _vm._v(" "), _c("div", {
+    staticClass: "invalid-feedback"
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 form-group col-md-6"
+  }, [_c("label", {
+    staticClass: "form-label"
   }, [_vm._v("Date:")]), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
@@ -14692,6 +14752,47 @@ var render = function render() {
       }
     }, [_vm._v(_vm._s(d.tank_name))]);
   })], 2), _vm._v(" "), _c("div", {
+    staticClass: "invalid-feedback"
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 form-group col-md-6"
+  }, [_c("label", {
+    staticClass: "form-label"
+  }, [_vm._v("Type:")]), _vm._v(" "), _c("select", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.param.type,
+      expression: "param.type"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      name: "type",
+      id: "type"
+    },
+    on: {
+      change: function change($event) {
+        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
+          return o.selected;
+        }).map(function (o) {
+          var val = "_value" in o ? o._value : o.value;
+          return val;
+        });
+        _vm.$set(_vm.param, "type", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
+      }
+    }
+  }, [_c("option", {
+    attrs: {
+      value: ""
+    }
+  }, [_vm._v("Select Type")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "shift sell"
+    }
+  }, [_vm._v("Shift sell")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "tank refill"
+    }
+  }, [_vm._v("Tank refill")])]), _vm._v(" "), _c("div", {
     staticClass: "invalid-feedback"
   })]), _vm._v(" "), _c("div", {
     staticClass: "mb-3 form-group col-md-6"
@@ -15223,7 +15324,7 @@ var render = function render() {
     attrs: {
       value: ""
     }
-  }, [_vm._v("Select Tank")]), _vm._v(" "), _vm._l(_vm.listDataPayOrder, function (d) {
+  }, [_vm._v("Select Pay order")]), _vm._v(" "), _vm._l(_vm.listDataPayOrder, function (d) {
     return _c("option", {
       domProps: {
         value: d.id
@@ -15319,12 +15420,12 @@ var render = function render() {
     staticClass: "mb-3 form-group col-md-3"
   }, [_c("label", {
     staticClass: "form-label"
-  }, [_vm._v("DLP Sale:")]), _vm._v(" "), _c("input", {
+  }, [_vm._v("DIP Sale:")]), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
-      value: _vm.param.net_profit,
-      expression: "param.net_profit"
+      value: _vm.param.buy_price,
+      expression: "param.buy_price"
     }],
     staticClass: "form-control",
     attrs: {
@@ -15333,17 +15434,161 @@ var render = function render() {
       name: "end_reading"
     },
     domProps: {
-      value: _vm.param.net_profit
+      value: _vm.param.buy_price
     },
     on: {
       input: function input($event) {
         if ($event.target.composing) return;
-        _vm.$set(_vm.param, "net_profit", $event.target.value);
+        _vm.$set(_vm.param, "buy_price", $event.target.value);
       }
     }
   }), _vm._v(" "), _c("div", {
     staticClass: "invalid-feedback"
-  })])])])])]), _vm._v(" "), _c("div", {
+  })])])]), _vm._v(" "), _vm._l(_vm.tankReadingData, function (d, dIndex) {
+    return _vm.tankReadingData.length > 0 ? _c("div", {
+      staticClass: "card"
+    }, [_c("div", {
+      staticClass: "card-header"
+    }, [_c("h5", {
+      staticClass: "card-title"
+    }, [_vm._v(_vm._s(d.dispenser_name))])]), _vm._v(" "), d.nozzle.length > 0 ? _c("div", {
+      staticClass: "card-body"
+    }, _vm._l(d.nozzle, function (n, nIndex) {
+      return _c("div", {
+        staticClass: "row align-items-center text-start"
+      }, [_c("div", {
+        staticClass: "col-md-2"
+      }, [_c("label", {
+        staticClass: "form-label"
+      }, [_c("p", {
+        staticClass: "m-0"
+      }, [_vm._v(_vm._s(n.name))])])]), _vm._v(" "), _c("div", {
+        staticClass: "mb-3 col-md-3"
+      }, [_c("label", [_vm._v("Previous Reading ")]), _vm._v(" "), _c("input", {
+        directives: [{
+          name: "model",
+          rawName: "v-model",
+          value: n.start_reading,
+          expression: "n.start_reading"
+        }],
+        staticClass: "form-control",
+        attrs: {
+          type: "text",
+          disabled: "",
+          id: "prReading" + nIndex + dIndex
+        },
+        domProps: {
+          value: n.start_reading
+        },
+        on: {
+          input: function input($event) {
+            if ($event.target.composing) return;
+            _vm.$set(n, "start_reading", $event.target.value);
+          }
+        }
+      })]), _vm._v(" "), _c("div", {
+        staticClass: "mb-3 col-md-3"
+      }, [_c("label", [_vm._v("End reading ")]), _vm._v(" "), _c("input", {
+        directives: [{
+          name: "model",
+          rawName: "v-model",
+          value: n.end_reading,
+          expression: "n.end_reading"
+        }],
+        staticClass: "form-control",
+        attrs: {
+          type: "text",
+          disabled: "",
+          id: "trReading" + nIndex + dIndex
+        },
+        domProps: {
+          value: n.end_reading
+        },
+        on: {
+          input: function input($event) {
+            if ($event.target.composing) return;
+            _vm.$set(n, "end_reading", $event.target.value);
+          }
+        }
+      })]), _vm._v(" "), _c("div", {
+        staticClass: "mb-3 col-md-3"
+      }, [_c("label", [_vm._v("sale on " + _vm._s(n.name) + " ")]), _vm._v(" "), _c("input", {
+        directives: [{
+          name: "model",
+          rawName: "v-model",
+          value: n.buy_price,
+          expression: "n.buy_price"
+        }],
+        staticClass: "form-control",
+        attrs: {
+          type: "text",
+          disabled: "",
+          id: "sorReading" + nIndex + dIndex
+        },
+        domProps: {
+          value: n.buy_price
+        },
+        on: {
+          input: function input($event) {
+            if ($event.target.composing) return;
+            _vm.$set(n, "buy_price", $event.target.value);
+          }
+        }
+      })])]);
+    }), 0) : _vm._e()]) : _vm._e();
+  }), _vm._v(" "), _c("div", {
+    staticClass: "row"
+  }, [_c("div", {
+    staticClass: "col-sm-8"
+  }), _vm._v(" "), _c("div", {
+    staticClass: "col-sm-4"
+  }, [_c("div", {
+    staticClass: "text-right mb-4"
+  }, [_c("label", [_vm._v("Loss/Porfit")]), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.total_nozzle_buy_price,
+      expression: "total_nozzle_buy_price"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      disabled: ""
+    },
+    domProps: {
+      value: _vm.total_nozzle_buy_price
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.total_nozzle_buy_price = $event.target.value;
+      }
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "text-right"
+  }, [_c("label", [_vm._v("Net Porfit")]), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: this.param.net_profit,
+      expression: "this.param.net_profit"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      disabled: ""
+    },
+    domProps: {
+      value: this.param.net_profit
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(this.param, "net_profit", $event.target.value);
+      }
+    }
+  })])])])], 2)]), _vm._v(" "), _c("div", {
     staticClass: "row",
     staticStyle: {
       "text-align": "right"

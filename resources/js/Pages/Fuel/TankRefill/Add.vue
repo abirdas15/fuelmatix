@@ -40,7 +40,7 @@
                                             <div class="mb-3 form-group col-md-3">
                                                 <label class="form-label">Select Pay order:</label>
                                                 <select class="form-control" name="pay_order_id" id="pay_order_id"  v-model="param.pay_order_id">
-                                                    <option value="">Select Tank</option>
+                                                    <option value="">Select Pay order</option>
                                                     <option v-for="d in listDataPayOrder" :value="d.id">{{d.number}}</option>
                                                 </select>
                                                 <div class="invalid-feedback"></div>
@@ -64,9 +64,55 @@
                                                 <div class="invalid-feedback"></div>
                                             </div>
                                             <div class="mb-3 form-group col-md-3">
-                                                <label class="form-label">DLP Sale:</label>
-                                                <input type="text" disabled class="form-control " name="end_reading" v-model="param.net_profit">
+                                                <label class="form-label">DIP Sale:</label>
+                                                <input type="text" disabled class="form-control " name="end_reading" v-model="param.buy_price">
                                                 <div class="invalid-feedback"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card" v-if="tankReadingData.length > 0"
+                                         v-for="(d, dIndex) in tankReadingData">
+                                        <div class="card-header">
+                                            <h5 class="card-title">{{ d.dispenser_name }}</h5>
+                                        </div>
+                                        <div class="card-body" v-if="d.nozzle.length > 0">
+                                            <div class="row align-items-center text-start" v-for="(n, nIndex) in d.nozzle">
+                                                <div class=" col-md-2">
+                                                    <label class="form-label">
+                                                        <p class="m-0">{{ n.name }}</p>
+                                                    </label>
+                                                </div>
+                                                <div class="mb-3 col-md-3">
+                                                    <label>Previous Reading </label>
+                                                    <input type="text" class="form-control" disabled
+                                                             :id="'prReading'+nIndex+dIndex"
+                                                           v-model="n.start_reading">
+                                                </div>
+                                                <div class="mb-3 col-md-3">
+                                                    <label>End reading </label>
+                                                    <input type="text" class="form-control" disabled
+                                                             :id="'trReading'+nIndex+dIndex"
+                                                           v-model="n.end_reading">
+                                                </div>
+                                                <div class="mb-3 col-md-3">
+                                                    <label>sale on {{ n.name }} </label>
+                                                    <input type="text" class="form-control" disabled
+                                                             :id="'sorReading'+nIndex+dIndex"
+                                                           v-model="n.buy_price">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-8"></div>
+                                        <div class="col-sm-4">
+                                            <div class="text-right mb-4">
+                                                <label>Loss/Porfit</label>
+                                                <input type="text" class="form-control" disabled v-model="total_nozzle_buy_price">
+                                            </div>
+                                            <div class="text-right">
+                                                <label>Net Porfit</label>
+                                                <input type="text" class="form-control" disabled v-model="this.param.net_profit">
                                             </div>
                                         </div>
                                     </div>
@@ -100,12 +146,15 @@ export default {
                 date: '',
                 tank_id: '',
                 pay_order_id: '',
-                quantity: '',
-                start_reading: '',
-                end_reading: '',
-                buy_price: '',
-                net_profit: '',
+                quantity: 0,
+                start_reading: 0,
+                end_reading: 0,
+                buy_price: 0,
+                amount: 0,
+                net_profit: 0,
             },
+            unit_price: 0,
+            total_nozzle_buy_price: 0,
             listDataTank: [],
             listDataPayOrder: [],
             tankDispenserData: [],
@@ -117,10 +166,17 @@ export default {
     watch: {
         'param.pay_order_id': function () {
             this.getPayOderSingle()
+            this.getDispenserSingle()
         },
         'param.tank_id': function () {
             this.getDispenserSingle()
             this.getTankReading()
+        },
+        'total_nozzle_buy_price': function () {
+            this.param.net_profit = this.param.buy_price - this.total_nozzle_buy_price
+        },
+        'param.buy_price': function () {
+            this.param.net_profit = this.param.buy_price - this.total_nozzle_buy_price
         }
     },
     methods: {
@@ -137,23 +193,29 @@ export default {
                     this.tankDispenserData = res.data;
                     this.param.start_reading = res.data.start_reading
                     this.param.end_reading = res.data.end_reading
+                    this.param.dip_sale = this.param.end_reading - this.param.start_reading
+                    if (this.unit_price > 0) {
+                        this.param.buy_price = (this.param.end_reading - this.param.start_reading) * this.unit_price
+                    }
+
                 }
             });
         },
         getDispenserSingle: function () {
             ApiService.POST(ApiRoutes.TankGetNozzle, {tank_id: this.param.tank_id},res => {
-                if (parseInt(res.status) === 200) {
-                    this.tankReadingData = res.data;
-                }
+                this.tankReadingData = res;
+                this.tankReadingData.forEach(v => {
+                    v.nozzle.forEach(nozzle => {
+                        nozzle.buy_price = (nozzle.end_reading - nozzle.start_reading) * this.unit_price
+                        this.total_nozzle_buy_price += nozzle.buy_price;
+                    })
+                })
             });
         },
         getPayOrder: function () {
             ApiService.POST(ApiRoutes.PayOrderLatest, {},res => {
                 if (parseInt(res.status) === 200) {
                     this.listDataPayOrder = res.data;
-                    this.param.quantity = res.data.quantity
-                    this.param.buy_price = res.data.amount
-                    this.param.net_profit = (this.param.start_reading - this.param.end_reading) * (this.param.buy_price / this.param.quantity )
                 }
             });
         },
@@ -161,6 +223,9 @@ export default {
             ApiService.POST(ApiRoutes.PayOrderSingle, {id: this.param.pay_order_id},res => {
                 if (parseInt(res.status) === 200) {
                     this.singlePayOrder = res.data;
+                    this.param.quantity = res.data.quantity
+                    this.param.amount = res.data.amount
+                    this.unit_price = this.param.amount / this.param.quantity
                 }
             });
         },
