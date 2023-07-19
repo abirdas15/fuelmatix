@@ -70,8 +70,8 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="card" v-if="tankReadingData.length > 0"
-                                         v-for="(d, dIndex) in tankReadingData">
+                                    <div class="card" v-if="param.dispensers.length > 0"
+                                         v-for="(d, dIndex) in param.dispensers">
                                         <div class="card-header">
                                             <h5 class="card-title">{{ d.dispenser_name }}</h5>
                                         </div>
@@ -108,7 +108,7 @@
                                         <div class="col-sm-4">
                                             <div class="text-right mb-4">
                                                 <label>Total refill volume</label>
-                                                <input type="text" class="form-control" disabled v-model="total_refill_volume">
+                                                <input type="text" class="form-control" disabled v-model="param.total_refill_volume">
                                             </div>
                                             <div class="text-right">
                                                 <label>Loss/Porfit</label>
@@ -152,9 +152,10 @@ export default {
                 dip_sale: 0,
                 amount: 0,
                 net_profit: 0,
+                total_refill_volume: 0,
+                dispensers: [],
             },
             unit_price: 0,
-            total_refill_volume: 0,
             listDataTank: [],
             listDataPayOrder: [],
             tankDispenserData: [],
@@ -203,15 +204,15 @@ export default {
         },
         getDispenserSingle: function () {
             ApiService.POST(ApiRoutes.TankGetNozzle, {tank_id: this.param.tank_id},res => {
-                this.tankReadingData = res;
-                this.tankReadingData.forEach(v => {
+                this.param.dispensers = res;
+                this.param.dispensers.forEach(v => {
                     v.nozzle.forEach(nozzle => {
                         nozzle.sale = nozzle.end_reading - nozzle.start_reading
-                        this.total_refill_volume += nozzle.sale;
+                        this.param.total_refill_volume += nozzle.sale;
                     })
                 })
-                this.total_refill_volume += this.param.dip_sale
-                this.param.net_profit = this.param.quantity - this.total_refill_volume
+                this.param.total_refill_volume += this.param.dip_sale
+                this.param.net_profit = this.param.total_refill_volume - this.param.quantity
             });
         },
         getPayOrder: function () {

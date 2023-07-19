@@ -5121,10 +5121,11 @@ __webpack_require__.r(__webpack_exports__);
         end_reading: 0,
         dip_sale: 0,
         amount: 0,
-        net_profit: 0
+        net_profit: 0,
+        total_refill_volume: 0,
+        dispensers: []
       },
       unit_price: 0,
-      total_refill_volume: 0,
       listDataTank: [],
       listDataPayOrder: [],
       tankDispenserData: [],
@@ -5183,15 +5184,15 @@ __webpack_require__.r(__webpack_exports__);
       _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].TankGetNozzle, {
         tank_id: this.param.tank_id
       }, function (res) {
-        _this3.tankReadingData = res;
-        _this3.tankReadingData.forEach(function (v) {
+        _this3.param.dispensers = res;
+        _this3.param.dispensers.forEach(function (v) {
           v.nozzle.forEach(function (nozzle) {
             nozzle.sale = nozzle.end_reading - nozzle.start_reading;
-            _this3.total_refill_volume += nozzle.sale;
+            _this3.param.total_refill_volume += nozzle.sale;
           });
         });
-        _this3.total_refill_volume += _this3.param.dip_sale;
-        _this3.param.net_profit = _this3.param.quantity - _this3.total_refill_volume;
+        _this3.param.total_refill_volume += _this3.param.dip_sale;
+        _this3.param.net_profit = _this3.param.total_refill_volume - _this3.param.quantity;
       });
     },
     getPayOrder: function getPayOrder() {
@@ -15446,8 +15447,8 @@ var render = function render() {
     }
   }), _vm._v(" "), _c("div", {
     staticClass: "invalid-feedback"
-  })])])]), _vm._v(" "), _vm._l(_vm.tankReadingData, function (d, dIndex) {
-    return _vm.tankReadingData.length > 0 ? _c("div", {
+  })])])]), _vm._v(" "), _vm._l(_vm.param.dispensers, function (d, dIndex) {
+    return _vm.param.dispensers.length > 0 ? _c("div", {
       staticClass: "card"
     }, [_c("div", {
       staticClass: "card-header"
@@ -15550,8 +15551,8 @@ var render = function render() {
     directives: [{
       name: "model",
       rawName: "v-model",
-      value: _vm.total_refill_volume,
-      expression: "total_refill_volume"
+      value: _vm.param.total_refill_volume,
+      expression: "param.total_refill_volume"
     }],
     staticClass: "form-control",
     attrs: {
@@ -15559,12 +15560,12 @@ var render = function render() {
       disabled: ""
     },
     domProps: {
-      value: _vm.total_refill_volume
+      value: _vm.param.total_refill_volume
     },
     on: {
       input: function input($event) {
         if ($event.target.composing) return;
-        _vm.total_refill_volume = $event.target.value;
+        _vm.$set(_vm.param, "total_refill_volume", $event.target.value);
       }
     }
   })]), _vm._v(" "), _c("div", {
@@ -15956,12 +15957,12 @@ var render = function render() {
   }, [_c("router-link", {
     attrs: {
       to: {
-        name: "TankAdd"
+        name: "TankRefillAdd"
       }
     }
   }, [_c("i", {
     staticClass: "fa-solid fa-plus"
-  }), _vm._v(" Add New Tank")])], 1)])]), _vm._v(" "), _c("div", {
+  }), _vm._v(" Add New Tank Refill")])], 1)])]), _vm._v(" "), _c("div", {
     staticClass: "row"
   }, [_c("div", {
     staticClass: "col-12"
@@ -16148,7 +16149,7 @@ var staticRenderFns = [function () {
     attrs: {
       href: "javascript:void(0)"
     }
-  }, [_vm._v("Tank List")])]);
+  }, [_vm._v("Tank Refill History")])]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
@@ -16156,7 +16157,7 @@ var staticRenderFns = [function () {
     staticClass: "card-header bg-secondary"
   }, [_c("h4", {
     staticClass: "card-title"
-  }, [_vm._v("Tank List")])]);
+  }, [_vm._v("Tank Refill List")])]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;

@@ -4,15 +4,15 @@
             <div class="row page-titles">
                 <ol class="breadcrumb align-items-center ">
                     <li class="breadcrumb-item active"><router-link :to="{name: 'Dashboard'}">Home</router-link></li>
-                    <li class="breadcrumb-item"><a href="javascript:void(0)">Tank List</a></li>
-                    <li style="margin-left: auto;"><router-link :to="{name: 'TankAdd'}"><i class="fa-solid fa-plus"></i> Add New Tank</router-link></li>
+                    <li class="breadcrumb-item"><a href="javascript:void(0)">Tank Refill History</a></li>
+                    <li style="margin-left: auto;"><router-link :to="{name: 'TankRefillAdd'}"><i class="fa-solid fa-plus"></i> Add New Tank Refill</router-link></li>
                 </ol>
             </div>
             <div class="row">
                 <div class="col-12">
                     <div class="card">
                         <div class="card-header bg-secondary">
-                            <h4 class="card-title">Tank List</h4>
+                            <h4 class="card-title">Tank Refill List</h4>
                         </div>
                         <div class="card-body">
                             <div class="row mt-4">
