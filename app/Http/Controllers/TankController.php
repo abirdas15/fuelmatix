@@ -321,7 +321,7 @@ class TankController extends Controller
                 $reading = NozzleReading::select('reading')->where('nozzle_id', $nozzle['id'])->where('type', 'tank refill')->limit(2)->get()->toArray();
                 $nozzle['start_reading'] = isset($reading[0]) ? $reading[0]['reading'] : 0;
                 $nozzle['end_reading'] = isset($reading[1]) ? $reading[1]['reading'] : 0;
-                $nozzle['buy_price'] = 0;
+                $nozzle['sale'] = 0;
             }
         }
         return $dispensers;
