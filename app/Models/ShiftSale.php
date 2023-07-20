@@ -12,4 +12,8 @@ class ShiftSale extends Model
     protected $table = 'shift_sale';
 
     public $timestamps = false;
+    protected $hidden = [
+        'client_company_id',
+        'user_id',
+    ];
 }

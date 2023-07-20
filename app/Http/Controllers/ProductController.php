@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Dispenser;
+use App\Models\NozzleReading;
 use App\Models\Product;
 use App\Models\ShiftSale;
 use App\Models\ShiftSummary;
 use App\Models\Tank;
+use App\Models\TankLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -124,32 +126,45 @@ class ProductController extends Controller
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
-        $shitSale = ShiftSale::select('id', 'product_id', 'start_reading', 'end_reading', 'consumption', 'amount')
+        $product = Product::where('id', $inputData['product_id'])->where('client_company_id', $inputData['session_user']['client_company_id'])->first();
+        if ($product == null) {
+            return response()->json(['status' => 500, 'error' => 'Cannot find product.']);
+        }
+        $shitSale = ShiftSale::select('id', 'end_reading', 'start_reading', 'consumption')
             ->where('product_id', $inputData['product_id'])
-            ->where('status', 'start')
+            ->where('client_company_id', $inputData['session_user']['client_company_id'])
             ->orderBy('id', 'DESC')
             ->first();
-        $product = Product::select('name')->find($inputData['product_id']);
-        if ($shitSale == null) {
-            $shitSale = [
-                'id' => '',
-                'product_id' => $inputData['product_id'],
-                'start_reading' => 0,
-                'end_reading' => 0,
-                'consumption' => null,
-                'amount' => 0,
-                'status' => 'start'
-            ];
-        } else {
-            $shitSale['status'] = 'end';
+        $end_reading = 0;
+        $start_reading = $product->opening_stock != null ? $product->opening_stock : 0;
+        $tank = Tank::where('product_id', $inputData['product_id'])->select('id')->where('client_company_id', $inputData['session_user']['client_company_id'])->first();
+        if ($tank != null) {
+            $tankReading = TankLog::select('tank_log.volume')
+                ->where('type', 'shift sell')
+                ->where('tank_id', $tank->id)
+                ->orderBy('tank_log.id', 'DESC')
+                ->first();
+            if ($tankReading != null) {
+                $end_reading = $tankReading['volume'];
+            }
         }
-        $shitSale['product_name'] = $product->name;
-        $shitSaleSummary = ShiftSummary::select('id', 'nozzle_id', 'start_reading', 'end_reading', 'consumption', 'amount')
-            ->where('shift_sale_id', $shitSale['id'])
-            ->get()
-            ->keyBy('nozzle_id');
+        if ($shitSale != null) {
+            $start_reading = $shitSale['end_reading'];
+        }
+        $consumption = $start_reading - $end_reading;
+        $amount = $consumption * $product['selling_price'];
+        $result = [
+            'date' => date('Y-m-d'),
+            'product_id' => $inputData['product_id'],
+            'start_reading' => $start_reading,
+            'end_reading' => $end_reading,
+            'consumption' => $consumption,
+            'amount' => $amount,
+            'selling_price' => $product->selling_price
+        ];
         $dispensers = Dispenser::select('id', 'dispenser_name')
             ->where('product_id', $inputData['product_id'])
+            ->where('client_company_id', $inputData['session_user']['client_company_id'])
             ->with(['nozzle' => function($q) {
                 $q->select('nozzles.id', 'nozzles.dispenser_id', 'nozzles.name');
             }])
@@ -157,13 +172,16 @@ class ProductController extends Controller
             ->toArray();
         foreach ($dispensers as &$dispenser) {
             foreach ($dispenser['nozzle'] as &$nozzle) {
-                $nozzle['start_reading'] = isset($shitSaleSummary[$nozzle['id']]) ? $shitSaleSummary[$nozzle['id']]['start_reading'] : 0;
-                $nozzle['end_reading'] = isset($shitSaleSummary[$nozzle['id']]) ? $shitSaleSummary[$nozzle['id']]['end_reading'] : 0;
-                $nozzle['consumption'] = isset($shitSaleSummary[$nozzle['id']]) ? $shitSaleSummary[$nozzle['id']]['consumption'] : null;
-                $nozzle['amount'] = isset($shitSaleSummary[$nozzle['id']]) ? $shitSaleSummary[$nozzle['id']]['amount'] : 0;
+                $reading = NozzleReading::select('reading')->where('client_company_id', $inputData['session_user']['client_company_id'])->where('nozzle_id', $nozzle['id'])->where('type', 'shift sell')->limit(2)->get()->toArray();
+                $nozzle['start_reading'] = isset($reading[0]) ? $reading[0]['reading'] : 0;
+                $nozzle['end_reading'] = isset($reading[1]) ? $reading[1]['reading'] : 0;
+                $nozzle['consumption'] =  $nozzle['start_reading']  - $nozzle['end_reading'];
+                $nozzle['amount'] = $nozzle['consumption'] * $product['selling_price'];
             }
         }
-        return response()->json(['status' => 200, 'summary' => $dispensers, 'shift_sale' => $shitSale]);
+        $result['dispensers'] = $dispensers;
+
+        return response()->json(['status' => 200, 'data' => $result]);
     }
     public function getTank(Request $request)
     {

@@ -113,6 +113,10 @@ Route::group(['middleware' => 'AuthReqCheck'], function() {
     });
     Route::group(['prefix' => 'shift/sale'], function() {
         Route::post('save', [ShiftSaleController::class, 'save']);
+        Route::post('list', [ShiftSaleController::class, 'list']);
+        Route::post('single', [ShiftSaleController::class, 'single']);
+        Route::post('update', [ShiftSaleController::class, 'update']);
+        Route::post('delete', [ShiftSaleController::class, 'delete']);
     });
     Route::group(['prefix' => 'expense'], function() {
         Route::post('save', [ExpenseController::class, 'save']);

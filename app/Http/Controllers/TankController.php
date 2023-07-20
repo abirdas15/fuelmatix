@@ -176,6 +176,7 @@ class TankController extends Controller
         $reading->date = $inputData['date'];
         $reading->height = $inputData['height'];
         $reading->water_height = $inputData['water_height'];
+        $reading->type = $inputData['type'];
         $reading->volume = $bstiChart != null ? $bstiChart->volume : 0;
         $reading->client_company_id = $inputData['session_user']['client_company_id'];
         if ($reading->save()) {
@@ -311,6 +312,7 @@ class TankController extends Controller
         }
         $dispensers = Dispenser::select('id', 'dispenser_name')
             ->where('tank_id', $inputData['tank_id'])
+            ->where('client_company_id', $inputData['session_user']['client_company_id'])
             ->with(['nozzle' => function($q) {
                 $q->select('nozzles.id', 'nozzles.dispenser_id', 'nozzles.name');
             }])
@@ -318,7 +320,7 @@ class TankController extends Controller
             ->toArray();
         foreach ($dispensers as &$dispenser) {
             foreach ($dispenser['nozzle'] as &$nozzle) {
-                $reading = NozzleReading::select('reading')->where('nozzle_id', $nozzle['id'])->where('type', 'tank refill')->limit(2)->get()->toArray();
+                $reading = NozzleReading::select('reading')->where('client_company_id', $inputData['session_user']['client_company_id'])->where('nozzle_id', $nozzle['id'])->where('type', 'tank refill')->limit(2)->get()->toArray();
                 $nozzle['start_reading'] = isset($reading[0]) ? $reading[0]['reading'] : 0;
                 $nozzle['end_reading'] = isset($reading[1]) ? $reading[1]['reading'] : 0;
                 $nozzle['sale'] = 0;
@@ -403,6 +405,7 @@ class TankController extends Controller
         $refillHistory = TankRefillHistory::where('tank_refill_id', $inputData['id'])->get()->keyBy('nozzle_id');
         $dispensers = Dispenser::select('id', 'dispenser_name')
             ->where('tank_id', $result['tank_id'])
+            ->where('client_company_id', $inputData['session_user']['client_company_id'])
             ->with(['nozzle' => function($q) {
                 $q->select('nozzles.id', 'nozzles.dispenser_id', 'nozzles.name');
             }])
