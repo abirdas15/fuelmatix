@@ -14,7 +14,7 @@
                     <span class="nav-text">Sales</span>
                 </a>
                     <ul aria-expanded="false" class="bichi">
-                        <li><router-link :to="{name: 'ShiftSaleStart'}">Shift Sale</router-link></li>
+                        <li><router-link :to="{name: 'ShiftSaleList'}">Shift Sale</router-link></li>
                         <li><a href="./sale.html">Sale</a></li>
                         <li><a href="./salesHistroy.html">Sale Histroy</a></li>
                         <li><a href="#">Item Sale</a></li>

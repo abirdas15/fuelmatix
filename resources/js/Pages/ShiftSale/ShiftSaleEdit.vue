@@ -13,7 +13,7 @@
                 <div class="col-xl-12 col-lg-12">
                     <div class="card">
                         <div class="card-header">
-                            <h4 class="card-title">Shift Sale Start</h4>
+                            <h4 class="card-title">Shift Sale Edit</h4>
                         </div>
                         <form @submit.prevent="save">
                             <div class="card-body">
@@ -147,6 +147,7 @@ export default {
             listDispenser: null,
             product_id: '',
             productIndex: 0,
+            id: '',
         }
     },
     methods: {
@@ -184,14 +185,22 @@ export default {
                 this.TableLoading = false
                 if (parseInt(res.status) === 200) {
                     this.listData = res.data.data;
+                    this.listData.map((v, i) => {
+                        if (this.product_id == v.id) {
+                            this.productIndex = i
+                        }
+                    })
+                    this.calculateLineProgress()
                 }
             });
         },
-        getProductDispenser: function () {
-            ApiService.POST(ApiRoutes.ProductDispenser, {product_id: this.product_id}, res => {
+        getSingle: function() {
+            ApiService.POST(ApiRoutes.ShiftSaleSingle, {id: this.id}, res => {
                 this.TableLoading = false
                 if (parseInt(res.status) === 200) {
                     this.listDispenser = res.data;
+                    this.product_id = this.listDispenser.product_id
+                    this.getProduct()
                 }
             });
         },
@@ -212,7 +221,8 @@ export default {
         },
     },
     created() {
-        this.getProduct()
+        this.id = this.$route.params.id
+        this.getSingle()
     },
     mounted() {
         $('#dashboard_bar').text('Shift Sale Start')
