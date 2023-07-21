@@ -49,6 +49,11 @@ class ProductController extends Controller
         $result = Product::select('products.*', 'product_types.name as product_type')
             ->leftJoin('product_types', 'product_types.id', '=', 'products.type_id')
             ->where('client_company_id', $inputData['session_user']['client_company_id']);
+        if (isset($inputData['type_id']) && !empty($inputData['type_id'])) {
+            $result->where(function($q) use ($inputData) {
+                $q->where('products.type_id', $inputData['type_id']);
+            });
+        }
         if (!empty($keyword)) {
             $result->where(function($q) use ($keyword) {
                 $q->where('products.name', 'LIKE', '%'.$keyword.'%');

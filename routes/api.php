@@ -22,6 +22,7 @@ use App\Http\Controllers\TankController;
 use App\Http\Controllers\BankController;
 use App\Http\Controllers\VendorController;
 use App\Http\Controllers\PayOrderController;
+use App\Http\Controllers\SaleController;
 
 /*
 |--------------------------------------------------------------------------
@@ -169,6 +170,13 @@ Route::group(['middleware' => 'AuthReqCheck'], function() {
         Route::post('update', [PayOrderController::class, 'update']);
         Route::post('delete', [PayOrderController::class, 'delete']);
         Route::post('latest', [PayOrderController::class, 'latest']);
+    });
+    Route::group(['prefix' => 'sale'], function() {
+        Route::post('save', [SaleController::class, 'save']);
+        Route::post('list', [SaleController::class, 'list']);
+        Route::post('single', [SaleController::class, 'single']);
+        Route::post('update', [SaleController::class, 'update']);
+        Route::post('delete', [SaleController::class, 'delete']);
     });
 });
 
