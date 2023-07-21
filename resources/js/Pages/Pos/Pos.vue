@@ -122,7 +122,6 @@
 <script>
 import ApiService from "../../Services/ApiService";
 import ApiRoutes from "../../Services/ApiRoutes";
-import {active} from "../../../../public/js/app";
 
 export default {
     data() {
@@ -133,7 +132,6 @@ export default {
         }
     },
     methods: {
-        active,
         getProducts: function (id = null) {
             let param = {
                 limit: 5000,

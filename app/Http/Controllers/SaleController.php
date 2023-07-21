@@ -87,7 +87,11 @@ class SaleController extends Controller
         }
         $result = Sale::find($inputData['id']);
         $result['date'] = date('Y-m-d', strtotime($result['date']));
-        $result['products'] = SaleData::where('sale_id', $inputData['id'])->get()->toArray();
+        $result['products'] = SaleData::select('sale_data.*', 'products.name as product_name', 'product_types.name as type_name')
+            ->leftJoin('products', 'products.id', '=', 'sale_data.product_id')
+            ->leftJoin('product_types', 'products.type_id', '=', 'product_types.id')
+            ->where('sale_data.sale_id', $inputData['id'])
+            ->get()->toArray();
         return response()->json(['status' => 200, 'data' => $result]);
     }
     public function update(Request $request)
