@@ -202,10 +202,7 @@
 <script>
 import ApiService from "../../Services/ApiService";
 import ApiRoutes from "../../Services/ApiRoutes";
-<<<<<<< HEAD
-=======
 import {Printd} from "printd"
->>>>>>> 554e3c7e1cdbea38c10d751697daea9b577630b6
 
 export default {
     data() {
@@ -342,9 +339,6 @@ export default {
         }
     },
     methods: {
-<<<<<<< HEAD
-        getProducts: function (id = null) {
-=======
         updateSubtotal: function (i) {
             this.sale[i].subtotal = parseFloat(this.sale[i].price * this.sale[i].quantity).toFixed(2)
         },
@@ -423,7 +417,6 @@ export default {
         },
         getProducts: function (id = null, index = null) {
             this.selectedProductIndex = index
->>>>>>> 554e3c7e1cdbea38c10d751697daea9b577630b6
             let param = {
                 limit: 5000,
                 page: 1
