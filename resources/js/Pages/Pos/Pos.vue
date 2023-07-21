@@ -350,7 +350,7 @@ export default {
                 return;
             }
             this.loading = true
-            ApiService.POST(ApiRoutes.SaleAdd, {products: this.sale}, res => {
+            ApiService.POST(ApiRoutes.SaleAdd, {payment_method: 'cash', products: this.sale}, res => {
                 if (parseInt(res.status) === 200) {
                     this.saleId = res.data
                     this.singleOrder()

@@ -6297,7 +6297,11 @@ __webpack_require__.r(__webpack_exports__);
       }, function (res) {
         if (parseInt(res.status) === 200) {
           _this2.singleSaleData = res.data;
-          if (isEdit) {}
+          if (isEdit) {
+            _this2.singleSaleData.products.map(function (v) {
+              var product = {};
+            });
+          }
           if (isPrint) {
             setTimeout(function () {
               _this2.loading = false;
@@ -6643,6 +6647,7 @@ __webpack_require__.r(__webpack_exports__);
       }
       this.loading = true;
       _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].SaleAdd, {
+        payment_method: 'cash',
         products: this.sale
       }, function (res) {
         if (parseInt(res.status) === 200) {
