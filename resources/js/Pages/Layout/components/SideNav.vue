@@ -16,11 +16,11 @@
                     <ul aria-expanded="false" class="bichi">
                         <li><router-link :to="{name: 'ShiftSaleList'}">Shift Sale</router-link></li>
                         <li><a href="./sale.html">Sale</a></li>
-                        <li><a href="./salesHistroy.html">Sale Histroy</a></li>
                         <li><a href="#">Item Sale</a></li>
                         <li><a href="#">Bill</a></li>
                         <li><a href="./creditSaleDetailEntry.html">Credit Sale Detail Entry</a></li>
                         <li><router-link :to="{name: 'Pos'}" >POS</router-link></li>
+                        <li><router-link :to="{name: 'PosList'}" >POS History</router-link></li>
                     </ul>
                 </li>
                 <li><a class="has-arrow " href="javascript:void()" aria-expanded="false">

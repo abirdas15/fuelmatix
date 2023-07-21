@@ -202,10 +202,7 @@
 <script>
 import ApiService from "../../Services/ApiService";
 import ApiRoutes from "../../Services/ApiRoutes";
-<<<<<<< HEAD
-=======
 import {Printd} from "printd"
->>>>>>> 554e3c7e1cdbea38c10d751697daea9b577630b6
 
 export default {
     data() {
@@ -342,9 +339,6 @@ export default {
         }
     },
     methods: {
-<<<<<<< HEAD
-        getProducts: function (id = null) {
-=======
         updateSubtotal: function (i) {
             this.sale[i].subtotal = parseFloat(this.sale[i].price * this.sale[i].quantity).toFixed(2)
         },
@@ -359,18 +353,22 @@ export default {
             ApiService.POST(ApiRoutes.SaleAdd, {products: this.sale}, res => {
                 if (parseInt(res.status) === 200) {
                     this.saleId = res.data
-                    this.singleOrder()
+                    this.singleOrder(true)
                 }
             });
         },
-        singleOrder: function () {
+        singleOrder: function (isPrint = false, isEdit = false) {
             ApiService.POST(ApiRoutes.SaleSingle, {id: this.saleId}, res => {
                 if (parseInt(res.status) === 200) {
                     this.singleSaleData = res.data
-                    setTimeout(() => {
-                        this.loading = false
-                        this.print()
-                    }, 1000)
+                    if (isEdit) {
+                    }
+                    if (isPrint) {
+                        setTimeout(() => {
+                            this.loading = false
+                            this.print()
+                        }, 1000)
+                    }
                 }
             });
         },
@@ -423,7 +421,6 @@ export default {
         },
         getProducts: function (id = null, index = null) {
             this.selectedProductIndex = index
->>>>>>> 554e3c7e1cdbea38c10d751697daea9b577630b6
             let param = {
                 limit: 5000,
                 page: 1
@@ -523,8 +520,10 @@ export default {
         }
     },
     created() {
+        this.saleId = this.$route.params.id
         this.getProducts()
         this.getProductType()
+        this.singleOrder()
     },
     mounted() {
         this.printD = new Printd()
