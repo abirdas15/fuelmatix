@@ -6279,12 +6279,12 @@ __webpack_require__.r(__webpack_exports__);
         return;
       }
       this.loading = true;
-      _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].SaleAdd, {
+      _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].SaleEdit, {
+        id: this.saleId,
         payment_method: 'cash',
         products: this.sale
       }, function (res) {
         if (parseInt(res.status) === 200) {
-          _this.saleId = res.data;
           _this.singleOrder(true);
         }
       });
