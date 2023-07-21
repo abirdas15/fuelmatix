@@ -41,7 +41,7 @@ class SaleController extends Controller
                 $saleData->subtotal = $product['subtotal'];
                 $saleData->save();
             }
-            return response()->json(['status' => 200, 'message' => 'Successfully saved sale.']);
+            return response()->json(['status' => 200, 'message' => 'Successfully saved sale.', 'data' => $sale->id]);
         }
         return response()->json(['status' => 500, 'error' => 'Cannot saved sale.']);
     }
