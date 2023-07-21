@@ -353,18 +353,22 @@ export default {
             ApiService.POST(ApiRoutes.SaleAdd, {products: this.sale}, res => {
                 if (parseInt(res.status) === 200) {
                     this.saleId = res.data
-                    this.singleOrder()
+                    this.singleOrder(true)
                 }
             });
         },
-        singleOrder: function () {
+        singleOrder: function (isPrint = false, isEdit = false) {
             ApiService.POST(ApiRoutes.SaleSingle, {id: this.saleId}, res => {
                 if (parseInt(res.status) === 200) {
                     this.singleSaleData = res.data
-                    setTimeout(() => {
-                        this.loading = false
-                        this.print()
-                    }, 1000)
+                    if (isEdit) {
+                    }
+                    if (isPrint) {
+                        setTimeout(() => {
+                            this.loading = false
+                            this.print()
+                        }, 1000)
+                    }
                 }
             });
         },
@@ -516,8 +520,10 @@ export default {
         }
     },
     created() {
+        this.saleId = this.$route.params.id
         this.getProducts()
         this.getProductType()
+        this.singleOrder()
     },
     mounted() {
         this.printD = new Printd()

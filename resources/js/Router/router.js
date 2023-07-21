@@ -36,6 +36,8 @@ import ShiftSaleStart from "../Pages/ShiftSale/ShiftSaleAdd";
 import ShiftSaleList from "../Pages/ShiftSale/List.vue";
 import ShiftSaleEdit from "../Pages/ShiftSale/ShiftSaleEdit.vue";
 import Pos from "../Pages/Pos/Pos";
+import PosList from "../Pages/Pos/List.vue";
+import PosEdit from "../Pages/Pos/Edit.vue";
 import Expense from "../Pages/Expenses/List";
 import ExpenseAdd from "../Pages/Expenses/Add";
 import ExpenseEdit from "../Pages/Expenses/Edit";
@@ -101,6 +103,8 @@ const router = new VueRouter({
                 { path: ROOT_URL + "/shift/sale/list", name: "ShiftSaleList", component: ShiftSaleList},
                 { path: ROOT_URL + "/shift/sale/edit/:id", name: "ShiftSaleEdit", component: ShiftSaleEdit},
                 { path: ROOT_URL + "/pos", name: "Pos", component: Pos},
+                { path: ROOT_URL + "/pos/list", name: "PosList", component: PosList},
+                { path: ROOT_URL + "/pos/edit/:id", name: "PosEdit", component: PosEdit},
                 { path: ROOT_URL + "/expense", name: "Expense", component: Expense},
                 { path: ROOT_URL + "/expense/add", name: "ExpenseAdd", component: ExpenseAdd},
                 { path: ROOT_URL + "/expense/edit/:id", name: "ExpenseEdit", component: ExpenseEdit},
