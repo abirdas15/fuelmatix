@@ -94,74 +94,18 @@
                             </div>
                             <div class="default-cart">
                                 <div class="d-flex flex-nowrap overflow-auto pb-2 mb-2">
-                                    <button class="btn active-btn me-2">All Categories</button>
-                                    <button class="btn light btn-dark me-2">Shoes</button>
-                                    <button class="btn light btn-dark me-2">Fruits</button>
-                                    <button class="btn light btn-dark me-2">Jackets</button>
-                                    <button class="btn light btn-dark me-2">Laptop</button>
-                                    <button class="btn light btn-dark me-2">Tshirt</button>
-                                </div>
-                                <div class="d-flex flex-nowrap overflow-auto pb-2 mb-2">
-                                    <button class="btn active-btn me-2">All Brands</button>
-                                    <button class="btn light btn-dark me-2">Colors</button>
-                                    <button class="btn light btn-dark me-2">Fruits</button>
-                                    <button class="btn light btn-dark me-2">Jackets</button>
-                                    <button class="btn light btn-dark me-2">Laptop</button>
-                                    <button class="btn light btn-dark me-2">Tshirt</button>
+                                    <button class="btn btn-sm active-btn me-2">All Categories</button>
+                                    <button class="btn btn-sm light btn-dark me-2" v-for="type in productType" @click="getProducts(type.id)">{{ type.name }}</button>
                                 </div>
                                 <div class="product-list">
-                                    <div class="each-product">
+                                    <div class="each-product" v-for="(p, i) in products">
                                         <div class="img">
-                                            <img src="https://picsum.photos/200?random=1" alt="">
+                                            <img :src="'https://via.placeholder.com/100x70?text='+p.name" alt="">
                                         </div>
                                         <div class="detail">
-                                            <div class="name">T-shirt</div>
-                                            <div class="desc">Tshirt</div>
-                                        </div>
-                                    </div>
-                                    <div class="each-product">
-                                        <div class="img">
-                                            <img src="https://picsum.photos/200?random=2" alt="">
-                                        </div>
-                                        <div class="detail">
-                                            <div class="name">Headphone</div>
-                                            <div class="desc">A4tech</div>
-                                        </div>
-                                    </div>
-                                    <div class="each-product">
-                                        <div class="img">
-                                            <img src="https://picsum.photos/200?random=3" alt="">
-                                        </div>
-                                        <div class="detail">
-                                            <div class="name">T-shirt</div>
-                                            <div class="desc">Tshirt</div>
-                                        </div>
-                                    </div>
-                                    <div class="each-product">
-                                        <div class="img">
-                                            <img src="https://picsum.photos/200?random=4" alt="">
-                                        </div>
-                                        <div class="detail">
-                                            <div class="name">Headphone</div>
-                                            <div class="desc">A4tech</div>
-                                        </div>
-                                    </div>
-                                    <div class="each-product">
-                                        <div class="img">
-                                            <img src="https://picsum.photos/200?random=5" alt="">
-                                        </div>
-                                        <div class="detail">
-                                            <div class="name">T-shirt</div>
-                                            <div class="desc">Tshirt</div>
-                                        </div>
-                                    </div>
-                                    <div class="each-product">
-                                        <div class="img">
-                                            <img src="https://picsum.photos/200?random=6" alt="">
-                                        </div>
-                                        <div class="detail">
-                                            <div class="name">Headphone</div>
-                                            <div class="desc">A4tech</div>
+                                            <div class="name">{{p.name}}</div>
+                                            <div class="desc">{{ p.product_type }}</div>
+                                            <p class="mt-1 mb-0"><kbd>Ctrl</kbd>+<kbd>{{getProductNumber(i)}}</kbd></p>
                                         </div>
                                     </div>
                                 </div>
@@ -182,14 +126,83 @@ import ApiRoutes from "../../Services/ApiRoutes";
 export default {
     data() {
         return {
-
+            products: [],
+            productType: []
         }
     },
     methods: {
-
+        getProducts: function (id = null) {
+            let param = {
+                limit: 5000,
+                page: 1
+            }
+            if (id != null) {
+                param.type_id = id;
+            }
+            ApiService.POST(ApiRoutes.ProductList, param, res => {
+                if (parseInt(res.status) === 200) {
+                    this.products = res.data.data;
+                    document.addEventListener("keydown", function (event) {
+                        event.stopPropagation();
+                        event.preventDefault();
+                        if(event.ctrlKey && event.keyCode == 81) {
+                            console.log("CTRL + Q was pressed!");
+                        }
+                        if(event.ctrlKey && event.keyCode == 82) {
+                            console.log("CTRL + W was pressed!");
+                        }
+                    });
+                }
+            });
+        },
+        getProductNumber: function (index) {
+            let alphabet = ''
+            switch(index) {
+                case 0:
+                    alphabet = 'A'
+                    break;
+                case 1:
+                    alphabet = 'S'
+                    break;
+                case 2:
+                    alphabet = 'D'
+                    break;
+                case 3:
+                    alphabet = 'F'
+                    break;
+                case 4:
+                    alphabet = 'G'
+                    break;
+                case 5:
+                    alphabet = 'H'
+                    break;
+                case 6:
+                    alphabet = 'I'
+                    break;
+                case 7:
+                    alphabet = 'J'
+                    break;
+                case 8:
+                    alphabet = 'K'
+                    break;
+                case 9:
+                    alphabet = 'L'
+                    break;
+                default:
+                // do nothing
+            }
+            return alphabet
+        },
+        getProductType: function () {
+            ApiService.POST(ApiRoutes.ProductType, {},res => {
+                if (parseInt(res.status) === 200) {
+                    this.productType = res.data
+                }
+            });
+        }
     },
     created() {
-
+        this.getProducts()
     },
     mounted() {
         $('#dashboard_bar').text('Pos')
@@ -273,5 +286,6 @@ export default {
 .active-btn{
     background-color: #6572FF;
     border-color: #6572FF;
+    color: #ffffff;
 }
 </style>

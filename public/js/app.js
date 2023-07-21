@@ -6251,10 +6251,89 @@ __webpack_require__.r(__webpack_exports__);
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
-    return {};
+    return {
+      products: [],
+      productType: []
+    };
   },
-  methods: {},
-  created: function created() {},
+  methods: {
+    getProducts: function getProducts() {
+      var _this = this;
+      var id = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+      var param = {
+        limit: 5000,
+        page: 1
+      };
+      if (id != null) {
+        param.type_id = id;
+      }
+      _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].ProductList, param, function (res) {
+        if (parseInt(res.status) === 200) {
+          _this.products = res.data.data;
+          document.addEventListener("keydown", function (event) {
+            event.stopPropagation();
+            event.preventDefault();
+            if (event.ctrlKey && event.keyCode == 81) {
+              console.log("CTRL + Q was pressed!");
+            }
+            if (event.ctrlKey && event.keyCode == 82) {
+              console.log("CTRL + W was pressed!");
+            }
+          });
+        }
+      });
+    },
+    getProductNumber: function getProductNumber(index) {
+      var alphabet = '';
+      switch (index) {
+        case 0:
+          alphabet = 'A';
+          break;
+        case 1:
+          alphabet = 'S';
+          break;
+        case 2:
+          alphabet = 'D';
+          break;
+        case 3:
+          alphabet = 'F';
+          break;
+        case 4:
+          alphabet = 'G';
+          break;
+        case 5:
+          alphabet = 'H';
+          break;
+        case 6:
+          alphabet = 'I';
+          break;
+        case 7:
+          alphabet = 'J';
+          break;
+        case 8:
+          alphabet = 'K';
+          break;
+        case 9:
+          alphabet = 'L';
+          break;
+        default:
+        // do nothing
+      }
+
+      return alphabet;
+    },
+    getProductType: function getProductType() {
+      var _this2 = this;
+      _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].ProductType, {}, function (res) {
+        if (parseInt(res.status) === 200) {
+          _this2.productType = res.data;
+        }
+      });
+    }
+  },
+  created: function created() {
+    this.getProducts();
+  },
   mounted: function mounted() {
     $('#dashboard_bar').text('Pos');
   }
@@ -19973,7 +20052,51 @@ var render = function render() {
         name: "Dashboard"
       }
     }
-  }, [_vm._v("Home")])], 1), _vm._v(" "), _vm._m(0)])]), _vm._v(" "), _vm._m(1)])]);
+  }, [_vm._v("Home")])], 1), _vm._v(" "), _vm._m(0)])]), _vm._v(" "), _c("div", {
+    staticClass: "row"
+  }, [_c("div", {
+    staticClass: "col-xl-12 col-lg-12"
+  }, [_c("div", {
+    staticClass: "row"
+  }, [_vm._m(1), _vm._v(" "), _c("div", {
+    staticClass: "col-sm-7"
+  }, [_vm._m(2), _vm._v(" "), _c("div", {
+    staticClass: "default-cart"
+  }, [_c("div", {
+    staticClass: "d-flex flex-nowrap overflow-auto pb-2 mb-2"
+  }, [_c("button", {
+    staticClass: "btn btn-sm active-btn me-2"
+  }, [_vm._v("All Categories")]), _vm._v(" "), _vm._l(_vm.productType, function (type) {
+    return _c("button", {
+      staticClass: "btn btn-sm light btn-dark me-2",
+      on: {
+        click: function click($event) {
+          return _vm.getProducts(type.id);
+        }
+      }
+    }, [_vm._v(_vm._s(type.name))]);
+  })], 2), _vm._v(" "), _c("div", {
+    staticClass: "product-list"
+  }, _vm._l(_vm.products, function (p, i) {
+    return _c("div", {
+      staticClass: "each-product"
+    }, [_c("div", {
+      staticClass: "img"
+    }, [_c("img", {
+      attrs: {
+        src: "https://via.placeholder.com/100x70?text=" + p.name,
+        alt: ""
+      }
+    })]), _vm._v(" "), _c("div", {
+      staticClass: "detail"
+    }, [_c("div", {
+      staticClass: "name"
+    }, [_vm._v(_vm._s(p.name))]), _vm._v(" "), _c("div", {
+      staticClass: "desc"
+    }, [_vm._v(_vm._s(p.product_type))]), _vm._v(" "), _c("p", {
+      staticClass: "mt-1 mb-0"
+    }, [_c("kbd", [_vm._v("Ctrl")]), _vm._v("+"), _c("kbd", [_vm._v(_vm._s(_vm.getProductNumber(i)))])])])]);
+  }), 0)])])])])])])]);
 };
 var staticRenderFns = [function () {
   var _vm = this,
@@ -19989,12 +20112,6 @@ var staticRenderFns = [function () {
   var _vm = this,
     _c = _vm._self._c;
   return _c("div", {
-    staticClass: "row"
-  }, [_c("div", {
-    staticClass: "col-xl-12 col-lg-12"
-  }, [_c("div", {
-    staticClass: "row"
-  }, [_c("div", {
     staticClass: "col-sm-5"
   }, [_c("div", {
     staticClass: "row"
@@ -20067,9 +20184,11 @@ var staticRenderFns = [function () {
     staticClass: "btn btn-success width-fixed"
   }, [_vm._v("Paynow "), _c("i", {
     staticClass: "fa-solid fa-money-bill-1"
-  })])])])]), _vm._v(" "), _c("div", {
-    staticClass: "col-sm-7"
-  }, [_c("div", {
+  })])])])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
     staticClass: "row"
   }, [_c("div", {
     staticClass: "col-sm-12"
@@ -20085,129 +20204,7 @@ var staticRenderFns = [function () {
       type: "text",
       placeholder: "Username"
     }
-  })])])]), _vm._v(" "), _c("div", {
-    staticClass: "default-cart"
-  }, [_c("div", {
-    staticClass: "d-flex flex-nowrap overflow-auto pb-2 mb-2"
-  }, [_c("button", {
-    staticClass: "btn active-btn me-2"
-  }, [_vm._v("All Categories")]), _vm._v(" "), _c("button", {
-    staticClass: "btn light btn-dark me-2"
-  }, [_vm._v("Shoes")]), _vm._v(" "), _c("button", {
-    staticClass: "btn light btn-dark me-2"
-  }, [_vm._v("Fruits")]), _vm._v(" "), _c("button", {
-    staticClass: "btn light btn-dark me-2"
-  }, [_vm._v("Jackets")]), _vm._v(" "), _c("button", {
-    staticClass: "btn light btn-dark me-2"
-  }, [_vm._v("Laptop")]), _vm._v(" "), _c("button", {
-    staticClass: "btn light btn-dark me-2"
-  }, [_vm._v("Tshirt")])]), _vm._v(" "), _c("div", {
-    staticClass: "d-flex flex-nowrap overflow-auto pb-2 mb-2"
-  }, [_c("button", {
-    staticClass: "btn active-btn me-2"
-  }, [_vm._v("All Brands")]), _vm._v(" "), _c("button", {
-    staticClass: "btn light btn-dark me-2"
-  }, [_vm._v("Colors")]), _vm._v(" "), _c("button", {
-    staticClass: "btn light btn-dark me-2"
-  }, [_vm._v("Fruits")]), _vm._v(" "), _c("button", {
-    staticClass: "btn light btn-dark me-2"
-  }, [_vm._v("Jackets")]), _vm._v(" "), _c("button", {
-    staticClass: "btn light btn-dark me-2"
-  }, [_vm._v("Laptop")]), _vm._v(" "), _c("button", {
-    staticClass: "btn light btn-dark me-2"
-  }, [_vm._v("Tshirt")])]), _vm._v(" "), _c("div", {
-    staticClass: "product-list"
-  }, [_c("div", {
-    staticClass: "each-product"
-  }, [_c("div", {
-    staticClass: "img"
-  }, [_c("img", {
-    attrs: {
-      src: "https://picsum.photos/200?random=1",
-      alt: ""
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "detail"
-  }, [_c("div", {
-    staticClass: "name"
-  }, [_vm._v("T-shirt")]), _vm._v(" "), _c("div", {
-    staticClass: "desc"
-  }, [_vm._v("Tshirt")])])]), _vm._v(" "), _c("div", {
-    staticClass: "each-product"
-  }, [_c("div", {
-    staticClass: "img"
-  }, [_c("img", {
-    attrs: {
-      src: "https://picsum.photos/200?random=2",
-      alt: ""
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "detail"
-  }, [_c("div", {
-    staticClass: "name"
-  }, [_vm._v("Headphone")]), _vm._v(" "), _c("div", {
-    staticClass: "desc"
-  }, [_vm._v("A4tech")])])]), _vm._v(" "), _c("div", {
-    staticClass: "each-product"
-  }, [_c("div", {
-    staticClass: "img"
-  }, [_c("img", {
-    attrs: {
-      src: "https://picsum.photos/200?random=3",
-      alt: ""
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "detail"
-  }, [_c("div", {
-    staticClass: "name"
-  }, [_vm._v("T-shirt")]), _vm._v(" "), _c("div", {
-    staticClass: "desc"
-  }, [_vm._v("Tshirt")])])]), _vm._v(" "), _c("div", {
-    staticClass: "each-product"
-  }, [_c("div", {
-    staticClass: "img"
-  }, [_c("img", {
-    attrs: {
-      src: "https://picsum.photos/200?random=4",
-      alt: ""
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "detail"
-  }, [_c("div", {
-    staticClass: "name"
-  }, [_vm._v("Headphone")]), _vm._v(" "), _c("div", {
-    staticClass: "desc"
-  }, [_vm._v("A4tech")])])]), _vm._v(" "), _c("div", {
-    staticClass: "each-product"
-  }, [_c("div", {
-    staticClass: "img"
-  }, [_c("img", {
-    attrs: {
-      src: "https://picsum.photos/200?random=5",
-      alt: ""
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "detail"
-  }, [_c("div", {
-    staticClass: "name"
-  }, [_vm._v("T-shirt")]), _vm._v(" "), _c("div", {
-    staticClass: "desc"
-  }, [_vm._v("Tshirt")])])]), _vm._v(" "), _c("div", {
-    staticClass: "each-product"
-  }, [_c("div", {
-    staticClass: "img"
-  }, [_c("img", {
-    attrs: {
-      src: "https://picsum.photos/200?random=6",
-      alt: ""
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "detail"
-  }, [_c("div", {
-    staticClass: "name"
-  }, [_vm._v("Headphone")]), _vm._v(" "), _c("div", {
-    staticClass: "desc"
-  }, [_vm._v("A4tech")])])])])])])])])]);
+  })])])]);
 }];
 render._withStripped = true;
 
@@ -22358,7 +22355,7 @@ exports = module.exports = __webpack_require__(/*! ../../../../node_modules/css-
 
 
 // module
-exports.push([module.i, ".product-list[data-v-1f629840] {\n  display: flex;\n  align-items: center;\n  flex-wrap: wrap;\n}\n.product-list .each-product[data-v-1f629840] {\n  border: 1px solid #f2f2f2;\n  background-color: #ffffff;\n  margin-right: 15px;\n  border-radius: 10px;\n  box-shadow: 0rem 0.3125rem 0.3125rem 0rem rgba(82, 63, 105, 0.05);\n  width: 180px;\n  transition: 500ms;\n  margin-bottom: 15px;\n}\n.product-list .each-product[data-v-1f629840]:hover {\n  border: 1px solid #6572FF;\n  transition: 500ms;\n}\n.product-list .each-product .img[data-v-1f629840] {\n  width: 100%;\n  height: 170px;\n}\n.product-list .each-product .img img[data-v-1f629840] {\n  border-top-left-radius: 10px;\n  border-top-right-radius: 10px;\n  width: 100%;\n  height: 100%;\n  object-fit: cover;\n  object-position: center;\n}\n.product-list .each-product .detail[data-v-1f629840] {\n  padding: 10px;\n}\n.product-list .each-product .detail .name[data-v-1f629840] {\n  font-weight: bold;\n}\n.product-list .each-product .detail .desc[data-v-1f629840] {\n  font-size: 13px;\n  color: #808080;\n}\n.blank-white[data-v-1f629840] {\n  width: 100%;\n  border-radius: 15px;\n  padding: 27px 10px;\n  background-color: #ffffff;\n  box-shadow: 0rem 0.3125rem 0.3125rem 0rem rgba(82, 63, 105, 0.05);\n}\n.t-section[data-v-1f629840] {\n  height: 530px;\n  overflow: auto;\n}\n.default-cart[data-v-1f629840] {\n  margin-bottom: 1.875rem;\n  background-color: #fff;\n  transition: all 0.5s ease-in-out;\n  position: relative;\n  border: 0rem solid transparent;\n  border-radius: 1.25rem;\n  box-shadow: 0rem 0.3125rem 0.3125rem 0rem rgba(82, 63, 105, 0.05);\n  /* height: calc(100% - 30px); */\n  padding: 20px;\n}\n.btn-cart-plus[data-v-1f629840] {\n  background-color: #D653C1;\n  border-radius: 10px;\n  padding: 8px 15px;\n  color: #ffffff;\n}\n.width-fixed[data-v-1f629840] {\n  width: 150px;\n}\n.active-btn[data-v-1f629840] {\n  background-color: #6572FF;\n  border-color: #6572FF;\n}", ""]);
+exports.push([module.i, ".product-list[data-v-1f629840] {\n  display: flex;\n  align-items: center;\n  flex-wrap: wrap;\n}\n.product-list .each-product[data-v-1f629840] {\n  border: 1px solid #f2f2f2;\n  background-color: #ffffff;\n  margin-right: 15px;\n  border-radius: 10px;\n  box-shadow: 0rem 0.3125rem 0.3125rem 0rem rgba(82, 63, 105, 0.05);\n  width: 180px;\n  transition: 500ms;\n  margin-bottom: 15px;\n}\n.product-list .each-product[data-v-1f629840]:hover {\n  border: 1px solid #6572FF;\n  transition: 500ms;\n}\n.product-list .each-product .img[data-v-1f629840] {\n  width: 100%;\n  height: 170px;\n}\n.product-list .each-product .img img[data-v-1f629840] {\n  border-top-left-radius: 10px;\n  border-top-right-radius: 10px;\n  width: 100%;\n  height: 100%;\n  object-fit: cover;\n  object-position: center;\n}\n.product-list .each-product .detail[data-v-1f629840] {\n  padding: 10px;\n}\n.product-list .each-product .detail .name[data-v-1f629840] {\n  font-weight: bold;\n}\n.product-list .each-product .detail .desc[data-v-1f629840] {\n  font-size: 13px;\n  color: #808080;\n}\n.blank-white[data-v-1f629840] {\n  width: 100%;\n  border-radius: 15px;\n  padding: 27px 10px;\n  background-color: #ffffff;\n  box-shadow: 0rem 0.3125rem 0.3125rem 0rem rgba(82, 63, 105, 0.05);\n}\n.t-section[data-v-1f629840] {\n  height: 530px;\n  overflow: auto;\n}\n.default-cart[data-v-1f629840] {\n  margin-bottom: 1.875rem;\n  background-color: #fff;\n  transition: all 0.5s ease-in-out;\n  position: relative;\n  border: 0rem solid transparent;\n  border-radius: 1.25rem;\n  box-shadow: 0rem 0.3125rem 0.3125rem 0rem rgba(82, 63, 105, 0.05);\n  /* height: calc(100% - 30px); */\n  padding: 20px;\n}\n.btn-cart-plus[data-v-1f629840] {\n  background-color: #D653C1;\n  border-radius: 10px;\n  padding: 8px 15px;\n  color: #ffffff;\n}\n.width-fixed[data-v-1f629840] {\n  width: 150px;\n}\n.active-btn[data-v-1f629840] {\n  background-color: #6572FF;\n  border-color: #6572FF;\n  color: #ffffff;\n}", ""]);
 
 // exports
 
