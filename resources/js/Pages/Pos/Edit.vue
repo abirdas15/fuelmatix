@@ -362,6 +362,12 @@ export default {
                 if (parseInt(res.status) === 200) {
                     this.singleSaleData = res.data
                     if (isEdit) {
+                        this.singleSaleData.products.map(v => {
+                            let product = {
+
+                            }
+
+                        })
                     }
                     if (isPrint) {
                         setTimeout(() => {
