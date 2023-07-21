@@ -176,7 +176,7 @@
 
                 <tbody>
                 <tr v-for="p in singleSaleData.products">
-                    <td>{{ p?.name }}</td>
+                    <td>{{ p?.product_name }}</td>
                     <td>{{ p.quantity }}</td>
                     <td class="price">{{ p.price }}</td>
                     <td class="price">{{ p.subtotal }}</td>
@@ -350,7 +350,7 @@ export default {
                 return;
             }
             this.loading = true
-            ApiService.POST(ApiRoutes.SaleAdd, {products: this.sale}, res => {
+            ApiService.POST(ApiRoutes.SaleAdd, {payment_method: 'cash',products: this.sale}, res => {
                 if (parseInt(res.status) === 200) {
                     this.saleId = res.data
                     this.singleOrder(true)
@@ -362,11 +362,21 @@ export default {
                 if (parseInt(res.status) === 200) {
                     this.singleSaleData = res.data
                     if (isEdit) {
-                        this.singleSaleData.products.map(v => {
+                        this.singleSaleData.products.map(p => {
                             let product = {
-
+                                name: p.product_name,
+                                type: p.type_name,
+                                product_id: p.product_id,
+                                quantity: parseFloat(p.quantity).toFixed(2),
+                                price: parseFloat(p.price).toFixed(2),
+                                subtotal: parseFloat(p.subtotal).toFixed(2),
                             }
-
+                            let isExist = this.sale.map(v => v.product_id).indexOf(product.product_id);
+                            if (isExist > -1) {
+                                this.updateProduct('plus', isExist)
+                            } else {
+                                this.sale.push(product)
+                            }
                         })
                     }
                     if (isPrint) {
@@ -529,7 +539,7 @@ export default {
         this.saleId = this.$route.params.id
         this.getProducts()
         this.getProductType()
-        this.singleOrder()
+        this.singleOrder(false, true)
     },
     mounted() {
         this.printD = new Printd()

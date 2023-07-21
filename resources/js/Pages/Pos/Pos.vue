@@ -176,7 +176,7 @@
 
                 <tbody>
                 <tr v-for="p in singleSaleData.products">
-                    <td>{{ p?.name }}</td>
+                    <td>{{ p?.product_name }}</td>
                     <td>{{ p.quantity }}</td>
                     <td class="price">{{ p.price }}</td>
                     <td class="price">{{ p.subtotal }}</td>

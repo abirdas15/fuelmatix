@@ -6280,6 +6280,7 @@ __webpack_require__.r(__webpack_exports__);
       }
       this.loading = true;
       _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].SaleAdd, {
+        payment_method: 'cash',
         products: this.sale
       }, function (res) {
         if (parseInt(res.status) === 200) {
@@ -6298,8 +6299,23 @@ __webpack_require__.r(__webpack_exports__);
         if (parseInt(res.status) === 200) {
           _this2.singleSaleData = res.data;
           if (isEdit) {
-            _this2.singleSaleData.products.map(function (v) {
-              var product = {};
+            _this2.singleSaleData.products.map(function (p) {
+              var product = {
+                name: p.product_name,
+                type: p.type_name,
+                product_id: p.product_id,
+                quantity: parseFloat(p.quantity).toFixed(2),
+                price: parseFloat(p.price).toFixed(2),
+                subtotal: parseFloat(p.subtotal).toFixed(2)
+              };
+              var isExist = _this2.sale.map(function (v) {
+                return v.product_id;
+              }).indexOf(product.product_id);
+              if (isExist > -1) {
+                _this2.updateProduct('plus', isExist);
+              } else {
+                _this2.sale.push(product);
+              }
             });
           }
           if (isPrint) {
@@ -6468,7 +6484,7 @@ __webpack_require__.r(__webpack_exports__);
     this.saleId = this.$route.params.id;
     this.getProducts();
     this.getProductType();
-    this.singleOrder();
+    this.singleOrder(false, true);
   },
   mounted: function mounted() {
     this.printD = new printd__WEBPACK_IMPORTED_MODULE_2__["Printd"]();
@@ -20731,7 +20747,7 @@ var render = function render() {
   }, [_c("tbody", [_c("tr", [_c("td", [_vm._v("Date : "), _c("span", [_vm._v(_vm._s(_vm.singleSaleData.date))])])]), _vm._v(" "), _vm._m(7)])]), _vm._v(" "), _c("table", {
     staticClass: "items"
   }, [_vm._m(8), _vm._v(" "), _c("tbody", [_vm._l(_vm.singleSaleData.products, function (p) {
-    return _c("tr", [_c("td", [_vm._v(_vm._s(p === null || p === void 0 ? void 0 : p.name))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(p.quantity))]), _vm._v(" "), _c("td", {
+    return _c("tr", [_c("td", [_vm._v(_vm._s(p === null || p === void 0 ? void 0 : p.product_name))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(p.quantity))]), _vm._v(" "), _c("td", {
       staticClass: "price"
     }, [_vm._v(_vm._s(p.price))]), _vm._v(" "), _c("td", {
       staticClass: "price"
@@ -21366,7 +21382,7 @@ var render = function render() {
   }, [_c("tbody", [_c("tr", [_c("td", [_vm._v("Date : "), _c("span", [_vm._v(_vm._s(_vm.singleSaleData.date))])])]), _vm._v(" "), _vm._m(7)])]), _vm._v(" "), _c("table", {
     staticClass: "items"
   }, [_vm._m(8), _vm._v(" "), _c("tbody", [_vm._l(_vm.singleSaleData.products, function (p) {
-    return _c("tr", [_c("td", [_vm._v(_vm._s(p === null || p === void 0 ? void 0 : p.name))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(p.quantity))]), _vm._v(" "), _c("td", {
+    return _c("tr", [_c("td", [_vm._v(_vm._s(p === null || p === void 0 ? void 0 : p.product_name))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(p.quantity))]), _vm._v(" "), _c("td", {
       staticClass: "price"
     }, [_vm._v(_vm._s(p.price))]), _vm._v(" "), _c("td", {
       staticClass: "price"
@@ -60973,15 +60989,14 @@ __webpack_require__.r(__webpack_exports__);
 /*!****************************************!*\
   !*** ./resources/js/Pages/Pos/Pos.vue ***!
   \****************************************/
-/*! no static exports found */
+/*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Pos_vue_vue_type_template_id_1f629840_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Pos.vue?vue&type=template&id=1f629840&scoped=true& */ "./resources/js/Pages/Pos/Pos.vue?vue&type=template&id=1f629840&scoped=true&");
 /* harmony import */ var _Pos_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Pos.vue?vue&type=script&lang=js& */ "./resources/js/Pages/Pos/Pos.vue?vue&type=script&lang=js&");
-/* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _Pos_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__) if(["default"].indexOf(__WEBPACK_IMPORT_KEY__) < 0) (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _Pos_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__[key]; }) }(__WEBPACK_IMPORT_KEY__));
-/* harmony import */ var _Pos_vue_vue_type_style_index_0_id_1f629840_lang_scss_scoped_true___WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Pos.vue?vue&type=style&index=0&id=1f629840&lang=scss&scoped=true& */ "./resources/js/Pages/Pos/Pos.vue?vue&type=style&index=0&id=1f629840&lang=scss&scoped=true&");
+/* empty/unused harmony star reexport *//* harmony import */ var _Pos_vue_vue_type_style_index_0_id_1f629840_lang_scss_scoped_true___WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Pos.vue?vue&type=style&index=0&id=1f629840&lang=scss&scoped=true& */ "./resources/js/Pages/Pos/Pos.vue?vue&type=style&index=0&id=1f629840&lang=scss&scoped=true&");
 /* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
 
 
@@ -61013,7 +61028,7 @@ component.options.__file = "resources/js/Pages/Pos/Pos.vue"
 /*!*****************************************************************!*\
   !*** ./resources/js/Pages/Pos/Pos.vue?vue&type=script&lang=js& ***!
   \*****************************************************************/
-/*! no static exports found */
+/*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -62496,7 +62511,7 @@ var app = new vue__WEBPACK_IMPORTED_MODULE_1___default.a({
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! D:\xampp7.4\htdocs\fuelmatix\resources\js\app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! D:\xampp\htdocs\projects\fuelmatix\resources\js\app.js */"./resources/js/app.js");
 
 
 /***/ })
