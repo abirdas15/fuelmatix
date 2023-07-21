@@ -94,8 +94,8 @@
                             </div>
                             <div class="default-cart">
                                 <div class="d-flex flex-nowrap overflow-auto pb-2 mb-2">
-                                    <button class="btn btn-sm active-btn me-2">All Categories</button>
-                                    <button class="btn btn-sm light btn-dark me-2" v-for="type in productType" @click="getProducts(type.id)">{{ type.name }}</button>
+                                    <button class="btn btn-sm me-2" :class="{'btn-active': selectedProductIndex == undefined}" @click="getProducts">All Categories</button>
+                                    <button class="btn btn-sm light btn-dark me-2" v-for="(type, i) in productType" :class="{'btn-active': i == selectedProductIndex}" @click="getProducts(type.id)">{{ type.name }}</button>
                                 </div>
                                 <div class="product-list">
                                     <div class="each-product" v-for="(p, i) in products">
@@ -105,7 +105,7 @@
                                         <div class="detail">
                                             <div class="name">{{p.name}}</div>
                                             <div class="desc">{{ p.product_type }}</div>
-                                            <p class="mt-1 mb-0"><kbd>Ctrl</kbd>+<kbd>{{getProductNumber(i)}}</kbd></p>
+                                            <p class="mt-1 mb-0"><kbd>Alt</kbd>+<kbd>{{getProductNumber(i)}}</kbd></p>
                                         </div>
                                     </div>
                                 </div>
@@ -122,34 +122,37 @@
 <script>
 import ApiService from "../../Services/ApiService";
 import ApiRoutes from "../../Services/ApiRoutes";
+import {active} from "../../../../public/js/app";
 
 export default {
     data() {
         return {
             products: [],
-            productType: []
+            productType: [],
+            selectedProductIndex: null
         }
     },
     methods: {
+        active,
         getProducts: function (id = null) {
             let param = {
                 limit: 5000,
                 page: 1
             }
             if (id != null) {
+                this.selectedProductIndex = id
                 param.type_id = id;
             }
             ApiService.POST(ApiRoutes.ProductList, param, res => {
                 if (parseInt(res.status) === 200) {
                     this.products = res.data.data;
                     document.addEventListener("keydown", function (event) {
-                        event.stopPropagation();
-                        event.preventDefault();
-                        if(event.ctrlKey && event.keyCode == 81) {
-                            console.log("CTRL + Q was pressed!");
+                        if (event.altKey) {
+                            event.stopPropagation();
+                            event.preventDefault();
                         }
-                        if(event.ctrlKey && event.keyCode == 82) {
-                            console.log("CTRL + W was pressed!");
+                        if(event.altKey && event.key == 'a') {
+                            console.log("CTRL + a was pressed!");
                         }
                     });
                 }
@@ -203,6 +206,7 @@ export default {
     },
     created() {
         this.getProducts()
+        this.getProductType()
     },
     mounted() {
         $('#dashboard_bar').text('Pos')
