@@ -23,6 +23,7 @@ use App\Http\Controllers\BankController;
 use App\Http\Controllers\VendorController;
 use App\Http\Controllers\PayOrderController;
 use App\Http\Controllers\SaleController;
+use App\Http\Controllers\CreditCompanyController;
 
 /*
 |--------------------------------------------------------------------------
@@ -118,6 +119,7 @@ Route::group(['middleware' => 'AuthReqCheck'], function() {
         Route::post('single', [ShiftSaleController::class, 'single']);
         Route::post('update', [ShiftSaleController::class, 'update']);
         Route::post('delete', [ShiftSaleController::class, 'delete']);
+        Route::post('getCategory', [ShiftSaleController::class, 'getCategory']);
     });
     Route::group(['prefix' => 'expense'], function() {
         Route::post('save', [ExpenseController::class, 'save']);
@@ -177,6 +179,13 @@ Route::group(['middleware' => 'AuthReqCheck'], function() {
         Route::post('single', [SaleController::class, 'single']);
         Route::post('update', [SaleController::class, 'update']);
         Route::post('delete', [SaleController::class, 'delete']);
+    });
+    Route::group(['prefix' => 'creditCompany'], function() {
+        Route::post('save', [CreditCompanyController::class, 'save']);
+        Route::post('list', [CreditCompanyController::class, 'list']);
+        Route::post('single', [CreditCompanyController::class, 'single']);
+        Route::post('update', [CreditCompanyController::class, 'update']);
+        Route::post('delete', [CreditCompanyController::class, 'delete']);
     });
 });
 

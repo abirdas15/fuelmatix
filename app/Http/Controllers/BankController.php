@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Common\AccountCategory;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Str;
 
 class BankController extends Controller
 {
@@ -18,7 +18,7 @@ class BankController extends Controller
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
-        $bank = Category::where('client_company_id', $inputData['session_user']['client_company_id'])->where('slug', 'bank')->first();
+        $bank = Category::where('client_company_id', $inputData['session_user']['client_company_id'])->where('category', AccountCategory::BANK)->first();
         if ($bank == null) {
             return response()->json(['status' => 500, 'error' => 'Cannot find bank group.']);
         }
@@ -27,7 +27,6 @@ class BankController extends Controller
         $category_hericy = json_encode($category_hericy);
         $category = new Category();
         $category->category = $inputData['name'];
-        $category->slug = Str::slug($inputData['name'], '-');
         $category->parent_category = $bank->id;
         $category->type = $bank->type;
         $category->category_hericy = $category_hericy;
@@ -44,7 +43,7 @@ class BankController extends Controller
         $keyword = isset($inputData['keyword']) ? $inputData['keyword'] : '';
         $order_by = isset($inputData['order_by']) ? $inputData['order_by'] : 'id';
         $order_mode = isset($inputData['order_mode']) ? $inputData['order_mode'] : 'DESC';
-        $bank = Category::where('client_company_id', $inputData['session_user']['client_company_id'])->where('slug', 'bank')->first();
+        $bank = Category::where('client_company_id', $inputData['session_user']['client_company_id'])->where('category', AccountCategory::BANK)->first();
         $result = Category::select('id', 'category as name')
             ->where('client_company_id', $inputData['session_user']['client_company_id'])
             ->where('parent_category', $bank->id);
@@ -79,7 +78,7 @@ class BankController extends Controller
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
-        $bank = Category::where('client_company_id', $inputData['session_user']['client_company_id'])->where('slug', 'bank')->first();
+        $bank = Category::where('client_company_id', $inputData['session_user']['client_company_id'])->where('category', AccountCategory::BANK)->first();
         if ($bank == null) {
             return response()->json(['status' => 500, 'error' => 'Cannot find bank group.']);
         }
@@ -91,7 +90,6 @@ class BankController extends Controller
         array_push($category_hericy, $inputData['name']);
         $category_hericy = json_encode($category_hericy);
         $category->category = $inputData['name'];
-        $category->slug = Str::slug($inputData['name'], '-');
         $category->category_hericy = $category_hericy;
         if ($category->save()) {
             return response()->json(['status' => 200, 'message' => 'Successfully updated bank.']);

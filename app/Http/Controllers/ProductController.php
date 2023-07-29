@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use App\Models\Dispenser;
 use App\Models\NozzleReading;
 use App\Models\Product;
@@ -177,9 +178,9 @@ class ProductController extends Controller
             ->toArray();
         foreach ($dispensers as &$dispenser) {
             foreach ($dispenser['nozzle'] as &$nozzle) {
-                $reading = NozzleReading::select('reading')->where('client_company_id', $inputData['session_user']['client_company_id'])->where('nozzle_id', $nozzle['id'])->where('type', 'shift sell')->limit(2)->get()->toArray();
-                $nozzle['start_reading'] = isset($reading[0]) ? $reading[0]['reading'] : 0;
-                $nozzle['end_reading'] = isset($reading[1]) ? $reading[1]['reading'] : 0;
+                $reading = NozzleReading::select('*')->where('client_company_id', $inputData['session_user']['client_company_id'])->where('nozzle_id', $nozzle['id'])->orderBy('id', 'DESC')->where('type', 'shift sell')->limit(2)->get()->toArray();
+                $nozzle['end_reading'] = isset($reading[0]) ? $reading[0]['reading'] : 0;
+                $nozzle['start_reading'] = isset($reading[1]) ? $reading[1]['reading'] : 0;
                 $nozzle['consumption'] =  $nozzle['start_reading']  - $nozzle['end_reading'];
                 $nozzle['amount'] = $nozzle['consumption'] * $product['selling_price'];
             }
