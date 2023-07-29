@@ -96,15 +96,15 @@ class ShiftSaleController extends Controller
             }
             $transactionData['linked_id'] = $incomeCategory['id'];
             foreach ($inputData['categories'] as $category) {
-                $transactionData['transaction'][] = [
-                    ['date' => $inputData['date'], 'account_id' => $category['id'], 'debit_amount' => $category['amount'], 'credit_amount' => 0, 'module' => 'shift sale', 'module_id' => $shiftSale->id]
+                $transactionData['transaction'] = [
+                    ['date' => date('Y-m-d'), 'account_id' => $category['category_id'], 'debit_amount' => 0, 'credit_amount' => $category['amount'], 'module' => 'shift sale', 'module_id' => $shiftSale->id]
                 ];
             }
             TransactionController::saveTransaction($transactionData);
             $transactionData = [];
             $transactionData['linked_id'] = $stockCategory['id'];
             $transactionData['transaction'] = [
-                ['date' => $inputData['date'], 'account_id' => $costOfGoodSoldCategory['id'], 'debit_amount' => $buyingPrice, 'credit_amount' => 0, 'module' => 'shift sale', 'module_id' => $shiftSale->id]
+                ['date' => date('Y-m-d'), 'account_id' => $costOfGoodSoldCategory['id'], 'debit_amount' => 0, 'credit_amount' => $buyingPrice, 'module' => 'shift sale', 'module_id' => $shiftSale->id]
             ];
             TransactionController::saveTransaction($transactionData);
             return response()->json(['status' => 200, 'message' => 'Successfully saved shift sale.']);
@@ -225,17 +225,13 @@ class ShiftSaleController extends Controller
     public function getCategory(Request $request)
     {
         $inputData = $request->all();
-        $cash = Category::select('id', 'category as name')
-            ->where('category', AccountCategory::CASH)
-            ->where('client_company_id', $inputData['session_user']['client_company_id'])
-            ->first();
         $accountReceivable = Category::select('id')
             ->where('category', AccountCategory::ACCOUNT_RECEIVABLE)
             ->where('client_company_id', $inputData['session_user']['client_company_id'])
             ->first();
-        $result['cash'] = $cash;
-        $result['companies'] = Category::select('id', 'category as name')
+        $result = Category::select('id', 'category as name')
             ->where('parent_category', $accountReceivable->id)
+            ->orWhere('category', AccountCategory::CASH)
             ->get()
             ->toArray();
         return response()->json(['status' => 200, 'data' => $result]);

@@ -7303,25 +7303,19 @@ __webpack_require__.r(__webpack_exports__);
       productIndex: 0,
       totalSale: 0,
       totalAmount: 0,
-      allAmountCategory: null
+      allAmountCategory: null,
+      categories: []
     };
   },
   methods: {
-    pushCashAmount: function pushCashAmount(e) {
-      if (e.target.value > 0) {
-        this.listDispenser.categories.push({
-          category_id: this.allAmountCategory.cash.id,
-          amount: e.target.value
-        });
-      }
+    removeCategory: function removeCategory(index) {
+      this.categories.splice(index, 1);
     },
-    pushCompanyAmount: function pushCompanyAmount(e) {
-      if (e.target.value > 0) {
-        this.listDispenser.categories.push({
-          category_id: this.allAmountCategory.cash.id,
-          amount: e.target.value
-        });
-      }
+    addCategory: function addCategory() {
+      this.categories.push({
+        amount: '',
+        category_id: ''
+      });
     },
     getTotalSale: function getTotalSale() {
       var _this = this;
@@ -7394,7 +7388,10 @@ __webpack_require__.r(__webpack_exports__);
         _this4.TableLoading = false;
         if (parseInt(res.status) === 200) {
           _this4.listDispenser = res.data;
-          _this4.listDispenser['categories'] = [];
+          _this4.categories.push({
+            amount: '',
+            category_id: _this4.allAmountCategory[0].id
+          });
         }
         _this4.getTotalSale();
       });
@@ -7403,6 +7400,7 @@ __webpack_require__.r(__webpack_exports__);
       var _this5 = this;
       _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].ClearErrorHandler();
       this.loading = true;
+      this.listDispenser.categories = this.categories;
       _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].ShiftSaleAdd, this.listDispenser, function (res) {
         _this5.loading = false;
         if (parseInt(res.status) === 200) {
@@ -23336,44 +23334,77 @@ var render = function render() {
     }), 0) : _vm._e()]) : _vm._e();
   }), _vm._v(" "), _c("div", {
     staticClass: "col-sm-12 text-end mb-2"
-  }, [_c("h3", [_vm._v("Total sale: " + _vm._s(_vm.totalSale))]), _vm._v(" "), _c("h3", [_vm._v("Total amount: " + _vm._s(_vm.totalAmount))])]), _vm._v(" "), _c("div", {
-    staticClass: "col-sm-12 text-end"
-  }, [_c("div", {
-    staticClass: "d-flex align-items-center"
-  }, [_c("label", {
-    staticClass: "me-2"
-  }, [_vm._v("Cash :")]), _vm._v(" "), _c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      name: "",
-      id: ""
-    },
-    on: {
-      input: function input($event) {
-        return _vm.pushCashAmount($event);
+  }, [_c("h3", [_vm._v("Total sale: " + _vm._s(_vm.totalSale))]), _vm._v(" "), _c("h3", [_vm._v("Total amount: " + _vm._s(_vm.totalAmount))])]), _vm._v(" "), _vm._l(_vm.categories, function (category, index) {
+    return _c("div", {
+      staticClass: "col-sm-12 text-end"
+    }, [_c("div", {
+      staticClass: "d-flex align-items-center"
+    }, [_c("select", {
+      directives: [{
+        name: "model",
+        rawName: "v-model",
+        value: category.category_id,
+        expression: "category.category_id"
+      }],
+      staticClass: "form-control",
+      on: {
+        change: function change($event) {
+          var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
+            return o.selected;
+          }).map(function (o) {
+            var val = "_value" in o ? o._value : o.value;
+            return val;
+          });
+          _vm.$set(category, "category_id", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
+        }
       }
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "d-flex align-items-center"
-  }, [_c("label", {
-    staticClass: "me-2"
-  }, [_vm._v("Company :")]), _vm._v(" "), _c("select", {
-    staticClass: "form-control"
-  }, _vm._l(_vm.allAmountCategory.companies, function (c) {
-    return _c("option", {
+    }, _vm._l(_vm.allAmountCategory, function (c) {
+      return _c("option", {
+        domProps: {
+          value: c.id
+        }
+      }, [_vm._v(_vm._s(c.name))]);
+    }), 0), _vm._v(" "), _c("input", {
+      directives: [{
+        name: "model",
+        rawName: "v-model",
+        value: category.amount,
+        expression: "category.amount"
+      }],
+      staticClass: "form-control",
+      attrs: {
+        type: "text",
+        id: ""
+      },
       domProps: {
-        value: c.id
+        value: category.amount
+      },
+      on: {
+        input: function input($event) {
+          if ($event.target.composing) return;
+          _vm.$set(category, "amount", $event.target.value);
+        }
       }
-    }, [_vm._v(_vm._s(c.name))]);
-  }), 0), _vm._v(" "), _c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      name: "",
-      id: ""
-    }
-  })])])], 2)]) : _c("div", {
+    }), _vm._v(" "), index == 0 ? _c("button", {
+      staticClass: "btn btn-primary",
+      attrs: {
+        type: "button"
+      },
+      on: {
+        click: _vm.addCategory
+      }
+    }, [_vm._v("+")]) : _c("button", {
+      staticClass: "btn btn-danger",
+      attrs: {
+        type: "button"
+      },
+      on: {
+        click: function click($event) {
+          return _vm.removeCategory(index);
+        }
+      }
+    }, [_vm._v("x")])])]);
+  })], 2)]) : _c("div", {
     staticClass: "text-center"
   }, [_vm._v("Please Select any product")])]), _vm._v(" "), _vm.product_id ? _c("div", {
     staticClass: "row",
@@ -63905,7 +63936,7 @@ var app = new vue__WEBPACK_IMPORTED_MODULE_1___default.a({
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! D:\xampp\htdocs\projects\fuelmatix\resources\js\app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! D:\xampp7.4\htdocs\fuelmatix\resources\js\app.js */"./resources/js/app.js");
 
 
 /***/ })

@@ -115,17 +115,14 @@
                                                 <h3>Total sale: {{totalSale}}</h3>
                                                 <h3>Total amount: {{totalAmount}}</h3>
                                             </div>
-                                            <div class="col-sm-12 text-end">
+                                            <div class="col-sm-12 text-end" v-for="(category,index) in categories">
                                                 <div class="d-flex align-items-center">
-                                                    <label class="me-2">Cash :</label>
-                                                    <input class="form-control" type="text" name="" id="" @input="pushCashAmount($event)">
-                                                </div>
-                                                <div class="d-flex align-items-center">
-                                                    <label class="me-2">Company :</label>
-                                                    <select class="form-control">
-                                                        <option v-for="c in allAmountCategory.companies" :value="c.id">{{c.name}}</option>
+                                                    <select class="form-control" v-model="category.category_id">
+                                                        <option v-for="c in allAmountCategory" :value="c.id">{{c.name}}</option>
                                                     </select>
-                                                    <input class="form-control" type="text" name="" id="">
+                                                    <input class="form-control" type="text" v-model="category.amount" id="">
+                                                    <button class="btn btn-primary" v-if="index == 0" type="button" @click="addCategory">+</button>
+                                                    <button class="btn btn-danger" v-else type="button" @click="removeCategory(index)">x</button>
                                                 </div>
                                             </div>
                                         </div>
@@ -166,19 +163,19 @@ export default {
             productIndex: 0,
             totalSale: 0,
             totalAmount: 0,
-            allAmountCategory: null
+            allAmountCategory: null,
+            categories: []
         }
     },
     methods: {
-        pushCashAmount: function (e) {
-            if (e.target.value > 0) {
-                this.listDispenser.categories.push({category_id: this.allAmountCategory.cash.id, amount: e.target.value})
-            }
+        removeCategory: function(index) {
+            this.categories.splice(index, 1);
         },
-        pushCompanyAmount: function (e) {
-            if (e.target.value > 0) {
-                this.listDispenser.categories.push({category_id: this.allAmountCategory.cash.id, amount: e.target.value})
-            }
+        addCategory: function() {
+            this.categories.push({
+                amount: '',
+                category_id: ''
+            });
         },
         getTotalSale: function () {
             this.listDispenser.dispensers.map((dispenser) => {
@@ -240,7 +237,10 @@ export default {
                 this.TableLoading = false
                 if (parseInt(res.status) === 200) {
                     this.listDispenser = res.data;
-                    this.listDispenser['categories'] = [];
+                    this.categories.push({
+                        amount: '',
+                        category_id: this.allAmountCategory[0].id
+                    });
                 }
                 this.getTotalSale()
             });
@@ -248,6 +248,7 @@ export default {
         save: function () {
             ApiService.ClearErrorHandler();
             this.loading = true
+            this.listDispenser.categories = this.categories;
             ApiService.POST(ApiRoutes.ShiftSaleAdd, this.listDispenser, res => {
                 this.loading = false
                 if (parseInt(res.status) === 200) {
