@@ -119,6 +119,12 @@ const ApiRoutes = {
     SaleSingle: ApiVersion + '/sale/single',
     SaleDelete: ApiVersion + '/sale/delete',
     SaleList: ApiVersion + '/sale/list',
+    //Credit Company
+    CreditCompanyAdd: ApiVersion + '/creditCompany/save',
+    CreditCompanyEdit: ApiVersion + '/creditCompany/update',
+    CreditCompanySingle: ApiVersion + '/creditCompany/single',
+    CreditCompanyDelete: ApiVersion + '/creditCompany/delete',
+    CreditCompanyList: ApiVersion + '/creditCompany/list',
 
 };
 

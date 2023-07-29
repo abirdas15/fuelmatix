@@ -47,7 +47,7 @@
                                     </div>
                                     <div class="mb-3 form-group col-md-6">
                                         <label class="form-label">Pay Order Number:</label>
-                                        <input type="text" class="form-control" name="name" v-model="param.number">
+                                        <input type="text" class="form-control" name="number" v-model="param.number">
                                         <div class="invalid-feedback"></div>
                                     </div>
                                 </div>

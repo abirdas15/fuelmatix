@@ -97,7 +97,7 @@
                     <ul aria-expanded="false" class="bichi">
                         <li><a href="./tank&NozzleSetup.html">Pump & Nozzle Setup</a></li>
                         <li><a href="./tank.html">Tank Setup</a></li>
-                        <li><a href="./creditCompanySetup.html">Credit Company Setup </a></li>
+                        <li><router-link :to="{name: 'CreditCompany'}">Credit Company Setup </router-link></li>
                         <li><a href="./posSetup.html">Pos Setup</a></li>
                         <li><a href="./#">Products</a></li>
                         <li><a href="./#">Sekkubg Price</a></li>

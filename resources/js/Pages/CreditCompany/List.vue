@@ -4,15 +4,15 @@
             <div class="row page-titles">
                 <ol class="breadcrumb align-items-center ">
                     <li class="breadcrumb-item active"><router-link :to="{name: 'Dashboard'}">Home</router-link></li>
-                    <li class="breadcrumb-item"><a href="javascript:void(0)">Nozzle List</a></li>
-                    <li style="margin-left: auto;"><router-link :to="{name: 'NozzleAdd'}"><i class="fa-solid fa-plus"></i> Add New Nozzle</router-link></li>
+                    <li class="breadcrumb-item"><a href="javascript:void(0)">Credit Company List</a></li>
+                    <li style="margin-left: auto;"><router-link :to="{name: 'CreditCompanyAdd'}"><i class="fa-solid fa-plus"></i> Add New Credit Company</router-link></li>
                 </ol>
             </div>
             <div class="row">
                 <div class="col-12">
                     <div class="card">
                         <div class="card-header bg-secondary">
-                            <h4 class="card-title">Nozzle List</h4>
+                            <h4 class="card-title">Credit Company List</h4>
                         </div>
                         <div class="card-body">
                             <div class="row mt-4">
@@ -37,18 +37,24 @@
                                         <table class="display  dataTable no-footer" style="min-width: 845px">
                                             <thead>
                                             <tr class="text-white" style="background-color: #4886EE;color:#ffffff">
-                                                <th class="text-white" @click="sortData('name')" :class="sortClass('name')">Nozzle Name</th>
-                                                <th class="text-white" @click="sortData('dispenser_name')" :class="sortClass('dispenser_name')">Dispenser Name</th>
+                                                <th class="text-white" @click="sortData('name')" :class="sortClass('name')">Name</th>
+                                                <th class="text-white" @click="sortData('contact_person')" :class="sortClass('contact_person')">Contact Person</th>
+                                                <th class="text-white" @click="sortData('email')" :class="sortClass('email')">Email</th>
+                                                <th class="text-white" @click="sortData('phone')" :class="sortClass('phone')">Phone</th>
+                                                <th class="text-white" @click="sortData('credit_limit')" :class="sortClass('credit_limit')">Credit Limit</th>
                                                 <th class="text-white" >Action</th>
                                             </tr>
                                             </thead>
                                             <tbody v-if="listData.length > 0 && TableLoading == false">
                                             <tr v-for="f in listData">
                                                 <td >{{f.name}}</td>
-                                                <td><a href="javascript:void(0);">{{f.dispenser_name}}</a></td>
+                                                <td><a href="javascript:void(0);">{{f.contact_person}}</a></td>
+                                                <td><a href="javascript:void(0);">{{f.email}}</a></td>
+                                                <td><a href="javascript:void(0);">{{f.phone}}</a></td>
+                                                <td><a href="javascript:void(0);">{{f.credit_limit}}</a></td>
                                                 <td>
                                                     <div class="d-flex justify-content-end">
-                                                        <router-link :to="{name: 'NozzleEdit', params: { id: f.id }}" class=" btn btn-primary shadow btn-xs sharp me-1">
+                                                        <router-link :to="{name: 'CreditCompanyEdit', params: { id: f.id }}" class=" btn btn-primary shadow btn-xs sharp me-1">
                                                             <i class="fas fa-pencil-alt"></i>
                                                         </router-link>
                                                         <a  href="javascript:void(0)"  @click="openModalDelete(f)" class="btn btn-danger shadow btn-xs sharp">
@@ -89,9 +95,9 @@
 
 <script>
 import Swal from 'sweetalert2/dist/sweetalert2.js'
-import ApiService from "../../../Services/ApiService";
-import ApiRoutes from "../../../Services/ApiRoutes";
-import Pagination from "../../../Helpers/Pagination";
+import ApiService from "../../Services/ApiService";
+import ApiRoutes from "../../Services/ApiRoutes";
+import Pagination from "../../Helpers/Pagination";
 export default {
     components: {
         Pagination,
@@ -148,7 +154,7 @@ export default {
             }
             this.Param.page = page.page;
             this.TableLoading = true
-            ApiService.POST(ApiRoutes.NozzleList, this.Param,res => {
+            ApiService.POST(ApiRoutes.CreditCompanyList, this.Param,res => {
                 this.TableLoading = false
                 if (parseInt(res.status) === 200) {
                     this.paginateData = res.data;
@@ -159,7 +165,7 @@ export default {
             });
         },
         Delete: function (data) {
-            ApiService.POST(ApiRoutes.NozzleDelete, {id: data.id },res => {
+            ApiService.POST(ApiRoutes.CreditCompanyDelete, {id: data.id },res => {
                 if (parseInt(res.status) === 200) {
                     this.$toast.success(res.message);
                     this.list()
@@ -188,7 +194,7 @@ export default {
 
     },
     mounted() {
-        $('#dashboard_bar').text('Nozzle List')
+        $('#dashboard_bar').text('Credit Company List')
     }
 }
 </script>

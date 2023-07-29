@@ -13,7 +13,7 @@
             <div class="col-xl-12 col-lg-12">
                 <div class="card">
                     <div class="card-header">
-                        <h4 class="card-title">CreditCompany</h4>
+                        <h4 class="card-title">Credit Company</h4>
                     </div>
                     <div class="card-body">
                         <div class="basic-form">
@@ -26,17 +26,22 @@
                                     </div>
                                     <div class="mb-3 form-group col-md-6">
                                         <label class="form-label">Email:</label>
-                                        <input type="text" class="form-control" name="email" v-model="param.email">
+                                        <input type="email" class="form-control" name="email" v-model="param.email">
                                         <div class="invalid-feedback"></div>
                                     </div>
                                     <div class="mb-3 form-group col-md-6">
                                         <label class="form-label">Contact Person:</label>
-                                        <input type="text" class="form-control" name="email" v-model="param.contact_person">
+                                        <input type="text" class="form-control" name="contact_person" v-model="param.contact_person">
                                         <div class="invalid-feedback"></div>
                                     </div>
                                     <div class="mb-3 form-group col-md-6">
                                         <label class="form-label">Phone:</label>
                                         <input type="text" class="form-control" name="phone" v-model="param.phone">
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                    <div class="mb-3 form-group col-md-6">
+                                        <label class="form-label">Address:</label>
+                                        <input type="text" class="form-control" name="address" v-model="param.address">
                                         <div class="invalid-feedback"></div>
                                     </div>
                                     <div class="mb-3 form-group col-md-6">
@@ -65,8 +70,8 @@
 </template>
 
 <script>
-import ApiService from "../../../Services/ApiService";
-import ApiRoutes from "../../../Services/ApiRoutes";
+import ApiService from "../../Services/ApiService";
+import ApiRoutes from "../../Services/ApiRoutes";
 export default {
     data() {
         return {
@@ -103,7 +108,6 @@ export default {
         },
     },
     created() {
-        this.dispenserList()
     },
     mounted() {
         $('#dashboard_bar').text('Credit Company Add')
