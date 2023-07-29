@@ -60,6 +60,9 @@ import VendorEdit from "../Pages/Vendors/Edit";
 import PayOrder from "../Pages/PayOrder/List";
 import PayOrderAdd from "../Pages/PayOrder/Add";
 import PayOrderEdit from "../Pages/PayOrder/Edit";
+import CreditCompany from "../Pages/CreditCompany/List.vue";
+import CreditCompanyAdd from "../Pages/CreditCompany/Add.vue";
+import CreditCompanyEdit from "../Pages/CreditCompany/Edit.vue";
 
 const ROOT_URL = "";
 const router = new VueRouter({
@@ -127,6 +130,9 @@ const router = new VueRouter({
                 { path: ROOT_URL + "/pay/order", name: "PayOrder", component: PayOrder},
                 { path: ROOT_URL + "/pay/order/add", name: "PayOrderAdd", component: PayOrderAdd},
                 { path: ROOT_URL + "/pay/order/edit/:id", name: "PayOrderEdit", component: PayOrderEdit},
+                { path: ROOT_URL + "/credit/company", name: "CreditCompany", component: CreditCompany},
+                { path: ROOT_URL + "/credit/company/add", name: "CreditCompanyAdd", component: CreditCompanyAdd},
+                { path: ROOT_URL + "/credit/company/edit/:id", name: "CreditCompanyEdit", component: CreditCompanyEdit},
             ],
         },
     ],

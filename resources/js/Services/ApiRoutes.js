@@ -68,6 +68,7 @@ const ApiRoutes = {
     ShiftSaleDelete: ApiVersion + '/shift/sale/delete',
     ShiftSaleList: ApiVersion + '/shift/sale/list',
     ShiftSaleSingle: ApiVersion + '/shift/sale/single',
+    ShiftSaleGetCategory: ApiVersion + '/shift/sale/getCategory',
     //expense
     ExpenseAdd: ApiVersion + '/expense/save',
     ExpenseEdit: ApiVersion + '/expense/update',
@@ -119,6 +120,12 @@ const ApiRoutes = {
     SaleSingle: ApiVersion + '/sale/single',
     SaleDelete: ApiVersion + '/sale/delete',
     SaleList: ApiVersion + '/sale/list',
+    //Credit Company
+    CreditCompanyAdd: ApiVersion + '/creditCompany/save',
+    CreditCompanyEdit: ApiVersion + '/creditCompany/update',
+    CreditCompanySingle: ApiVersion + '/creditCompany/single',
+    CreditCompanyDelete: ApiVersion + '/creditCompany/delete',
+    CreditCompanyList: ApiVersion + '/creditCompany/list',
 
 };
 

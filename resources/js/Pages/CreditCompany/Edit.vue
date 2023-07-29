@@ -4,8 +4,8 @@
             <div class="row page-titles">
                 <ol class="breadcrumb align-items-center ">
                     <li class="breadcrumb-item active"><router-link :to="{name: 'Dashboard'}">Home</router-link></li>
-                    <li class="breadcrumb-item active"><router-link :to="{name: 'PayOrder'}">Pay Order</router-link></li>
-                    <li class="breadcrumb-item"><a href="javascript:void(0)">Add</a></li>
+                    <li class="breadcrumb-item active"><router-link :to="{name: 'CreditCompany'}">Credit Company</router-link></li>
+                    <li class="breadcrumb-item"><a href="javascript:void(0)">Edit</a></li>
 
                 </ol>
             </div>
@@ -13,50 +13,51 @@
             <div class="col-xl-12 col-lg-12">
                 <div class="card">
                     <div class="card-header">
-                        <h4 class="card-title">Pay Order</h4>
+                        <h4 class="card-title">Credit Company</h4>
                     </div>
                     <div class="card-body">
                         <div class="basic-form">
                             <form @submit.prevent="save">
                                 <div class="row">
                                     <div class="mb-3 form-group col-md-6">
-                                        <label class="form-label">Bank:</label>
-                                        <select class="form-control" name="bank_id" id="bank_id"  v-model="param.bank_id">
-                                            <option value="">Select Bank</option>
-                                            <option v-for="d in listDataBank" :value="d.id">{{d.name}}</option>
-                                        </select>
+                                        <label class="form-label">Name:</label>
+                                        <input type="text" class="form-control" name="name" v-model="param.name">
                                         <div class="invalid-feedback"></div>
                                     </div>
                                     <div class="mb-3 form-group col-md-6">
-                                        <label class="form-label">Vendor:</label>
-                                        <select class="form-control" name="vendor_id" id="vendor_id"  v-model="param.vendor_id">
-                                            <option value="">Select Bank</option>
-                                            <option v-for="d in listDataVendor" :value="d.id">{{d.name}}</option>
-                                        </select>
+                                        <label class="form-label">Email:</label>
+                                        <input type="text" class="form-control" name="email" v-model="param.email">
                                         <div class="invalid-feedback"></div>
                                     </div>
                                     <div class="mb-3 form-group col-md-6">
-                                        <label class="form-label">Amount:</label>
-                                        <input type="text" class="form-control" name="amount" v-model="param.amount">
+                                        <label class="form-label">Contact Person:</label>
+                                        <input type="text" class="form-control" name="email" v-model="param.contact_person">
                                         <div class="invalid-feedback"></div>
                                     </div>
                                     <div class="mb-3 form-group col-md-6">
-                                        <label class="form-label">Unit Quantity:</label>
-                                        <input type="text" class="form-control" name="quantity" v-model="param.quantity">
+                                        <label class="form-label">Phone:</label>
+                                        <input type="text" class="form-control" name="phone" v-model="param.phone">
                                         <div class="invalid-feedback"></div>
                                     </div>
                                     <div class="mb-3 form-group col-md-6">
-                                        <label class="form-label">Pay Order Number:</label>
-                                        <input type="text" class="form-control" name="number" v-model="param.number">
+                                        <label class="form-label">Address:</label>
+                                        <input type="text" class="form-control" name="phone" v-model="param.address">
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                    <div class="mb-3 form-group col-md-6">
+                                        <label class="form-label">Credit Limit:</label>
+                                        <input type="text" class="form-control" name="credit_limit" v-model="param.credit_limit">
                                         <div class="invalid-feedback"></div>
                                     </div>
                                 </div>
                                 <div class="row" style="text-align: right;">
-                                    <div class="col-sm-6"></div>
+                                    <div class="mb-3 col-md-6">
+
+                                    </div>
                                     <div class="mb-3 col-md-6">
                                         <button type="submit" class="btn btn-primary" v-if="!loading">Submit</button>
                                         <button type="button" class="btn btn-primary" v-if="loading">Submitting...</button>
-                                        <router-link :to="{name: 'PayOrder'}" type="button" class="btn btn-primary">Cancel</router-link>
+                                        <router-link :to="{name: 'CreditCompany'}" type="button" class="btn btn-primary">Cancel</router-link>
                                     </div>
                                 </div>
                             </form>
@@ -74,47 +75,28 @@ import ApiRoutes from "../../Services/ApiRoutes";
 export default {
     data() {
         return {
-            param: {
-                bank_id: '',
-                vendor_id: '',
-                number: '',
-                amount: '',
-                quantity: '',
-            },
-            listParam: {
-                limit: 5000,
-                page: 1,
-            },
+            param: {},
             loading: false,
-            listDataBank: [],
-            listDataVendor: [],
+            id: '',
+            listData: [],
         }
     },
     methods: {
-        getBank: function () {
-            ApiService.POST(ApiRoutes.BankList, {limit: 5000, page: 1},res => {
-                this.TableLoading = false
+        getSingle: function () {
+            ApiService.POST(ApiRoutes.CreditCompanySingle, {id: this.id},res => {
                 if (parseInt(res.status) === 200) {
-                    this.listDataBank = res.data.data;
-                }
-            });
-        },
-        getVendor: function () {
-            ApiService.POST(ApiRoutes.VendorList, {limit: 5000, page: 1},res => {
-                this.TableLoading = false
-                if (parseInt(res.status) === 200) {
-                    this.listDataVendor = res.data.data;
+                    this.param = res.data
                 }
             });
         },
         save: function () {
             ApiService.ClearErrorHandler();
             this.loading = true
-            ApiService.POST(ApiRoutes.PayOrderAdd, this.param,res => {
+            ApiService.POST(ApiRoutes.CreditCompanyEdit, this.param,res => {
                 this.loading = false
                 if (parseInt(res.status) === 200) {
                     this.$router.push({
-                        name: 'PayOrder'
+                        name: 'CreditCompany'
                     })
                 } else {
                     ApiService.ErrorHandler(res.errors);
@@ -123,11 +105,11 @@ export default {
         },
     },
     created() {
-        this.getBank()
-        this.getVendor()
+        this.id = this.$route.params.id
+        this.getSingle()
     },
     mounted() {
-        $('#dashboard_bar').text('Pay Order Add')
+        $('#dashboard_bar').text('Credit Company Edit')
     }
 }
 </script>
