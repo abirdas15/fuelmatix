@@ -48,7 +48,6 @@ class AccountHead extends Command
                 'type' => 'assets',
                 'category_hericy' => json_encode(['Assets']),
                 'default' => 1,
-                'slug' => 'assets',
                 'client_company_id' => $clientCompany->id,
             ],
             [
@@ -58,7 +57,6 @@ class AccountHead extends Command
                 'balance' => 0,
                 'category_hericy' => json_encode(['Equity']),
                 'default' => 1,
-                'slug' => 'equity',
                 'client_company_id' => $clientCompany->id,
             ],
             [
@@ -68,7 +66,6 @@ class AccountHead extends Command
                 'balance' => 0,
                 'category_hericy' => json_encode(['Liabilities']),
                 'default' => 1,
-                'slug' => 'liabilities',
                 'client_company_id' => $clientCompany->id,
             ],
             [
@@ -78,7 +75,6 @@ class AccountHead extends Command
                 'balance' => 0,
                 'category_hericy' => json_encode(['Income']),
                 'default' => 1,
-                'slug' => 'income',
                 'client_company_id' => $clientCompany->id,
             ],
             [
@@ -88,7 +84,6 @@ class AccountHead extends Command
                 'balance' => 0,
                 'category_hericy' => json_encode(['Expenses']),
                 'default' => 1,
-                'slug' => 'expense',
                 'client_company_id' => $clientCompany->id,
             ],
             [
@@ -98,7 +93,6 @@ class AccountHead extends Command
                 'balance' => 0,
                 'category_hericy' => json_encode(['Assets', 'Current Assets']),
                 'default' => 1,
-                'slug' => 'current-asset',
                 'client_company_id' => $clientCompany->id,
             ],
             [
@@ -108,7 +102,6 @@ class AccountHead extends Command
                 'balance' => 0,
                 'category_hericy' => json_encode(['Assets', 'Current Asset', 'Account Receivable']),
                 'default' => 1,
-                'slug' => 'account-receivable',
                 'client_company_id' => $clientCompany->id,
             ],
             [
@@ -118,7 +111,6 @@ class AccountHead extends Command
                 'balance' => 0,
                 'category_hericy' => json_encode(['Liabilities', 'Current Liabilities']),
                 'default' => 1,
-                'slug' => 'current-liabilities',
                 'client_company_id' => $clientCompany->id,
             ],
             [
@@ -128,7 +120,15 @@ class AccountHead extends Command
                 'balance' => 0,
                 'category_hericy' => json_encode(['Liabilities', 'Current Liabilities', 'Account Payable']),
                 'default' => 1,
-                'slug' => 'account-payable',
+                'client_company_id' => $clientCompany->id,
+            ],
+            [
+                'category' => 'Stock In Hand',
+                'parent_category' => 6,
+                'type' => 'assets',
+                'balance' => 0,
+                'category_hericy' => json_encode(["Assets", "Current Asset", "Stock In Hand"]),
+                'default' => 1,
                 'client_company_id' => $clientCompany->id,
             ],
             [
@@ -138,7 +138,6 @@ class AccountHead extends Command
                 'balance' => 0,
                 'category_hericy' => json_encode(["Assets", "Current Asset", "Cash"]),
                 'default' => 1,
-                'slug' => 'cash',
                 'client_company_id' => $clientCompany->id,
             ],
             [
@@ -148,7 +147,42 @@ class AccountHead extends Command
                 'balance' => 0,
                 'category_hericy' => json_encode(["Assets", "Current Asset", "Bank"]),
                 'default' => 1,
-                'slug' => 'bank',
+                'client_company_id' => $clientCompany->id,
+            ],
+            [
+                'category' => 'Cost of Good Sold',
+                'parent_category' => 4,
+                'type' => 'expenses',
+                'balance' => 0,
+                'category_hericy' => json_encode(['Expenses', 'Cost of Good Sold']),
+                'default' => 1,
+                'client_company_id' => $clientCompany->id,
+            ],
+            [
+                'category' => 'Operating Expense',
+                'parent_category' => 5,
+                'type' => 'expenses',
+                'balance' => 0,
+                'category_hericy' => json_encode(['Expenses', 'Operating Expense']),
+                'default' => 1,
+                'client_company_id' => $clientCompany->id,
+            ],
+            [
+                'category' => 'Interest Expense',
+                'parent_category' => 5,
+                'type' => 'expenses',
+                'balance' => 0,
+                'category_hericy' => json_encode(['Expenses', 'Interest Expense']),
+                'default' => 1,
+                'client_company_id' => $clientCompany->id,
+            ],
+            [
+                'category' => 'Tax',
+                'parent_category' => 5,
+                'type' => 'expenses',
+                'balance' => 0,
+                'category_hericy' => json_encode(['Expenses', 'Tax']),
+                'default' => 1,
                 'client_company_id' => $clientCompany->id,
             ],
         ];

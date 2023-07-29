@@ -10,7 +10,9 @@ class CategoryController extends Controller
 {
     public function list(Request $request)
     {
+        $inputData = $request->all();
         $result = Category::select('id', 'category', 'balance', 'parent_category', 'description')
+            ->where('client_company_id', $inputData['session_user']['client_company_id'])
             ->with(['children' => function($q) {
                 $q->select('id', 'category', 'parent_category', 'balance', 'description');
             }])
@@ -22,7 +24,8 @@ class CategoryController extends Controller
     public function parent(Request $request)
     {
         $inputData = $request->all();
-        $result = Category::select('id', 'category_hericy', 'type');
+        $result = Category::select('id', 'category_hericy', 'type')
+            ->where('client_company_id', $inputData['session_user']['client_company_id']);
         if (isset($inputData['type']) && !empty($inputData['type'])) {
             $result->where(function($q) use ($inputData) {
                 $q->where('type', $inputData['type']);
@@ -63,6 +66,7 @@ class CategoryController extends Controller
         $category->type = $inputData['type'];
         $category->description = $inputData['description'] ?? null;
         $category->account_category = $inputData['account_category'] ?? 0;
+        $category->client_company_id = $inputData['session_user']['client_company_id'];
         if ($category->save()) {
             if (!empty($inputData['parent_category'])) {
                 $parentCategory = Category::select('category_hericy')->where('id', $inputData['parent_category'])->first();

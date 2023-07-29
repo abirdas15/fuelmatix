@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Common\AccountCategory;
+use App\Models\Category;
 use App\Models\Dispenser;
 use App\Models\ShiftSale;
 use App\Models\ShiftSummary;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class ShiftSaleController extends Controller
@@ -163,5 +163,24 @@ class ShiftSaleController extends Controller
         ShiftSale::where('id', $inputData['id'])->delete();
         ShiftSummary::where('shift_sale_id', $inputData['id'])->delete();
         return response()->json(['status' => 200, 'message' => 'Successfully deleted shift sale.']);
+    }
+    public function getCategory(Request $request)
+    {
+        $inputData = $request->all();
+        $cash = Category::select('id', 'category as name')
+            ->where('category', AccountCategory::CASH)
+            ->where('client_company_id', $inputData['session_user']['client_company_id'])
+            ->get()
+            ->toArray();
+        $accountReceivable = Category::select('id')
+            ->where('category', AccountCategory::ACCOUNT_RECEIVABLE)
+            ->where('client_company_id', $inputData['session_user']['client_company_id'])
+            ->first();
+        $result['cash'] = $cash;
+        $result['companies'] = Category::select('id', 'category as name')
+            ->where('parent_category', $accountReceivable->id)
+            ->get()
+            ->toArray();
+        return response()->json(['status' => 200, 'data' => $result]);
     }
 }

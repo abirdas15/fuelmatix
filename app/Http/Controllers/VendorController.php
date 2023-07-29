@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Common\AccountCategory;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Str;
 
 class VendorController extends Controller
 {
@@ -19,7 +19,7 @@ class VendorController extends Controller
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
-        $accountPayable = Category::where('client_company_id', $inputData['session_user']['client_company_id'])->where('slug', 'account-payable')->first();
+        $accountPayable = Category::where('client_company_id', $inputData['session_user']['client_company_id'])->where('category', AccountCategory::ACCOUNT_PAYABLE)->first();
         if ($accountPayable == null) {
             return response()->json(['status' => 500, 'error' => 'Cannot find vendor group.']);
         }
@@ -28,7 +28,6 @@ class VendorController extends Controller
         $category_hericy = json_encode($category_hericy);
         $category = new Category();
         $category->category = $inputData['name'];
-        $category->slug = Str::slug($inputData['name'], '-');
         $category->parent_category = $accountPayable->id;
         $category->type = $accountPayable->type;
         $category->category_hericy = $category_hericy;
@@ -45,7 +44,7 @@ class VendorController extends Controller
         $keyword = isset($inputData['keyword']) ? $inputData['keyword'] : '';
         $order_by = isset($inputData['order_by']) ? $inputData['order_by'] : 'id';
         $order_mode = isset($inputData['order_mode']) ? $inputData['order_mode'] : 'DESC';
-        $bank = Category::where('client_company_id', $inputData['session_user']['client_company_id'])->where('slug', 'account-payable')->first();
+        $bank = Category::where('client_company_id', $inputData['session_user']['client_company_id'])->where('category', AccountCategory::ACCOUNT_PAYABLE)->first();
         $result = Category::select('id', 'category as name')
             ->where('client_company_id', $inputData['session_user']['client_company_id'])
             ->where('parent_category', $bank->id);
@@ -80,7 +79,7 @@ class VendorController extends Controller
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
-        $accountPayable = Category::where('client_company_id', $inputData['session_user']['client_company_id'])->where('slug', 'account-payable')->first();
+        $accountPayable = Category::where('client_company_id', $inputData['session_user']['client_company_id'])->where('category', AccountCategory::ACCOUNT_PAYABLE)->first();
         if ($accountPayable == null) {
             return response()->json(['status' => 500, 'error' => 'Cannot find vendor group.']);
         }
@@ -92,7 +91,6 @@ class VendorController extends Controller
             return response()->json(['status' => 500, 'error' => 'Cannot find bank.']);
         }
         $category->category = $inputData['name'];
-        $category->slug = Str::slug($inputData['name'], '-');
         $category->category_hericy = $category_hericy;
         if ($category->save()) {
             return response()->json(['status' => 200, 'message' => 'Successfully updated vendor.']);

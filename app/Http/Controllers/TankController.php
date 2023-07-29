@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\BstiChart;
 use App\Models\Dispenser;
 use App\Models\NozzleReading;
+use App\Models\PayOrder;
+use App\Models\Product;
+use App\Models\ProductPrice;
 use App\Models\Tank;
 use App\Models\TankLog;
 use App\Models\TankRefill;
@@ -340,6 +343,19 @@ class TankController extends Controller
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
+
+        $payOrder = PayOrder::find($inputData['pay_order_id']);
+        if ($payOrder == null) {
+            return response()->json(['status' => 500, 'error' => 'Cannot find pay order.']);
+        }
+        $tank = Tank::find($inputData['tank_id']);
+        if ($tank == null) {
+            return response()->json(['status' => 500, 'error' => 'Can not find tank.']);
+        }
+        if ($tank['product_id'] == null) {
+            return response()->json(['status' => 500, 'error' => 'Tank has no product. Please assign product.']);
+        }
+
         $tankRefill = new TankRefill();
         $tankRefill->date = $inputData['date'];
         $tankRefill->tank_id = $inputData['tank_id'];
@@ -352,6 +368,17 @@ class TankController extends Controller
         $tankRefill->net_profit = $inputData['net_profit'] ?? 0;
         $tankRefill->client_company_id = $inputData['session_user']['client_company_id'];
         if ($tankRefill->save()) {
+            $productPrice = new ProductPrice();
+            $productPrice->date = $inputData['date'];
+            $productPrice->product_id = $tank['product_id'];
+            $productPrice->quantity = $payOrder['quantity'];
+            $productPrice->stock_quantity = $payOrder['quantity'];
+            $productPrice->price = $payOrder['amount'];
+            $productPrice->unit_price = $payOrder['amount'] / $payOrder['quantity'];
+            $productPrice->module = 'tank refill';
+            $productPrice->module_id = $tankRefill->id;
+            $productPrice->client_company_id = $inputData['session_user']['client_company_id'];
+            $productPrice->save();
             if (isset($inputData['dispensers'])) {
                 foreach ($inputData['dispensers'] as $dispenser) {
                     foreach ($dispenser['nozzle'] as $nozzle) {
@@ -433,6 +460,17 @@ class TankController extends Controller
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
+        $payOrder = PayOrder::find($inputData['pay_order_id']);
+        if ($payOrder == null) {
+            return response()->json(['status' => 500, 'error' => 'Cannot find pay order.']);
+        }
+        $tank = Tank::find($inputData['tank_id']);
+        if ($tank == null) {
+            return response()->json(['status' => 500, 'error' => 'Can not find tank.']);
+        }
+        if ($tank['product_id'] == null) {
+            return response()->json(['status' => 500, 'error' => 'Tank has no product. Please assign product.']);
+        }
         $tankRefill = TankRefill::find($inputData['id']);
         if ($tankRefill == null) {
             return response()->json(['status' => 500, 'error' => 'Cannot find tank refill.']);
@@ -447,6 +485,13 @@ class TankController extends Controller
         $tankRefill->total_refill_volume = $inputData['total_refill_volume'] ?? 0;
         $tankRefill->net_profit = $inputData['net_profit'] ?? 0;
         if ($tankRefill->save()) {
+            $productPrice = ProductPrice::where('module', 'tank refill')->where('module_id', $inputData['id'])->first();
+            if ($productPrice != null) {
+                $productPrice->quantity = $payOrder['quantity'];
+                $productPrice->price = $payOrder['amount'];
+                $productPrice->unit_price = $payOrder['amount'] / $payOrder['quantity'];
+                $productPrice->save();
+            }
             if (isset($inputData['dispensers'])) {
                 TankRefillHistory::where('tank_refill_id', $inputData['id'])->delete();
                 foreach ($inputData['dispensers'] as $dispenser) {
