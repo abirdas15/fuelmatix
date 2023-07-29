@@ -36,6 +36,7 @@ class TransactionController extends Controller
             $newTransaction->linked_id = $inputData['linked_id'];
             $newTransaction->added_by = Auth::user()->id;
             $newTransaction->module = $transaction['module'] ?? 'accounting';
+            $newTransaction->module_id = $transaction['module_id'] ?? null;
             if ($newTransaction->save()) {
                 $id = $newTransaction->id;
                 $category = Category::with('parent')->where('id', $newTransaction->account_id)->first();
@@ -64,6 +65,7 @@ class TransactionController extends Controller
                 $newTransaction->linked_id = $transaction['account_id'];
                 $newTransaction->added_by = Auth::user()->id;
                 $newTransaction->module = $transaction['module'] ?? 'accounting';
+                $newTransaction->module_id = $transaction['module_id'] ?? null;
                 $newTransaction->parent_id = $id;
                 $newTransaction->save();
                 $previous = Transaction::find($id);

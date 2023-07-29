@@ -151,7 +151,7 @@ class AccountHead extends Command
             ],
             [
                 'category' => 'Cost of Good Sold',
-                'parent_category' => 4,
+                'parent_category' => 5,
                 'type' => 'expenses',
                 'balance' => 0,
                 'category_hericy' => json_encode(['Expenses', 'Cost of Good Sold']),
