@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Common\AccountCategory;
 use App\Models\Category;
 use App\Models\Dispenser;
+use App\Models\ProductPrice;
 use App\Models\ShiftSale;
 use App\Models\ShiftSummary;
 use Illuminate\Http\Request;
@@ -27,6 +28,34 @@ class ShiftSaleController extends Controller
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
+        $category = Category::where('category', AccountCategory::INCOME)->where('client_company_id', $inputData['session_user']['client_company_id'])->first();
+        $incomeCategory = Category::where('parent_category', $category['id'])
+            ->where('module', 'product')
+            ->where('module_id', $inputData['product_id'])
+            ->where('client_company_id', $inputData['session_user']['client_company_id'])
+            ->first();
+        if ($incomeCategory == null) {
+            return response()->json(['status' => 500, 'error' => 'Cannot fin account income category.']);
+        }
+        $category = Category::where('category', AccountCategory::STOCK_IN_HAND)->where('client_company_id', $inputData['session_user']['client_company_id'])->first();
+        $stockCategory = Category::where('parent_category', $category['id'])
+            ->where('module', 'product')
+            ->where('module_id', $inputData['product_id'])
+            ->where('client_company_id', $inputData['session_user']['client_company_id'])
+            ->first();
+        if ($stockCategory == null) {
+            return response()->json(['status' => 500, 'error' => 'Cannot fin account stock category.']);
+        }
+        $category = Category::where('category', AccountCategory::COST_OF_GOOD_SOLD)->where('client_company_id', $inputData['session_user']['client_company_id'])->first();
+        $costOfGoodSoldCategory = Category::where('parent_category', $category['id'])
+            ->where('module', 'product')
+            ->where('module_id', $inputData['product_id'])
+            ->where('client_company_id', $inputData['session_user']['client_company_id'])
+            ->first();
+        if ($costOfGoodSoldCategory == null) {
+            return response()->json(['status' => 500, 'error' => 'Cannot fin account stock of good sold category.']);
+        }
+        $productPrices = ProductPrice::where('client_company_id', $inputData['session_user']['client_company_id'])->where('product_id', $inputData['product_id'])->where('stock_quantity', '>', 0)->get();
         $shiftSale = new ShiftSale();
         $shiftSale->date = $inputData['date'];
         $shiftSale->product_id = $inputData['product_id'];
@@ -37,8 +66,10 @@ class ShiftSaleController extends Controller
         $shiftSale->user_id = $inputData['session_user']['id'];
         $shiftSale->client_company_id = $inputData['session_user']['client_company_id'];
         if ($shiftSale->save()) {
+            $totalNozzleConsumption = 0;
             foreach ($inputData['dispensers'] as $dispenser) {
                 foreach ($dispenser['nozzle'] as $nozzle) {
+                    $totalNozzleConsumption += $nozzle['consumption'];
                     $shiftSaleSummary = new ShiftSummary();
                     $shiftSaleSummary->shift_sale_id = $shiftSale->id;
                     $shiftSaleSummary->nozzle_id = $nozzle['id'];
@@ -49,6 +80,33 @@ class ShiftSaleController extends Controller
                     $shiftSaleSummary->save();
                 }
             }
+            $buyingPrice = 0;
+            foreach ($productPrices as $productPrice) {
+                if ($productPrice['stock_quantity'] > $totalNozzleConsumption) {
+                    $productPrice['stock_quantity'] = $productPrice['stock_quantity'] - $totalNozzleConsumption;
+                    $buyingPrice = $productPrice['unit_price'] * $totalNozzleConsumption;
+                    $productPrice->save();
+                    break;
+                } else {
+                    $totalNozzleConsumption = $totalNozzleConsumption - $productPrice['stock_quantity'];
+                    $buyingPrice = $buyingPrice + ($productPrice['unit_price'] * $totalNozzleConsumption);
+                    $productPrice['stock_quantity'] = 0;
+                    $productPrice->save();
+                }
+            }
+            $transactionData['linked_id'] = $incomeCategory['id'];
+            foreach ($inputData['categories'] as $category) {
+                $transactionData['transaction'][] = [
+                    ['date' => $inputData['date'], 'account_id' => $category['id'], 'debit_amount' => $category['amount'], 'credit_amount' => 0, 'module' => 'shift sale', 'module_id' => $shiftSale->id]
+                ];
+            }
+            TransactionController::saveTransaction($transactionData);
+            $transactionData = [];
+            $transactionData['linked_id'] = $stockCategory['id'];
+            $transactionData['transaction'] = [
+                ['date' => $inputData['date'], 'account_id' => $costOfGoodSoldCategory['id'], 'debit_amount' => $buyingPrice, 'credit_amount' => 0, 'module' => 'shift sale', 'module_id' => $shiftSale->id]
+            ];
+            TransactionController::saveTransaction($transactionData);
             return response()->json(['status' => 200, 'message' => 'Successfully saved shift sale.']);
         }
         return response()->json(['status' => 500, 'error' => 'Cannot saved shift sale.']);
