@@ -521,6 +521,7 @@ class TankController extends Controller
         }
         TankRefill::where('id', $inputData['id'])->delete();
         TankRefillHistory::where('tank_refill_id', $inputData['id'])->delete();
+        ProductPrice::where('module', 'tank refill')->where('module_id', $inputData['id'])->delete();
         return response()->json(['status' => 200, 'message' => 'Successfully deleted tank refill.']);
     }
 }
