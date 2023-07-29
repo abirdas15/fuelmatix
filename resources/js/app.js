@@ -38,6 +38,18 @@ Vue.use(VueToast, { position: "top-right" });
                 let replace = str.replace('$', ' ');
                 return replace;
             },
+            isDataExist: function (modelValue, matchKey, index, data) {
+                let found = 0;
+                data.map(v => {
+                    if (v[matchKey] ===  modelValue) {
+                        found++;
+                    }
+                })
+                if (found > 1) {
+                    data[index][matchKey] = ''
+                    this.$toast.error('You already select this item')
+                }
+            },
             isNumeric(str) {
                 if (typeof str != "string") return false // we only process strings!
                 return !isNaN(str) && // use type coercion to parse the _entirety_ of the string (`parseFloat` alone does not do this)...
