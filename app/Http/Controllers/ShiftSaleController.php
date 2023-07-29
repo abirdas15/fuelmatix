@@ -228,8 +228,7 @@ class ShiftSaleController extends Controller
         $cash = Category::select('id', 'category as name')
             ->where('category', AccountCategory::CASH)
             ->where('client_company_id', $inputData['session_user']['client_company_id'])
-            ->get()
-            ->toArray();
+            ->first();
         $accountReceivable = Category::select('id')
             ->where('category', AccountCategory::ACCOUNT_RECEIVABLE)
             ->where('client_company_id', $inputData['session_user']['client_company_id'])

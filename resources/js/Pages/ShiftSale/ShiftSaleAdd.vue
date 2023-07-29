@@ -111,6 +111,23 @@
                                                     </div>
                                                 </div>
                                             </div>
+                                            <div class="col-sm-12 text-end mb-2">
+                                                <h3>Total sale: {{totalSale}}</h3>
+                                                <h3>Total amount: {{totalAmount}}</h3>
+                                            </div>
+                                            <div class="col-sm-12 text-end">
+                                                <div class="d-flex align-items-center">
+                                                    <label class="me-2">Cash :</label>
+                                                    <input class="form-control" type="text" name="" id="" @input="pushCashAmount($event)">
+                                                </div>
+                                                <div class="d-flex align-items-center">
+                                                    <label class="me-2">Company :</label>
+                                                    <select class="form-control">
+                                                        <option v-for="c in allAmountCategory.companies" :value="c.id">{{c.name}}</option>
+                                                    </select>
+                                                    <input class="form-control" type="text" name="" id="">
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="text-center" v-else>Please Select any product</div>
@@ -147,9 +164,30 @@ export default {
             listDispenser: null,
             product_id: '',
             productIndex: 0,
+            totalSale: 0,
+            totalAmount: 0,
+            allAmountCategory: null
         }
     },
     methods: {
+        pushCashAmount: function (e) {
+            if (e.target.value > 0) {
+                this.listDispenser.categories.push({category_id: this.allAmountCategory.cash.id, amount: e.target.value})
+            }
+        },
+        pushCompanyAmount: function (e) {
+            if (e.target.value > 0) {
+                this.listDispenser.categories.push({category_id: this.allAmountCategory.cash.id, amount: e.target.value})
+            }
+        },
+        getTotalSale: function () {
+            this.listDispenser.dispensers.map((dispenser) => {
+                dispenser.nozzle.map((nozzle) => {
+                    this.totalSale += nozzle.consumption
+                    this.totalAmount += nozzle.amount
+                })
+            })
+        },
         disableInput: function (id) {
             $('#'+id).prop('readonly', true);
         },
@@ -172,12 +210,13 @@ export default {
         },
         calculateAmountNozzle: function (dIndex, nIndex) {
             if (this.isNumeric(this.listDispenser.dispensers[dIndex].nozzle[nIndex].end_reading)) {
-                this.listDispenser.dispensers[dIndex].nozzle[nIndex].consumption = parseFloat(this.listDispenser.dispensers[dIndex].nozzle[nIndex].start_reading) - parseFloat(this.listDispenser.dispensers[dIndex].nozzle[nIndex].end_reading)
+                this.listDispenser.dispensers[dIndex].nozzle[nIndex].consumption = parseFloat(this.listDispenser.dispensers[dIndex].nozzle[nIndex].end_reading) - parseFloat(this.listDispenser.dispensers[dIndex].nozzle[nIndex].start_reading)
                 this.listDispenser.dispensers[dIndex].nozzle[nIndex].amount = parseFloat(this.listDispenser.dispensers[dIndex].nozzle[nIndex].consumption) * parseFloat(this.listDispenser.selling_price)
             } else {
                 this.listDispenser.dispensers[dIndex].nozzle[nIndex].consumption = 0
                 this.listDispenser.dispensers[dIndex].nozzle[nIndex].amount = 0
             }
+            this.getTotalSale()
         },
         getProduct: function () {
             ApiService.POST(ApiRoutes.ProductList, {limit: 5000, page: 1, order_mode: 'ASC'}, res => {
@@ -187,12 +226,23 @@ export default {
                 }
             });
         },
+        getCategory: function () {
+            ApiService.POST(ApiRoutes.ShiftSaleGetCategory, {}, res => {
+                if (parseInt(res.status) === 200) {
+                    this.allAmountCategory = res.data;
+                }
+            });
+        },
         getProductDispenser: function () {
+            this.totalSale = 0
+            this.totalAmount = 0
             ApiService.POST(ApiRoutes.ProductDispenser, {product_id: this.product_id}, res => {
                 this.TableLoading = false
                 if (parseInt(res.status) === 200) {
                     this.listDispenser = res.data;
+                    this.listDispenser['categories'] = [];
                 }
+                this.getTotalSale()
             });
         },
         save: function () {
@@ -212,6 +262,7 @@ export default {
         },
     },
     created() {
+        this.getCategory()
         this.getProduct()
     },
     mounted() {

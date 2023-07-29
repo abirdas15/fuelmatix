@@ -301,7 +301,7 @@ class ProductController extends Controller
                 $reading = NozzleReading::select('*')->where('client_company_id', $inputData['session_user']['client_company_id'])->where('nozzle_id', $nozzle['id'])->orderBy('id', 'DESC')->where('type', 'shift sell')->limit(2)->get()->toArray();
                 $nozzle['end_reading'] = isset($reading[0]) ? $reading[0]['reading'] : 0;
                 $nozzle['start_reading'] = isset($reading[1]) ? $reading[1]['reading'] : 0;
-                $nozzle['consumption'] =  $nozzle['start_reading']  - $nozzle['end_reading'];
+                $nozzle['consumption'] =  $nozzle['end_reading']  - $nozzle['start_reading'];
                 $nozzle['amount'] = $nozzle['consumption'] * $product['selling_price'];
             }
         }

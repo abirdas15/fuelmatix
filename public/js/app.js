@@ -5415,6 +5415,7 @@ __webpack_require__.r(__webpack_exports__);
     },
     getDispenserSingle: function getDispenserSingle() {
       var _this3 = this;
+      this.param.total_refill_volume = 0;
       _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].TankGetNozzle, {
         tank_id: this.param.tank_id
       }, function (res) {
@@ -7299,10 +7300,38 @@ __webpack_require__.r(__webpack_exports__);
       listData: [],
       listDispenser: null,
       product_id: '',
-      productIndex: 0
+      productIndex: 0,
+      totalSale: 0,
+      totalAmount: 0,
+      allAmountCategory: null
     };
   },
   methods: {
+    pushCashAmount: function pushCashAmount(e) {
+      if (e.target.value > 0) {
+        this.listDispenser.categories.push({
+          category_id: this.allAmountCategory.cash.id,
+          amount: e.target.value
+        });
+      }
+    },
+    pushCompanyAmount: function pushCompanyAmount(e) {
+      if (e.target.value > 0) {
+        this.listDispenser.categories.push({
+          category_id: this.allAmountCategory.cash.id,
+          amount: e.target.value
+        });
+      }
+    },
+    getTotalSale: function getTotalSale() {
+      var _this = this;
+      this.listDispenser.dispensers.map(function (dispenser) {
+        dispenser.nozzle.map(function (nozzle) {
+          _this.totalSale += nozzle.consumption;
+          _this.totalAmount += nozzle.amount;
+        });
+      });
+    },
     disableInput: function disableInput(id) {
       $('#' + id).prop('readonly', true);
     },
@@ -7326,46 +7355,59 @@ __webpack_require__.r(__webpack_exports__);
     },
     calculateAmountNozzle: function calculateAmountNozzle(dIndex, nIndex) {
       if (this.isNumeric(this.listDispenser.dispensers[dIndex].nozzle[nIndex].end_reading)) {
-        this.listDispenser.dispensers[dIndex].nozzle[nIndex].consumption = parseFloat(this.listDispenser.dispensers[dIndex].nozzle[nIndex].start_reading) - parseFloat(this.listDispenser.dispensers[dIndex].nozzle[nIndex].end_reading);
+        this.listDispenser.dispensers[dIndex].nozzle[nIndex].consumption = parseFloat(this.listDispenser.dispensers[dIndex].nozzle[nIndex].end_reading) - parseFloat(this.listDispenser.dispensers[dIndex].nozzle[nIndex].start_reading);
         this.listDispenser.dispensers[dIndex].nozzle[nIndex].amount = parseFloat(this.listDispenser.dispensers[dIndex].nozzle[nIndex].consumption) * parseFloat(this.listDispenser.selling_price);
       } else {
         this.listDispenser.dispensers[dIndex].nozzle[nIndex].consumption = 0;
         this.listDispenser.dispensers[dIndex].nozzle[nIndex].amount = 0;
       }
+      this.getTotalSale();
     },
     getProduct: function getProduct() {
-      var _this = this;
+      var _this2 = this;
       _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].ProductList, {
         limit: 5000,
         page: 1,
         order_mode: 'ASC'
       }, function (res) {
-        _this.TableLoading = false;
+        _this2.TableLoading = false;
         if (parseInt(res.status) === 200) {
-          _this.listData = res.data.data;
+          _this2.listData = res.data.data;
+        }
+      });
+    },
+    getCategory: function getCategory() {
+      var _this3 = this;
+      _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].ShiftSaleGetCategory, {}, function (res) {
+        if (parseInt(res.status) === 200) {
+          _this3.allAmountCategory = res.data;
         }
       });
     },
     getProductDispenser: function getProductDispenser() {
-      var _this2 = this;
+      var _this4 = this;
+      this.totalSale = 0;
+      this.totalAmount = 0;
       _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].ProductDispenser, {
         product_id: this.product_id
       }, function (res) {
-        _this2.TableLoading = false;
+        _this4.TableLoading = false;
         if (parseInt(res.status) === 200) {
-          _this2.listDispenser = res.data;
+          _this4.listDispenser = res.data;
+          _this4.listDispenser['categories'] = [];
         }
+        _this4.getTotalSale();
       });
     },
     save: function save() {
-      var _this3 = this;
+      var _this5 = this;
       _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].ClearErrorHandler();
       this.loading = true;
       _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].ShiftSaleAdd, this.listDispenser, function (res) {
-        _this3.loading = false;
+        _this5.loading = false;
         if (parseInt(res.status) === 200) {
-          _this3.$toast.success(res.message);
-          _this3.$router.push({
+          _this5.$toast.success(res.message);
+          _this5.$router.push({
             name: 'ShiftSaleList'
           });
         } else {
@@ -7375,6 +7417,7 @@ __webpack_require__.r(__webpack_exports__);
     }
   },
   created: function created() {
+    this.getCategory();
     this.getProduct();
   },
   mounted: function mounted() {
@@ -23291,7 +23334,46 @@ var render = function render() {
         }
       })])]);
     }), 0) : _vm._e()]) : _vm._e();
-  })], 2)]) : _c("div", {
+  }), _vm._v(" "), _c("div", {
+    staticClass: "col-sm-12 text-end mb-2"
+  }, [_c("h3", [_vm._v("Total sale: " + _vm._s(_vm.totalSale))]), _vm._v(" "), _c("h3", [_vm._v("Total amount: " + _vm._s(_vm.totalAmount))])]), _vm._v(" "), _c("div", {
+    staticClass: "col-sm-12 text-end"
+  }, [_c("div", {
+    staticClass: "d-flex align-items-center"
+  }, [_c("label", {
+    staticClass: "me-2"
+  }, [_vm._v("Cash :")]), _vm._v(" "), _c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      name: "",
+      id: ""
+    },
+    on: {
+      input: function input($event) {
+        return _vm.pushCashAmount($event);
+      }
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "d-flex align-items-center"
+  }, [_c("label", {
+    staticClass: "me-2"
+  }, [_vm._v("Company :")]), _vm._v(" "), _c("select", {
+    staticClass: "form-control"
+  }, _vm._l(_vm.allAmountCategory.companies, function (c) {
+    return _c("option", {
+      domProps: {
+        value: c.id
+      }
+    }, [_vm._v(_vm._s(c.name))]);
+  }), 0), _vm._v(" "), _c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      name: "",
+      id: ""
+    }
+  })])])], 2)]) : _c("div", {
     staticClass: "text-center"
   }, [_vm._v("Please Select any product")])]), _vm._v(" "), _vm.product_id ? _c("div", {
     staticClass: "row",
@@ -63496,6 +63578,7 @@ var ApiRoutes = {
   ShiftSaleDelete: ApiVersion + '/shift/sale/delete',
   ShiftSaleList: ApiVersion + '/shift/sale/list',
   ShiftSaleSingle: ApiVersion + '/shift/sale/single',
+  ShiftSaleGetCategory: ApiVersion + '/shift/sale/getCategory',
   //expense
   ExpenseAdd: ApiVersion + '/expense/save',
   ExpenseEdit: ApiVersion + '/expense/update',
