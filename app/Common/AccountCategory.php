@@ -22,4 +22,5 @@ class AccountCategory
     const TAX = 'Tax';
     const EVAPORATIVE = 'Evaporative';
     const POS_MACHINE = 'Pos Machine';
+    const SALARY_EXPENSE = 'Salary Expense';
 }

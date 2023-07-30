@@ -168,6 +168,15 @@ class AccountHead extends Command
                 'client_company_id' => $clientCompany->id,
             ],
             [
+                'category' => 'Salary Expense',
+                'parent_category' => 5,
+                'type' => 'expenses',
+                'balance' => 0,
+                'category_hericy' => json_encode(['Expenses', 'Salary Expense']),
+                'default' => 1,
+                'client_company_id' => $clientCompany->id,
+            ],
+            [
                 'category' => 'Operating Expense',
                 'parent_category' => 5,
                 'type' => 'expenses',
