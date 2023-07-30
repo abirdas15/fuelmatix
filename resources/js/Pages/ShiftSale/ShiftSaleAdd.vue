@@ -47,13 +47,18 @@
                                                             </label>
 
                                                         </div>
-                                                        <div class="mb-3 col-md-3">
+                                                        <div class="mb-3 col-md-2">
                                                             <label>Previous Reading </label>
                                                             <input disabled id="prReading"
                                                                    type="text" class="form-control"
                                                                    v-model="listDispenser.start_reading">
                                                         </div>
-                                                        <div class="mb-3 col-md-3">
+                                                        <div class="mb-3 col-md-2">
+                                                            <label>Tank Refill </label>
+                                                            <input type="text" class="form-control"  disabled
+                                                                v-model="listDispenser.tank_refill">
+                                                        </div>
+                                                        <div class="mb-3 col-md-2">
                                                             <label>Final Reading </label>
                                                             <input id="frReading" @blur="disableInput('frReading')"
                                                                 type="text" class="form-control"  @click="enableInput('frReading')"
@@ -98,6 +103,7 @@
                                                                    @input="calculateAmountNozzle(dIndex, nIndex) ">
                                                         </div>
 
+
                                                         <div class="mb-3 col-md-2">
                                                             <label>Consumption </label>
                                                             <input type="text" disabled class="form-control"
@@ -124,11 +130,12 @@
                                                             <option v-for="c in allAmountCategory" :value="c.id">{{c.name}}</option>
                                                         </select>
                                                         <input class="form-control me-3"  style="max-width: 210px" type="text" v-model="category.amount" id="">
-                                                        <button class="btn btn-danger"  v-if="index > 0"  type="button" @click="removeCategory(index)">
+                                                        <button class="btn btn-primary"  v-if="index == 0" type="button" @click="addCategory">+</button>
+                                                        <button class="btn btn-danger"  v-else  type="button" @click="removeCategory(index)">
                                                             <i class="fa-solid fa-xmark"></i>
                                                         </button>
                                                     </div>
-                                                    <button class="btn btn-primary" style="margin-right: 5rem;" type="button" @click="addCategory">+</button>
+
                                                 </div>
                                             </div>
                                         </div>
@@ -238,6 +245,7 @@ export default {
             });
         },
         getCategory: function () {
+            this.categories = []
             ApiService.POST(ApiRoutes.ShiftSaleGetCategory, {}, res => {
                 if (parseInt(res.status) === 200) {
                     this.allAmountCategory = res.data;

@@ -7381,6 +7381,7 @@ __webpack_require__.r(__webpack_exports__);
     },
     getCategory: function getCategory() {
       var _this4 = this;
+      this.categories = [];
       _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].ShiftSaleGetCategory, {}, function (res) {
         if (parseInt(res.status) === 200) {
           _this4.allAmountCategory = res.data;
@@ -23123,7 +23124,7 @@ var render = function render() {
   }, [_c("div", {
     staticClass: "row align-items-center text-start"
   }, [_vm._m(2), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-3"
+    staticClass: "mb-3 col-md-2"
   }, [_c("label", [_vm._v("Previous Reading ")]), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
@@ -23147,7 +23148,30 @@ var render = function render() {
       }
     }
   })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-3"
+    staticClass: "mb-3 col-md-2"
+  }, [_c("label", [_vm._v("Tank Refill ")]), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.listDispenser.tank_refill,
+      expression: "listDispenser.tank_refill"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      disabled: ""
+    },
+    domProps: {
+      value: _vm.listDispenser.tank_refill
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.listDispenser, "tank_refill", $event.target.value);
+      }
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-2"
   }, [_c("label", [_vm._v("Final Reading ")]), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
@@ -23349,7 +23373,7 @@ var render = function render() {
     staticClass: "col-sm-6"
   }), _vm._v(" "), _c("div", {
     staticClass: "col-sm-6 text-end"
-  }, [_vm._l(_vm.categories, function (category, index) {
+  }, _vm._l(_vm.categories, function (category, index) {
     return _c("div", {
       staticClass: "d-flex align-items-center mb-3"
     }, [_c("select", {
@@ -23406,7 +23430,15 @@ var render = function render() {
           _vm.$set(category, "amount", $event.target.value);
         }
       }
-    }), _vm._v(" "), index > 0 ? _c("button", {
+    }), _vm._v(" "), index == 0 ? _c("button", {
+      staticClass: "btn btn-primary",
+      attrs: {
+        type: "button"
+      },
+      on: {
+        click: _vm.addCategory
+      }
+    }, [_vm._v("+")]) : _c("button", {
       staticClass: "btn btn-danger",
       attrs: {
         type: "button"
@@ -23418,19 +23450,8 @@ var render = function render() {
       }
     }, [_c("i", {
       staticClass: "fa-solid fa-xmark"
-    })]) : _vm._e()]);
-  }), _vm._v(" "), _c("button", {
-    staticClass: "btn btn-primary",
-    staticStyle: {
-      "margin-right": "5rem"
-    },
-    attrs: {
-      type: "button"
-    },
-    on: {
-      click: _vm.addCategory
-    }
-  }, [_vm._v("+")])], 2)])], 2)]) : _c("div", {
+    })])]);
+  }), 0)])], 2)]) : _c("div", {
     staticClass: "text-center"
   }, [_vm._v("Please Select any product")])]), _vm._v(" "), _vm.product_id ? _c("div", {
     staticClass: "row",
