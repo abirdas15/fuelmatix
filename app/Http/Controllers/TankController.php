@@ -290,10 +290,11 @@ class TankController extends Controller
             ->where('client_company_id', $inputData['session_user']['client_company_id'])
             ->where('date', date('Y-m-d'))
             ->where('module', 'product')->where('module_id', $product['id'])
+            ->orderBy('id', 'DESC')
             ->first();
         $start_reading = $product->opening_stock;
         if ($stock != null) {
-            $start_reading = $stock['closing_stock'];
+            $start_reading = $stock['opening_stock']  + $stock['in_stock'] - $stock['out_stock'];
         } else {
             $previousStock = Stock::select('*')
                 ->where('client_company_id', $inputData['session_user']['client_company_id'])
@@ -419,9 +420,10 @@ class TankController extends Controller
                 'product_id' => $tank['product_id'],
                 'date' => $inputData['date'],
                 'in_stock' => $inputData['total_refill_volume'],
+                'out_stock' => 0,
                 'opening_stock' => $inputData['start_reading']
             ];
-            TransactionController::saveInStock($stockData);
+            TransactionController::saveStock($stockData);
 
             $productPrice = new ProductPrice();
             $productPrice->date = $inputData['date'];
