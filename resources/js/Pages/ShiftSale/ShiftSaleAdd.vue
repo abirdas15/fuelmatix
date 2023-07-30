@@ -124,14 +124,19 @@
                                             <div class="row">
                                                 <div class="col-sm-6"></div>
                                                 <div class="col-sm-6 text-end">
-                                                    <div class="d-flex align-items-center mb-3"  v-for="(category,index) in categories">
+                                                    <div class="d-flex mb-3"  v-for="(category,index) in categories">
                                                         <select class="form-control me-3" style="max-width: 210px" v-model="category.category_id"
                                                                 @change="isDataExist(category.category_id, 'category_id', index, categories)" >
                                                             <option v-for="c in allAmountCategory" :value="c.id">{{c.name}}</option>
                                                         </select>
-                                                        <input class="form-control me-3"  style="max-width: 210px" type="text" v-model="category.amount" id="">
-                                                        <button class="btn btn-primary"  v-if="index == 0" type="button" @click="addCategory">+</button>
-                                                        <button class="btn btn-danger"  v-else  type="button" @click="removeCategory(index)">
+                                                        <div class="form-group">
+                                                            <input class="form-control me-3"  style="max-width: 210px" type="text" v-model="category.amount" :id="'categories.'+index+'.amount'"
+                                                                   :name="'categories.'+index+'.amount'">
+                                                            <div class="invalid-feedback"></div>
+                                                        </div>
+
+                                                        <button class="btn btn-primary"  style="height: 54px" v-if="index == 0" type="button" @click="addCategory">+</button>
+                                                        <button class="btn btn-danger"  style="height: 54px"   v-else  type="button" @click="removeCategory(index)">
                                                             <i class="fa-solid fa-xmark"></i>
                                                         </button>
                                                     </div>
@@ -272,6 +277,15 @@ export default {
             ApiService.ClearErrorHandler();
             this.loading = true
             this.listDispenser.categories = this.categories;
+            let totalCategoryAmount = 0
+            this.listDispenser.categories.map(v => {
+                totalCategoryAmount += v.amount
+            })
+            if (this.totalAmount != totalCategoryAmount) {
+                this.loading = false
+                this.$toast.error('Please match the total amount and category list')
+                return
+            }
             ApiService.POST(ApiRoutes.ShiftSaleAdd, this.listDispenser, res => {
                 this.loading = false
                 if (parseInt(res.status) === 200) {
