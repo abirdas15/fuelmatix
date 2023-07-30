@@ -7412,6 +7412,15 @@ __webpack_require__.r(__webpack_exports__);
       _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].ClearErrorHandler();
       this.loading = true;
       this.listDispenser.categories = this.categories;
+      var totalCategoryAmount = 0;
+      this.listDispenser.categories.map(function (v) {
+        totalCategoryAmount += v.amount;
+      });
+      if (this.totalAmount != totalCategoryAmount) {
+        this.loading = false;
+        this.$toast.error('Please match the total amount and category list');
+        return;
+      }
       _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].ShiftSaleAdd, this.listDispenser, function (res) {
         _this6.loading = false;
         if (parseInt(res.status) === 200) {
@@ -23375,7 +23384,7 @@ var render = function render() {
     staticClass: "col-sm-6 text-end"
   }, _vm._l(_vm.categories, function (category, index) {
     return _c("div", {
-      staticClass: "d-flex align-items-center mb-3"
+      staticClass: "d-flex mb-3"
     }, [_c("select", {
       directives: [{
         name: "model",
@@ -23406,7 +23415,9 @@ var render = function render() {
           value: c.id
         }
       }, [_vm._v(_vm._s(c.name))]);
-    }), 0), _vm._v(" "), _c("input", {
+    }), 0), _vm._v(" "), _c("div", {
+      staticClass: "form-group"
+    }, [_c("input", {
       directives: [{
         name: "model",
         rawName: "v-model",
@@ -23419,7 +23430,8 @@ var render = function render() {
       },
       attrs: {
         type: "text",
-        id: ""
+        id: "categories." + index + ".amount",
+        name: "categories." + index + ".amount"
       },
       domProps: {
         value: category.amount
@@ -23430,8 +23442,13 @@ var render = function render() {
           _vm.$set(category, "amount", $event.target.value);
         }
       }
-    }), _vm._v(" "), index == 0 ? _c("button", {
+    }), _vm._v(" "), _c("div", {
+      staticClass: "invalid-feedback"
+    })]), _vm._v(" "), index == 0 ? _c("button", {
       staticClass: "btn btn-primary",
+      staticStyle: {
+        height: "54px"
+      },
       attrs: {
         type: "button"
       },
@@ -23440,6 +23457,9 @@ var render = function render() {
       }
     }, [_vm._v("+")]) : _c("button", {
       staticClass: "btn btn-danger",
+      staticStyle: {
+        height: "54px"
+      },
       attrs: {
         type: "button"
       },
