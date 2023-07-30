@@ -76,15 +76,15 @@ class ShiftSaleController extends Controller
         $shiftSale->client_company_id = $inputData['session_user']['client_company_id'];
         if ($shiftSale->save()) {
             $totalNozzleConsumption = 0;
-
             $stockData = [
                 'client_company_id' => $inputData['session_user']['client_company_id'],
                 'date' => $inputData['date'],
                 'out_stock' => $inputData['consumption'],
+                'in_stock' => 0,
                 'product_id' => $inputData['product_id'],
-                'opening_stock' => $inputData['start_reading']
+                'opening_stock' => $inputData['start_reading'] + $inputData['tank_refill']
             ];
-            TransactionController::saveOutStock($stockData);
+            TransactionController::saveStock($stockData);
 
             foreach ($inputData['dispensers'] as $dispenser) {
                 foreach ($dispenser['nozzle'] as $nozzle) {

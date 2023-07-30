@@ -228,79 +228,17 @@ class TransactionController extends Controller
         self::updateCategoryBalance($category, $balance);
         Transaction::where('id', $transaction->id)->delete();
     }
-    public static function saveInStock($stockData)
+    public static function saveStock($stockData)
     {
-        $stock = Stock::select('*', DB::raw('DATE(date) as date'))
-            ->where('client_company_id', $stockData['client_company_id'])
-            ->where('date', $stockData['date'])
-            ->where('module', 'product')->where('module_id', $stockData['product_id'])
-            ->first();
-        if ($stock == null) {
-            $previousStock = Stock::select('*', DB::raw('DATE(date) as date'))
-                ->where('client_company_id', $stockData['client_company_id'])
-                ->where('module', 'product')->where('module_id', $stockData['product_id'])
-                ->orderBy('id', 'DESC')
-                ->first();
-            $stock = new Stock();
-            if ($previousStock == null) {
-                $stock->date = $stockData['date'];
-                $stock->module = 'product';
-                $stock->module_id = $stockData['product_id'];
-                $stock->opening_stock = $stockData['opening_stock'];
-                $stock->out_stock = 0;
-                $stock->in_stock = $stockData['in_stock'];
-                $stock->closing_stock = $stockData['opening_stock'] +  $stockData['in_stock'];
-            } else {
-                $stock->date = $stockData['date'];
-                $stock->module = 'product';
-                $stock->module_id = $stockData['product_id'];
-                $stock->opening_stock = $previousStock['closing_stock'];
-                $stock->in_stock = $stockData['in_stock'];
-                $stock->closing_stock = $previousStock['closing_stock'] + $stockData['in_stock'];
-            }
-        } else {
-            $stock->in_stock = $stock->in_stock + $stockData['in_stock'];
-            $stock->closing_stock = $stock->opening_stock + $stock->in_stock - $stock->out_stock;
-        }
-        $stock->client_company_id = $stockData['client_company_id'];
-        $stock->save();
-    }
-    public static function saveOutStock($stockData)
-    {
-        $stock = Stock::select('*', DB::raw('DATE(date) as date'))
-            ->where('client_company_id', $stockData['client_company_id'])
-            ->where('date', $stockData['date'])
-            ->where('module', 'product')->where('module_id', $stockData['product_id'])
-            ->first();
-        if ($stock == null) {
-            $previousStock = Stock::select('*', DB::raw('DATE(date) as date'))
-                ->where('client_company_id', $stockData['client_company_id'])
-                ->where('module', 'product')->where('module_id', $stockData['product_id'])
-                ->orderBy('id', 'DESC')
-                ->first();
-            $stock = new Stock();
-            if ($previousStock == null) {
-                $stock->date = $stockData['date'];
-                $stock->module = 'product';
-                $stock->module_id = $stockData['product_id'];
-                $stock->opening_stock = $stockData['opening_stock'];
-                $stock->out_stock = $stockData['out_stock'];
-                $stock->in_stock = 0;
-                $stock->closing_stock =  $stock->opening_stock + $stock->in_stock -  $stockData['out_stock'];
-            } else {
-                $stock->date = $stockData['date'];
-                $stock->module = 'product';
-                $stock->module_id = $stockData['product_id'];
-                $stock->opening_stock = $previousStock['closing_stock'];
-                $stock->in_stock = 0;
-                $stock->out_stock = $stockData['out_stock'];
-                $stock->closing_stock = $previousStock['closing_stock'] - $stockData['out_stock'];
-            }
-        } else {
-            $stock->out_stock = $stock->out_stock + $stockData['out_stock'];
-            $stock->closing_stock = $stock->opening_stock + $stock->in_stock - $stock->out_stock;
-        }
-        $stock->client_company_id = $stockData['client_company_id'];
-        $stock->save();
+        $stockModel = new Stock();
+        $stockModel->date = $stockData['date'];
+        $stockModel->module = 'product';
+        $stockModel->module_id = $stockData['product_id'];
+        $stockModel->opening_stock = $stockData['opening_stock'];
+        $stockModel->out_stock = $stockData['out_stock'];
+        $stockModel->in_stock = $stockData['in_stock'];
+        $stockModel->closing_stock = $stockModel->opening_stock + $stockModel->in_stock - $stockModel->out_stock;
+        $stockModel->client_company_id = $stockData['client_company_id'];
+        $stockModel->save();
     }
 }
