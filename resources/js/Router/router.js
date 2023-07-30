@@ -63,6 +63,9 @@ import PayOrderEdit from "../Pages/PayOrder/Edit";
 import CreditCompany from "../Pages/CreditCompany/List.vue";
 import CreditCompanyAdd from "../Pages/CreditCompany/Add.vue";
 import CreditCompanyEdit from "../Pages/CreditCompany/Edit.vue";
+import posMachine from "../Pages/posMachine/List.vue";
+import posMachineAdd from "../Pages/posMachine/Add.vue";
+import posMachineEdit from "../Pages/posMachine/Edit.vue";
 
 const ROOT_URL = "";
 const router = new VueRouter({
@@ -133,6 +136,9 @@ const router = new VueRouter({
                 { path: ROOT_URL + "/credit/company", name: "CreditCompany", component: CreditCompany},
                 { path: ROOT_URL + "/credit/company/add", name: "CreditCompanyAdd", component: CreditCompanyAdd},
                 { path: ROOT_URL + "/credit/company/edit/:id", name: "CreditCompanyEdit", component: CreditCompanyEdit},
+                { path: ROOT_URL + "/pos/machine", name: "posMachine", component: posMachine},
+                { path: ROOT_URL + "/pos/machine/add", name: "posMachineAdd", component: posMachineAdd},
+                { path: ROOT_URL + "/pos/machine/edit/:id", name: "posMachineEdit", component: posMachineEdit},
             ],
         },
     ],

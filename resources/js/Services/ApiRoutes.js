@@ -126,6 +126,12 @@ const ApiRoutes = {
     CreditCompanySingle: ApiVersion + '/creditCompany/single',
     CreditCompanyDelete: ApiVersion + '/creditCompany/delete',
     CreditCompanyList: ApiVersion + '/creditCompany/list',
+    //POS Machine
+    posMachineAdd: ApiVersion + '/posMachine/save',
+    posMachineEdit: ApiVersion + '/posMachine/update',
+    posMachineSingle: ApiVersion + '/posMachine/single',
+    posMachineDelete: ApiVersion + '/posMachine/delete',
+    posMachineList: ApiVersion + '/posMachine/list',
 
 };
 

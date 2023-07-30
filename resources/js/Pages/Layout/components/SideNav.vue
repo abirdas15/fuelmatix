@@ -98,7 +98,7 @@
                         <li><a href="./tank&NozzleSetup.html">Pump & Nozzle Setup</a></li>
                         <li><a href="./tank.html">Tank Setup</a></li>
                         <li><router-link :to="{name: 'CreditCompany'}">Credit Company Setup </router-link></li>
-                        <li><a href="./posSetup.html">Pos Setup</a></li>
+                        <li><router-link :to="{name: 'posMachine'}">Pos Setup</router-link></li>
                         <li><a href="./#">Products</a></li>
                         <li><a href="./#">Sekkubg Price</a></li>
                     </ul>
