@@ -111,18 +111,24 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="col-sm-12 text-end mb-2">
-                                                <h3>Total sale: {{totalSale}}</h3>
-                                                <h3>Total amount: {{totalAmount}}</h3>
+                                            <div class="col-sm-11 text-end mb-2">
+                                                <h4>Total sale: {{totalSale}}</h4>
+                                                <h4>Total amount: {{totalAmount}}</h4>
                                             </div>
-                                            <div class="col-sm-12 text-end" v-for="(category,index) in categories">
-                                                <div class="d-flex align-items-center">
-                                                    <select class="form-control" v-model="category.category_id">
-                                                        <option v-for="c in allAmountCategory" :value="c.id">{{c.name}}</option>
-                                                    </select>
-                                                    <input class="form-control" type="text" v-model="category.amount" id="">
-                                                    <button class="btn btn-primary" v-if="index == 0" type="button" @click="addCategory">+</button>
-                                                    <button class="btn btn-danger" v-else type="button" @click="removeCategory(index)">x</button>
+                                            <div class="row">
+                                                <div class="col-sm-6"></div>
+                                                <div class="col-sm-6 text-end">
+                                                    <div class="d-flex align-items-center mb-3"  v-for="(category,index) in categories">
+                                                        <select class="form-control me-3" style="max-width: 210px" v-model="category.category_id"
+                                                                @change="isDataExist(category.category_id, 'category_id', index, categories)" >
+                                                            <option v-for="c in allAmountCategory" :value="c.id">{{c.name}}</option>
+                                                        </select>
+                                                        <input class="form-control me-3"  style="max-width: 210px" type="text" v-model="category.amount" id="">
+                                                        <button class="btn btn-danger"  v-if="index > 0"  type="button" @click="removeCategory(index)">
+                                                            <i class="fa-solid fa-xmark"></i>
+                                                        </button>
+                                                    </div>
+                                                    <button class="btn btn-primary" style="margin-right: 5rem;" type="button" @click="addCategory">+</button>
                                                 </div>
                                             </div>
                                         </div>
@@ -168,6 +174,14 @@ export default {
         }
     },
     methods: {
+        checkIfCategoryExist: function (id, index) {
+            this.categories.map(v => {
+                if (v.category_id == id) {
+                    this.$toast.error('You Already Selected this type')
+                    this.categories[index].category_id = ''
+                }
+            })
+        },
         removeCategory: function(index) {
             this.categories.splice(index, 1);
         },
@@ -227,6 +241,10 @@ export default {
             ApiService.POST(ApiRoutes.ShiftSaleGetCategory, {}, res => {
                 if (parseInt(res.status) === 200) {
                     this.allAmountCategory = res.data;
+                    this.categories.push({
+                        amount: '',
+                        category_id: this.allAmountCategory[0].id
+                    });
                 }
             });
         },
@@ -237,10 +255,7 @@ export default {
                 this.TableLoading = false
                 if (parseInt(res.status) === 200) {
                     this.listDispenser = res.data;
-                    this.categories.push({
-                        amount: '',
-                        category_id: this.allAmountCategory[0].id
-                    });
+                    this.getCategory()
                 }
                 this.getTotalSale()
             });
@@ -263,7 +278,6 @@ export default {
         },
     },
     created() {
-        this.getCategory()
         this.getProduct()
     },
     mounted() {
