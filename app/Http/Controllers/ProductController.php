@@ -267,7 +267,7 @@ class ProductController extends Controller
         $end_reading = 0;
         $start_reading = $product->opening_stock ?? 0;
         if ($stock != null) {
-            $start_reading = $stock['closing_stock'];
+            $start_reading = $stock['opening_stock'];
             $tank_refill = $stock['in_stock'];
         } else {
             $previousStock = Stock::select('*')

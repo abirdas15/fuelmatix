@@ -29,6 +29,9 @@ class ShiftSaleController extends Controller
             'dispensers' => 'required|array',
             'categories.*.category_id' => 'required',
             'categories.*.amount' => 'required',
+        ],[
+            'categories.*.category_id.required' => 'The category field is required.',
+            'categories.*.amount.required' => 'The category field is required.'
         ]);
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);

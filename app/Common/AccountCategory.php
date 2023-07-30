@@ -21,4 +21,5 @@ class AccountCategory
     const INTEREST_EXPENSE = 'Interest Expense';
     const TAX = 'Tax';
     const EVAPORATIVE = 'Evaporative';
+    const POS_MACHINE = 'Pos Machine';
 }

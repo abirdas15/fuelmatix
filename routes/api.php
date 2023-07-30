@@ -24,6 +24,7 @@ use App\Http\Controllers\VendorController;
 use App\Http\Controllers\PayOrderController;
 use App\Http\Controllers\SaleController;
 use App\Http\Controllers\CreditCompanyController;
+use App\Http\Controllers\PosMachineController;
 
 /*
 |--------------------------------------------------------------------------
@@ -186,6 +187,13 @@ Route::group(['middleware' => 'AuthReqCheck'], function() {
         Route::post('single', [CreditCompanyController::class, 'single']);
         Route::post('update', [CreditCompanyController::class, 'update']);
         Route::post('delete', [CreditCompanyController::class, 'delete']);
+    });
+    Route::group(['prefix' => 'posMachine'], function() {
+        Route::post('save', [PosMachineController::class, 'save']);
+        Route::post('list', [PosMachineController::class, 'list']);
+        Route::post('single', [PosMachineController::class, 'single']);
+        Route::post('update', [PosMachineController::class, 'update']);
+        Route::post('delete', [PosMachineController::class, 'delete']);
     });
 });
 

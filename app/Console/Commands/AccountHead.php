@@ -150,6 +150,15 @@ class AccountHead extends Command
                 'client_company_id' => $clientCompany->id,
             ],
             [
+                'category' => 'POS Machine',
+                'parent_category' => 6,
+                'type' => 'assets',
+                'balance' => 0,
+                'category_hericy' => json_encode(["Assets", "Current Asset", "POS Machine"]),
+                'default' => 1,
+                'client_company_id' => $clientCompany->id,
+            ],
+            [
                 'category' => 'Cost of Good Sold',
                 'parent_category' => 5,
                 'type' => 'expenses',
