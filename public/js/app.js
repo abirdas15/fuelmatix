@@ -7308,15 +7308,6 @@ __webpack_require__.r(__webpack_exports__);
     };
   },
   methods: {
-    checkIfCategoryExist: function checkIfCategoryExist(id, index) {
-      var _this = this;
-      this.categories.map(function (v) {
-        if (v.category_id == id) {
-          _this.$toast.error('You Already Selected this type');
-          _this.categories[index].category_id = '';
-        }
-      });
-    },
     removeCategory: function removeCategory(index) {
       this.categories.splice(index, 1);
     },
@@ -7327,11 +7318,11 @@ __webpack_require__.r(__webpack_exports__);
       });
     },
     getTotalSale: function getTotalSale() {
-      var _this2 = this;
+      var _this = this;
       this.listDispenser.dispensers.map(function (dispenser) {
         dispenser.nozzle.map(function (nozzle) {
-          _this2.totalSale += nozzle.consumption;
-          _this2.totalAmount += nozzle.amount;
+          _this.totalSale += nozzle.consumption;
+          _this.totalAmount += nozzle.amount;
         });
       });
     },
@@ -7367,65 +7358,66 @@ __webpack_require__.r(__webpack_exports__);
       this.getTotalSale();
     },
     getProduct: function getProduct() {
-      var _this3 = this;
+      var _this2 = this;
       _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].ProductList, {
         limit: 5000,
         page: 1,
         order_mode: 'ASC'
       }, function (res) {
-        _this3.TableLoading = false;
+        _this2.TableLoading = false;
         if (parseInt(res.status) === 200) {
-          _this3.listData = res.data.data;
+          _this2.listData = res.data.data;
         }
       });
     },
     getCategory: function getCategory() {
-      var _this4 = this;
+      var _this3 = this;
       this.categories = [];
       _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].ShiftSaleGetCategory, {}, function (res) {
         if (parseInt(res.status) === 200) {
-          _this4.allAmountCategory = res.data;
-          _this4.categories.push({
+          _this3.allAmountCategory = res.data;
+          _this3.categories.push({
             amount: '',
-            category_id: _this4.allAmountCategory[0].id
+            category_id: _this3.allAmountCategory[0].id
           });
         }
       });
     },
     getProductDispenser: function getProductDispenser() {
-      var _this5 = this;
+      var _this4 = this;
       this.totalSale = 0;
       this.totalAmount = 0;
       _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].ProductDispenser, {
         product_id: this.product_id
       }, function (res) {
-        _this5.TableLoading = false;
+        _this4.TableLoading = false;
         if (parseInt(res.status) === 200) {
-          _this5.listDispenser = res.data;
-          _this5.getCategory();
+          _this4.listDispenser = res.data;
+          _this4.getCategory();
         }
-        _this5.getTotalSale();
+        _this4.getTotalSale();
       });
     },
     save: function save() {
-      var _this6 = this;
+      var _this5 = this;
       _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].ClearErrorHandler();
       this.loading = true;
       this.listDispenser.categories = this.categories;
       var totalCategoryAmount = 0;
       this.listDispenser.categories.map(function (v) {
-        totalCategoryAmount += v.amount;
+        totalCategoryAmount += Number(v.amount);
       });
+      console.log(totalCategoryAmount);
       if (this.totalAmount != totalCategoryAmount) {
         this.loading = false;
         this.$toast.error('Please match the total amount and category list');
         return;
       }
       _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].ShiftSaleAdd, this.listDispenser, function (res) {
-        _this6.loading = false;
+        _this5.loading = false;
         if (parseInt(res.status) === 200) {
-          _this6.$toast.success(res.message);
-          _this6.$router.push({
+          _this5.$toast.success(res.message);
+          _this5.$router.push({
             name: 'ShiftSaleList'
           });
         } else {
