@@ -20,4 +20,5 @@ class AccountCategory
     const OPERATING_EXPENSE = 'Operating Expense';
     const INTEREST_EXPENSE = 'Interest Expense';
     const TAX = 'Tax';
+    const EVAPORATIVE = 'Evaporative';
 }

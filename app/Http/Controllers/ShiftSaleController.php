@@ -7,8 +7,11 @@ use App\Models\Category;
 use App\Models\Dispenser;
 use App\Models\ProductPrice;
 use App\Models\ShiftSale;
+use App\Models\ShiftSaleTransaction;
 use App\Models\ShiftSummary;
+use App\Models\Stock;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class ShiftSaleController extends Controller
@@ -62,6 +65,7 @@ class ShiftSaleController extends Controller
         $shiftSale->date = $inputData['date'];
         $shiftSale->product_id = $inputData['product_id'];
         $shiftSale->start_reading = $inputData['start_reading'];
+        $shiftSale->tank_refill = $inputData['tank_refill'];
         $shiftSale->end_reading = $inputData['end_reading'];
         $shiftSale->consumption = $inputData['consumption'];
         $shiftSale->amount = $inputData['amount'];
@@ -69,6 +73,16 @@ class ShiftSaleController extends Controller
         $shiftSale->client_company_id = $inputData['session_user']['client_company_id'];
         if ($shiftSale->save()) {
             $totalNozzleConsumption = 0;
+
+            $stockData = [
+                'client_company_id' => $inputData['session_user']['client_company_id'],
+                'date' => $inputData['date'],
+                'out_stock' => $inputData['consumption'],
+                'product_id' => $inputData['product_id'],
+                'opening_stock' => $inputData['start_reading']
+            ];
+            TransactionController::saveOutStock($stockData);
+
             foreach ($inputData['dispensers'] as $dispenser) {
                 foreach ($dispenser['nozzle'] as $nozzle) {
                     $totalNozzleConsumption += $nozzle['consumption'];
@@ -97,9 +111,15 @@ class ShiftSaleController extends Controller
                 }
             }
             $transactionData['linked_id'] = $incomeCategory['id'];
+            $shiftSaleTransaction = [];
             foreach ($inputData['categories'] as $category) {
                 $transactionData['transaction'] = [
                     ['date' => date('Y-m-d'), 'account_id' => $category['category_id'], 'debit_amount' => 0, 'credit_amount' => $category['amount'], 'module' => 'shift sale', 'module_id' => $shiftSale->id]
+                ];
+                $shiftSaleTransaction[] = [
+                    'shift_sale_id' => $shiftSale->id,
+                    'category_id' => $category['category_id'],
+                    'amount' => $category['amount']
                 ];
             }
             TransactionController::saveTransaction($transactionData);
@@ -109,6 +129,7 @@ class ShiftSaleController extends Controller
                 ['date' => date('Y-m-d'), 'account_id' => $costOfGoodSoldCategory['id'], 'debit_amount' => 0, 'credit_amount' => $buyingPrice, 'module' => 'shift sale', 'module_id' => $shiftSale->id]
             ];
             TransactionController::saveTransaction($transactionData);
+            ShiftSaleTransaction::insert($shiftSaleTransaction);
             return response()->json(['status' => 200, 'message' => 'Successfully saved shift sale.']);
         }
         return response()->json(['status' => 500, 'error' => 'Cannot saved shift sale.']);
@@ -165,6 +186,7 @@ class ShiftSaleController extends Controller
             }
         }
         $result['dispensers'] = $dispensers;
+        $result['categories'] = ShiftSaleTransaction::select('category_id', 'amount')->where('shift_sale_id', $inputData['id'])->get()->toArray();
         return response()->json(['status' => 200, 'data' => $result]);
     }
     public function update(Request $request)
@@ -207,6 +229,7 @@ class ShiftSaleController extends Controller
                     $shiftSaleSummary->save();
                 }
             }
+
             return response()->json(['status' => 200, 'message' => 'Successfully updated shift sale.']);
         }
         return response()->json(['status' => 500, 'error' => 'Cannot updated shift sale.']);

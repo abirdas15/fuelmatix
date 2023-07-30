@@ -9,9 +9,11 @@ use App\Models\NozzleReading;
 use App\Models\Product;
 use App\Models\ShiftSale;
 use App\Models\ShiftSummary;
+use App\Models\Stock;
 use App\Models\Tank;
 use App\Models\TankLog;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class ProductController extends Controller
@@ -256,13 +258,27 @@ class ProductController extends Controller
         if ($product == null) {
             return response()->json(['status' => 500, 'error' => 'Cannot find product.']);
         }
-        $shitSale = ShiftSale::select('id', 'end_reading', 'start_reading', 'consumption')
-            ->where('product_id', $inputData['product_id'])
+        $stock = Stock::select('*')
             ->where('client_company_id', $inputData['session_user']['client_company_id'])
-            ->orderBy('id', 'DESC')
+            ->where('date', date('Y-m-d'))
+            ->where('module', 'product')->where('module_id', $inputData['product_id'])
             ->first();
+        $tank_refill = 0;
         $end_reading = 0;
-        $start_reading = $product->opening_stock != null ? $product->opening_stock : 0;
+        $start_reading = $product->opening_stock ?? 0;
+        if ($stock != null) {
+            $start_reading = $stock['closing_stock'];
+            $tank_refill = $stock['in_stock'];
+        } else {
+            $previousStock = Stock::select('*')
+                ->where('client_company_id', $inputData['session_user']['client_company_id'])
+                ->where('module', 'product')->where('module_id', $inputData['product_id'])
+                ->orderBy('id', 'DESC')
+                ->first();
+            if ($previousStock != null) {
+                $start_reading = $previousStock->closing_stock;
+            }
+        }
         $tank = Tank::where('product_id', $inputData['product_id'])->select('id')->where('client_company_id', $inputData['session_user']['client_company_id'])->first();
         if ($tank != null) {
             $tankReading = TankLog::select('tank_log.volume')
@@ -274,15 +290,13 @@ class ProductController extends Controller
                 $end_reading = $tankReading['volume'];
             }
         }
-        if ($shitSale != null) {
-            $start_reading = $shitSale['end_reading'];
-        }
-        $consumption = $start_reading - $end_reading;
+        $consumption = $start_reading + $tank_refill - $end_reading;
         $amount = $consumption * $product['selling_price'];
         $result = [
             'date' => date('Y-m-d'),
             'product_id' => $inputData['product_id'],
             'start_reading' => $start_reading,
+            'tank_refill' => $tank_refill,
             'end_reading' => $end_reading,
             'consumption' => $consumption,
             'amount' => $amount,

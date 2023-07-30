@@ -185,6 +185,15 @@ class AccountHead extends Command
                 'default' => 1,
                 'client_company_id' => $clientCompany->id,
             ],
+            [
+                'category' => 'Evaporative',
+                'parent_category' => 5,
+                'type' => 'expenses',
+                'balance' => 0,
+                'category_hericy' => json_encode(['Expenses', 'Evaporative']),
+                'default' => 1,
+                'client_company_id' => $clientCompany->id,
+            ],
         ];
         Category::truncate();
         Category::insert($data);

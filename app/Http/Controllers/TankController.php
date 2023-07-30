@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Common\AccountCategory;
 use App\Models\BstiChart;
+use App\Models\Category;
 use App\Models\Dispenser;
 use App\Models\NozzleReading;
 use App\Models\PayOrder;
 use App\Models\Product;
 use App\Models\ProductPrice;
+use App\Models\Stock;
 use App\Models\Tank;
 use App\Models\TankLog;
 use App\Models\TankRefill;
@@ -221,7 +224,7 @@ class TankController extends Controller
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
-        $result = TankLog::select('id', 'height', 'water_height', 'tank_id')->find($inputData['id']);
+        $result = TankLog::select('id', 'height', 'water_height', 'tank_id', 'date', 'type')->find($inputData['id']);
         return response()->json(['status' => 200, 'data' => $result]);
     }
     public function readingUpdate(Request $request)
@@ -275,6 +278,33 @@ class TankController extends Controller
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
+        $tank = Tank::find($inputData['tank_id']);
+        if ($tank == null) {
+            return response()->json(['status' => 500, 'error' => 'Cannot find tank.']);
+        }
+        if ($tank['product_id'] == null) {
+            return response()->json(['status' => 500, 'error' => 'Cannot find product for this tank.']);
+        }
+        $product = Product::find($tank['product_id']);
+        $stock = Stock::select('*')
+            ->where('client_company_id', $inputData['session_user']['client_company_id'])
+            ->where('date', date('Y-m-d'))
+            ->where('module', 'product')->where('module_id', $product['id'])
+            ->first();
+        $start_reading = $product->opening_stock;
+        if ($stock != null) {
+            $start_reading = $stock['closing_stock'];
+        } else {
+            $previousStock = Stock::select('*')
+                ->where('client_company_id', $inputData['session_user']['client_company_id'])
+                ->where('module', 'product')->where('module_id', $product['id'])
+                ->orderBy('id', 'DESC')
+                ->first();
+            if ($previousStock != null) {
+                $start_reading = $previousStock->closing_stock;
+            }
+        }
+
         $result = TankLog::select('id', 'height')
             ->where('type', 'tank refill')
             ->where('tank_id', $inputData['tank_id'])
@@ -283,13 +313,6 @@ class TankController extends Controller
             ->limit(2)
             ->get()
             ->toArray();
-
-        $start_height = isset($result[1]) ? $result[1]['height'] : 0;
-        $bstiChart = BstiChart::where('tank_id', $inputData['tank_id'])
-            ->where('height', '=', floor($start_height))
-            ->first();
-        $start_reading = $bstiChart != null ? $bstiChart['volume'] : 0;
-
         $end_height = isset($result[0]) ? $result[0]['height'] : 0;
         $bstiChart = BstiChart::where('tank_id', $inputData['tank_id'])
             ->where('height', '=', floor($end_height))
@@ -355,7 +378,21 @@ class TankController extends Controller
         if ($tank['product_id'] == null) {
             return response()->json(['status' => 500, 'error' => 'Tank has no product. Please assign product.']);
         }
-
+        $category = Category::where('category', AccountCategory::STOCK_IN_HAND)->where('client_company_id', $inputData['session_user']['client_company_id'])->first();
+        $stockCategory = Category::where('parent_category', $category['id'])
+            ->where('module', 'product')
+            ->where('module_id', $tank['product_id'])
+            ->where('client_company_id', $inputData['session_user']['client_company_id'])
+            ->first();
+        if ($stockCategory == null) {
+            return response()->json(['status' => 500, 'error' => 'Cannot find accounts stock category.']);
+        }
+        $lossCategory = Category::where('category', AccountCategory::EVAPORATIVE)
+            ->where('client_company_id', $inputData['session_user']['client_company_id'])
+            ->first();
+        if ($lossCategory == null) {
+            return response()->json(['status' => 500, 'error' => 'Cannot find accounts loss category.']);
+        }
         $tankRefill = new TankRefill();
         $tankRefill->date = $inputData['date'];
         $tankRefill->tank_id = $inputData['tank_id'];
@@ -368,6 +405,24 @@ class TankController extends Controller
         $tankRefill->net_profit = $inputData['net_profit'] ?? 0;
         $tankRefill->client_company_id = $inputData['session_user']['client_company_id'];
         if ($tankRefill->save()) {
+            $unitPrice = $payOrder['amount'] / $payOrder['quantity'];
+            $totalRefillAmount = $inputData['total_refill_volume'] * $unitPrice;
+            $transactionData['linked_id'] = $payOrder['vendor_id'];
+            $lossAmount = $payOrder['amount'] - $totalRefillAmount;
+            $transactionData['transaction'] = [
+                ['date' => $inputData['date'], 'account_id' => $stockCategory['id'], 'debit_amount' => 0, 'credit_amount' => $totalRefillAmount, 'module' => 'tank refill', 'module_id' => $tankRefill->id],
+                ['date' => $inputData['date'], 'account_id' => $lossCategory['id'], 'debit_amount' => 0, 'credit_amount' => $lossAmount, 'module' => 'tank refill', 'module_id' => $tankRefill->id],
+            ];
+            TransactionController::saveTransaction($transactionData);
+            $stockData = [
+                'client_company_id' => $inputData['session_user']['client_company_id'],
+                'product_id' => $tank['product_id'],
+                'date' => $inputData['date'],
+                'in_stock' => $inputData['total_refill_volume'],
+                'opening_stock' => $inputData['start_reading']
+            ];
+            TransactionController::saveInStock($stockData);
+
             $productPrice = new ProductPrice();
             $productPrice->date = $inputData['date'];
             $productPrice->product_id = $tank['product_id'];
@@ -382,6 +437,7 @@ class TankController extends Controller
             if (isset($inputData['dispensers'])) {
                 foreach ($inputData['dispensers'] as $dispenser) {
                     foreach ($dispenser['nozzle'] as $nozzle) {
+
                         $tankRefillHistory = new TankRefillHistory();
                         $tankRefillHistory->tank_refill_id = $tankRefill->id;
                         $tankRefillHistory->nozzle_id = $nozzle['id'];
