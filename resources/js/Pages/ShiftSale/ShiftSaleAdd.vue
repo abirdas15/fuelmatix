@@ -271,9 +271,8 @@ export default {
             this.listDispenser.categories = this.categories;
             let totalCategoryAmount = 0
             this.listDispenser.categories.map(v => {
-                totalCategoryAmount += Number(v.amount)
+                totalCategoryAmount += parseInt(v.amount)
             })
-            console.log(totalCategoryAmount)
             if (this.totalAmount != totalCategoryAmount) {
                 this.loading = false
                 this.$toast.error('Please match the total amount and category list')
