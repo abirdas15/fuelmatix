@@ -25,6 +25,7 @@ use App\Http\Controllers\PayOrderController;
 use App\Http\Controllers\SaleController;
 use App\Http\Controllers\CreditCompanyController;
 use App\Http\Controllers\PosMachineController;
+use App\Http\Controllers\EmployeeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -194,6 +195,13 @@ Route::group(['middleware' => 'AuthReqCheck'], function() {
         Route::post('single', [PosMachineController::class, 'single']);
         Route::post('update', [PosMachineController::class, 'update']);
         Route::post('delete', [PosMachineController::class, 'delete']);
+    });
+    Route::group(['prefix' => 'employee'], function() {
+        Route::post('save', [EmployeeController::class, 'save']);
+        Route::post('list', [EmployeeController::class, 'list']);
+        Route::post('single', [EmployeeController::class, 'single']);
+        Route::post('update', [EmployeeController::class, 'update']);
+        Route::post('delete', [EmployeeController::class, 'delete']);
     });
 });
 

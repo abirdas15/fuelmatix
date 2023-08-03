@@ -40,6 +40,9 @@ class AccountHead extends Command
     public function handle()
     {
         $clientCompany = ClientCompany::first();
+
+
+
         $data = [
             [
                'category' => 'Assets',
@@ -132,8 +135,17 @@ class AccountHead extends Command
                 'client_company_id' => $clientCompany->id,
             ],
             [
-                'category' => 'Cash',
+                'category' => 'Cash In Hand',
                 'parent_category' => 6,
+                'type' => 'assets',
+                'balance' => 0,
+                'category_hericy' => json_encode(["Assets", "Current Asset", "Cash In Hand"]),
+                'default' => 1,
+                'client_company_id' => $clientCompany->id,
+            ],
+            [
+                'category' => 'Cash',
+                'parent_category' => 11,
                 'type' => 'assets',
                 'balance' => 0,
                 'category_hericy' => json_encode(["Assets", "Current Asset", "Cash"]),
