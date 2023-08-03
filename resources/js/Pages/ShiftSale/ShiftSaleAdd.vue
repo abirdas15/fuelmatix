@@ -186,14 +186,6 @@ export default {
         }
     },
     methods: {
-        checkIfCategoryExist: function (id, index) {
-            this.categories.map(v => {
-                if (v.category_id == id) {
-                    this.$toast.error('You Already Selected this type')
-                    this.categories[index].category_id = ''
-                }
-            })
-        },
         removeCategory: function(index) {
             this.categories.splice(index, 1);
         },
@@ -279,8 +271,9 @@ export default {
             this.listDispenser.categories = this.categories;
             let totalCategoryAmount = 0
             this.listDispenser.categories.map(v => {
-                totalCategoryAmount += v.amount
+                totalCategoryAmount += Number(v.amount)
             })
+            console.log(totalCategoryAmount)
             if (this.totalAmount != totalCategoryAmount) {
                 this.loading = false
                 this.$toast.error('Please match the total amount and category list')
