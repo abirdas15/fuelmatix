@@ -206,6 +206,7 @@ Route::group(['middleware' => 'AuthReqCheck'], function() {
     });
     Route::group(['prefix' => 'salary'], function() {
         Route::post('searchEmployee', [SalaryController::class, 'searchEmployee']);
+        Route::post('save', [SalaryController::class, 'save']);
         Route::post('list', [SalaryController::class, 'list']);
         Route::post('single', [SalaryController::class, 'single']);
         Route::post('update', [SalaryController::class, 'update']);
