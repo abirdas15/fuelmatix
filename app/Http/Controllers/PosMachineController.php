@@ -28,17 +28,14 @@ class PosMachineController extends Controller
             'tds' => $inputData['tds'] ?? null,
             'bank_category_id' => $inputData['bank_category_id'] ?? null,
         ];
-        $category_hericy = json_decode($posMachine['category_hericy']);
-        array_push($category_hericy, $inputData['name']);
-        $category_hericy = json_encode($category_hericy);
         $category = new Category();
         $category->category = $inputData['name'];
         $category->parent_category = $posMachine->id;
         $category->type = $posMachine->type;
-        $category->category_hericy = $category_hericy;
         $category->others = json_encode($others);
         $category->client_company_id = $inputData['session_user']['client_company_id'];
         if ($category->save()) {
+            $category->updateCategory();
             return response()->json(['status' => 200, 'message' => 'Successfully saved pos machine.']);
         }
         return response()->json(['status' => 500, 'errors' => 'Cannot saved pos machine.']);
@@ -114,13 +111,10 @@ class PosMachineController extends Controller
             'tds' => $inputData['tds'] ?? null,
             'bank_category_id' => $inputData['bank_category_id'] ?? null,
         ];
-        $category_hericy = json_decode($posMachine['category_hericy']);
-        array_push($category_hericy, $inputData['name']);
-        $category_hericy = json_encode($category_hericy);
         $category->category = $inputData['name'];
-        $category->category_hericy = $category_hericy;
         $category->others = json_encode($others);
         if ($category->save()) {
+            $category->updateCategory();
             return response()->json(['status' => 200, 'message' => 'Successfully updated pos machine.']);
         }
         return response()->json(['status' => 500, 'errors' => 'Cannot updated pos machine.']);

@@ -26,6 +26,7 @@ use App\Http\Controllers\SaleController;
 use App\Http\Controllers\CreditCompanyController;
 use App\Http\Controllers\PosMachineController;
 use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\SalaryController;
 
 /*
 |--------------------------------------------------------------------------
@@ -202,6 +203,15 @@ Route::group(['middleware' => 'AuthReqCheck'], function() {
         Route::post('single', [EmployeeController::class, 'single']);
         Route::post('update', [EmployeeController::class, 'update']);
         Route::post('delete', [EmployeeController::class, 'delete']);
+    });
+    Route::group(['prefix' => 'salary'], function() {
+        Route::post('searchEmployee', [SalaryController::class, 'searchEmployee']);
+        Route::post('save', [SalaryController::class, 'save']);
+        Route::post('list', [SalaryController::class, 'list']);
+        Route::post('single', [SalaryController::class, 'single']);
+        Route::post('update', [SalaryController::class, 'update']);
+        Route::post('delete', [SalaryController::class, 'delete']);
+        Route::post('getCategory', [SalaryController::class, 'getCategory']);
     });
 });
 

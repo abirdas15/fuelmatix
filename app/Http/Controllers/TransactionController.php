@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\SessionUser;
 use App\Models\Category;
 use App\Models\Stock;
 use App\Models\Transaction;
@@ -27,6 +28,7 @@ class TransactionController extends Controller
     }
     public static function saveTransaction($inputData)
     {
+        $sessionUser = SessionUser::getUser();
         foreach ($inputData['transaction'] as $transaction) {
             $newTransaction = new Transaction();
             $newTransaction->date = $transaction['date'];
@@ -39,25 +41,9 @@ class TransactionController extends Controller
             $newTransaction->added_by = Auth::user()->id;
             $newTransaction->module = $transaction['module'] ?? 'accounting';
             $newTransaction->module_id = $transaction['module_id'] ?? null;
+            $newTransaction->client_company_id = $sessionUser['client_company_id'];
             if ($newTransaction->save()) {
                 $id = $newTransaction->id;
-                $category = Category::with('parent')->where('id', $newTransaction->account_id)->first();
-
-                $balance = 0;
-                if ($category['type'] == 'expenses') {
-                    $balance = $newTransaction['credit_amount'] - $newTransaction['debit_amount'];
-                } else if ($category['type'] == 'income') {
-                    $balance = $newTransaction['debit_amount'] - $newTransaction['credit_amount'];
-                }  else if ($category['type'] == 'assets') {
-                    $balance = $newTransaction['credit_amount'] - $newTransaction['debit_amount'];
-                } else if ($category['type'] == 'liabilities') {
-                    $balance = $newTransaction['debit_amount'] - $newTransaction['credit_amount'];
-                } else if ($category['type'] == 'equity') {
-                    $balance = $newTransaction['debit_amount'] - $newTransaction['credit_amount'];
-                }
-
-                self::updateCategoryBalance($category, $balance);
-
                 $newTransaction = new Transaction();
                 $newTransaction->date = $transaction['date'];
                 $newTransaction->description = null;
@@ -68,27 +54,12 @@ class TransactionController extends Controller
                 $newTransaction->added_by = Auth::user()->id;
                 $newTransaction->module = $transaction['module'] ?? 'accounting';
                 $newTransaction->module_id = $transaction['module_id'] ?? null;
+                $newTransaction->client_company_id = $sessionUser['client_company_id'];
                 $newTransaction->parent_id = $id;
                 $newTransaction->save();
                 $previous = Transaction::find($id);
                 $previous->parent_id = $newTransaction->id;
                 $previous->save();
-
-                $category = Category::with('parent')->where('id', $newTransaction->account_id)->first();
-
-                $balance = 0;
-                if ($category['type'] == 'expenses') {
-                    $balance = $newTransaction['credit_amount'] - $newTransaction['debit_amount'];
-                } else if ($category['type'] == 'income') {
-                    $balance = $newTransaction['debit_amount'] - $newTransaction['credit_amount'];
-                }  else if ($category['type'] == 'assets') {
-                    $balance = $newTransaction['credit_amount'] - $newTransaction['debit_amount'];
-                } else if ($category['type'] == 'liabilities') {
-                    $balance = $newTransaction['debit_amount'] - $newTransaction['credit_amount'];
-                } else if ($category['type'] == 'equity') {
-                    $balance = $newTransaction['debit_amount'] - $newTransaction['credit_amount'];
-                }
-                self::updateCategoryBalance($category, $balance);
             }
         }
         return true;
