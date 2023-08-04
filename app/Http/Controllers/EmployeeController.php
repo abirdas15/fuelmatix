@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Common\AccountCategory;
 use App\Models\Category;
+use App\Repository\EmployeeRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -47,28 +48,8 @@ class EmployeeController extends Controller
     }
     public function list(Request $request)
     {
-        $inputData = $request->all();
-        $limit = isset($inputData['limit']) ? $inputData['limit'] : 10;
-        $keyword = isset($inputData['keyword']) ? $inputData['keyword'] : '';
-        $order_by = isset($inputData['order_by']) ? $inputData['order_by'] : 'id';
-        $order_mode = isset($inputData['order_mode']) ? $inputData['order_mode'] : 'DESC';
-        $salaryExpense = Category::select('id')->where('client_company_id', $inputData['session_user']['client_company_id'])->where('category', AccountCategory::SALARY_EXPENSE)->first();
-        $result = Category::select('id', 'category as name', 'rfid', 'others')
-            ->where('client_company_id', $inputData['session_user']['client_company_id'])
-            ->where('parent_category', $salaryExpense->id);
-        if (!empty($keyword)) {
-            $result->where(function($q) use ($keyword) {
-                $q->where('category', 'LIKE', '%'.$keyword.'%');
-            });
-        }
-        $result = $result->orderBy($order_by, $order_mode)
-            ->paginate($limit);
-        foreach ($result as &$data) {
-            $others = json_decode($data['others']);
-            $data['position'] = $others != null ? $others->position : null;
-            $data['salary'] = $others != null ? $others->salary : null;
-            unset($data['others']);
-        }
+        $requestData = $request->all();
+        $result = EmployeeRepository::list($requestData);
         return response()->json(['status' => 200, 'data' => $result]);
     }
     public function single(Request $request)

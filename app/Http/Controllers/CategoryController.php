@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\Transaction;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class CategoryController extends Controller
@@ -11,15 +13,34 @@ class CategoryController extends Controller
     public function list(Request $request)
     {
         $inputData = $request->all();
-        $result = Category::select('id', 'category', 'balance', 'parent_category', 'description')
+        $transaction = Transaction::select(DB::raw('SUM(debit_amount) as total_debit_amount'), DB::raw('SUM(credit_amount) as total_credit_amount'), 'account_id')
+            ->groupBy('account_id')
+            ->get()
+            ->keyBy('account_id')
+            ->toArray();
+        $categories = Category::select('id', 'category', 'balance', 'parent_category', 'description', 'category_ids', 'type')
             ->where('client_company_id', $inputData['session_user']['client_company_id'])
             ->with(['children' => function($q) {
-                $q->select('id', 'category', 'parent_category', 'balance', 'description');
+                $q->select('id', 'category', 'parent_category', 'balance', 'description', 'category_ids', 'type');
             }])
             ->whereNull('parent_category')
             ->get()
             ->toArray();
+        $result = self::categoryTree($categories, $transaction);
         return response()->json(['status' => 200, 'data' => $result]);
+    }
+    public static function categoryTree($categories, $transaction)
+    {
+        foreach ($categories as &$category) {
+            if (isset($transaction[$category['id']])) {
+                self::updateCategoryBalance($category, $transaction[$category['id']]['amount']);
+            }
+        }
+        return $categories;
+    }
+    public function updateCategoryBalance($category, $amount)
+    {
+
     }
     public function parent(Request $request)
     {
