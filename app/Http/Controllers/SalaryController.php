@@ -120,4 +120,21 @@ class SalaryController extends Controller
         }
         return response()->json(['status' => 200, 'data' => $result]);
     }
+    public function getCategory(Request $request)
+    {
+        $sessionUser = SessionUser::getUser();
+        $cashInHand = Category::select('id')
+            ->where('category', AccountCategory::CASH_IM_HAND)
+            ->where('client_company_id', $sessionUser['client_company_id'])
+            ->first();
+        $bank = Category::select('id')
+            ->where('category', AccountCategory::BANK)
+            ->where('client_company_id', $sessionUser['client_company_id'])
+            ->first();
+        $result = Category::select('id', 'category as name')
+            ->whereIn('parent_category', [$bank->id, $cashInHand->id])
+            ->get()
+            ->toArray();
+        return response()->json(['status' => 200, 'data' => $result]);
+    }
 }

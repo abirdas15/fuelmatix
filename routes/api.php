@@ -211,6 +211,7 @@ Route::group(['middleware' => 'AuthReqCheck'], function() {
         Route::post('single', [SalaryController::class, 'single']);
         Route::post('update', [SalaryController::class, 'update']);
         Route::post('delete', [SalaryController::class, 'delete']);
+        Route::post('getCategory', [SalaryController::class, 'getCategory']);
     });
 });
 
