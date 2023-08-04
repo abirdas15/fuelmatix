@@ -515,3 +515,9 @@ input::-webkit-inner-spin-button {
 input[type=number] {
     -moz-appearance: textfield;
 }
+.block{
+    pointer-events: none;
+    filter: blur(3px);
+    cursor: not-allowed;
+    opacity: .8;
+}

@@ -132,6 +132,20 @@ const ApiRoutes = {
     posMachineSingle: ApiVersion + '/posMachine/single',
     posMachineDelete: ApiVersion + '/posMachine/delete',
     posMachineList: ApiVersion + '/posMachine/list',
+    //Employee
+    employeeAdd: ApiVersion + '/employee/save',
+    employeeEdit: ApiVersion + '/employee/update',
+    employeeSingle: ApiVersion + '/employee/single',
+    employeeDelete: ApiVersion + '/employee/delete',
+    employeeList: ApiVersion + '/employee/list',
+    //Salary
+    salarySearchEmployee: ApiVersion + '/salary/searchEmployee',
+    salaryAdd: ApiVersion + '/salary/save',
+    salaryEdit: ApiVersion + '/salary/update',
+    salarySingle: ApiVersion + '/salary/single',
+    salaryDelete: ApiVersion + '/salary/delete',
+    salaryList: ApiVersion + '/salary/list',
+    salaryGetCategory: ApiVersion + '/salary/getCategory',
 
 };
 

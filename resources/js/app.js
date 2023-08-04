@@ -54,7 +54,30 @@ Vue.use(VueToast, { position: "top-right" });
                 if (typeof str != "string") return false // we only process strings!
                 return !isNaN(str) && // use type coercion to parse the _entirety_ of the string (`parseFloat` alone does not do this)...
                     !isNaN(parseFloat(str)) // ...and ensure strings of whitespace fail
-            }
+            },
+            years: function (startYear) {
+                let years = [];
+                for (let i = startYear; i < new Date().getFullYear()+5; i++) {
+                    years.push({ id:i, name: i})
+                }
+                return years
+            },
+            months: function () {
+                return [
+                    {id: 'january', name: 'January'},
+                    {id: 'february', name: 'February'},
+                    {id: 'march', name: 'March'},
+                    {id: 'april', name: 'April'},
+                    {id: 'may', name: 'May'},
+                    {id: 'june', name: 'June'},
+                    {id: 'july', name: 'July'},
+                    {id: 'august', name: 'August'},
+                    {id: 'september', name: 'September'},
+                    {id: 'october', name: 'October'},
+                    {id: 'november', name: 'November'},
+                    {id: 'December', name: 'December'},
+                ]
+            },
         }
     });
 const app = new Vue({

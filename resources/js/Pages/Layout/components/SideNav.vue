@@ -82,7 +82,7 @@
                         <li><a href="./#">Transaction</a></li>
                     </ul>
                 </li>
-                <li><a class="has-arrow " href="javascript:void()" aria-expanded="false">
+                <li><a class="has-arrow " href="javascript:void(0)" aria-expanded="false">
                     <i class="fa-solid fa-money-bill"></i>
                     <span class="nav-text">Expenses</span>
                 </a>
@@ -90,7 +90,7 @@
                         <li><router-link :to="{name:'Expense'}">Expense</router-link></li>
                     </ul>
                 </li>
-                <li><a class="has-arrow " href="javascript:void()" aria-expanded="false">
+                <li><a class="has-arrow " href="javascript:void(0)" aria-expanded="false">
                     <i class="	fas fa-users"></i>
                     <span class="nav-text">Setup</span>
                 </a>
@@ -98,6 +98,8 @@
                         <li><a href="./tank&NozzleSetup.html">Pump & Nozzle Setup</a></li>
                         <li><a href="./tank.html">Tank Setup</a></li>
                         <li><router-link :to="{name: 'CreditCompany'}">Credit Company Setup </router-link></li>
+                        <li><router-link :to="{name: 'employee'}">Employee Setup </router-link></li>
+                        <li><router-link :to="{name: 'salary'}">Employee Salary </router-link></li>
                         <li><router-link :to="{name: 'posMachine'}">Pos Setup</router-link></li>
                         <li><a href="./#">Products</a></li>
                         <li><a href="./#">Sekkubg Price</a></li>

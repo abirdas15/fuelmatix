@@ -66,6 +66,12 @@ import CreditCompanyEdit from "../Pages/CreditCompany/Edit.vue";
 import posMachine from "../Pages/posMachine/List.vue";
 import posMachineAdd from "../Pages/posMachine/Add.vue";
 import posMachineEdit from "../Pages/posMachine/Edit.vue";
+import employee from "../Pages/Employee/List.vue";
+import employeeAdd from "../Pages/Employee/Add.vue";
+import employeeEdit from "../Pages/Employee/Edit.vue";
+import salary from "../Pages/Salary/List.vue";
+import salaryAdd from "../Pages/Salary/Add.vue";
+import salaryEdit from "../Pages/Salary/Edit.vue";
 
 const ROOT_URL = "";
 const router = new VueRouter({
@@ -139,6 +145,12 @@ const router = new VueRouter({
                 { path: ROOT_URL + "/pos/machine", name: "posMachine", component: posMachine},
                 { path: ROOT_URL + "/pos/machine/add", name: "posMachineAdd", component: posMachineAdd},
                 { path: ROOT_URL + "/pos/machine/edit/:id", name: "posMachineEdit", component: posMachineEdit},
+                { path: ROOT_URL + "/employee", name: "employee", component: employee},
+                { path: ROOT_URL + "/employee/add", name: "employeeAdd", component: employeeAdd},
+                { path: ROOT_URL + "/employee/edit/:id", name: "employeeEdit", component: employeeEdit},
+                { path: ROOT_URL + "/salary", name: "salary", component: salary},
+                { path: ROOT_URL + "/salary/add", name: "salaryAdd", component: salaryAdd},
+                { path: ROOT_URL + "/salary/edit/:id", name: "salaryEdit", component: salaryEdit},
             ],
         },
     ],
