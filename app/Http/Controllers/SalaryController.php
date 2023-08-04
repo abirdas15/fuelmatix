@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Common\AccountCategory;
 use App\Common\Module;
 use App\Helpers\SessionUser;
+use App\Models\Category;
 use App\Models\Transaction;
 use App\Repository\EmployeeRepository;
 use Illuminate\Http\Request;
@@ -72,5 +74,50 @@ class SalaryController extends Controller
             TransactionController::saveTransaction($transactions);
         }
         return response()->json(['status' => 200, 'message' => 'Successfully saved salary.']);
+    }
+    public function list(Request $request)
+    {
+        $requestData = $request->all();
+        $sessionUser = SessionUser::getUser();
+        $limit = $requestData['limit'] ?? 10;
+        $orderBy = $requestData['order_by'] ?? 'id';
+        $orderMode = $requestData['order_mode'] ?? 'DESC';
+        $keyword = $requestData['keyword'] ?? '';
+        $month = $requestData['month'] ?? '';
+        $year = $requestData['year'] ?? '';
+        $salaryCategory = Category::select('id')
+            ->where('client_company_id', $sessionUser['client_company_id'])
+            ->where('category', AccountCategory::SALARY_EXPENSE)
+            ->first();
+        if (!$salaryCategory instanceof Category) {
+            return response()->json(['status' => 500, 'errors' => 'Can not find account salary category.']);
+        }
+        $result = Transaction::select('transactions.id', 'transactions.debit_amount as amount', 'c.category as name', 'transactions.date', 'c1.category as payment_method')
+            ->leftJoin('categories as c', 'c.id', '=', 'transactions.linked_id')
+            ->leftJoin('categories as c1', 'c1.id', '=', 'transactions.account_id')
+            ->where('c.parent_category', $salaryCategory->id)
+            ->where('transactions.client_company_id', $sessionUser['client_company_id']);
+        if (!empty($month)) {
+            $result->where(function($q) use ($month) {
+                $q->whereMonth('date', $month);
+            });
+        }
+        if (!empty($year)) {
+            $result->where(function($q) use ($year) {
+                $q->whereYear('date', $year);
+            });
+        }
+        if (!empty($keyword)) {
+            $result->where(function($q) use ($keyword) {
+                $q->where('c.category', 'LIKE', '%'.$keyword.'%');
+                $q->orWhere('c1.category', 'LIKE', '%'.$keyword.'%');
+            });
+        }
+        $result = $result->orderBy($orderBy, $orderMode)
+            ->paginate($limit);
+        foreach ($result as &$data) {
+            $data['date'] = date('F, Y', strtotime($data['date']));
+        }
+        return response()->json(['status' => 200, 'data' => $result]);
     }
 }
