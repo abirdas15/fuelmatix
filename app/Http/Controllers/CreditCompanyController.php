@@ -30,18 +30,15 @@ class CreditCompanyController extends Controller
             'address' => $inputData['address'] ?? null,
             'contact_person' => $inputData['contact_person'] ?? null,
         ];
-        $category_hericy = json_decode($accountReceivable['category_hericy']);
-        array_push($category_hericy, $inputData['name']);
-        $category_hericy = json_encode($category_hericy);
         $category = new Category();
         $category->category = $inputData['name'];
         $category->parent_category = $accountReceivable->id;
         $category->type = $accountReceivable->type;
-        $category->category_hericy = $category_hericy;
         $category->credit_limit = $inputData['credit_limit'] ?? null;
         $category->others = json_encode($others);
         $category->client_company_id = $inputData['session_user']['client_company_id'];
         if ($category->save()) {
+            $category->updateCategory();
             return response()->json(['status' => 200, 'message' => 'Successfully saved credit company.']);
         }
         return response()->json(['status' => 500, 'errors' => 'Cannot saved credit company.']);
@@ -118,16 +115,13 @@ class CreditCompanyController extends Controller
             'address' => $inputData['address'] ?? null,
             'contact_person' => $inputData['contact_person'] ?? null,
         ];
-        $category_hericy = json_decode($accountReceivable['category_hericy']);
-        array_push($category_hericy, $inputData['name']);
-        $category_hericy = json_encode($category_hericy);
         $category->category = $inputData['name'];
         $category->parent_category = $accountReceivable->id;
         $category->type = $accountReceivable->type;
-        $category->category_hericy = $category_hericy;
         $category->credit_limit = $inputData['credit_limit'] ?? null;
         $category->others = json_encode($others);
         if ($category->save()) {
+            $category->updateCategory();
             return response()->json(['status' => 200, 'message' => 'Successfully updated credit company.']);
         }
         return response()->json(['status' => 500, 'errors' => 'Cannot updated credit company.']);

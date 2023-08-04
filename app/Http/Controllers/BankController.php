@@ -22,16 +22,13 @@ class BankController extends Controller
         if ($bank == null) {
             return response()->json(['status' => 500, 'error' => 'Cannot find bank group.']);
         }
-        $category_hericy = json_decode($bank['category_hericy']);
-        array_push($category_hericy, $inputData['name']);
-        $category_hericy = json_encode($category_hericy);
         $category = new Category();
         $category->category = $inputData['name'];
         $category->parent_category = $bank->id;
         $category->type = $bank->type;
-        $category->category_hericy = $category_hericy;
         $category->client_company_id = $inputData['session_user']['client_company_id'];
         if ($category->save()) {
+            $category->updateCategory();
             return response()->json(['status' => 200, 'message' => 'Successfully saved bank.']);
         }
         return response()->json(['status' => 500, 'errors' => 'Cannot save bank.']);
@@ -86,12 +83,9 @@ class BankController extends Controller
         if ($category == null) {
             return response()->json(['status' => 500, 'error' => 'Cannot find bank.']);
         }
-        $category_hericy = json_decode($bank['category_hericy']);
-        array_push($category_hericy, $inputData['name']);
-        $category_hericy = json_encode($category_hericy);
         $category->category = $inputData['name'];
-        $category->category_hericy = $category_hericy;
         if ($category->save()) {
+            $category->updateCategory();
             return response()->json(['status' => 200, 'message' => 'Successfully updated bank.']);
         }
         return response()->json(['status' => 500, 'errors' => 'Cannot updated bank.']);

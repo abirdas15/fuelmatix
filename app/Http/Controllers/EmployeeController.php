@@ -30,18 +30,15 @@ class EmployeeController extends Controller
             'position' => $requestData['position'] ?? null,
             'salary' => $requestData['salary'] ?? null,
         ];
-        $category_hericy = json_decode($salaryExpense['category_hericy']);
-        array_push($category_hericy, $requestData['name']);
-        $category_hericy = json_encode($category_hericy);
         $category = new Category();
         $category->category = $requestData['name'];
         $category->parent_category = $salaryExpense->id;
         $category->type = $salaryExpense->type;
-        $category->category_hericy = $category_hericy;
         $category->rfid = $requestData['rfid'] ?? null;
         $category->others = json_encode($others);
         $category->client_company_id = $requestData['session_user']['client_company_id'];
         if ($category->save()) {
+            $category->updateCategory();
             return response()->json(['status' => 200, 'message' => 'Successfully saved employee.']);
         }
         return response()->json(['status' => 500, 'errors' => 'Cannot saved employee.']);
@@ -97,15 +94,12 @@ class EmployeeController extends Controller
             'position' => $requestData['position'] ?? null,
             'salary' => $requestData['salary'] ?? null,
         ];
-        $category_hericy = json_decode($salaryExpense['category_hericy']);
-        array_push($category_hericy, $requestData['name']);
-        $category_hericy = json_encode($category_hericy);
         $category->category = $requestData['name'];
         $category->parent_category = $salaryExpense->id;
-        $category->category_hericy = $category_hericy;
         $category->rfid = $requestData['rfid'] ?? null;
         $category->others = json_encode($others);
         if ($category->save()) {
+            $category->updateCategory();
             return response()->json(['status' => 200, 'message' => 'Successfully updated employee.']);
         }
         return response()->json(['status' => 500, 'errors' => 'Cannot updated employee.']);

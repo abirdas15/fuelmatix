@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Common\AccountCategory;
+use App\Common\Module;
 use App\Models\Category;
 use App\Models\Dispenser;
 use App\Models\NozzleReading;
@@ -42,24 +43,11 @@ class ProductController extends Controller
             $incomeCategory = Category::where('category', AccountCategory::INCOME)->where('client_company_id', $inputData['session_user']['client_company_id'])->first();
             $costOfGoodSoldCategory = Category::where('category', AccountCategory::COST_OF_GOOD_SOLD)->where('client_company_id', $inputData['session_user']['client_company_id'])->first();
             $stockCategory = Category::where('category', AccountCategory::STOCK_IN_HAND)->where('client_company_id', $inputData['session_user']['client_company_id'])->first();
-
-            $incomeCategoryHericy = json_decode($incomeCategory['category_hericy']);
-            array_push($incomeCategoryHericy, $inputData['name']);
-            $incomeCategoryHericy = json_encode($incomeCategoryHericy);
-
-            $costOfGoodSoldCategoryHericy = json_decode($costOfGoodSoldCategory['category_hericy']);
-            array_push($costOfGoodSoldCategoryHericy, $inputData['name']);
-            $costOfGoodSoldCategoryHericy = json_encode($costOfGoodSoldCategoryHericy);
-
-            $stockCategoryHericy = json_decode($stockCategory['category_hericy']);
-            array_push($stockCategoryHericy, $inputData['name']);
-            $stockCategoryHericy = json_encode($stockCategoryHericy);
             $categoryData = [
                 [
                     'category' => $inputData['name'],
                     'parent_category' => $incomeCategory['id'],
                     'type' => $incomeCategory['type'],
-                    'category_hericy' =>  $incomeCategoryHericy,
                     'module' => 'product',
                     'module_id' => $product->id,
                     'client_company_id' => $inputData['session_user']['client_company_id']
@@ -68,7 +56,6 @@ class ProductController extends Controller
                     'category' => $inputData['name'],
                     'parent_category' => $costOfGoodSoldCategory['id'],
                     'type' => $costOfGoodSoldCategory['type'],
-                    'category_hericy' => $costOfGoodSoldCategoryHericy,
                     'module' => 'product',
                     'module_id' => $product->id,
                     'client_company_id' => $inputData['session_user']['client_company_id']
@@ -77,13 +64,17 @@ class ProductController extends Controller
                     'category' => $inputData['name'],
                     'parent_category' => $stockCategory['id'],
                     'type' => $stockCategory['type'],
-                    'category_hericy' => $stockCategoryHericy,
                     'module' => 'product',
                     'module_id' => $product->id,
                     'client_company_id' => $inputData['session_user']['client_company_id']
                 ]
             ];
-            Category::insert($categoryData);
+            foreach ($categoryData as $data) {
+                $category = new Category($data);
+                if ($category->save()) {
+                    $category->updateCategory();
+                }
+            }
             return response()->json(['status' => 200, 'message' => 'Successfully save product.']);
         }
         return response()->json(['status' => 500, 'error' => 'Cannot save product.']);
@@ -151,79 +142,58 @@ class ProductController extends Controller
         $product->unit = $inputData['unit'];
         $product->opening_stock = $inputData['opening_stock'] ?? null;
         if ($product->save()) {
-            $category = Category::where('module', 'product')->where('category', AccountCategory::INCOME)->where('module_id', $inputData['id'])->first();
-            if ($category == null) {
-                $incomeCategory = Category::where('category', AccountCategory::INCOME)->where('client_company_id', $inputData['session_user']['client_company_id'])->first();
-                $incomeCategoryHericy = json_decode($incomeCategory['category_hericy']);
-                array_push($incomeCategoryHericy, $inputData['name']);
-                $incomeCategoryHericy = json_encode($incomeCategoryHericy);
-                $data = [
-                    'category' => $inputData['name'],
-                    'parent_category' => $incomeCategory['id'],
-                    'type' => $incomeCategory['type'],
-                    'category_hericy' =>  $incomeCategoryHericy,
-                    'module' => 'product',
-                    'module_id' => $product->id,
-                    'client_company_id' => $inputData['session_user']['client_company_id']
-                ];
-                Category::create($data);
+            $incomeCategory = Category::where('category', AccountCategory::INCOME)->where('client_company_id', $inputData['session_user']['client_company_id'])->first();
+            $costOfGoodSoldCategory = Category::where('category', AccountCategory::COST_OF_GOOD_SOLD)->where('client_company_id', $inputData['session_user']['client_company_id'])->first();
+            $stockCategory = Category::where('category', AccountCategory::STOCK_IN_HAND)->where('client_company_id', $inputData['session_user']['client_company_id'])->first();
+
+            $incomeCategoryModel = Category::where('module', Module::PRODUCT)->where('parent_category', $incomeCategory->id)->where('module_id', $inputData['id'])->first();
+            if ($incomeCategoryModel == null) {
+                $incomeCategoryModel = new Category();
+                $incomeCategoryModel->category = $inputData['name'];
+                $incomeCategoryModel->parent_category = $incomeCategory['id'];
+                $incomeCategoryModel->type = $incomeCategory['type'];
+                $incomeCategoryModel->module = Module::PRODUCT;
+                $incomeCategoryModel->module_id = $product->id;
+                $incomeCategoryModel->client_company_id = $inputData['session_user']['client_company_id'];
             } else {
-                $incomeCategoryHericy = json_decode($category['category_hericy']);
-                array_push($incomeCategoryHericy, $inputData['name']);
-                $incomeCategoryHericy = json_encode($incomeCategoryHericy);
-                $category->category = $inputData['name'];
-                $category->category_hericy = $incomeCategoryHericy;
-                $category->save();
+                $incomeCategoryModel->category = $inputData['name'];
+            }
+            if ($incomeCategoryModel->save()) {
+                $incomeCategoryModel->updateCategory();
             }
 
-            $category = Category::where('module', 'product')->where('category', AccountCategory::COST_OF_GOOD_SOLD)->where('module_id', $inputData['id'])->first();
-            if ($category == null) {
+            $costOfGoodSoldCategoryModel = Category::where('module', Module::PRODUCT)->where('parent_category', $costOfGoodSoldCategory->id)->where('module_id', $inputData['id'])->first();
+            if ($costOfGoodSoldCategoryModel == null) {
                 $costOfGoodSoldCategory = Category::where('category', AccountCategory::COST_OF_GOOD_SOLD)->where('client_company_id', $inputData['session_user']['client_company_id'])->first();
-                $costOfGoodSoldCategoryHericy = json_decode($costOfGoodSoldCategory['category_hericy']);
-                array_push($costOfGoodSoldCategoryHericy, $inputData['name']);
-                $costOfGoodSoldCategoryHericy = json_encode($costOfGoodSoldCategoryHericy);
-                $data = [
-                    'category' => $inputData['name'],
-                    'parent_category' => $costOfGoodSoldCategory['id'],
-                    'type' => $costOfGoodSoldCategory['type'],
-                    'category_hericy' =>  $costOfGoodSoldCategoryHericy,
-                    'module' => 'product',
-                    'module_id' => $product->id,
-                    'client_company_id' => $inputData['session_user']['client_company_id']
-                ];
-                Category::create($data);
+                $costOfGoodSoldCategoryModel = new Category();
+                $costOfGoodSoldCategoryModel->category = $inputData['name'];
+                $costOfGoodSoldCategoryModel->parent_category = $costOfGoodSoldCategory['id'];
+                $costOfGoodSoldCategoryModel->type = $costOfGoodSoldCategory['type'];
+                $costOfGoodSoldCategoryModel->module = Module::PRODUCT;
+                $costOfGoodSoldCategoryModel->module_id = $product->id;
+                $costOfGoodSoldCategoryModel->client_company_id = $inputData['session_user']['client_company_id'];
             } else {
-                $costOfGoodSoldCategoryHericy = json_decode($category['category_hericy']);
-                array_push($costOfGoodSoldCategoryHericy, $inputData['name']);
-                $costOfGoodSoldCategoryHericy = json_encode($costOfGoodSoldCategoryHericy);
-                $category->category = $inputData['name'];
-                $category->category_hericy = $costOfGoodSoldCategoryHericy;
-                $category->save();
+                $costOfGoodSoldCategoryModel->category = $inputData['name'];
+            }
+            if ($costOfGoodSoldCategoryModel->save()) {
+                $costOfGoodSoldCategoryModel->updateCategory();
             }
 
-            $category = Category::where('module', 'product')->where('category', AccountCategory::STOCK_IN_HAND)->where('module_id', $inputData['id'])->first();
-            if ($category == null) {
+            $stockCategoryModel = Category::where('module', Module::PRODUCT)->where('parent_category', $stockCategory->id)->where('module_id', $inputData['id'])->first();
+            if ($stockCategoryModel == null) {
                 $stockCategory = Category::where('category', AccountCategory::STOCK_IN_HAND)->where('client_company_id', $inputData['session_user']['client_company_id'])->first();
-                $stockCategoryHericy = json_decode($stockCategory['category_hericy']);
-                array_push($stockCategoryHericy, $inputData['name']);
-                $stockCategoryHericy = json_encode($stockCategoryHericy);
-                $data = [
-                    'category' => $inputData['name'],
-                    'parent_category' => $stockCategory['id'],
-                    'type' => $stockCategory['type'],
-                    'category_hericy' =>  $stockCategoryHericy,
-                    'module' => 'product',
-                    'module_id' => $product->id,
-                    'client_company_id' => $inputData['session_user']['client_company_id']
-                ];
-                Category::create($data);
+                $stockCategoryModel = new Category();
+                $stockCategoryModel->category = $inputData['name'];
+                $stockCategoryModel->parent_category = $stockCategory['id'];
+                $stockCategoryModel->type = $stockCategory['type'];
+                $stockCategoryModel->module = Module::PRODUCT;
+                $stockCategoryModel->module_id = $product->id;
+                $stockCategoryModel->client_company_id = $inputData['session_user']['client_company_id'];
             } else {
-                $stockCategoryHericy = json_decode($category['category_hericy']);
-                array_push($stockCategoryHericy, $inputData['name']);
-                $stockCategoryHericy = json_encode($stockCategoryHericy);
-                $category->category = $inputData['name'];
-                $category->category_hericy = $stockCategoryHericy;
-                $category->save();
+                $stockCategoryModel->category = $inputData['name'];
+            }
+            if ($stockCategoryModel->save()) {
+                $stockCategoryModel->updateCategory();
             }
             return response()->json(['status' => 200, 'message' => 'Successfully updated product.']);
         }

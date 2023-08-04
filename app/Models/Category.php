@@ -5,7 +5,6 @@ namespace App\Models;
 use App\Helpers\MybosTime;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
 
 class Category extends Model
 {
@@ -13,25 +12,27 @@ class Category extends Model
     protected $table = 'categories';
     public $timestamps = false;
     protected $guarded = ['id'];
-    public $incrementing = false;
 
-    protected static function boot()
+    public function updateCategory()
     {
-        parent::boot();
-
-        self::saving(function ($model) {
-
-        });
-
-        static::created(function($model)
-        {
-
-        });
-
-        self::updating(function (&$model) {
-
-        });
+        $category_hericy = [];
+        $category_ids = [];
+        if ($this->parent_category != null) {
+            $parentCategory = Category::where('id', $this->parent_category)->first();
+            $category_hericy = json_decode($parentCategory['category_hericy']);
+            $category_ids = json_decode($parentCategory['category_ids']);
+        }
+        array_push($category_hericy, $this->category);
+        array_push($category_ids, $this->id);
+        $category = Category::find($this->id);
+        $category->category_hericy = $category_hericy;
+        $category->category_ids = $category_ids;
+        if ($category->save()) {
+            return true;
+        }
+        return false;
     }
+
 
 
     public function grandchildren()

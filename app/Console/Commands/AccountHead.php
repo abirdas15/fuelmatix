@@ -156,10 +156,10 @@ class AccountHead extends Command
                 'parent_category' => 11,
                 'type' => 'assets',
                 'balance' => 0,
-                'category_hericy' => json_encode(["Assets", "Current Asset", "Cash"]),
+                'category_hericy' => json_encode(["Assets", "Current Asset", "Cash In Hand", "Cash"]),
                 'default' => 1,
                 'client_company_id' => $clientCompany->id,
-                'category_ids' => json_encode([1,6,12])
+                'category_ids' => json_encode([1,6,11,12])
             ],
             [
                 'category' => 'Bank',

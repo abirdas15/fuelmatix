@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\SessionUser;
 use App\Models\Category;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
@@ -13,10 +14,12 @@ class CategoryController extends Controller
     public function list(Request $request)
     {
         $inputData = $request->all();
-        $transaction = Transaction::select(DB::raw('SUM(debit_amount) as total_debit_amount'), DB::raw('SUM(credit_amount) as total_credit_amount'), 'account_id')
+        $sessionUser = SessionUser::getUser();
+        $transaction = Transaction::select(DB::raw('SUM(debit_amount) as debit_amount'), DB::raw('SUM(credit_amount) as credit_amount'), 'category_ids')
+            ->leftJoin('categories', 'categories.id', '=', 'transactions.account_id')
+            ->where('transactions.client_company_id', $sessionUser['client_company_id'])
             ->groupBy('account_id')
             ->get()
-            ->keyBy('account_id')
             ->toArray();
         $categories = Category::select('id', 'category', 'balance', 'parent_category', 'description', 'category_ids', 'type')
             ->where('client_company_id', $inputData['session_user']['client_company_id'])
@@ -26,21 +29,34 @@ class CategoryController extends Controller
             ->whereNull('parent_category')
             ->get()
             ->toArray();
-        $result = self::categoryTree($categories, $transaction);
+        $result = self::updateCategoryBalance($categories, $transaction);
         return response()->json(['status' => 200, 'data' => $result]);
     }
-    public static function categoryTree($categories, $transaction)
+    public static function updateCategoryBalance($categories, $transactions)
     {
         foreach ($categories as &$category) {
-            if (isset($transaction[$category['id']])) {
-                self::updateCategoryBalance($category, $transaction[$category['id']]['amount']);
+            foreach ($transactions as $transaction) {
+                $categoryIds = json_decode($transaction['category_ids']);
+                if (in_array($category['id'], $categoryIds)) {
+                    if ($category['type'] == 'expenses') {
+                        $balance = $transaction['credit_amount'] - $transaction['debit_amount'];
+                    } else if ($category['type'] == 'income') {
+                        $balance = $transaction['debit_amount'] - $transaction['credit_amount'];
+                    }  else if ($category['type'] == 'assets') {
+                        $balance = $transaction['credit_amount'] - $transaction['debit_amount'];
+                    } else if ($category['type'] == 'liabilities') {
+                        $balance = $transaction['debit_amount'] - $transaction['credit_amount'];
+                    } else if ($category['type'] == 'equity') {
+                        $balance = $transaction['debit_amount'] - $transaction['credit_amount'];
+                    }
+                    $category['balance'] =  $category['balance'] + $balance;
+                }
+            }
+            if (count($category['children'] )> 0) {
+                $category['children'] = self::updateCategoryBalance($category['children'], $transactions);
             }
         }
         return $categories;
-    }
-    public function updateCategoryBalance($category, $amount)
-    {
-
     }
     public function parent(Request $request)
     {
@@ -89,16 +105,7 @@ class CategoryController extends Controller
         $category->account_category = $inputData['account_category'] ?? 0;
         $category->client_company_id = $inputData['session_user']['client_company_id'];
         if ($category->save()) {
-            if (!empty($inputData['parent_category'])) {
-                $parentCategory = Category::select('category_hericy')->where('id', $inputData['parent_category'])->first();
-                $category_hericy = json_decode($parentCategory['category_hericy']);
-                array_push($category_hericy, $category->category);
-                $category_hericy = json_encode($category_hericy);
-            } else {
-                $category_hericy = json_encode([$category->category]);
-            }
-            $category->category_hericy = $category_hericy;
-            $category->save();
+            $category->updateCategory();
             return response()->json(['status' => 200, 'msg' => 'Successfully save category']);
         }
         return response()->json(['status' => 200, 'msg' => 'Can not save category']);
@@ -141,16 +148,7 @@ class CategoryController extends Controller
         $category->description = $inputData['description'] ?? null;
         $category->account_category = $inputData['account_category'] ?? 0;
         if ($category->save()) {
-            if (!empty($inputData['parent_category'])) {
-                $parentCategory = Category::select('category_hericy')->where('id', $inputData['parent_category'])->first();
-                $category_hericy = json_decode($parentCategory['category_hericy']);
-                array_push($category_hericy, $category->category);
-                $category_hericy = json_encode($category_hericy);
-            } else {
-                $category_hericy = json_encode([$category->category]);
-            }
-            $category->category_hericy = $category_hericy;
-            $category->save();
+            $category->updateCategory();
             return response()->json(['status' => 200, 'msg' => 'Successfully update category']);
         }
         return response()->json(['status' => 200, 'msg' => 'Can not update category']);
