@@ -131,6 +131,7 @@
                                                         </select>
                                                         <div class="form-group">
                                                             <input class="form-control me-3"  style="max-width: 210px" type="text" v-model="category.amount" :id="'categories.'+index+'.amount'"
+                                                                   @input="calculateValue(category.amount)"
                                                                    :name="'categories.'+index+'.amount'">
                                                             <div class="invalid-feedback"></div>
                                                         </div>
@@ -140,7 +141,10 @@
                                                             <i class="fa-solid fa-xmark"></i>
                                                         </button>
                                                     </div>
-
+                                                </div>
+                                                <div class="col-sm-6"></div>
+                                                <div class="col-sm-6">
+                                                    <h4>Amount: {{totalPaid}}</h4>
                                                 </div>
                                             </div>
                                         </div>
@@ -182,10 +186,18 @@ export default {
             totalSale: 0,
             totalAmount: 0,
             allAmountCategory: null,
-            categories: []
+            categories: [],
+            totalPaid: 0
         }
     },
     methods: {
+        calculateValue: function (amount) {
+            console.log(amount)
+            this.totalPaid = 0
+            this.categories.map(v => {
+                this.totalPaid += parseInt(v.amount)
+            })
+        },
         removeCategory: function(index) {
             this.categories.splice(index, 1);
         },
