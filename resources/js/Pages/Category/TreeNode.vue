@@ -6,12 +6,12 @@
                     <li><a href="javascript:void(0)" @click="openCategory()">Open Account</a></li>
                     <li><a href="javascript:void(0)" @click="openCategoryModalEdit()">Edit Account</a></li>
                     <li><a href="javascript:void(0)" @click="openCategoryModal()">New account</a></li>
-                    <li><a href="javascript:void(0)">Delete account</a></li>
+                    <li id="delete"><a href="javascript:void(0)">Delete account</a></li>
                 </ul>
             </div>
         </div>
         <li>
-            <a href="#" @dblclick="openTransaction(node)" @contextmenu="rightClick($event, node.id)" class="accordion-btn">
+            <a href="#" @dblclick="openTransaction(node)" @contextmenu="rightClick($event, node)" class="accordion-btn">
                 <span>
                     <img src="images/arrow-svg.svg" alt="" v-if="node.children.length > 0"/>
                     {{ node.category }}
@@ -90,9 +90,14 @@ export default {
         openCategoryModalEdit: function () {
             this.$parent.openCategoryEditModal()
         },
-        rightClick: function (e, id) {
+        rightClick: function (e, node) {
             e.preventDefault();
-            this.$store.commit('PutParentCategory', id);
+            this.$store.commit('PutParentCategory', node.id);
+            if (node?.default != 1) {
+                $('#delete').show()
+            } else {
+                $('#delete').hide()
+            }
             this.showPopup(e);
         },
         showPopup: function (evt) {

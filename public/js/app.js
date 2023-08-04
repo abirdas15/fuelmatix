@@ -2737,9 +2737,14 @@ __webpack_require__.r(__webpack_exports__);
     openCategoryModalEdit: function openCategoryModalEdit() {
       this.$parent.openCategoryEditModal();
     },
-    rightClick: function rightClick(e, id) {
+    rightClick: function rightClick(e, node) {
       e.preventDefault();
-      this.$store.commit('PutParentCategory', id);
+      this.$store.commit('PutParentCategory', node.id);
+      if ((node === null || node === void 0 ? void 0 : node["default"]) != 1) {
+        $('#delete').show();
+      } else {
+        $('#delete').hide();
+      }
       this.showPopup(e);
     },
     showPopup: function showPopup(evt) {
@@ -10523,7 +10528,7 @@ var render = function render() {
         return _vm.openTransaction(_vm.node);
       },
       contextmenu: function contextmenu($event) {
-        return _vm.rightClick($event, _vm.node.id);
+        return _vm.rightClick($event, _vm.node);
       }
     }
   }, [_c("span", [_vm.node.children.length > 0 ? _c("img", {
@@ -10547,7 +10552,11 @@ var render = function render() {
 var staticRenderFns = [function () {
   var _vm = this,
     _c = _vm._self._c;
-  return _c("li", [_c("a", {
+  return _c("li", {
+    attrs: {
+      id: "delete"
+    }
+  }, [_c("a", {
     attrs: {
       href: "javascript:void(0)"
     }
