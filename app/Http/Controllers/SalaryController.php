@@ -59,12 +59,12 @@ class SalaryController extends Controller
         $sessionUser = SessionUser::getUser();
         $date = $requestData['year'].'-'.$requestData['month'].'-01';
         $employeeIds = array_column($requestData['employees'], 'id');
-        Transaction::where('client_company_id', $sessionUser['client_company_id'])
-            ->where('date', $date)
-            ->where('module', Module::SALARY)
-            ->whereIn('account_id', $employeeIds)
-            ->orWhereIn('linked_id', $employeeIds)
-            ->delete();
+//        Transaction::where('client_company_id', $sessionUser['client_company_id'])
+//            ->where('date', $date)
+//            ->where('module', Module::SALARY)
+//            ->whereIn('account_id', $employeeIds)
+//            ->orWhereIn('linked_id', $employeeIds)
+//            ->delete();
         foreach ($requestData['employees'] as $employee) {
             $transactions  = [];
             $transactions['linked_id'] = $employee['id'];

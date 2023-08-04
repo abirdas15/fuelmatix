@@ -88,6 +88,7 @@
                 </a>
                     <ul aria-expanded="false" class="bichi">
                         <li><router-link :to="{name:'Expense'}">Expense</router-link></li>
+                        <li><router-link :to="{name: 'salary'}">Salary </router-link></li>
                     </ul>
                 </li>
                 <li><a class="has-arrow " href="javascript:void(0)" aria-expanded="false">
@@ -99,7 +100,6 @@
                         <li><a href="./tank.html">Tank Setup</a></li>
                         <li><router-link :to="{name: 'CreditCompany'}">Credit Company Setup </router-link></li>
                         <li><router-link :to="{name: 'employee'}">Employee Setup </router-link></li>
-                        <li><router-link :to="{name: 'salary'}">Employee Salary </router-link></li>
                         <li><router-link :to="{name: 'posMachine'}">Pos Setup</router-link></li>
                         <li><a href="./#">Products</a></li>
                         <li><a href="./#">Sekkubg Price</a></li>

@@ -21847,7 +21847,13 @@ var render = function render() {
         name: "Expense"
       }
     }
-  }, [_vm._v("Expense")])], 1)])]), _vm._v(" "), _c("li", [_vm._m(16), _vm._v(" "), _c("ul", {
+  }, [_vm._v("Expense")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
+    attrs: {
+      to: {
+        name: "salary"
+      }
+    }
+  }, [_vm._v("Salary ")])], 1)])]), _vm._v(" "), _c("li", [_vm._m(16), _vm._v(" "), _c("ul", {
     staticClass: "bichi",
     attrs: {
       "aria-expanded": "false"
@@ -21865,12 +21871,6 @@ var render = function render() {
       }
     }
   }, [_vm._v("Employee Setup ")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
-    attrs: {
-      to: {
-        name: "salary"
-      }
-    }
-  }, [_vm._v("Employee Salary ")])], 1), _vm._v(" "), _c("li", [_c("router-link", {
     attrs: {
       to: {
         name: "posMachine"
@@ -67614,40 +67614,40 @@ vue__WEBPACK_IMPORTED_MODULE_1___default.a.mixin({
     },
     months: function months() {
       return [{
-        id: 'january',
+        id: 1,
         name: 'January'
       }, {
-        id: 'february',
+        id: 2,
         name: 'February'
       }, {
-        id: 'march',
+        id: 3,
         name: 'March'
       }, {
-        id: 'april',
+        id: 4,
         name: 'April'
       }, {
-        id: 'may',
+        id: 5,
         name: 'May'
       }, {
-        id: 'june',
+        id: 6,
         name: 'June'
       }, {
-        id: 'july',
+        id: 7,
         name: 'July'
       }, {
-        id: 'august',
+        id: 8,
         name: 'August'
       }, {
-        id: 'september',
+        id: 9,
         name: 'September'
       }, {
-        id: 'october',
+        id: 10,
         name: 'October'
       }, {
-        id: 'november',
+        id: 11,
         name: 'November'
       }, {
-        id: 'December',
+        id: 12,
         name: 'December'
       }];
     }
