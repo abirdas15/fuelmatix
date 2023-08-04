@@ -13,6 +13,7 @@ class AccountCategory
     const ACCOUNT_RECEIVABLE = 'Account Receivable';
     const CURRENT_LIABILITIES = 'Current Liabilities';
     const ACCOUNT_PAYABLE = 'Account Payable';
+    const CASH_IM_HAND = 'Cash In Hand';
     const CASH = 'Cash';
     const BANK = 'Bank';
     const STOCK_IN_HAND = 'Stock In Hand';
