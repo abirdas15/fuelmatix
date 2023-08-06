@@ -89,6 +89,7 @@
                     <ul aria-expanded="false" class="bichi">
                         <li><router-link :to="{name:'Expense'}">Expense</router-link></li>
                         <li><router-link :to="{name: 'salary'}">Salary </router-link></li>
+                        <li><router-link :to="{name: 'CompanySale'}">Company Sale </router-link></li>
                     </ul>
                 </li>
                 <li><a class="has-arrow " href="javascript:void(0)" aria-expanded="false">

@@ -146,6 +146,13 @@ const ApiRoutes = {
     salaryDelete: ApiVersion + '/salary/delete',
     salaryList: ApiVersion + '/salary/list',
     salaryGetCategory: ApiVersion + '/salary/getCategory',
+    //Company sale
+    companySaleAdd: ApiVersion + '/companySale/save',
+    companySaleEdit: ApiVersion + '/companySale/update',
+    companySaleSingle: ApiVersion + '/companySale/single',
+    companySaleDelete: ApiVersion + '/companySale/delete',
+    companySaleList: ApiVersion + '/companySale/list',
+    companySaleGetCategory: ApiVersion + '/companySale/getCategory',
 
 };
 
