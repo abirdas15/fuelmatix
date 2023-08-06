@@ -48,10 +48,10 @@
                                                 <td><a href="javascript:void(0);">{{f.name}}</a></td>
                                                 <td><a href="javascript:void(0);">{{f?.amount}}</a></td>
                                                 <td>
-                                                    <button class="btn btn-sm btn-primary" @click="tableAction('expand', f)">Expand</button>
-                                                    <button class="btn btn-sm btn-danger"  @click="tableAction('generate', f, i)" :class="'genloading'+i">Generate Invoices </button>
+                                                    <button class="btn btn-sm btn-primary" v-if="!f.is_invoice"  @click="tableAction('expand', f)">Expand</button>
+                                                    <button class="btn btn-sm btn-danger" v-if="!f.is_invoice"   @click="tableAction('generate', f, i)" :class="'genloading'+i">Generate Invoices </button>
                                                     <button class="btn btn-sm btn-danger" style="display: none" :class="'genloading'+i">Generating... </button>
-                                                    <button class="btn btn-sm btn-info" v-if="f.is_invoice" @click="tableAction('view', f)">View Invoices</button>
+                                                    <router-link :to="{name: 'InvoicesView', params: { id: f.id }}" class="btn btn-sm btn-info" v-if="f.is_invoice" @click="tableAction('view', f)">View Invoices</router-link>
                                                 </td>
                                             </tr>
                                             </tbody>

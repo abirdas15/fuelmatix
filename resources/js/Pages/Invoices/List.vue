@@ -64,7 +64,7 @@
                                                 <td>
                                                     <div class="d-flex justify-content-end align-items-center">
                                                         <button class="btn btn-sm btn-primary me-2" @click="paymentModal(f)">Payment</button>
-                                                        <router-link :to="{name: 'InvoicesView'}" class="btn btn-sm btn-info me-2">View</router-link>
+                                                        <router-link :to="{name: 'InvoicesView', params: { id: f.id }}" class="btn btn-sm btn-info me-2">View</router-link>
                                                         <button class="btn btn-sm btn-danger me-2" @click="openModalDelete(f)">Delete</button>
                                                     </div>
                                                 </td>

@@ -9488,7 +9488,11 @@ var render = function render() {
   return _c("div", {
     staticClass: "authincation h-100 align-items-center",
     staticStyle: {
-      "background-image": "url('/images/')"
+      "background-image": "url('/images/fuelbg.jpg')",
+      "background-repeat": "no-repeat",
+      width: "100%",
+      "background-position": "center",
+      "background-size": "cover"
     }
   }, [_c("div", {
     staticClass: "container h-100"
@@ -11096,14 +11100,14 @@ var render = function render() {
       attrs: {
         href: "javascript:void(0);"
       }
-    }, [_vm._v(_vm._s(f === null || f === void 0 ? void 0 : f.amount))])]), _vm._v(" "), _c("td", [_c("button", {
+    }, [_vm._v(_vm._s(f === null || f === void 0 ? void 0 : f.amount))])]), _vm._v(" "), _c("td", [!f.is_invoice ? _c("button", {
       staticClass: "btn btn-sm btn-primary",
       on: {
         click: function click($event) {
           return _vm.tableAction("expand", f);
         }
       }
-    }, [_vm._v("Expand")]), _vm._v(" "), _c("button", {
+    }, [_vm._v("Expand")]) : _vm._e(), _vm._v(" "), !f.is_invoice ? _c("button", {
       staticClass: "btn btn-sm btn-danger",
       "class": "genloading" + i,
       on: {
@@ -11111,20 +11115,28 @@ var render = function render() {
           return _vm.tableAction("generate", f, i);
         }
       }
-    }, [_vm._v("Generate Invoices ")]), _vm._v(" "), _c("button", {
+    }, [_vm._v("Generate Invoices ")]) : _vm._e(), _vm._v(" "), _c("button", {
       staticClass: "btn btn-sm btn-danger",
       "class": "genloading" + i,
       staticStyle: {
         display: "none"
       }
-    }, [_vm._v("Generating... ")]), _vm._v(" "), f.is_invoice ? _c("button", {
+    }, [_vm._v("Generating... ")]), _vm._v(" "), f.is_invoice ? _c("router-link", {
       staticClass: "btn btn-sm btn-info",
+      attrs: {
+        to: {
+          name: "InvoicesView",
+          params: {
+            id: f.id
+          }
+        }
+      },
       on: {
         click: function click($event) {
           return _vm.tableAction("view", f);
         }
       }
-    }, [_vm._v("View Invoices")]) : _vm._e()])]);
+    }, [_vm._v("View Invoices")]) : _vm._e()], 1)]);
   }), 0) : _vm._e(), _vm._v(" "), _vm.listData.length == 0 && _vm.TableLoading == false ? _c("tbody", [_vm._m(2)]) : _vm._e(), _vm._v(" "), _vm.TableLoading == true ? _c("tbody", [_vm._m(3)]) : _vm._e()]), _vm._v(" "), _vm.paginateData != null ? _c("div", {
     staticClass: "dataTables_info",
     attrs: {
@@ -21136,7 +21148,10 @@ var render = function render() {
       staticClass: "btn btn-sm btn-info me-2",
       attrs: {
         to: {
-          name: "InvoicesView"
+          name: "InvoicesView",
+          params: {
+            id: f.id
+          }
         }
       }
     }, [_vm._v("View")]), _vm._v(" "), _c("button", {
