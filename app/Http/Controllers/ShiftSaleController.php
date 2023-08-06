@@ -40,12 +40,13 @@ class ShiftSaleController extends Controller
         if ($inputData['status'] == 'start') {
             $shiftSale = new ShiftSale();
             $shiftSale->date = $inputData['date'];
+            $shiftSale->product_id = $inputData['product_id'];
             $shiftSale->status = 'start';
             $shiftSale->client_company_id = $inputData['session_user']['client_company_id'];
             $shiftSale->save();
             return response()->json(['status' => 200, 'message' => 'Successfully started shift sale.']);
         }
-        ShiftSale::where('client_company_id', $inputData['session_user']['client_company_id'])->where('status', 'start')->delete();
+        ShiftSale::where('client_company_id', $inputData['session_user']['client_company_id'])->where('product_id', $inputData['product_id'])->where('status', 'start')->delete();
         $category = Category::where('category', AccountCategory::INCOME)->where('client_company_id', $inputData['session_user']['client_company_id'])->first();
         $incomeCategory = Category::where('parent_category', $category['id'])
             ->where('module', 'product')
