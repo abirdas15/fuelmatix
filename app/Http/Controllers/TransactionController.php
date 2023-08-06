@@ -217,7 +217,8 @@ class TransactionController extends Controller
         $requestData = $request->all();
         $validator = Validator::make($requestData, [
             'id' => 'required',
-            'amount' => 'required|array'
+            'data' => 'required|array',
+            'data.*.amount' => 'required'
         ]);
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
@@ -226,10 +227,30 @@ class TransactionController extends Controller
         if (!$transaction instanceof Transaction) {
             return response()->json(['status' => 500, 'error' => 'Cannot find transaction.']);
         }
-        $totalAmount = array_sum($requestData['amount']);
+        $totalAmount = array_sum(array_column($requestData['data'], 'amount'));
         $amountColumn = $transaction['debit_amount'] == 0 ? 'credit_amount' : 'debit_amount';
         if ($totalAmount != $transaction[$amountColumn]) {
             return response()->json(['status' => 500, 'error' => 'Your transaction amount are not same.']);
         }
+        $transactionData = [];
+        foreach ($requestData['data'] as $data) {
+            $transactionData[] = [
+                'date' => $transaction['date'],
+                'account_id' => $transaction['account_id'],
+                'description' => $data['description'] ?? '',
+                'debit_amount' => $transaction['credit_amount'] == 0 ? $data['amount'] : 0,
+                'credit_amount' => $transaction['debit_amount'] == 0 ? $data['amount'] : 0,
+                'file' => $transaction['file'] ?? null,
+                'linked_id' => $transaction['linked_id'],
+                'added_by' => $transaction['added_by'],
+                'module' => $transaction['module'],
+                'module_id' => $transaction['module_id'],
+                'client_company_id' => $transaction['client_company_id'],
+                'parent_id' => $transaction['parent_id'],
+            ];
+        }
+        Transaction::insert($transactionData);
+        Transaction::where('id', $requestData['id'])->delete();
+        return response()->json(['status' => 200, 'message' => 'Successfully split transaction.']);
     }
 }
