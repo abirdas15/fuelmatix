@@ -39,10 +39,10 @@
 <body>
 <div style="width: 100%; margin-top: 20px; padding: 20px">
     <div style="width: 50%; float: left">
-        <div style="margin-bottom: 5px"><strong>{{ $company['name'] }}</strong></div>
-        <address style="margin-bottom: 5px">{{ $company['address'] }}</address>
-        <div style="margin-bottom: 5px">Phone: {{ $company['phone_number'] }}</div>
-        <div style="margin-bottom: 5px">Email: {{ $company['email'] }}</div>
+        <div style="margin-bottom: 5px"><strong>{{ $data['company']['name'] }}</strong></div>
+        <address style="margin-bottom: 5px">{{ $data['company']['address'] }}</address>
+        <div style="margin-bottom: 5px">Phone: {{ $data['company']['phone_number'] }}</div>
+        <div style="margin-bottom: 5px">Email: {{ $data['company']['email'] }}</div>
     </div>
     <div style="width: 50%; float: left;">
         <div style="width: 90%">
@@ -63,11 +63,35 @@
             </table>
         </div>
     </div>
-    <div style="width: 100%">
+    <div style="width: 100%; margin-bottom: 50px">
         <div style="margin-bottom: 5px"><strong>Bill To</strong></div>
-        <address style="margin-bottom: 5px">{{ $company['address'] }}</address>
-        <div style="margin-bottom: 5px">Phone: {{ $company['phone_number'] }}</div>
-        <div style="margin-bottom: 5px">Email: {{ $company['email'] }}</div>
+        <div style="margin-bottom: 5px">{{ $data['customer_company']['name'] }}</div>
+        <address style="margin-bottom: 5px">{{ $data['customer_company']['address'] }}</address>
+        <div style="margin-bottom: 5px">Phone: {{ $data['customer_company']['phone'] }}</div>
+        <div style="margin-bottom: 5px">Email: {{ $data['customer_company']['email'] }}</div>
+    </div>
+    <table class="table" style="width: 95%; margin-bottom: 30px">
+        <thead>
+        <tr>
+            <th style="width: 70%">Description</th>
+            <th style="width: 30%; text-align: right">Amount</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td style="height: 300px; vertical-align: top;">{{ $data['description'] }}</td>
+            <td style="text-align: right; vertical-align: top; height: 300px">{{ number_format($data['amount'] - $data['paid_amount'], 2) }}</td>
+        </tr>
+        </tbody>
+        <tfoot>
+        <tr>
+            <th style="text-align: right">Total</th>
+            <th style="text-align: right">{{ number_format($data['amount'] - $data['paid_amount'], 2) }}</th>
+        </tr>
+        </tfoot>
+    </table>
+    <div style="text-align: center">
+        <em>Thank you for your business!</em>
     </div>
 </div>
 </body>
