@@ -295,7 +295,18 @@ class ProductController extends Controller
             }
         }
         $result['dispensers'] = $dispensers;
-
+        $shiftSale = ShiftSale::where('client_company_id', $inputData['session_user']['client_company_id'])
+            ->where('product_id', $inputData['product_id'])
+            ->orderBy('id', 'DESC')
+            ->first();
+        $result['status'] = 'start';
+        if (!empty($shiftSale)) {
+            if ($shiftSale['status'] == 'end') {
+                $result['status'] = 'start';
+            } else {
+                $result['status'] = 'end';
+            }
+        }
         return response()->json(['status' => 200, 'data' => $result]);
     }
     public function getTank(Request $request)

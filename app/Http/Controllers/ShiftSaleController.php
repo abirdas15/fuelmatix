@@ -21,6 +21,7 @@ class ShiftSaleController extends Controller
         $inputData = $request->all();
         $validator = Validator::make($inputData, [
             'date' => 'required',
+            'status' => 'required',
             'product_id' => 'required',
             'start_reading' => 'required',
             'end_reading' => 'required',
@@ -36,6 +37,16 @@ class ShiftSaleController extends Controller
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
+        if ($inputData['status'] == 'start') {
+            $shiftSale = new ShiftSale();
+            $shiftSale->date = $inputData['date'];
+            $shiftSale->product_id = $inputData['product_id'];
+            $shiftSale->status = 'start';
+            $shiftSale->client_company_id = $inputData['session_user']['client_company_id'];
+            $shiftSale->save();
+            return response()->json(['status' => 200, 'message' => 'Successfully started shift sale.']);
+        }
+        ShiftSale::where('client_company_id', $inputData['session_user']['client_company_id'])->where('product_id', $inputData['product_id'])->where('status', 'start')->delete();
         $category = Category::where('category', AccountCategory::INCOME)->where('client_company_id', $inputData['session_user']['client_company_id'])->first();
         $incomeCategory = Category::where('parent_category', $category['id'])
             ->where('module', 'product')
@@ -72,6 +83,7 @@ class ShiftSaleController extends Controller
         $shiftSale->end_reading = $inputData['end_reading'];
         $shiftSale->consumption = $inputData['consumption'];
         $shiftSale->amount = $inputData['amount'];
+        $shiftSale->status = 'end';
         $shiftSale->user_id = $inputData['session_user']['id'];
         $shiftSale->client_company_id = $inputData['session_user']['client_company_id'];
         if ($shiftSale->save()) {
@@ -133,9 +145,9 @@ class ShiftSaleController extends Controller
             ];
             TransactionController::saveTransaction($transactionData);
             ShiftSaleTransaction::insert($shiftSaleTransaction);
-            return response()->json(['status' => 200, 'message' => 'Successfully saved shift sale.']);
+            return response()->json(['status' => 200, 'message' => 'Successfully ended shift sale.']);
         }
-        return response()->json(['status' => 500, 'error' => 'Cannot saved shift sale.']);
+        return response()->json(['status' => 500, 'error' => 'Cannot ended shift sale.']);
     }
     public function list(Request $request)
     {
