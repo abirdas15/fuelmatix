@@ -28,6 +28,7 @@ use App\Http\Controllers\PosMachineController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\SalaryController;
 use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\DashboardController;
 
 /*
 |--------------------------------------------------------------------------
@@ -225,6 +226,9 @@ Route::group(['middleware' => 'AuthReqCheck'], function() {
         Route::post('delete', [InvoiceController::class, 'delete']);
         Route::post('single', [InvoiceController::class, 'single']);
         Route::post('download/pdf', [InvoiceController::class, 'downloadPdf']);
+    });
+    Route::group(['prefix' => 'dashboard'], function() {
+        Route::post('get', [DashboardController::class, 'get']);
     });
 });
 
