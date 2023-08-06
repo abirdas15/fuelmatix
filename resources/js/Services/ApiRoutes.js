@@ -15,6 +15,7 @@ const ApiRoutes = {
     //Transaction
     TransactionSave: ApiVersion + '/transaction/save',
     TransactionSingle: ApiVersion + '/transaction/single',
+    TransactionSplit: ApiVersion + '/transaction/split',
     //Balance Sheet
     BalanceSheetGet: ApiVersion + '/balance-sheet/get',
     //Profit and loss

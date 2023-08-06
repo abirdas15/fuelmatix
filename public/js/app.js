@@ -2801,7 +2801,10 @@ __webpack_require__.r(__webpack_exports__);
       TableLoading: false,
       listData: [],
       selectedData: null,
-      expandParam: []
+      expandParam: {
+        id: '',
+        data: []
+      }
     };
   },
   watch: {
@@ -2818,15 +2821,41 @@ __webpack_require__.r(__webpack_exports__);
     }
   },
   methods: {
-    expand: function expand() {},
+    expand: function expand() {
+      var _this = this;
+      _Services_ApiService__WEBPACK_IMPORTED_MODULE_1__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_2__["default"].TransactionSplit, this.expandParam, function (res) {
+        if (parseInt(res.status) === 200) {
+          _this.$toast.success(res.message);
+          $('.createExpand').addClass('d-none');
+          _this.list();
+        } else {
+          _this.$toast.error(res.error);
+          _Services_ApiService__WEBPACK_IMPORTED_MODULE_1__["default"].ErrorHandler(res.error);
+        }
+      });
+    },
     tableAction: function tableAction(e, data) {
-      if (e.target.value == 'expand') {
+      if (e == 'expand') {
         this.selectedData = data;
+        this.expandParam.id = data.id;
+        this.expandParam.data.push({
+          amount: 0,
+          description: ''
+        });
         $('.createExpand').removeClass('d-none');
       }
     },
+    addMore: function addMore() {
+      this.expandParam.data.push({
+        amount: 0,
+        description: ''
+      });
+    },
+    spliceData: function spliceData(i) {
+      this.expandParam.data.splice(i, 1);
+    },
     list: function list(page) {
-      var _this = this;
+      var _this2 = this;
       if (page == undefined) {
         page = {
           page: 1
@@ -2835,23 +2864,23 @@ __webpack_require__.r(__webpack_exports__);
       this.Param.page = page.page;
       this.TableLoading = true;
       _Services_ApiService__WEBPACK_IMPORTED_MODULE_1__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_2__["default"].companySaleList, this.Param, function (res) {
-        _this.TableLoading = false;
+        _this2.TableLoading = false;
         if (parseInt(res.status) === 200) {
-          _this.paginateData = res.data;
-          _this.listData = res.data.data;
+          _this2.paginateData = res.data;
+          _this2.listData = res.data.data;
         } else {
           _Services_ApiService__WEBPACK_IMPORTED_MODULE_1__["default"].ErrorHandler(res.error);
         }
       });
     },
     Delete: function Delete(data) {
-      var _this2 = this;
+      var _this3 = this;
       _Services_ApiService__WEBPACK_IMPORTED_MODULE_1__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_2__["default"].companySaleDelete, {
         id: data.id
       }, function (res) {
         if (parseInt(res.status) === 200) {
-          _this2.$toast.success(res.message);
-          _this2.list();
+          _this3.$toast.success(res.message);
+          _this3.list();
         } else {
           _Services_ApiService__WEBPACK_IMPORTED_MODULE_1__["default"].ErrorHandler(res.error);
         }
@@ -10827,7 +10856,10 @@ var render = function render() {
       }
     }
   }, [_vm._v("Amount")]), _vm._v(" "), _c("th", {
-    staticClass: "text-white"
+    staticClass: "text-white",
+    staticStyle: {
+      width: "375px"
+    }
   }, [_vm._v("Action")])])]), _vm._v(" "), _vm.listData.length > 0 && _vm.TableLoading == false ? _c("tbody", _vm._l(_vm.listData, function (f) {
     return _c("tr", [_c("td", [_vm._v(_vm._s(f.date))]), _vm._v(" "), _c("td", [_c("a", {
       attrs: {
@@ -10837,26 +10869,28 @@ var render = function render() {
       attrs: {
         href: "javascript:void(0);"
       }
-    }, [_vm._v(_vm._s(f === null || f === void 0 ? void 0 : f.amount))])]), _vm._v(" "), _c("td", [_c("select", {
-      staticClass: "form-select",
+    }, [_vm._v(_vm._s(f === null || f === void 0 ? void 0 : f.amount))])]), _vm._v(" "), _c("td", [_c("button", {
+      staticClass: "btn btn-sm btn-primary",
       on: {
-        change: function change($event) {
-          return _vm.tableAction($event, f);
+        click: function click($event) {
+          return _vm.tableAction("expand", f);
         }
       }
-    }, [_c("option", {
-      attrs: {
-        value: "expand"
+    }, [_vm._v("Expand")]), _vm._v(" "), _c("button", {
+      staticClass: "btn btn-sm btn-danger",
+      on: {
+        click: function click($event) {
+          return _vm.tableAction("generate", f);
+        }
       }
-    }, [_vm._v("Expand")]), _vm._v(" "), _c("option", {
-      attrs: {
-        value: "generate"
+    }, [_vm._v("Generate Invoices")]), _vm._v(" "), _c("button", {
+      staticClass: "btn btn-sm btn-info",
+      on: {
+        click: function click($event) {
+          return _vm.tableAction("view", f);
+        }
       }
-    }, [_vm._v("Generate Invoices")]), _vm._v(" "), _c("option", {
-      attrs: {
-        value: "view"
-      }
-    }, [_vm._v("View Invoices")])])])]);
+    }, [_vm._v("View Invoices")])])]);
   }), 0) : _vm._e(), _vm._v(" "), _vm.listData.length == 0 && _vm.TableLoading == false ? _c("tbody", [_vm._m(2)]) : _vm._e(), _vm._v(" "), _vm.TableLoading == true ? _c("tbody", [_vm._m(3)]) : _vm._e()]), _vm._v(" "), _vm.paginateData != null ? _c("div", {
     staticClass: "dataTables_info",
     attrs: {
@@ -10875,7 +10909,7 @@ var render = function render() {
       onChange: _vm.list
     }
   })], 1)])])])])])])])]), _vm._v(" "), _c("div", {
-    staticClass: "popup-wrapper createExpand d-none"
+    staticClass: "popup-wrapper-modal createExpand d-none"
   }, [_c("form", {
     staticClass: "popup-box",
     staticStyle: {
@@ -10887,85 +10921,104 @@ var render = function render() {
         return _vm.expand.apply(null, arguments);
       }
     }
-  }, [_vm._m(4), _vm._v(" "), _c("div", {
-    staticClass: "row"
-  }, [_c("div", {
-    staticClass: "col-sm-6"
-  }, [_c("div", {
-    staticClass: "input-wrapper form-group mb-3"
-  }, [_c("label", {
-    attrs: {
-      "for": "substation"
-    }
-  }, [_vm._v("Substation")]), _vm._v(" "), _c("select", {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: _vm.postData.substation_id,
-      expression: "postData.substation_id"
-    }],
-    staticClass: "w-100 form-control bg-form-control",
-    attrs: {
-      name: "substation_id",
-      id: "substation"
-    },
-    on: {
-      change: function change($event) {
-        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
-          return o.selected;
-        }).map(function (o) {
-          var val = "_value" in o ? o._value : o.value;
-          return val;
-        });
-        _vm.$set(_vm.postData, "substation_id", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
+  }, [_vm._m(4), _vm._v(" "), _vm._l(_vm.expandParam.data, function (e, i) {
+    return _c("div", {
+      staticClass: "row align-items-center"
+    }, [_c("div", {
+      staticClass: "col-sm-5"
+    }, [_c("div", {
+      staticClass: "input-wrapper form-group mb-3"
+    }, [_c("label", {
+      attrs: {
+        "for": "amount"
       }
-    }
-  }, [_c("option", {
-    domProps: {
-      value: ""
-    }
-  }, [_vm._v("Select substation")]), _vm._v(" "), _vm._l(_vm.allSubstation, function (s) {
-    return _c("option", {
+    }, [_vm._v("Amount")]), _vm._v(" "), _c("input", {
+      directives: [{
+        name: "model",
+        rawName: "v-model",
+        value: e.amount,
+        expression: "e.amount"
+      }],
+      staticClass: "w-100 form-control",
+      attrs: {
+        type: "text",
+        name: "amount",
+        id: "amount",
+        placeholder: "Amount here"
+      },
       domProps: {
-        value: s.id
+        value: e.amount
+      },
+      on: {
+        input: function input($event) {
+          if ($event.target.composing) return;
+          _vm.$set(e, "amount", $event.target.value);
+        }
       }
-    }, [_vm._v(_vm._s(s.name))]);
-  })], 2), _vm._v(" "), _c("small", {
-    staticClass: "error-report text-danger"
-  })])]), _vm._v(" "), _c("div", {
-    staticClass: "col-sm-6"
-  }, [_c("div", {
-    staticClass: "input-wrapper form-group mb-3"
-  }, [_c("label", {
+    }), _vm._v(" "), _c("small", {
+      staticClass: "invalid-feedback"
+    })])]), _vm._v(" "), _c("div", {
+      staticClass: "col-sm-5"
+    }, [_c("div", {
+      staticClass: "input-wrapper form-group mb-3"
+    }, [_c("label", {
+      attrs: {
+        "for": "description"
+      }
+    }, [_vm._v("Description")]), _vm._v(" "), _c("input", {
+      directives: [{
+        name: "model",
+        rawName: "v-model",
+        value: e.description,
+        expression: "e.description"
+      }],
+      staticClass: "w-100 form-control",
+      attrs: {
+        type: "text",
+        name: "description",
+        id: "description",
+        placeholder: "Description here"
+      },
+      domProps: {
+        value: e.description
+      },
+      on: {
+        input: function input($event) {
+          if ($event.target.composing) return;
+          _vm.$set(e, "description", $event.target.value);
+        }
+      }
+    }), _vm._v(" "), _c("small", {
+      staticClass: "invalid-feedback"
+    })])]), _vm._v(" "), _c("div", {
+      staticClass: "col-sm-2"
+    }, [_c("button", {
+      staticClass: "btn btn-danger",
+      staticStyle: {
+        height: "54px"
+      },
+      attrs: {
+        type: "button"
+      },
+      on: {
+        click: function click($event) {
+          return _vm.spliceData(i);
+        }
+      }
+    }, [_c("i", {
+      staticClass: "fa-solid fa-xmark"
+    })])])]);
+  }), _vm._v(" "), _c("div", {
+    staticClass: "text-end"
+  }, [_c("button", {
+    staticClass: "btn btn-primary",
     attrs: {
-      "for": "lat"
-    }
-  }, [_vm._v("Latitude")]), _vm._v(" "), _c("input", {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: _vm.postData.lat,
-      expression: "postData.lat"
-    }],
-    staticClass: "w-100 form-control",
-    attrs: {
-      type: "text",
-      name: "lat",
-      id: "lat",
-      placeholder: "Latitude here"
-    },
-    domProps: {
-      value: _vm.postData.lat
+      type: "button"
     },
     on: {
-      input: function input($event) {
-        if ($event.target.composing) return;
-        _vm.$set(_vm.postData, "lat", $event.target.value);
-      }
+      click: _vm.addMore
     }
-  }), _vm._v(" "), _c("small", {
-    staticClass: "error-report text-danger"
-  })])])]), _vm._v(" "), !_vm.Loading ? _c("button", {
+  }, [_vm._v("Add More")])]), _vm._v(" "), !_vm.Loading ? _c("button", {
     staticClass: "btn btn-primary",
     attrs: {
       type: "submit"
@@ -10976,7 +11029,7 @@ var render = function render() {
       type: "button",
       disabled: ""
     }
-  }, [_vm._v("Submitting...")]) : _vm._e()])])]);
+  }, [_vm._v("Submitting...")]) : _vm._e()], 2)])]);
 };
 var staticRenderFns = [function () {
   var _vm = this,
@@ -67765,6 +67818,7 @@ var ApiRoutes = {
   //Transaction
   TransactionSave: ApiVersion + '/transaction/save',
   TransactionSingle: ApiVersion + '/transaction/single',
+  TransactionSplit: ApiVersion + '/transaction/split',
   //Balance Sheet
   BalanceSheetGet: ApiVersion + '/balance-sheet/get',
   //Profit and loss

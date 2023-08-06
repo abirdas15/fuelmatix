@@ -39,7 +39,7 @@
                                                 <th class="text-white" @click="sortData('date')" :class="sortClass('date')">Date</th>
                                                 <th class="text-white" @click="sortData('name')" :class="sortClass('name')">Company</th>
                                                 <th class="text-white" @click="sortData('amount')" :class="sortClass('amount')">Amount</th>
-                                                <th class="text-white" >Action</th>
+                                                <th class="text-white" style="width: 375px">Action</th>
                                             </tr>
                                             </thead>
                                             <tbody v-if="listData.length > 0 && TableLoading == false">
@@ -48,11 +48,9 @@
                                                 <td><a href="javascript:void(0);">{{f.name}}</a></td>
                                                 <td><a href="javascript:void(0);">{{f?.amount}}</a></td>
                                                 <td>
-                                                    <select class="form-select" @change="tableAction($event, f)">
-                                                        <option value="expand">Expand</option>
-                                                        <option value="generate">Generate Invoices</option>
-                                                        <option value="view">View Invoices</option>
-                                                    </select>
+                                                    <button class="btn btn-sm btn-primary" @click="tableAction('expand', f)">Expand</button>
+                                                    <button class="btn btn-sm btn-danger" @click="tableAction('generate', f)">Generate Invoices</button>
+                                                    <button class="btn btn-sm btn-info" @click="tableAction('view', f)">View Invoices</button>
                                                 </td>
                                             </tr>
                                             </tbody>
@@ -82,28 +80,34 @@
                 </div>
             </div>
         </div>
-        <div class="popup-wrapper createExpand d-none">
+        <div class="popup-wrapper-modal createExpand d-none">
             <form @submit.prevent="expand" class="popup-box" style="max-width: 800px">
                 <button type="button" class=" btn  closeBtn"><i class="fas fa-times"></i></button>
-                <div class="row">
-                    <div class="col-sm-6">
+                <div class="row align-items-center" v-for="(e, i) in expandParam.data">
+                    <div class="col-sm-5">
                         <div class="input-wrapper form-group mb-3">
-                            <label for="substation">Substation</label>
-                            <select class="w-100 form-control bg-form-control" name="substation_id" id="substation" v-model="postData.substation_id">
-                                <option :value="''">Select substation</option>
-                                <option :value="s.id" v-for="s in allSubstation">{{s.name}}</option>
-                            </select>
-                            <small class="error-report text-danger"></small>
+                            <label for="amount">Amount</label>
+                            <input type="text" class="w-100 form-control" name="amount" id="amount"
+                                   v-model="e.amount" placeholder="Amount here">
+                            <small class="invalid-feedback"></small>
                         </div>
                     </div>
-                    <div class="col-sm-6">
+                    <div class="col-sm-5">
                         <div class="input-wrapper form-group mb-3">
-                            <label for="lat">Latitude</label>
-                            <input type="text" class="w-100 form-control" name="lat" id="lat"
-                                   v-model="postData.lat" placeholder="Latitude here">
-                            <small class="error-report text-danger"></small>
+                            <label for="description">Description</label>
+                            <input type="text" class="w-100 form-control" name="description" id="description"
+                                   v-model="e.description" placeholder="Description here">
+                            <small class="invalid-feedback"></small>
                         </div>
                     </div>
+                    <div class="col-sm-2">
+                        <button class="btn btn-danger"  style="height: 54px" type="button" @click="spliceData(i)">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="text-end">
+                    <button type="button" class="btn btn-primary" @click="addMore">Add More</button>
                 </div>
 
                 <button type="submit" class="btn btn-primary " v-if="!Loading">Submit</button>
@@ -136,7 +140,10 @@ export default {
             TableLoading: false,
             listData: [],
             selectedData: null,
-            expandParam: []
+            expandParam: {
+                id: '',
+                data: []
+            }
         };
     },
     watch: {
@@ -154,13 +161,30 @@ export default {
     },
     methods: {
         expand: function () {
-
+            ApiService.POST(ApiRoutes.TransactionSplit, this.expandParam,res => {
+                if (parseInt(res.status) === 200) {
+                    this.$toast.success(res.message);
+                    $('.createExpand').addClass('d-none')
+                    this.list()
+                } else {
+                    this.$toast.error(res.error)
+                    ApiService.ErrorHandler(res.error);
+                }
+            });
         },
         tableAction: function (e, data) {
-            if (e.target.value == 'expand') {
+            if (e == 'expand') {
                 this.selectedData = data
+                this.expandParam.id = data.id
+                this.expandParam.data.push({amount: 0, description: ''})
                 $('.createExpand').removeClass('d-none')
             }
+        },
+        addMore: function () {
+            this.expandParam.data.push({amount: 0, description: ''})
+        },
+        spliceData: function (i) {
+            this.expandParam.data.splice(i, 1)
         },
         list: function (page) {
             if (page == undefined) {
