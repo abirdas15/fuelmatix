@@ -164,6 +164,7 @@ class SaleController extends Controller
             ->paginate($limit);
         foreach ($result as &$data) {
             $data['date'] = date('d/m/Y', strtotime($data['date']));
+            $data['is_invoice'] = false;
         }
         return response()->json(['status' => 200, 'data' => $result]);
     }
