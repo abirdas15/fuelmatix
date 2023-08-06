@@ -3184,8 +3184,118 @@ __webpack_require__.r(__webpack_exports__);
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: "Dashboard",
+  data: function data() {
+    return {
+      dashboard: null
+    };
+  },
   mounted: function mounted() {
     $('#dashboard_bar').text('Dashboard');
+  },
+  methods: {
+    saleChart: function saleChart() {
+      if (jQuery('#saleChart').length > 0) {
+        var barChart_1 = document.getElementById("saleChart").getContext('2d');
+        new Chart(barChart_1, {
+          type: 'line',
+          data: {
+            labels: this.dashboard.sale.month,
+            datasets: [{
+              label: "Amount",
+              data: this.dashboard.sale.amount,
+              borderColor: 'rgba(136,108,192, 1)',
+              fill: false,
+              tension: 0
+            }, {
+              label: "Quantity",
+              data: this.dashboard.sale.quantity,
+              borderColor: 'rgb(13,125,253)',
+              fill: false,
+              tension: 0
+            }]
+          },
+          options: {
+            legend: false,
+            maintainAspectRatio: false,
+            responsive: true
+          }
+        });
+      }
+    },
+    invoiceChart: function invoiceChart() {
+      if (jQuery('#invoiceChart').length > 0) {
+        var barChart_1 = document.getElementById("invoiceChart").getContext('2d');
+        new Chart(barChart_1, {
+          type: 'bar',
+          data: {
+            labels: this.dashboard.invoice.label,
+            datasets: [{
+              data: this.dashboard.invoice.data,
+              borderColor: 'rgb(153, 102, 255)',
+              backgroundColor: 'rgba(153, 102, 255, 5)'
+            }]
+          },
+          options: {
+            legend: false,
+            maintainAspectRatio: false,
+            responsive: true,
+            scales: {
+              xAxes: [{
+                barThickness: 50,
+                // number (pixels) or 'flex'
+                maxBarThickness: 50 // number (pixels)
+              }]
+            }
+          }
+        });
+      }
+    },
+
+    payableChart: function payableChart() {
+      if (jQuery('#payChart').length > 0) {
+        var barChart_1 = document.getElementById("payChart").getContext('2d');
+        new Chart(barChart_1, {
+          type: 'bar',
+          data: {
+            labels: this.dashboard.payable.label,
+            datasets: [{
+              data: this.dashboard.payable.data,
+              borderColor: 'rgb(56,143,143)',
+              backgroundColor: 'rgb(75, 192, 192)'
+            }]
+          },
+          options: {
+            legend: false,
+            maintainAspectRatio: false,
+            responsive: true,
+            scales: {
+              xAxes: [{
+                barThickness: 50,
+                // number (pixels) or 'flex'
+                maxBarThickness: 50 // number (pixels)
+              }]
+            }
+          }
+        });
+      }
+    },
+
+    getChart: function getChart() {
+      var _this = this;
+      _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].getDashboard, {}, function (res) {
+        if (parseInt(res.status) === 200) {
+          _this.dashboard = res.data;
+          _this.saleChart();
+          _this.payableChart();
+          _this.invoiceChart();
+        } else {
+          _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].ErrorHandler(res.error);
+        }
+      });
+    }
+  },
+  created: function created() {
+    this.getChart();
   }
 });
 
@@ -12193,10 +12303,42 @@ var staticRenderFns = [function () {
   }, [_c("div", {
     staticClass: "row"
   }, [_c("div", {
-    staticClass: "col-xl-12"
+    staticClass: "col-xl-12 mb-5"
   }, [_c("div", {
-    staticClass: "row"
-  })])])])]);
+    staticClass: "text-center mt-1 mb-1"
+  }, [_vm._v("Sale")]), _vm._v(" "), _c("div", {
+    staticStyle: {
+      height: "300px"
+    }
+  }, [_c("canvas", {
+    attrs: {
+      id: "saleChart"
+    }
+  })])]), _vm._v(" "), _c("div", {
+    staticClass: "col-sm-6"
+  }, [_c("div", {
+    staticClass: "text-center mt-1 mb-1"
+  }, [_vm._v("Payable")]), _vm._v(" "), _c("div", {
+    staticStyle: {
+      height: "300px"
+    }
+  }, [_c("canvas", {
+    attrs: {
+      id: "payChart"
+    }
+  })])]), _vm._v(" "), _c("div", {
+    staticClass: "col-sm-6"
+  }, [_c("div", {
+    staticClass: "text-center mt-1 mb-1"
+  }, [_vm._v("Invoice")]), _vm._v(" "), _c("div", {
+    staticStyle: {
+      height: "300px"
+    }
+  }, [_c("canvas", {
+    attrs: {
+      id: "invoiceChart"
+    }
+  })])])])])]);
 }];
 render._withStripped = true;
 
@@ -68726,7 +68868,9 @@ var ApiRoutes = {
   invoiceSingle: ApiVersion + '/invoice/single',
   invoiceDelete: ApiVersion + '/invoice/delete',
   invoiceList: ApiVersion + '/invoice/list',
-  invoiceDownloadPdf: ApiVersion + '/invoice/download/pdf'
+  invoiceDownloadPdf: ApiVersion + '/invoice/download/pdf',
+  //Dashboard
+  getDashboard: ApiVersion + '/dashboard/get'
 };
 /* harmony default export */ __webpack_exports__["default"] = (ApiRoutes);
 
