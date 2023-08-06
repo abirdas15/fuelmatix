@@ -156,7 +156,7 @@ class SaleController extends Controller
         $accountReceivable = Category::where('client_company_id', $sessionUser['client_company_id'])->where('category', AccountCategory::ACCOUNT_RECEIVABLE)->first();
         $limit = $requestData['limit'] ?? 10;
         $orderBy = $requestData['order_by'] ?? 'transactions.id';
-        $orderMode = $requestData['order_by'] ?? 'DESC';
+        $orderMode = $requestData['order_mode'] ?? 'DESC';
         $result = Transaction::select('transactions.id', 'transactions.debit_amount as amount', 'transactions.date', 'transactions.description', 'categories.category as name')
             ->leftJoin('categories', 'categories.id', '=', 'transactions.linked_id')
             ->where('categories.parent_category', $accountReceivable->id);
