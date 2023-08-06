@@ -57,6 +57,7 @@
 <script src="{{ asset('vendor/peity/jquery.peity.min.js') }}"></script>
 <!-- Dashboard 1 -->
 <script src="{{ asset('js/dashboard/dashboard-1.js') }}"></script>
+<script src="{{ asset('js/popup.js') }}"></script>
 
 <script src="{{ asset('vendor/owl-carousel/owl.carousel.js') }}"></script>
 

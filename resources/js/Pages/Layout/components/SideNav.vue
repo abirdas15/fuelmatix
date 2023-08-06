@@ -21,6 +21,7 @@
                         <li><a href="./creditSaleDetailEntry.html">Credit Sale Detail Entry</a></li>
                         <li><router-link :to="{name: 'Pos'}" >POS</router-link></li>
                         <li><router-link :to="{name: 'PosList'}" >POS History</router-link></li>
+                        <li><router-link :to="{name: 'Invoices'}">Invoices </router-link></li>
                     </ul>
                 </li>
                 <li><a class="has-arrow " href="javascript:void()" aria-expanded="false">

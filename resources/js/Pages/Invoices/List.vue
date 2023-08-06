@@ -4,14 +4,14 @@
             <div class="row page-titles">
                 <ol class="breadcrumb align-items-center ">
                     <li class="breadcrumb-item active"><router-link :to="{name: 'Dashboard'}">Home</router-link></li>
-                    <li class="breadcrumb-item"><a href="javascript:void(0)">Company Sale</a></li>
+                    <li class="breadcrumb-item"><a href="javascript:void(0)">Invoice List</a></li>
                 </ol>
             </div>
             <div class="row">
                 <div class="col-12">
                     <div class="card">
                         <div class="card-header bg-secondary">
-                            <h4 class="card-title">Company Sale</h4>
+                            <h4 class="card-title">Invoice List</h4>
                         </div>
                         <div class="card-body">
                             <div class="row mt-4">
@@ -36,22 +36,37 @@
                                         <table class="display  dataTable no-footer" style="min-width: 845px">
                                             <thead>
                                             <tr class="text-white" style="background-color: #4886EE;color:#ffffff">
+                                                <th class="text-white" @click="sortData('invoice_number')" :class="sortClass('invoice_number')">Invoice Number</th>
                                                 <th class="text-white" @click="sortData('date')" :class="sortClass('date')">Date</th>
-                                                <th class="text-white" @click="sortData('name')" :class="sortClass('name')">Company</th>
+                                                <th class="text-white" @click="sortData('name')" :class="sortClass('name')">Name</th>
                                                 <th class="text-white" @click="sortData('amount')" :class="sortClass('amount')">Amount</th>
-                                                <th class="text-white" style="width: 375px">Action</th>
+                                                <th class="text-white" @click="sortData('due_amount')" :class="sortClass('due_amount')">Due Amount</th>
+                                                <th class="text-white" @click="sortData('paid_amount')" :class="sortClass('paid_amount')">Paid Amount</th>
+                                                <th class="text-white" @click="sortData('status')" :class="sortClass('status')">Status</th>
+                                                <th class="text-white" >Action</th>
                                             </tr>
                                             </thead>
                                             <tbody v-if="listData.length > 0 && TableLoading == false">
-                                            <tr v-for="(f, i) in listData">
-                                                <td >{{f.date}}</td>
-                                                <td><a href="javascript:void(0);">{{f.name}}</a></td>
+                                            <tr v-for="f in listData">
+                                                <td >{{f.invoice_number}}</td>
+                                                <td><a href="javascript:void(0);">{{f.date}}</a></td>
+                                                <td><a href="javascript:void(0);">{{f?.name}}</a></td>
                                                 <td><a href="javascript:void(0);">{{f?.amount}}</a></td>
+                                                <td><a href="javascript:void(0);">{{f?.due_amount}}</a></td>
+                                                <td><a href="javascript:void(0);">{{f?.paid_amount}}</a></td>
                                                 <td>
-                                                    <button class="btn btn-sm btn-primary" @click="tableAction('expand', f)">Expand</button>
-                                                    <button class="btn btn-sm btn-danger"  @click="tableAction('generate', f, i)" :class="'genloading'+i">Generate Invoices </button>
-                                                    <button class="btn btn-sm btn-danger" style="display: none" :class="'genloading'+i">Generating... </button>
-                                                    <button class="btn btn-sm btn-info" v-if="f.is_invoice" @click="tableAction('view', f)">View Invoices</button>
+                                                    <a href="javascript:void(0);">
+                                                        <span class="badge bg-danger text-bg-danger" v-if="f.status == 'due'">{{f?.status}}</span>
+                                                        <span class="badge bg-warning text-bg-warning" v-if="f.status == 'partial paid'">{{f?.status}}</span>
+                                                        <span class="badge bg-primary text-bg-primary" v-if="f.status == 'paid'">{{f?.status}}</span>
+                                                    </a>
+                                                </td>
+                                                <td>
+                                                    <div class="d-flex justify-content-end align-items-center">
+                                                        <button class="btn btn-sm btn-primary me-2" @click="paymentModal(f)">Payment</button>
+                                                        <router-link :to="{name: 'InvoicesView'}" class="btn btn-sm btn-info me-2">View</router-link>
+                                                        <button class="btn btn-sm btn-danger me-2" @click="openModalDelete(f)">Delete</button>
+                                                    </div>
                                                 </td>
                                             </tr>
                                             </tbody>
@@ -81,36 +96,29 @@
                 </div>
             </div>
         </div>
-        <div class="popup-wrapper-modal createExpand d-none">
-            <form @submit.prevent="expand" class="popup-box" style="max-width: 800px">
+        <div class="popup-wrapper-modal invoiceModal d-none">
+            <form @submit.prevent="payment" class="popup-box" style="max-width: 800px">
                 <button type="button" class=" btn  closeBtn"><i class="fas fa-times"></i></button>
-                <div class="row align-items-center" v-for="(e, i) in expandParam.data">
-                    <div class="col-sm-5">
-                        <div class="input-wrapper form-group mb-3">
-                            <label for="description">Description</label>
-                            <input type="text" class="w-100 form-control" name="description" id="description"
-                                   v-model="e.description" placeholder="Description here">
-                            <small class="invalid-feedback"></small>
-                        </div>
-                    </div>
-                    <div class="col-sm-5">
+                <div class="row align-items-center">
+                    <div class="col-sm-12">
                         <div class="input-wrapper form-group mb-3">
                             <label for="amount">Amount</label>
-                            <input type="text" class="w-100 form-control" name="amount" id="amount"
-                                   v-model="e.amount" placeholder="Amount here">
+                            <input type="text" class="w-100 form-control bg-white" name="amount" id="amount"
+                                   v-model="paymentParam.amount" placeholder="Amount here">
                             <small class="invalid-feedback"></small>
                         </div>
                     </div>
-                    <div class="col-sm-2">
-                        <button class="btn btn-danger"  style="height: 54px" type="button" @click="spliceData(i)">
-                            <i class="fa-solid fa-xmark"></i>
-                        </button>
+                    <div class="col-sm-12">
+                        <div class="input-wrapper form-group mb-3">
+                            <label for="description">Payment Method</label>
+                            <select class="form-control form-select" v-model="paymentParam.payment_id" name="payment_id">
+                                <option value="">Select Method</option>
+                                <option v-for="m in allAmountCategory" :value="m.id">{{m.name}}</option>
+                            </select>
+                            <small class="invalid-feedback"></small>
+                        </div>
                     </div>
                 </div>
-                <div class="text-end">
-                    <button type="button" class="btn btn-primary" @click="addMore">Add More</button>
-                </div>
-
                 <button type="submit" class="btn btn-primary " v-if="!Loading">Submit</button>
                 <button type="button" class="btn btn-primary " disabled v-if="Loading">Submitting...</button>
             </form>
@@ -133,18 +141,20 @@ export default {
             Param: {
                 keyword: '',
                 limit: 10,
-                order_by: 'transactions.id',
+                order_by: 'id',
                 order_mode: 'DESC',
                 page: 1,
             },
             Loading: false,
             TableLoading: false,
             listData: [],
-            selectedData: null,
-            expandParam: {
+            paymentInfo: null,
+            paymentParam: {
                 id: '',
-                data: []
-            }
+                amount: '',
+                payment_id: ''
+            },
+            allAmountCategory: []
         };
     },
     watch: {
@@ -154,6 +164,7 @@ export default {
     },
     created() {
         this.list();
+        this.getCategory();
     },
     computed: {
         Auth: function () {
@@ -161,47 +172,38 @@ export default {
         },
     },
     methods: {
-        expand: function () {
-            ApiService.POST(ApiRoutes.TransactionSplit, this.expandParam,res => {
+        paymentModal: function (f) {
+            this.paymentInfo = f
+            this.paymentParam.id = f.id
+            this.paymentParam.amount = f.due_amount
+            $('.invoiceModal').removeClass('d-none');
+
+        },
+        payment: function () {
+            ApiService.POST(ApiRoutes.invoicePayment, this.paymentParam,res => {
                 if (parseInt(res.status) === 200) {
                     this.$toast.success(res.message);
-                    $('.createExpand').addClass('d-none')
+                    $('.invoiceModal').addClass('d-none');
                     this.list()
                 } else {
-                    this.$toast.error(res.error)
-                    ApiService.ErrorHandler(res.error);
+                    ApiService.ErrorHandler(res.errors);
                 }
             });
         },
-        tableAction: function (e, data, i = null) {
-            if (e == 'expand') {
-                this.selectedData = data
-                this.expandParam.id = data.id
-                this.expandParam.data.push({amount: 0, description: ''})
-                $('.createExpand').removeClass('d-none')
-            } else if (e == 'generate') {
-                if (data.is_invoice) {
-                    this.$toast.success('Invoice already Created');
-                    return;
+        openModalDelete(data) {
+            Swal.fire({
+                title: 'Are you sure you want to delete?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    this.Delete(data)
                 }
-                $('.genloading'+ i).toggle()
-                ApiService.POST(ApiRoutes.invoiceGenerate, {id: data.id},res => {
-                    $('.genloading'+ i).toggle()
-                    if (parseInt(res.status) === 200) {
-                        this.$toast.success(res.message);
-                        this.list()
-                    } else {
-                        ApiService.ErrorHandler(res.errors);
-                    }
-                });
-
-            }
-        },
-        addMore: function () {
-            this.expandParam.data.push({amount: 0, description: ''})
-        },
-        spliceData: function (i) {
-            this.expandParam.data.splice(i, 1)
+            })
         },
         list: function (page) {
             if (page == undefined) {
@@ -211,7 +213,7 @@ export default {
             }
             this.Param.page = page.page;
             this.TableLoading = true
-            ApiService.POST(ApiRoutes.companySaleList, this.Param,res => {
+            ApiService.POST(ApiRoutes.invoiceList, this.Param,res => {
                 this.TableLoading = false
                 if (parseInt(res.status) === 200) {
                     this.paginateData = res.data;
@@ -222,7 +224,7 @@ export default {
             });
         },
         Delete: function (data) {
-            ApiService.POST(ApiRoutes.companySaleDelete, {id: data.id },res => {
+            ApiService.POST(ApiRoutes.invoiceDelete, {id: data.id },res => {
                 if (parseInt(res.status) === 200) {
                     this.$toast.success(res.message);
                     this.list()
@@ -248,10 +250,18 @@ export default {
             this.Param.order_mode = this.Param.order_mode == 'DESC' ? 'ASC' : 'DESC'
             this.list();
         },
+        getCategory: function () {
+            this.categories = []
+            ApiService.POST(ApiRoutes.salaryGetCategory, {}, res => {
+                if (parseInt(res.status) === 200) {
+                    this.allAmountCategory = res.data;
+                }
+            });
+        },
 
     },
     mounted() {
-        $('#dashboard_bar').text('Company Sale')
+        $('#dashboard_bar').text('Invoice List')
     }
 }
 </script>

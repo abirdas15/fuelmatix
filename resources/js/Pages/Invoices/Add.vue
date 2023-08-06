@@ -5,7 +5,7 @@
                 <ol class="breadcrumb align-items-center ">
                     <li class="breadcrumb-item active"><router-link :to="{name: 'Dashboard'}">Home</router-link></li>
                     <li class="breadcrumb-item active"><router-link :to="{name: 'Dispenser'}">Dispenser</router-link></li>
-                    <li class="breadcrumb-item"><a href="javascript:void(0)">Edit</a></li>
+                    <li class="breadcrumb-item"><a href="javascript:void(0)">Add</a></li>
 
                 </ol>
             </div>
@@ -37,6 +37,7 @@
                                         </select>
                                         <div class="invalid-feedback"></div>
                                     </div>
+
                                     <div class="mb-3 form-group col-md-6">
                                         <label class="form-label">Select Tank:</label>
                                         <select class="form-control" name="tank_id" id="tank_id"  v-model="param.tank_id">
@@ -51,7 +52,6 @@
                                         <input type="text" class="form-control" name="serial" v-model="param.serial">
                                         <div class="invalid-feedback"></div>
                                     </div>
-
                                     <div class="mb-3 form-group col-md-6">
                                         <label class="form-label">Opening Stock:</label>
                                         <input type="number" class="form-control" name="opening_stock" v-model="param.opening_stock">
@@ -78,14 +78,20 @@
 </template>
 
 <script>
-import ApiService from "../../../Services/ApiService";
-import ApiRoutes from "../../../Services/ApiRoutes";
+import ApiService from "../../Services/ApiService";
+import ApiRoutes from "../../Services/ApiRoutes";
 export default {
     data() {
         return {
-            param: {},
+            param: {
+                dispenser_name: '',
+                brand: '',
+                serial: '',
+                product_id: '',
+                tank_id: '',
+                opening_stock: ''
+            },
             loading: false,
-            id: '',
             listData: [],
             listDataTank: [],
         }
@@ -96,10 +102,11 @@ export default {
         }
     },
     methods: {
-        getSingle: function () {
-            ApiService.POST(ApiRoutes.DispenserSingle, {id: this.id},res => {
+        getProduct: function () {
+            ApiService.POST(ApiRoutes.ProductList, {limit: 5000, page: 1},res => {
+                this.TableLoading = false
                 if (parseInt(res.status) === 200) {
-                    this.param = res.data
+                    this.listData = res.data.data;
                 }
             });
         },
@@ -114,7 +121,7 @@ export default {
         save: function () {
             ApiService.ClearErrorHandler();
             this.loading = true
-            ApiService.POST(ApiRoutes.DispenserEdit, this.param,res => {
+            ApiService.POST(ApiRoutes.DispenserAdd, this.param,res => {
                 this.loading = false
                 if (parseInt(res.status) === 200) {
                     this.$router.push({
@@ -125,22 +132,12 @@ export default {
                 }
             });
         },
-        getProduct: function () {
-            ApiService.POST(ApiRoutes.ProductList, {limit: 5000, page: 1},res => {
-                this.TableLoading = false
-                if (parseInt(res.status) === 200) {
-                    this.listData = res.data.data;
-                }
-            });
-        },
     },
     created() {
-        this.id = this.$route.params.id
-        this.getSingle()
         this.getProduct()
     },
     mounted() {
-        $('#dashboard_bar').text('Dispenser Edit')
+        $('#dashboard_bar').text('Dispenser Add')
     }
 }
 </script>

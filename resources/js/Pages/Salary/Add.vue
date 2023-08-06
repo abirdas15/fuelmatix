@@ -66,7 +66,7 @@
                                                <th>Name</th>
                                                <th>Position</th>
                                                <th>Salary</th>
-                                               <th>Category</th>
+                                               <th>Payment Method</th>
                                            </tr>
                                            </thead>
                                            <tbody v-if="employee.length > 0">

@@ -1,5 +1,5 @@
 <template>
-    <div class="authincation h-100 align-items-center">
+    <div class="authincation h-100 align-items-center" style="background-image: url('/images/')">
         <div class="container h-100">
             <div class="row justify-content-center h-100">
                 <div class="col-md-6">
