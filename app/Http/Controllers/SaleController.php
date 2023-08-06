@@ -6,6 +6,7 @@ use App\Common\AccountCategory;
 use App\Common\Module;
 use App\Helpers\SessionUser;
 use App\Models\Category;
+use App\Models\Invoice;
 use App\Models\Sale;
 use App\Models\SaleData;
 use App\Models\Transaction;
@@ -157,14 +158,27 @@ class SaleController extends Controller
         $limit = $requestData['limit'] ?? 10;
         $orderBy = $requestData['order_by'] ?? 'transactions.id';
         $orderMode = $requestData['order_mode'] ?? 'DESC';
+        $keyword = $requestData['keyword'] ?? '';
         $result = Transaction::select('transactions.id', 'transactions.debit_amount as amount', 'transactions.date', 'transactions.description', 'categories.category as name')
             ->leftJoin('categories', 'categories.id', '=', 'transactions.linked_id')
-            ->where('categories.parent_category', $accountReceivable->id);
+            ->where('categories.parent_category', $accountReceivable->id)
+            ->where('transactions.debit_amount', '>', 0);
+        if (!empty($keyword)) {
+            $result->where(function($q) use ($keyword) {
+                $q->where('categories.category', 'LIKE', '%'.$keyword.'%');
+            });
+        }
         $result = $result->orderBy($orderBy, $orderMode)
             ->paginate($limit);
+        $transactionId = [];
         foreach ($result as &$data) {
+            $transactionId[] = $data['id'];
             $data['date'] = date('d/m/Y', strtotime($data['date']));
             $data['is_invoice'] = false;
+        }
+        $invoice = Invoice::select('transaction_id')->whereIn('transaction_id', $transactionId)->get()->keyBy('transaction_id')->toArray();
+        foreach ($result as &$data) {
+            $data['is_invoice'] = isset($invoice[$data['id']]) ? true : false;
         }
         return response()->json(['status' => 200, 'data' => $result]);
     }
