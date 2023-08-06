@@ -39,7 +39,7 @@ const ApiService = {
         axios.post(url, param, {
             headers: {
                 'Content-Type': 'application/json; charset=utf-8',
-                'x-api-key': '_@@jbbrd2023crmatix@@_'
+                'x-api-key': '_@@jbbrd2023fuelmatix@@_'
             },
             responseType: 'blob' }).then((response) => {
             if (response.status === 200) {

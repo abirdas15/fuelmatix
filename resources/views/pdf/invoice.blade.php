@@ -44,7 +44,7 @@
         <div style="margin-bottom: 5px">Phone: {{ $data['company']['phone_number'] }}</div>
         <div style="margin-bottom: 5px">Email: {{ $data['company']['email'] }}</div>
     </div>
-    <div style="width: 50%; float: left;">
+    <div style="width: 50%; float: right">
         <div style="width: 90%">
             <div style="text-align: right; margin-bottom: 5px"><strong>INVOICE</strong></div>
             <table class="table">
@@ -63,8 +63,8 @@
             </table>
         </div>
     </div>
-    <div style="width: 100%; margin-bottom: 50px">
-        <div style="margin-bottom: 5px"><strong>Bill To</strong></div>
+    <div style="width: 100%; margin-bottom: 50px; margin-top: 50px">
+        <div style="margin-bottom: 5px;"><strong>Bill To</strong></div>
         <div style="margin-bottom: 5px">{{ $data['customer_company']['name'] }}</div>
         <address style="margin-bottom: 5px">{{ $data['customer_company']['address'] }}</address>
         <div style="margin-bottom: 5px">Phone: {{ $data['customer_company']['phone'] }}</div>
@@ -80,13 +80,13 @@
         <tbody>
         <tr>
             <td style="height: 300px; vertical-align: top;">{{ $data['description'] }}</td>
-            <td style="text-align: right; vertical-align: top; height: 300px">{{ number_format($data['amount'] - $data['paid_amount'], 2) }}</td>
+            <td style="text-align: right; vertical-align: top; height: 300px">{{ number_format($data['amount'] , 2) }}</td>
         </tr>
         </tbody>
         <tfoot>
         <tr>
             <th style="text-align: right">Total</th>
-            <th style="text-align: right">{{ number_format($data['amount'] - $data['paid_amount'], 2) }}</th>
+            <th style="text-align: right">{{ number_format($data['amount'] , 2) }}</th>
         </tr>
         </tfoot>
     </table>

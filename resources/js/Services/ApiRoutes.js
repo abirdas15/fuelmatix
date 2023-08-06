@@ -161,7 +161,7 @@ const ApiRoutes = {
     invoiceSingle: ApiVersion + '/invoice/single',
     invoiceDelete: ApiVersion + '/invoice/delete',
     invoiceList: ApiVersion + '/invoice/list',
-    invoiceGetCategory: ApiVersion + '/invoice/getCategory',
+    invoiceDownloadPdf: ApiVersion + '/invoice/download/pdf',
 
 };
 

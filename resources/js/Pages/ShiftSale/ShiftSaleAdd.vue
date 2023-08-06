@@ -64,14 +64,14 @@
                                                                 type="text" class="form-control"  @click="enableInput('frReading')"
                                                                 v-model="listDispenser.end_reading"
                                                                 @input="calculateAmount">
-                                                            <input value="0" v-if="listDispenser.status == 'start'" disabled>
+                                                            <input class="form-control" value="0" v-if="listDispenser.status == 'start'" disabled>
                                                         </div>
 
                                                         <div class="mb-3 col-md-2">
                                                             <label>Consumption </label>
                                                             <input type="text" class="form-control" id="consumption" disabled  v-if="listDispenser.status == 'end'"
                                                                    v-model="listDispenser.consumption">
-                                                            <input value="0" v-if="listDispenser.status == 'start'" disabled>
+                                                            <input class="form-control" value="0" v-if="listDispenser.status == 'start'" disabled>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -96,57 +96,55 @@
                                                         <div class="mb-3 col-md-3">
                                                             <label>Final Reading </label>
                                                             <input type="text" class="form-control" @blur="disableInput('frReading'+nIndex+dIndex)"
+                                                                   v-if="listDispenser.status == 'end'"
                                                                    v-model="n.end_reading" @click="enableInput('frReading'+nIndex+dIndex)"
                                                                    @input="calculateAmountNozzle(dIndex, nIndex) ">
+                                                            <input class="form-control" value="0" v-if="listDispenser.status == 'start'" disabled>
                                                         </div>
 
 
                                                         <div class="mb-3 col-md-2">
                                                             <label>Consumption </label>
-                                                            <input type="text" disabled class="form-control"
+                                                            <input type="text" disabled class="form-control"   v-if="listDispenser.status == 'end'"
                                                                    v-model="n.consumption">
-                                                        </div>
-                                                        <div class="mb-3 col-md-2">
-                                                            <label>Amount </label>
-                                                            <input type="text" class="form-control" disabled
-                                                                   v-model="n.amount">
+                                                            <input class="form-control" value="0" v-if="listDispenser.status == 'start'" disabled>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
                                             <template v-if="listDispenser.status != 'start'">
+                                                <div class="col-sm-11 text-end mb-2">
+                                                    <h4>Total sale: {{totalSale}} Liter</h4>
+                                                    <h4>Total amount: {{totalAmount}} Tk</h4>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-sm-6"></div>
+                                                    <div class="col-sm-6 text-end">
+                                                        <div class="d-flex mb-3"  v-for="(category,index) in categories">
+                                                            <select class="form-control me-3" style="max-width: 210px" v-model="category.category_id"
+                                                                    @change="isDataExist(category.category_id, 'category_id', index, categories)" >
+                                                                <option v-for="c in allAmountCategory" :value="c.id">{{c.name}}</option>
+                                                            </select>
+                                                            <div class="form-group">
+                                                                <input class="form-control me-3"  style="max-width: 210px" type="text" v-model="category.amount" :id="'categories.'+index+'.amount'"
+                                                                       @input="calculateValue(category.amount)"
+                                                                       :name="'categories.'+index+'.amount'">
+                                                                <div class="invalid-feedback"></div>
+                                                            </div>
 
-                                            </template>
-                                            <div class="col-sm-11 text-end mb-2">
-                                                <h4>Total sale: {{totalSale}}</h4>
-                                                <h4>Total amount: {{totalAmount}}</h4>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-sm-6"></div>
-                                                <div class="col-sm-6 text-end">
-                                                    <div class="d-flex mb-3"  v-for="(category,index) in categories">
-                                                        <select class="form-control me-3" style="max-width: 210px" v-model="category.category_id"
-                                                                @change="isDataExist(category.category_id, 'category_id', index, categories)" >
-                                                            <option v-for="c in allAmountCategory" :value="c.id">{{c.name}}</option>
-                                                        </select>
-                                                        <div class="form-group">
-                                                            <input class="form-control me-3"  style="max-width: 210px" type="text" v-model="category.amount" :id="'categories.'+index+'.amount'"
-                                                                   @input="calculateValue(category.amount)"
-                                                                   :name="'categories.'+index+'.amount'">
-                                                            <div class="invalid-feedback"></div>
+                                                            <button class="btn btn-primary"  style="height: 54px" v-if="index == 0" type="button" @click="addCategory">+</button>
+                                                            <button class="btn btn-danger"  style="height: 54px"   v-else  type="button" @click="removeCategory(index)">
+                                                                <i class="fa-solid fa-xmark"></i>
+                                                            </button>
                                                         </div>
-
-                                                        <button class="btn btn-primary"  style="height: 54px" v-if="index == 0" type="button" @click="addCategory">+</button>
-                                                        <button class="btn btn-danger"  style="height: 54px"   v-else  type="button" @click="removeCategory(index)">
-                                                            <i class="fa-solid fa-xmark"></i>
-                                                        </button>
+                                                    </div>
+                                                    <div class="col-sm-6"></div>
+                                                    <div class="col-sm-6">
+                                                        <h4>Amount: {{totalPaid}} Tk</h4>
                                                     </div>
                                                 </div>
-                                                <div class="col-sm-6"></div>
-                                                <div class="col-sm-6">
-                                                    <h4>Amount: {{totalPaid}}</h4>
-                                                </div>
-                                            </div>
+                                            </template>
+
                                         </div>
                                     </div>
                                     <div class="text-center" v-else>Please Select any product</div>
@@ -156,7 +154,8 @@
 
                                     </div>
                                     <div class="mb-3 col-md-6">
-                                        <button type="submit" class="btn btn-primary" v-if="!loading">Submit</button>
+                                        <button type="submit" class="btn btn-primary" v-if="!loading && listDispenser?.status == 'start'">Start</button>
+                                        <button type="submit" class="btn btn-primary" v-if="!loading && listDispenser?.status == 'end'">End</button>
                                         <button type="button" class="btn btn-primary" v-if="loading">Submitting...</button>
                                         <router-link :to="{name: 'ShiftSaleList'}" type="button" class="btn btn-primary">Cancel</router-link>
                                     </div>
@@ -281,14 +280,16 @@ export default {
             ApiService.ClearErrorHandler();
             this.loading = true
             this.listDispenser.categories = this.categories;
-            let totalCategoryAmount = 0
-            this.listDispenser.categories.map(v => {
-                totalCategoryAmount += parseInt(v.amount)
-            })
-            if (this.totalAmount != totalCategoryAmount) {
-                this.loading = false
-                this.$toast.error('Please match the total amount and category list')
-                return
+            if (this.listDispenser.status == 'end') {
+                let totalCategoryAmount = 0
+                this.listDispenser.categories.map(v => {
+                    totalCategoryAmount += parseInt(v.amount)
+                })
+                if (this.totalAmount != totalCategoryAmount) {
+                    this.loading = false
+                    this.$toast.error('Please match the total amount and category list')
+                    return
+                }
             }
             ApiService.POST(ApiRoutes.ShiftSaleAdd, this.listDispenser, res => {
                 this.loading = false

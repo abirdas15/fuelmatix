@@ -122,11 +122,13 @@ export default {
         },
         downloadInvoice: function () {
             this.download = true
-            ApiService.POST(ApiRoutes.invoiceSingle, {id: this.id},res => {
+            ApiService.DOWNLOAD(ApiRoutes.invoiceDownloadPdf, {id: this.id},'',res => {
                 this.download = false
-                if (parseInt(res.status) === 200) {
-
-                }
+                let blob = new Blob([res], {type: 'pdf'});
+                const link = document.createElement('a');
+                link.href = window.URL.createObjectURL(blob);
+                link.download = 'invoice.pdf';
+                link.click();
             });
         },
     },

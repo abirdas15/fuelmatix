@@ -6557,11 +6557,17 @@ __webpack_require__.r(__webpack_exports__);
     downloadInvoice: function downloadInvoice() {
       var _this2 = this;
       this.download = true;
-      _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].invoiceSingle, {
+      _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].DOWNLOAD(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].invoiceDownloadPdf, {
         id: this.id
-      }, function (res) {
+      }, '', function (res) {
         _this2.download = false;
-        if (parseInt(res.status) === 200) {}
+        var blob = new Blob([res], {
+          type: 'pdf'
+        });
+        var link = document.createElement('a');
+        link.href = window.URL.createObjectURL(blob);
+        link.download = 'invoice.pdf';
+        link.click();
       });
     }
   },
@@ -8311,14 +8317,16 @@ __webpack_require__.r(__webpack_exports__);
       _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].ClearErrorHandler();
       this.loading = true;
       this.listDispenser.categories = this.categories;
-      var totalCategoryAmount = 0;
-      this.listDispenser.categories.map(function (v) {
-        totalCategoryAmount += parseInt(v.amount);
-      });
-      if (this.totalAmount != totalCategoryAmount) {
-        this.loading = false;
-        this.$toast.error('Please match the total amount and category list');
-        return;
+      if (this.listDispenser.status == 'end') {
+        var totalCategoryAmount = 0;
+        this.listDispenser.categories.map(function (v) {
+          totalCategoryAmount += parseInt(v.amount);
+        });
+        if (this.totalAmount != totalCategoryAmount) {
+          this.loading = false;
+          this.$toast.error('Please match the total amount and category list');
+          return;
+        }
       }
       _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].ShiftSaleAdd, this.listDispenser, function (res) {
         _this6.loading = false;
@@ -12188,275 +12196,7 @@ var staticRenderFns = [function () {
     staticClass: "col-xl-12"
   }, [_c("div", {
     staticClass: "row"
-  }, [_c("div", {
-    staticClass: "col-xl-6 left"
-  }, [_c("div", {
-    staticClass: "row"
-  }, [_c("div", {
-    staticClass: "col-xl-12"
-  }, [_c("div", {
-    staticClass: "row"
-  }, [_c("div", {
-    staticClass: "col-xl-6 col-sm-6 left-left"
-  }, [_c("div", {
-    staticClass: "col"
-  }, [_c("div", {
-    staticClass: "card bg-success widget-stat"
-  }, [_c("div", {
-    staticClass: "card-body px-4 pb-4"
-  }, [_c("div", {
-    staticClass: "media"
-  }, [_c("span", {
-    staticClass: "me-3"
-  }, [_c("i", {
-    staticClass: "fa fa-phone"
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "media-body text-white text-end"
-  }, [_c("p", {
-    staticClass: "mb-1"
-  }, [_vm._v("Calls in "), _c("br"), _vm._v(" queue")]), _vm._v(" "), _c("h3", {
-    staticClass: "text-white"
-  }, [_vm._v("76")])])])])]), _vm._v(" "), _c("div", {
-    staticClass: "card"
-  }, [_c("div", {
-    staticClass: "card-header border-0 pb-0"
-  }, [_c("h4", {
-    staticClass: "fs-20 font-w700 text-white"
-  }, [_vm._v("\n                                                        Calls per hour\n                                                    ")])]), _vm._v(" "), _c("div", {
-    staticClass: "card-body pb-0"
-  }, [_c("div", {
-    staticClass: "revenueMap",
-    attrs: {
-      id: "revenueMap"
-    }
-  })])])])]), _vm._v(" "), _c("div", {
-    staticClass: "col-xl-6 col-sm-6 left-right"
-  }, [_c("div", {
-    staticClass: "col"
-  }, [_c("div", {
-    staticClass: "card bg-warning widget-stat"
-  }, [_c("div", {
-    staticClass: "card-body px-4 pb-4"
-  }, [_c("div", {
-    staticClass: "media"
-  }, [_c("span", {
-    staticClass: "me-3"
-  }, [_c("i", {
-    staticClass: "fa fa-phone-volume"
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "media-body text-white text-end"
-  }, [_c("p", {
-    staticClass: "mb-1"
-  }, [_vm._v("Ongoing "), _c("br"), _vm._v(" Calls")]), _vm._v(" "), _c("h3", {
-    staticClass: "text-white"
-  }, [_vm._v("76")])])])])]), _vm._v(" "), _c("div", {
-    staticClass: "card bg-success widget-stat"
-  }, [_c("div", {
-    staticClass: "card-body px-4 pb-4"
-  }, [_c("div", {
-    staticClass: "media"
-  }, [_c("span", {
-    staticClass: "me-3"
-  }, [_c("i", {
-    staticClass: "fa-solid fa-check"
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "media-body text-white text-end"
-  }, [_c("p", {
-    staticClass: "mb-1"
-  }, [_vm._v(" Agents "), _c("br"), _vm._v(" online")]), _vm._v(" "), _c("h3", {
-    staticClass: "text-white"
-  }, [_vm._v("76")])])])])]), _vm._v(" "), _c("div", {
-    staticClass: "card bg-danger widget-stat"
-  }, [_c("div", {
-    staticClass: "card-body px-4 pb-4"
-  }, [_c("div", {
-    staticClass: "media"
-  }, [_c("span", {
-    staticClass: "me-3"
-  }, [_c("i", {
-    staticClass: "fa-solid fa-phone-slash"
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "media-body text-white text-end"
-  }, [_c("p", {
-    staticClass: "mb-1"
-  }, [_vm._v(" Abandoned calls")]), _vm._v(" "), _c("h3", {
-    staticClass: "text-white"
-  }, [_vm._v("76")])])])])])])])]), _vm._v(" "), _c("div", {
-    staticClass: "row"
-  }, [_c("div", {
-    staticClass: "col-xl-12"
-  }, [_c("div", {
-    staticClass: "card overflow-hidden"
-  }, [_c("div", {
-    staticClass: "social-graph-wrapper widget-facebook bg-info"
-  }, [_c("span", {
-    staticClass: "s-icon"
-  }, [_c("i", {
-    staticClass: "fas fa-clock"
-  })]), _vm._v(" "), _c("span", {
-    staticClass: "fs-24"
-  }, [_vm._v("wait\n                          time")])]), _vm._v(" "), _c("div", {
-    staticClass: "row"
-  }, [_c("div", {
-    staticClass: "col-6 border-end"
-  }, [_c("div", {
-    staticClass: "pt-3 pb-3 ps-0 pe-0 text-center"
-  }, [_c("h4", {
-    staticClass: "m-1"
-  }, [_c("span", {
-    staticClass: "counter"
-  }, [_vm._v("0.00")]), _vm._v("min")]), _vm._v(" "), _c("p", {
-    staticClass: "m-0"
-  }, [_vm._v("average")])])]), _vm._v(" "), _c("div", {
-    staticClass: "col-6"
-  }, [_c("div", {
-    staticClass: "pt-3 pb-3 ps-0 pe-0 text-center"
-  }, [_c("h4", {
-    staticClass: "m-1"
-  }, [_c("span", {
-    staticClass: "counter"
-  }, [_vm._v("0.00")]), _vm._v(" min")]), _vm._v(" "), _c("p", {
-    staticClass: "m-0"
-  }, [_vm._v("longest")])])])])])])])])])]), _vm._v(" "), _c("div", {
-    staticClass: "col-xl-6 right"
-  }, [_c("div", {
-    staticClass: "row"
-  }, [_c("div", {
-    staticClass: "col-xl-12"
-  }, [_c("div", {
-    staticClass: "row"
-  }, [_c("div", {
-    staticClass: "col-xl-6 col-sm-6 right-left"
-  }, [_c("div", {
-    staticClass: "col"
-  }, [_c("div", {
-    staticClass: "card bg-info widget-stat"
-  }, [_c("div", {
-    staticClass: "card-body px-4 pb-4"
-  }, [_c("div", {
-    staticClass: "media"
-  }, [_c("span", {
-    staticClass: "me-3"
-  }, [_c("i", {
-    staticClass: "fas fa-ticket-alt"
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "media-body text-white text-end"
-  }, [_c("p", {
-    staticClass: "mb-1"
-  }, [_vm._v("Unassigned Tickets")]), _vm._v(" "), _c("h3", {
-    staticClass: "text-white"
-  }, [_vm._v("76")])])])])]), _vm._v(" "), _c("div", {
-    staticClass: "card"
-  }, [_c("div", {
-    staticClass: "card-header border-0 pb-0"
-  }, [_c("h4", {
-    staticClass: "fs-20 font-w700 text-white"
-  }, [_vm._v("\n                                                        Tickets per hour\n                                                    ")])]), _vm._v(" "), _c("div", {
-    staticClass: "card-body pb-0"
-  }, [_c("div", {
-    staticClass: "revenueMap",
-    attrs: {
-      id: "revenueMap1"
-    }
-  })])])])]), _vm._v(" "), _c("div", {
-    staticClass: "col-xl-6 col-sm-6 right-right"
-  }, [_c("div", {
-    staticClass: "col"
-  }, [_c("div", {
-    staticClass: "card bg-secondary widget-stat"
-  }, [_c("div", {
-    staticClass: "card-body px-4 pb-4"
-  }, [_c("div", {
-    staticClass: "media"
-  }, [_c("span", {
-    staticClass: "me-3"
-  }, [_c("i", {
-    staticClass: "fas fa-ticket-alt"
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "media-body text-white text-end"
-  }, [_c("p", {
-    staticClass: "mb-1"
-  }, [_vm._v("Non Answered Tickets")]), _vm._v(" "), _c("h3", {
-    staticClass: "text-white"
-  }, [_vm._v("76")])])])])]), _vm._v(" "), _c("div", {
-    staticClass: "card bg-warning widget-stat"
-  }, [_c("div", {
-    staticClass: "card-body px-4 pb-4"
-  }, [_c("div", {
-    staticClass: "media"
-  }, [_c("span", {
-    staticClass: "me-3"
-  }, [_c("i", {
-    staticClass: "fa-solid fa-microchip"
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "media-body text-white text-end"
-  }, [_c("p", {
-    staticClass: "mb-1"
-  }, [_vm._v("Processing tickets")]), _vm._v(" "), _c("h3", {
-    staticClass: "text-white"
-  }, [_vm._v("76")])])])])]), _vm._v(" "), _c("div", {
-    staticClass: "col-xl-6 col-lg-6 col-md-6 col-sm-6"
-  }, [_c("div", {
-    staticClass: "card R-pie"
-  }, [_c("div", {
-    staticClass: "card-body"
-  }, [_c("div", {
-    staticClass: "chart-point"
-  }, [_c("div", {
-    staticClass: "check-point-area"
-  }, [_c("canvas", {
-    attrs: {
-      id: "doughnut_chart"
-    }
-  })]), _vm._v(" "), _c("ul", {
-    staticClass: "chart-point-list"
-  }, [_c("li", [_c("i", {
-    staticClass: "fa fa-circle text-primary me-1"
-  }), _vm._v(" Call ")]), _vm._v(" "), _c("li", [_c("i", {
-    staticClass: "fa fa-circle text-success me-1"
-  }), _vm._v(" Whatsapp")]), _vm._v(" "), _c("li", [_c("i", {
-    staticClass: "fa fa-circle text-warning me-1"
-  }), _vm._v(" Sms")]), _vm._v(" "), _c("li", [_c("i", {
-    staticClass: "fa fa-circle text-email me-1"
-  }), _vm._v(" Email")]), _vm._v(" "), _c("li", [_c("i", {
-    staticClass: "fa fa-circle text-mess me-1"
-  }), _vm._v(" Messenger")])])])])])])])])]), _vm._v(" "), _c("div", {
-    staticClass: "row"
-  }, [_c("div", {
-    staticClass: "col-xl-12"
-  }, [_c("div", {
-    staticClass: "card overflow-hidden"
-  }, [_c("div", {
-    staticClass: "social-graph-wrapper widget-facebook bg-secondary"
-  }, [_c("span", {
-    staticClass: "s-icon"
-  }, [_c("i", {
-    staticClass: "fas fa-clock"
-  })]), _vm._v(" "), _c("span", {
-    staticClass: "fs-24"
-  }, [_vm._v("reply\n                          time")])]), _vm._v(" "), _c("div", {
-    staticClass: "row"
-  }, [_c("div", {
-    staticClass: "col-6 border-end"
-  }, [_c("div", {
-    staticClass: "pt-3 pb-3 ps-0 pe-0 text-center"
-  }, [_c("h4", {
-    staticClass: "m-1"
-  }, [_c("span", {
-    staticClass: "counter"
-  }, [_vm._v("0.00")]), _vm._v("min")]), _vm._v(" "), _c("p", {
-    staticClass: "m-0"
-  }, [_vm._v("first")])])]), _vm._v(" "), _c("div", {
-    staticClass: "col-6"
-  }, [_c("div", {
-    staticClass: "pt-3 pb-3 ps-0 pe-0 text-center"
-  }, [_c("h4", {
-    staticClass: "m-1"
-  }, [_c("span", {
-    staticClass: "counter"
-  }, [_vm._v("0.00")]), _vm._v(" min")]), _vm._v(" "), _c("p", {
-    staticClass: "m-0"
-  }, [_vm._v("avg resolution")])])])])])])])])])])])])])])]);
+  })])])])]);
 }];
 render._withStripped = true;
 
@@ -26670,6 +26410,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
 var render = function render() {
+  var _vm$listDispenser, _vm$listDispenser2;
   var _vm = this,
     _c = _vm._self._c;
   return _c("div", {
@@ -26831,6 +26572,7 @@ var render = function render() {
       }, _vm.calculateAmount]
     }
   }) : _vm._e(), _vm._v(" "), _vm.listDispenser.status == "start" ? _c("input", {
+    staticClass: "form-control",
     attrs: {
       value: "0",
       disabled: ""
@@ -26860,6 +26602,7 @@ var render = function render() {
       }
     }
   }) : _vm._e(), _vm._v(" "), _vm.listDispenser.status == "start" ? _c("input", {
+    staticClass: "form-control",
     attrs: {
       value: "0",
       disabled: ""
@@ -26907,7 +26650,7 @@ var render = function render() {
         }
       })]), _vm._v(" "), _c("div", {
         staticClass: "mb-3 col-md-3"
-      }, [_c("label", [_vm._v("Final Reading ")]), _vm._v(" "), _c("input", {
+      }, [_c("label", [_vm._v("Final Reading ")]), _vm._v(" "), _vm.listDispenser.status == "end" ? _c("input", {
         directives: [{
           name: "model",
           rawName: "v-model",
@@ -26935,9 +26678,15 @@ var render = function render() {
             return _vm.calculateAmountNozzle(dIndex, nIndex);
           }]
         }
-      })]), _vm._v(" "), _c("div", {
+      }) : _vm._e(), _vm._v(" "), _vm.listDispenser.status == "start" ? _c("input", {
+        staticClass: "form-control",
+        attrs: {
+          value: "0",
+          disabled: ""
+        }
+      }) : _vm._e()]), _vm._v(" "), _c("div", {
         staticClass: "mb-3 col-md-2"
-      }, [_c("label", [_vm._v("Consumption ")]), _vm._v(" "), _c("input", {
+      }, [_c("label", [_vm._v("Consumption ")]), _vm._v(" "), _vm.listDispenser.status == "end" ? _c("input", {
         directives: [{
           name: "model",
           rawName: "v-model",
@@ -26958,34 +26707,17 @@ var render = function render() {
             _vm.$set(n, "consumption", $event.target.value);
           }
         }
-      })]), _vm._v(" "), _c("div", {
-        staticClass: "mb-3 col-md-2"
-      }, [_c("label", [_vm._v("Amount ")]), _vm._v(" "), _c("input", {
-        directives: [{
-          name: "model",
-          rawName: "v-model",
-          value: n.amount,
-          expression: "n.amount"
-        }],
+      }) : _vm._e(), _vm._v(" "), _vm.listDispenser.status == "start" ? _c("input", {
         staticClass: "form-control",
         attrs: {
-          type: "text",
+          value: "0",
           disabled: ""
-        },
-        domProps: {
-          value: n.amount
-        },
-        on: {
-          input: function input($event) {
-            if ($event.target.composing) return;
-            _vm.$set(n, "amount", $event.target.value);
-          }
         }
-      })])]);
+      }) : _vm._e()])]);
     }), 0) : _vm._e()]) : _vm._e();
-  }), _vm._v(" "), _vm.listDispenser.status != "start" ? void 0 : _vm._e(), _vm._v(" "), _c("div", {
+  }), _vm._v(" "), _vm.listDispenser.status != "start" ? [_c("div", {
     staticClass: "col-sm-11 text-end mb-2"
-  }, [_c("h4", [_vm._v("Total sale: " + _vm._s(_vm.totalSale))]), _vm._v(" "), _c("h4", [_vm._v("Total amount: " + _vm._s(_vm.totalAmount))])]), _vm._v(" "), _c("div", {
+  }, [_c("h4", [_vm._v("Total sale: " + _vm._s(_vm.totalSale) + " Liter")]), _vm._v(" "), _c("h4", [_vm._v("Total amount: " + _vm._s(_vm.totalAmount) + " Tk")])]), _vm._v(" "), _c("div", {
     staticClass: "row"
   }, [_c("div", {
     staticClass: "col-sm-6"
@@ -27086,7 +26818,7 @@ var render = function render() {
     staticClass: "col-sm-6"
   }), _vm._v(" "), _c("div", {
     staticClass: "col-sm-6"
-  }, [_c("h4", [_vm._v("Amount: " + _vm._s(_vm.totalPaid))])])])], 2)]) : _c("div", {
+  }, [_c("h4", [_vm._v("Amount: " + _vm._s(_vm.totalPaid) + " Tk")])])])] : _vm._e()], 2)]) : _c("div", {
     staticClass: "text-center"
   }, [_vm._v("Please Select any product")])]), _vm._v(" "), _vm.product_id ? _c("div", {
     staticClass: "row",
@@ -27097,12 +26829,17 @@ var render = function render() {
     staticClass: "mb-3 col-md-6"
   }), _vm._v(" "), _c("div", {
     staticClass: "mb-3 col-md-6"
-  }, [!_vm.loading ? _c("button", {
+  }, [!_vm.loading && ((_vm$listDispenser = _vm.listDispenser) === null || _vm$listDispenser === void 0 ? void 0 : _vm$listDispenser.status) == "start" ? _c("button", {
     staticClass: "btn btn-primary",
     attrs: {
       type: "submit"
     }
-  }, [_vm._v("Submit")]) : _vm._e(), _vm._v(" "), _vm.loading ? _c("button", {
+  }, [_vm._v("Start")]) : _vm._e(), _vm._v(" "), !_vm.loading && ((_vm$listDispenser2 = _vm.listDispenser) === null || _vm$listDispenser2 === void 0 ? void 0 : _vm$listDispenser2.status) == "end" ? _c("button", {
+    staticClass: "btn btn-primary",
+    attrs: {
+      type: "submit"
+    }
+  }, [_vm._v("End")]) : _vm._e(), _vm._v(" "), _vm.loading ? _c("button", {
     staticClass: "btn btn-primary",
     attrs: {
       type: "button"
@@ -68989,7 +68726,7 @@ var ApiRoutes = {
   invoiceSingle: ApiVersion + '/invoice/single',
   invoiceDelete: ApiVersion + '/invoice/delete',
   invoiceList: ApiVersion + '/invoice/list',
-  invoiceGetCategory: ApiVersion + '/invoice/getCategory'
+  invoiceDownloadPdf: ApiVersion + '/invoice/download/pdf'
 };
 /* harmony default export */ __webpack_exports__["default"] = (ApiRoutes);
 
@@ -69058,7 +68795,7 @@ var ApiService = {
     axios__WEBPACK_IMPORTED_MODULE_2___default.a.post(url, param, {
       headers: {
         'Content-Type': 'application/json; charset=utf-8',
-        'x-api-key': '_@@jbbrd2023crmatix@@_'
+        'x-api-key': '_@@jbbrd2023fuelmatix@@_'
       },
       responseType: 'blob'
     }).then(function (response) {

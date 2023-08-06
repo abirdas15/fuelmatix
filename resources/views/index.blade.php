@@ -48,15 +48,12 @@
 <script src="{{ asset('vendor/chart.js/Chart.bundle.min.js') }}"></script>
 <script src="{{ asset('vendor/jquery-nice-select/js/jquery.nice-select.min.js') }}"></script>
 <script src='{{ asset('vendor/moment/moment.min.js') }}'></script>
-<!-- Apex Chart -->
-<script src="{{ asset('vendor/apexchart/apexchart.js') }}"></script>
 
 <script src="{{ asset('vendor/chart.js/Chart.bundle.min.js') }}"></script>
 
 <!-- Chart piety plugin files -->
 <script src="{{ asset('vendor/peity/jquery.peity.min.js') }}"></script>
 <!-- Dashboard 1 -->
-<script src="{{ asset('js/dashboard/dashboard-1.js') }}"></script>
 <script src="{{ asset('js/popup.js') }}"></script>
 
 <script src="{{ asset('vendor/owl-carousel/owl.carousel.js') }}"></script>
