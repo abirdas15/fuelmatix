@@ -4,8 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Common\Module;
 use App\Helpers\SessionUser;
+use App\Models\Category;
+use App\Models\ClientCompany;
 use App\Models\Invoice;
 use App\Models\Transaction;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -109,5 +112,60 @@ class InvoiceController extends Controller
         Invoice::where('id', $requestData['id'])->delete();
         Transaction::where('module', Module::INVOICE)->where('module_id', $requestData['id'])->delete();
         return response()->json(['status' => 200, 'message' => 'Successfully deleted invoice.']);
+    }
+    public function single(Request $request)
+    {
+        $requestData = $request->all();
+        $validator = Validator::make($requestData, [
+            'id' => 'required'
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['status' => 500, 'errors' => $validator->errors()]);
+        }
+        $invoice = Invoice::find($requestData['id']);
+        if (!$invoice instanceof Invoice) {
+            return response()->json(['status' => 500, 'error' => 'Cannot find invoice.']);
+        }
+        $sessionUser = SessionUser::getUser();
+        $company = null;
+        if (!empty($sessionUser['client_company_id'])) {
+            $company = ClientCompany::find($sessionUser['client_company_id']);
+        }
+        $category = Category::select('others', 'category as name')->find($invoice['category_id']);
+        $others = json_decode($category['others']);
+        $category['email'] = $others->email ?? '';
+        $category['phone'] = $others->phone ?? '';
+        $category['address'] = $others->address ?? '';
+        $invoice['customer_company'] = $category;
+        $invoice['company'] = $company;
+        return response()->json(['status' => 200, 'data' => $invoice]);
+    }
+    public function downloadPdf(Request $request)
+    {
+        $requestData = $request->all();
+        $validator = Validator::make($requestData, [
+            'id' => 'required'
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['status' => 500, 'errors' => $validator->errors()]);
+        }
+        $invoice = Invoice::find($requestData['id']);
+        if (!$invoice instanceof Invoice) {
+            return response()->json(['status' => 500, 'error' => 'Cannot find invoice.']);
+        }
+        $sessionUser = SessionUser::getUser();
+        $company = null;
+        if (!empty($sessionUser['client_company_id'])) {
+            $company = ClientCompany::find($sessionUser['client_company_id']);
+        }
+        $category = Category::select('others', 'category as name')->find($invoice['category_id']);
+        $others = json_decode($category['others']);
+        $category['email'] = $others->email ?? '';
+        $category['phone'] = $others->phone ?? '';
+        $category['address'] = $others->address ?? '';
+        $invoice['customer_company'] = $category;
+        $invoice['company'] = $company;
+        $pdf = Pdf::loadView('pdf.invoice', ['data' => $invoice]);
+        return $pdf->stream();
     }
 }
