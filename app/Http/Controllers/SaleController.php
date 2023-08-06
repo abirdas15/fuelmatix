@@ -2,8 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Common\AccountCategory;
+use App\Common\Module;
+use App\Helpers\SessionUser;
+use App\Models\Category;
 use App\Models\Sale;
 use App\Models\SaleData;
+use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -143,5 +148,23 @@ class SaleController extends Controller
         Sale::where('id', $inputData['id'])->delete();
         SaleData::where('sale_id', $inputData['id'])->delete();
         return response()->json(['status' => 200, 'message' => 'Successfully deleted sale.']);
+    }
+    public function getCompanySale(Request $request)
+    {
+        $requestData = $request->all();
+        $sessionUser = SessionUser::getUser();
+        $accountReceivable = Category::where('client_company_id', $sessionUser['client_company_id'])->where('category', AccountCategory::ACCOUNT_RECEIVABLE)->first();
+        $limit = $requestData['limit'] ?? 10;
+        $orderBy = $requestData['order_by'] ?? 'transactions.id';
+        $orderMode = $requestData['order_by'] ?? 'DESC';
+        $result = Transaction::select('transactions.id', 'transactions.debit_amount as amount', 'transactions.date', 'transactions.description', 'categories.category as name')
+            ->leftJoin('categories', 'categories.id', '=', 'transactions.linked_id')
+            ->where('categories.parent_category', $accountReceivable->id);
+        $result = $result->orderBy($orderBy, $orderMode)
+            ->paginate($limit);
+        foreach ($result as &$data) {
+            $data['date'] = date('d/m/Y', strtotime($data['date']));
+        }
+        return response()->json(['status' => 200, 'data' => $result]);
     }
 }

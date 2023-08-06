@@ -212,4 +212,24 @@ class TransactionController extends Controller
         $stockModel->client_company_id = $stockData['client_company_id'];
         $stockModel->save();
     }
+    public function split(Request $request)
+    {
+        $requestData = $request->all();
+        $validator = Validator::make($requestData, [
+            'id' => 'required',
+            'amount' => 'required|array'
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['status' => 500, 'errors' => $validator->errors()]);
+        }
+        $transaction = Transaction::where('id', $requestData['id'])->first();
+        if (!$transaction instanceof Transaction) {
+            return response()->json(['status' => 500, 'error' => 'Cannot find transaction.']);
+        }
+        $totalAmount = array_sum($requestData['amount']);
+        $amountColumn = $transaction['debit_amount'] == 0 ? 'credit_amount' : 'debit_amount';
+        if ($totalAmount != $transaction[$amountColumn]) {
+            return response()->json(['status' => 500, 'error' => 'Your transaction amount are not same.']);
+        }
+    }
 }

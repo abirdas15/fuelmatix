@@ -54,6 +54,7 @@ Route::group(['middleware' => 'AuthReqCheck'], function() {
     Route::group(['prefix' => 'transaction'], function() {
         Route::post('save', [TransactionController::class, 'save']);
         Route::post('single', [TransactionController::class, 'single']);
+        Route::post('split', [TransactionController::class, 'split']);
     });
     Route::group(['prefix' => 'balance-sheet'], function() {
         Route::post('get', [BalanceSheetController::class, 'get']);
@@ -212,6 +213,12 @@ Route::group(['middleware' => 'AuthReqCheck'], function() {
         Route::post('update', [SalaryController::class, 'update']);
         Route::post('delete', [SalaryController::class, 'delete']);
         Route::post('getCategory', [SalaryController::class, 'getCategory']);
+    });
+    Route::group(['prefix' => 'companySale'], function() {
+        Route::post('list', [SaleController::class, 'getCompanySale']);
+        Route::post('single', [SaleController::class, 'single']);
+        Route::post('update', [SaleController::class, 'update']);
+        Route::post('delete', [SaleController::class, 'delete']);
     });
 });
 
