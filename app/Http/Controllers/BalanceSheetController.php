@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\SessionUser;
 use App\Models\Category;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
@@ -19,9 +20,17 @@ class BalanceSheetController extends Controller
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
-        $assets = self::getAssets($inputData['date']);
-        $liabilities = self::getLiabilities($inputData['date']);
-        $equity = self::getEquity($inputData['date']);
+        $sessionUser = SessionUser::getUser();
+        $transactions = Transaction::select(DB::raw('SUM(debit_amount) as debit_amount'), DB::raw('SUM(credit_amount) as credit_amount'), 'category_ids')
+            ->leftJoin('categories', 'categories.id', '=', 'transactions.account_id')
+            ->where('transactions.client_company_id', $sessionUser['client_company_id'])
+            ->where('date', '<=', $inputData['date'])
+            ->groupBy('account_id')
+            ->get()
+            ->toArray();
+        $assets = self::getAssets($transactions);
+        $liabilities = self::getLiabilities($transactions);
+        $equity = self::getEquity($transactions);
         $retain_earning = self::getRetainEarning($inputData['date']);
         $total_equity = $retain_earning + self::getTotalAmount($equity);
         $total_liabilities = self::getTotalAmount($liabilities);
@@ -41,9 +50,6 @@ class BalanceSheetController extends Controller
     {
         foreach ($transactions as $data) {
             $total = $total + $data['balance'];
-            if (isset($data['children']) && count($data['children']) > 0) {
-                $total = self::getTotalAmount($data['children'], $total);
-            }
         }
         return $total;
     }
@@ -55,35 +61,47 @@ class BalanceSheetController extends Controller
         $expense = array_sum($expense);
         return $income - $expense;
     }
-    public static function getEquity($date)
+    public static function getEquity($transactions)
     {
-        $categories = Category::select('id', 'category', 'balance', 'parent_category', 'description')
+        $sessionUser = SessionUser::getUser();
+        $categories = Category::select('id', 'category', 'balance', 'parent_category', 'description', 'category_ids', 'type')
+            ->where('client_company_id', $sessionUser['client_company_id'])
+            ->with(['children' => function($q) {
+                $q->select('id', 'category', 'parent_category', 'balance', 'description', 'category_ids', 'type');
+            }])
             ->where('type', 'equity')
+            ->whereNull('parent_category')
             ->get()
             ->toArray();
-        $transactions =  self::getTransactionAmount($date, 'assets');
-        $categories =  self::addCategoryAmount($categories, $transactions);
-        return self::buildTree($categories);
+        return CategoryController::updateCategoryBalance($categories, $transactions);
     }
-    public static function getAssets($date)
+    public static function getAssets($transactions)
     {
-        $categories = Category::select('id', 'category', 'balance', 'parent_category', 'description')
+        $sessionUser = SessionUser::getUser();
+        $categories = Category::select('id', 'category', 'balance', 'parent_category', 'description', 'category_ids', 'type')
+            ->where('client_company_id', $sessionUser['client_company_id'])
+            ->with(['children' => function($q) {
+                $q->select('id', 'category', 'parent_category', 'balance', 'description', 'category_ids', 'type');
+            }])
             ->where('type', 'assets')
+            ->whereNull('parent_category')
             ->get()
             ->toArray();
-        $transactions =  self::getTransactionAmount($date, 'assets');
-        $categories =  self::addCategoryAmount($categories, $transactions);
-        return self::buildTree($categories);
+        return CategoryController::updateCategoryBalance($categories, $transactions);
     }
-    public static function getLiabilities($date)
+    public static function getLiabilities($transactions)
     {
-        $categories = Category::select('id', 'category', 'balance', 'parent_category', 'description')
+        $sessionUser = SessionUser::getUser();
+        $categories = Category::select('id', 'category', 'balance', 'parent_category', 'description', 'category_ids', 'type')
+            ->where('client_company_id', $sessionUser['client_company_id'])
+            ->with(['children' => function($q) {
+                $q->select('id', 'category', 'parent_category', 'balance', 'description', 'category_ids', 'type');
+            }])
             ->where('type', 'liabilities')
+            ->whereNull('parent_category')
             ->get()
             ->toArray();
-        $transactions =  self::getTransactionAmount($date, 'liabilities');
-        $categories =  self::addCategoryAmount($categories, $transactions);
-        return self::buildTree($categories);
+        return CategoryController::updateCategoryBalance($categories, $transactions);
     }
     public static function buildTree($elements, $parentId = 0) {
         $branch = [];
