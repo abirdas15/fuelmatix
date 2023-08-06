@@ -27,6 +27,7 @@ use App\Http\Controllers\CreditCompanyController;
 use App\Http\Controllers\PosMachineController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\SalaryController;
+use App\Http\Controllers\InvoiceController;
 
 /*
 |--------------------------------------------------------------------------
@@ -216,9 +217,12 @@ Route::group(['middleware' => 'AuthReqCheck'], function() {
     });
     Route::group(['prefix' => 'companySale'], function() {
         Route::post('list', [SaleController::class, 'getCompanySale']);
-        Route::post('single', [SaleController::class, 'single']);
-        Route::post('update', [SaleController::class, 'update']);
-        Route::post('delete', [SaleController::class, 'delete']);
+    });
+    Route::group(['prefix' => 'invoice'], function() {
+        Route::post('generate', [InvoiceController::class, 'generate']);
+        Route::post('list', [InvoiceController::class, 'list']);
+        Route::post('payment', [InvoiceController::class, 'payment']);
+        Route::post('delete', [InvoiceController::class, 'delete']);
     });
 });
 
