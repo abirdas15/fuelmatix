@@ -174,11 +174,11 @@ class SaleController extends Controller
         foreach ($result as &$data) {
             $transactionId[] = $data['id'];
             $data['date'] = date('d/m/Y', strtotime($data['date']));
-            $data['is_invoice'] = false;
         }
-        $invoice = Invoice::select('transaction_id')->whereIn('transaction_id', $transactionId)->get()->keyBy('transaction_id')->toArray();
+        $invoice = Invoice::select('transaction_id', 'id')->whereIn('transaction_id', $transactionId)->get()->keyBy('transaction_id')->toArray();
         foreach ($result as &$data) {
             $data['is_invoice'] = isset($invoice[$data['id']]) ? true : false;
+            $data['invoice_id'] = isset($invoice[$data['id']]) ? $invoice[$data['id']]['id'] : '';
         }
         return response()->json(['status' => 200, 'data' => $result]);
     }
