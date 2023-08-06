@@ -2799,7 +2799,9 @@ __webpack_require__.r(__webpack_exports__);
       },
       Loading: false,
       TableLoading: false,
-      listData: []
+      listData: [],
+      selectedData: null,
+      expandParam: []
     };
   },
   watch: {
@@ -2816,24 +2818,15 @@ __webpack_require__.r(__webpack_exports__);
     }
   },
   methods: {
-    openModalDelete: function openModalDelete(data) {
-      var _this = this;
-      sweetalert2_dist_sweetalert2_js__WEBPACK_IMPORTED_MODULE_0___default.a.fire({
-        title: 'Are you sure you want to delete?',
-        text: "You won't be able to revert this!",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, delete it!'
-      }).then(function (result) {
-        if (result.isConfirmed) {
-          _this.Delete(data);
-        }
-      });
+    expand: function expand() {},
+    tableAction: function tableAction(e, data) {
+      if (e.target.value == 'expand') {
+        this.selectedData = data;
+        $('.createExpand').removeClass('d-none');
+      }
     },
     list: function list(page) {
-      var _this2 = this;
+      var _this = this;
       if (page == undefined) {
         page = {
           page: 1
@@ -2842,23 +2835,23 @@ __webpack_require__.r(__webpack_exports__);
       this.Param.page = page.page;
       this.TableLoading = true;
       _Services_ApiService__WEBPACK_IMPORTED_MODULE_1__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_2__["default"].companySaleList, this.Param, function (res) {
-        _this2.TableLoading = false;
+        _this.TableLoading = false;
         if (parseInt(res.status) === 200) {
-          _this2.paginateData = res.data;
-          _this2.listData = res.data.data;
+          _this.paginateData = res.data;
+          _this.listData = res.data.data;
         } else {
           _Services_ApiService__WEBPACK_IMPORTED_MODULE_1__["default"].ErrorHandler(res.error);
         }
       });
     },
     Delete: function Delete(data) {
-      var _this3 = this;
+      var _this2 = this;
       _Services_ApiService__WEBPACK_IMPORTED_MODULE_1__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_2__["default"].companySaleDelete, {
         id: data.id
       }, function (res) {
         if (parseInt(res.status) === 200) {
-          _this3.$toast.success(res.message);
-          _this3.list();
+          _this2.$toast.success(res.message);
+          _this2.list();
         } else {
           _Services_ApiService__WEBPACK_IMPORTED_MODULE_1__["default"].ErrorHandler(res.error);
         }
@@ -10819,10 +10812,10 @@ var render = function render() {
     }
   }, [_vm._v("Date")]), _vm._v(" "), _c("th", {
     staticClass: "text-white",
-    "class": _vm.sortClass("company"),
+    "class": _vm.sortClass("name"),
     on: {
       click: function click($event) {
-        return _vm.sortData("company");
+        return _vm.sortData("name");
       }
     }
   }, [_vm._v("Company")]), _vm._v(" "), _c("th", {
@@ -10840,37 +10833,30 @@ var render = function render() {
       attrs: {
         href: "javascript:void(0);"
       }
-    }, [_vm._v(_vm._s(f.company))])]), _vm._v(" "), _c("td", [_c("a", {
+    }, [_vm._v(_vm._s(f.name))])]), _vm._v(" "), _c("td", [_c("a", {
       attrs: {
         href: "javascript:void(0);"
       }
-    }, [_vm._v(_vm._s(f === null || f === void 0 ? void 0 : f.amount))])]), _vm._v(" "), _c("td", [_c("div", {
-      staticClass: "d-flex justify-content-end"
-    }, [_c("router-link", {
-      staticClass: "btn btn-primary shadow btn-xs sharp me-1",
-      attrs: {
-        to: {
-          name: "DispenserEdit",
-          params: {
-            id: f.id
-          }
-        }
-      }
-    }, [_c("i", {
-      staticClass: "fas fa-pencil-alt"
-    })]), _vm._v(" "), _c("a", {
-      staticClass: "btn btn-danger shadow btn-xs sharp",
-      attrs: {
-        href: "javascript:void(0)"
-      },
+    }, [_vm._v(_vm._s(f === null || f === void 0 ? void 0 : f.amount))])]), _vm._v(" "), _c("td", [_c("select", {
+      staticClass: "form-select",
       on: {
-        click: function click($event) {
-          return _vm.openModalDelete(f);
+        change: function change($event) {
+          return _vm.tableAction($event, f);
         }
       }
-    }, [_c("i", {
-      staticClass: "fa fa-trash"
-    })])], 1)])]);
+    }, [_c("option", {
+      attrs: {
+        value: "expand"
+      }
+    }, [_vm._v("Expand")]), _vm._v(" "), _c("option", {
+      attrs: {
+        value: "generate"
+      }
+    }, [_vm._v("Generate Invoices")]), _vm._v(" "), _c("option", {
+      attrs: {
+        value: "view"
+      }
+    }, [_vm._v("View Invoices")])])])]);
   }), 0) : _vm._e(), _vm._v(" "), _vm.listData.length == 0 && _vm.TableLoading == false ? _c("tbody", [_vm._m(2)]) : _vm._e(), _vm._v(" "), _vm.TableLoading == true ? _c("tbody", [_vm._m(3)]) : _vm._e()]), _vm._v(" "), _vm.paginateData != null ? _c("div", {
     staticClass: "dataTables_info",
     attrs: {
@@ -10888,7 +10874,109 @@ var render = function render() {
       data: _vm.paginateData,
       onChange: _vm.list
     }
-  })], 1)])])])])])])])])]);
+  })], 1)])])])])])])])]), _vm._v(" "), _c("div", {
+    staticClass: "popup-wrapper createExpand d-none"
+  }, [_c("form", {
+    staticClass: "popup-box",
+    staticStyle: {
+      "max-width": "800px"
+    },
+    on: {
+      submit: function submit($event) {
+        $event.preventDefault();
+        return _vm.expand.apply(null, arguments);
+      }
+    }
+  }, [_vm._m(4), _vm._v(" "), _c("div", {
+    staticClass: "row"
+  }, [_c("div", {
+    staticClass: "col-sm-6"
+  }, [_c("div", {
+    staticClass: "input-wrapper form-group mb-3"
+  }, [_c("label", {
+    attrs: {
+      "for": "substation"
+    }
+  }, [_vm._v("Substation")]), _vm._v(" "), _c("select", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.postData.substation_id,
+      expression: "postData.substation_id"
+    }],
+    staticClass: "w-100 form-control bg-form-control",
+    attrs: {
+      name: "substation_id",
+      id: "substation"
+    },
+    on: {
+      change: function change($event) {
+        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
+          return o.selected;
+        }).map(function (o) {
+          var val = "_value" in o ? o._value : o.value;
+          return val;
+        });
+        _vm.$set(_vm.postData, "substation_id", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
+      }
+    }
+  }, [_c("option", {
+    domProps: {
+      value: ""
+    }
+  }, [_vm._v("Select substation")]), _vm._v(" "), _vm._l(_vm.allSubstation, function (s) {
+    return _c("option", {
+      domProps: {
+        value: s.id
+      }
+    }, [_vm._v(_vm._s(s.name))]);
+  })], 2), _vm._v(" "), _c("small", {
+    staticClass: "error-report text-danger"
+  })])]), _vm._v(" "), _c("div", {
+    staticClass: "col-sm-6"
+  }, [_c("div", {
+    staticClass: "input-wrapper form-group mb-3"
+  }, [_c("label", {
+    attrs: {
+      "for": "lat"
+    }
+  }, [_vm._v("Latitude")]), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.postData.lat,
+      expression: "postData.lat"
+    }],
+    staticClass: "w-100 form-control",
+    attrs: {
+      type: "text",
+      name: "lat",
+      id: "lat",
+      placeholder: "Latitude here"
+    },
+    domProps: {
+      value: _vm.postData.lat
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.postData, "lat", $event.target.value);
+      }
+    }
+  }), _vm._v(" "), _c("small", {
+    staticClass: "error-report text-danger"
+  })])])]), _vm._v(" "), !_vm.Loading ? _c("button", {
+    staticClass: "btn btn-primary",
+    attrs: {
+      type: "submit"
+    }
+  }, [_vm._v("Submit")]) : _vm._e(), _vm._v(" "), _vm.Loading ? _c("button", {
+    staticClass: "btn btn-primary",
+    attrs: {
+      type: "button",
+      disabled: ""
+    }
+  }, [_vm._v("Submitting...")]) : _vm._e()])])]);
 };
 var staticRenderFns = [function () {
   var _vm = this,
@@ -10926,6 +11014,17 @@ var staticRenderFns = [function () {
       colspan: "10"
     }
   }, [_vm._v("Loading....")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("button", {
+    staticClass: "btn closeBtn",
+    attrs: {
+      type: "button"
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-times"
+  })]);
 }];
 render._withStripped = true;
 

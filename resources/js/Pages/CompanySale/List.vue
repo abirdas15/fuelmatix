@@ -37,7 +37,7 @@
                                             <thead>
                                             <tr class="text-white" style="background-color: #4886EE;color:#ffffff">
                                                 <th class="text-white" @click="sortData('date')" :class="sortClass('date')">Date</th>
-                                                <th class="text-white" @click="sortData('company')" :class="sortClass('company')">Company</th>
+                                                <th class="text-white" @click="sortData('name')" :class="sortClass('name')">Company</th>
                                                 <th class="text-white" @click="sortData('amount')" :class="sortClass('amount')">Amount</th>
                                                 <th class="text-white" >Action</th>
                                             </tr>
@@ -45,17 +45,14 @@
                                             <tbody v-if="listData.length > 0 && TableLoading == false">
                                             <tr v-for="f in listData">
                                                 <td >{{f.date}}</td>
-                                                <td><a href="javascript:void(0);">{{f.company}}</a></td>
+                                                <td><a href="javascript:void(0);">{{f.name}}</a></td>
                                                 <td><a href="javascript:void(0);">{{f?.amount}}</a></td>
                                                 <td>
-                                                    <div class="d-flex justify-content-end">
-                                                        <router-link :to="{name: 'DispenserEdit', params: { id: f.id }}" class=" btn btn-primary shadow btn-xs sharp me-1">
-                                                            <i class="fas fa-pencil-alt"></i>
-                                                        </router-link>
-                                                        <a  href="javascript:void(0)"  @click="openModalDelete(f)" class="btn btn-danger shadow btn-xs sharp">
-                                                            <i class="fa fa-trash"></i>
-                                                        </a>
-                                                    </div>
+                                                    <select class="form-select" @change="tableAction($event, f)">
+                                                        <option value="expand">Expand</option>
+                                                        <option value="generate">Generate Invoices</option>
+                                                        <option value="view">View Invoices</option>
+                                                    </select>
                                                 </td>
                                             </tr>
                                             </tbody>
@@ -85,6 +82,34 @@
                 </div>
             </div>
         </div>
+        <div class="popup-wrapper createExpand d-none">
+            <form @submit.prevent="expand" class="popup-box" style="max-width: 800px">
+                <button type="button" class=" btn  closeBtn"><i class="fas fa-times"></i></button>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="input-wrapper form-group mb-3">
+                            <label for="substation">Substation</label>
+                            <select class="w-100 form-control bg-form-control" name="substation_id" id="substation" v-model="postData.substation_id">
+                                <option :value="''">Select substation</option>
+                                <option :value="s.id" v-for="s in allSubstation">{{s.name}}</option>
+                            </select>
+                            <small class="error-report text-danger"></small>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="input-wrapper form-group mb-3">
+                            <label for="lat">Latitude</label>
+                            <input type="text" class="w-100 form-control" name="lat" id="lat"
+                                   v-model="postData.lat" placeholder="Latitude here">
+                            <small class="error-report text-danger"></small>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary " v-if="!Loading">Submit</button>
+                <button type="button" class="btn btn-primary " disabled v-if="Loading">Submitting...</button>
+            </form>
+        </div>
     </div>
 </template>
 
@@ -110,6 +135,8 @@ export default {
             Loading: false,
             TableLoading: false,
             listData: [],
+            selectedData: null,
+            expandParam: []
         };
     },
     watch: {
@@ -126,20 +153,14 @@ export default {
         },
     },
     methods: {
-        openModalDelete(data) {
-            Swal.fire({
-                title: 'Are you sure you want to delete?',
-                text: "You won't be able to revert this!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, delete it!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    this.Delete(data)
-                }
-            })
+        expand: function () {
+
+        },
+        tableAction: function (e, data) {
+            if (e.target.value == 'expand') {
+                this.selectedData = data
+                $('.createExpand').removeClass('d-none')
+            }
         },
         list: function (page) {
             if (page == undefined) {
