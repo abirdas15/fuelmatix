@@ -6536,6 +6536,7 @@ __webpack_require__.r(__webpack_exports__);
     return {
       param: {},
       loading: false,
+      download: false,
       id: '',
       listData: [],
       listDataTank: []
@@ -6551,6 +6552,16 @@ __webpack_require__.r(__webpack_exports__);
         if (parseInt(res.status) === 200) {
           _this.param = res.data;
         }
+      });
+    },
+    downloadInvoice: function downloadInvoice() {
+      var _this2 = this;
+      this.download = true;
+      _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].invoiceSingle, {
+        id: this.id
+      }, function (res) {
+        _this2.download = false;
+        if (parseInt(res.status) === 200) {}
       });
     }
   },
@@ -21379,7 +21390,18 @@ var render = function render() {
     staticClass: "card"
   }, [_vm._m(1), _vm._v(" "), _c("div", {
     staticClass: "card-body"
-  }, [_vm._m(2), _vm._v(" "), _c("div", {
+  }, [_c("div", {
+    staticClass: "row"
+  }, [_c("div", {
+    staticClass: "col-sm-12 text-end"
+  }, [!_vm.download ? _c("button", {
+    staticClass: "btn btn-primary",
+    on: {
+      click: _vm.downloadInvoice
+    }
+  }, [_vm._v("Download Invoice")]) : _vm._e(), _vm._v(" "), _vm.download ? _c("button", {
+    staticClass: "btn btn-primary"
+  }, [_vm._v("Downloading....")]) : _vm._e()])]), _vm._v(" "), _c("div", {
     staticClass: "basic-form"
   }, [_c("div", {
     staticClass: "container"
@@ -21391,9 +21413,9 @@ var render = function render() {
     staticClass: "mb-1"
   }, [_vm._v(_vm._s(_vm.param.company.name))]), _vm._v(" "), _c("div", [_vm._v(_vm._s(_vm.param.company.address))]), _vm._v(" "), _c("div", [_c("strong", [_vm._v("Email")]), _vm._v(": " + _vm._s(_vm.param.company.email))]), _vm._v(" "), _c("div", [_c("strong", [_vm._v("Phone")]), _vm._v(": " + _vm._s(_vm.param.company.phone_number))])]), _vm._v(" "), _c("div", {
     staticClass: "col-sm-6"
-  }, [_vm._m(3), _vm._v(" "), _c("table", {
+  }, [_vm._m(2), _vm._v(" "), _c("table", {
     staticClass: "table table-bordered"
-  }, [_vm._m(4), _vm._v(" "), _c("tbody", [_c("tr", [_c("td", {
+  }, [_vm._m(3), _vm._v(" "), _c("tbody", [_c("tr", [_c("td", {
     staticClass: "text-center"
   }, [_vm._v("#" + _vm._s(_vm.param.invoice_number))]), _vm._v(" "), _c("td", {
     staticClass: "text-center"
@@ -21409,7 +21431,7 @@ var render = function render() {
     staticClass: "col-sm-12"
   }, [_c("table", {
     staticClass: "table table-bordered align-top"
-  }, [_vm._m(5), _vm._v(" "), _c("tbody", [_c("tr", [_c("td", {
+  }, [_vm._m(4), _vm._v(" "), _c("tbody", [_c("tr", [_c("td", {
     staticStyle: {
       height: "400px",
       "vertical-align": "top"
@@ -21422,7 +21444,7 @@ var render = function render() {
     }
   }, [_vm._v(_vm._s(_vm.param.amount))])]), _vm._v(" "), _c("tr", [_c("td"), _vm._v(" "), _c("td", {
     staticClass: "text-end"
-  }, [_vm._v("Total: " + _vm._s(_vm.param.amount))])])])])])])])])])])])])]);
+  }, [_c("strong", [_vm._v("Total")]), _vm._v(": " + _vm._s(_vm.param.amount))])])])])])])])])])])])])]);
 };
 var staticRenderFns = [function () {
   var _vm = this,
@@ -21442,16 +21464,6 @@ var staticRenderFns = [function () {
   }, [_c("h4", {
     staticClass: "card-title"
   }, [_vm._v("Invoice")])]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("div", {
-    staticClass: "row"
-  }, [_c("div", {
-    staticClass: "col-sm-12 text-end"
-  }, [_c("button", {
-    staticClass: "btn btn-primary"
-  }, [_vm._v("Download Invoice")])])]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;

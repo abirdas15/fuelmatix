@@ -18,7 +18,8 @@
                     <div class="card-body">
                         <div class="row">
                             <div class="col-sm-12 text-end">
-                                <button class="btn btn-primary">Download Invoice</button>
+                                <button class="btn btn-primary" @click="downloadInvoice" v-if="!download">Download Invoice</button>
+                                <button class="btn btn-primary" v-if="download">Downloading....</button>
                             </div>
                         </div>
                         <div class="basic-form">
@@ -79,7 +80,7 @@
                                             </tr>
                                             <tr>
                                                 <td ></td>
-                                                <td class="text-end">Total: {{param.amount}}</td>
+                                                <td class="text-end"><strong>Total</strong>: {{param.amount}}</td>
                                             </tr>
                                             </tbody>
                                         </table>
@@ -102,6 +103,7 @@ export default {
         return {
             param: {},
             loading: false,
+            download: false,
             id: '',
             listData: [],
             listDataTank: [],
@@ -115,6 +117,15 @@ export default {
             ApiService.POST(ApiRoutes.invoiceSingle, {id: this.id},res => {
                 if (parseInt(res.status) === 200) {
                     this.param = res.data
+                }
+            });
+        },
+        downloadInvoice: function () {
+            this.download = true
+            ApiService.POST(ApiRoutes.invoiceSingle, {id: this.id},res => {
+                this.download = false
+                if (parseInt(res.status) === 200) {
+
                 }
             });
         },
