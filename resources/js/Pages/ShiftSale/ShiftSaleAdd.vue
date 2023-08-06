@@ -60,21 +60,18 @@
                                                         </div>
                                                         <div class="mb-3 col-md-2">
                                                             <label>Final Reading </label>
-                                                            <input id="frReading" @blur="disableInput('frReading')"
+                                                            <input id="frReading" @blur="disableInput('frReading')" v-if="listDispenser.status == 'end'"
                                                                 type="text" class="form-control"  @click="enableInput('frReading')"
                                                                 v-model="listDispenser.end_reading"
                                                                 @input="calculateAmount">
+                                                            <input value="0" v-if="listDispenser.status == 'start'" disabled>
                                                         </div>
 
                                                         <div class="mb-3 col-md-2">
                                                             <label>Consumption </label>
-                                                            <input type="text" class="form-control" id="consumption" disabled
+                                                            <input type="text" class="form-control" id="consumption" disabled  v-if="listDispenser.status == 'end'"
                                                                    v-model="listDispenser.consumption">
-                                                        </div>
-                                                        <div class="mb-3 col-md-2">
-                                                            <label>Amount </label>
-                                                            <input type="text" class="form-control" disabled
-                                                                   v-model="listDispenser.amount">
+                                                            <input value="0" v-if="listDispenser.status == 'start'" disabled>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -117,6 +114,9 @@
                                                     </div>
                                                 </div>
                                             </div>
+                                            <template v-if="listDispenser.status != 'start'">
+
+                                            </template>
                                             <div class="col-sm-11 text-end mb-2">
                                                 <h4>Total sale: {{totalSale}}</h4>
                                                 <h4>Total amount: {{totalAmount}}</h4>

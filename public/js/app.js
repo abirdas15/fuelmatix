@@ -26803,7 +26803,7 @@ var render = function render() {
     }
   })]), _vm._v(" "), _c("div", {
     staticClass: "mb-3 col-md-2"
-  }, [_c("label", [_vm._v("Final Reading ")]), _vm._v(" "), _c("input", {
+  }, [_c("label", [_vm._v("Final Reading ")]), _vm._v(" "), _vm.listDispenser.status == "end" ? _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -26830,9 +26830,14 @@ var render = function render() {
         _vm.$set(_vm.listDispenser, "end_reading", $event.target.value);
       }, _vm.calculateAmount]
     }
-  })]), _vm._v(" "), _c("div", {
+  }) : _vm._e(), _vm._v(" "), _vm.listDispenser.status == "start" ? _c("input", {
+    attrs: {
+      value: "0",
+      disabled: ""
+    }
+  }) : _vm._e()]), _vm._v(" "), _c("div", {
     staticClass: "mb-3 col-md-2"
-  }, [_c("label", [_vm._v("Consumption ")]), _vm._v(" "), _c("input", {
+  }, [_c("label", [_vm._v("Consumption ")]), _vm._v(" "), _vm.listDispenser.status == "end" ? _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -26854,30 +26859,12 @@ var render = function render() {
         _vm.$set(_vm.listDispenser, "consumption", $event.target.value);
       }
     }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-2"
-  }, [_c("label", [_vm._v("Amount ")]), _vm._v(" "), _c("input", {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: _vm.listDispenser.amount,
-      expression: "listDispenser.amount"
-    }],
-    staticClass: "form-control",
+  }) : _vm._e(), _vm._v(" "), _vm.listDispenser.status == "start" ? _c("input", {
     attrs: {
-      type: "text",
+      value: "0",
       disabled: ""
-    },
-    domProps: {
-      value: _vm.listDispenser.amount
-    },
-    on: {
-      input: function input($event) {
-        if ($event.target.composing) return;
-        _vm.$set(_vm.listDispenser, "amount", $event.target.value);
-      }
     }
-  })])])])]), _vm._v(" "), _vm._l(_vm.listDispenser.dispensers, function (d, dIndex) {
+  }) : _vm._e()])])])]), _vm._v(" "), _vm._l(_vm.listDispenser.dispensers, function (d, dIndex) {
     return _vm.listDispenser.dispensers.length > 0 ? _c("div", {
       staticClass: "card"
     }, [_c("div", {
@@ -26996,7 +26983,7 @@ var render = function render() {
         }
       })])]);
     }), 0) : _vm._e()]) : _vm._e();
-  }), _vm._v(" "), _c("div", {
+  }), _vm._v(" "), _vm.listDispenser.status != "start" ? void 0 : _vm._e(), _vm._v(" "), _c("div", {
     staticClass: "col-sm-11 text-end mb-2"
   }, [_c("h4", [_vm._v("Total sale: " + _vm._s(_vm.totalSale))]), _vm._v(" "), _c("h4", [_vm._v("Total amount: " + _vm._s(_vm.totalAmount))])]), _vm._v(" "), _c("div", {
     staticClass: "row"
