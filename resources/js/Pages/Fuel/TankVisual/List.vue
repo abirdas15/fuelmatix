@@ -35,32 +35,35 @@
                             </div>
                             <div class="row mt-4">
                                 <div class="col-sm-4 mb-5" v-for="f in listData">
-                                    <div id="waterLevelDiags" class="water-tank">
+                                    <div class="taank">
                                         <div class="tank-height">
                                             <div class="height">{{ f.height != null ? f.height : 'N/A' }}</div>
                                             <div class="height-line"></div>
                                         </div>
-                                        <div class="tank-capacity">
-                                            <div class="capacity">{{f.capacity != null ? f.capacity : 'N/A'}}</div>
-                                            <div class="capacity-line"></div>
-                                        </div>
-                                        <div class="fuel-height">
-                                            <div class="fuel-capacity" :style="{bottom: f.water_percent+'%', height: f.fuel_percent+'%'}">
-                                                <div class="fuel-attr" v-if="f.fuel_percent > 0">{{f.fuel_percent}}%</div>
-                                                <div class="fuel-line" v-if="f.fuel_percent > 0"></div>
+                                        <div id="waterLevelDiags" class="water-tank">
+                                            <div class="tank-capacity">
+                                                <div class="capacity">{{f.capacity != null ? f.capacity : 'N/A'}}</div>
+                                                <div class="capacity-line"></div>
                                             </div>
-                                            <div class="water-capacity" :style="{bottom: 0, height: f.water_percent+'%'}">
-                                                <div class="water-attr" v-if="f.water_percent > 0">{{f.water_percent}}%</div>
-                                                <div class="water-line" v-if="f.water_percent > 0"></div>
+                                            <div class="fuel-height">
+                                                <div class="fuel-capacity" :style="{bottom: f.water_percent+'%', height: f.fuel_percent+'%'}">
+                                                    <div class="fuel-attr" v-if="f.fuel_percent > 0">{{f.fuel_percent}}%</div>
+                                                    <div class="fuel-line" v-if="f.fuel_percent > 0"></div>
+                                                </div>
+                                                <div class="water-capacity" :style="{bottom: 0, height: f.water_percent+'%'}">
+                                                    <div class="water-attr" v-if="f.water_percent > 0">{{f.water_percent}}%</div>
+                                                    <div class="water-line" v-if="f.water_percent > 0"></div>
+                                                </div>
                                             </div>
                                         </div>
+                                        <div class="text-center mt-1 fw-bold">
+                                            {{f.tank_name}}
+                                        </div>
+                                        <div class="text-center">
+                                            ({{f.product_name}})
+                                        </div>
                                     </div>
-                                    <div class="text-center mt-1 fw-bold">
-                                        {{f.tank_name}}
-                                    </div>
-                                    <div class="text-center">
-                                        ({{f.product_name}})
-                                    </div>
+
                                 </div>
                             </div>
                         </div>
@@ -177,21 +180,13 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.water-tank{
-    margin: auto;
-    height: 250px;
-    width: 105px;
-    border-width: 3px;
-    border-color: #a6a6a6;
-    border-style: solid;
-    border-radius: 10px;
-    border-top-color: transparent!important;
+.taank{
     position: relative;
     .tank-height{
         position: absolute;
-        right: 0;
+        right: 40%;
         text-align: center;
-        top: -21px;
+        top: -24px;
         .height-line{
             height: 3px;
             width: 94px;
@@ -210,85 +205,116 @@ export default {
             top: 0.8rem;
         }
     }
-    .tank-capacity{
-        position: absolute;
-        left: 0;
-        text-align: center;
-        top: 1rem;
-        .capacity-line{
-            height: 3px;
-            width: 100px;
-            background-image: linear-gradient(90deg, transparent, transparent 50%, #fff 50%, #fff 100%), linear-gradient(90deg, red, red, red, red, red);
-            background-size: 12px 3px, 100% 3px;
-            border: none;
-        }
-        .capacity{
-            color: red;
-        }
-        .tank-attr{
-            color: red;
-            font-weight: bold;
+    .water-tank{
+        margin: auto;
+        height: 250px;
+        width: 300px;
+        border-radius : 190px 190px 133px 147px;
+        border-width: 3px;
+        border-color: #a6a6a6;
+        border-style: solid;
+        position: relative;
+        overflow: hidden;
+        .tank-capacity{
             position: absolute;
-            right: -7rem;
-            top: 0.8rem;
+            left: 41px;
+            text-align: center;
+            top: 1rem;
+            .capacity-line{
+                height: 3px;
+                width: 209px;
+                background-image: linear-gradient(90deg, transparent, transparent 50%, #fff 50%, #fff 100%), linear-gradient(90deg, red, red, red, red, red);
+                background-size: 12px 3px, 100% 3px;
+                border: none;
+            }
+            .capacity{
+                color: red;
+            }
+            .tank-attr{
+                color: red;
+                font-weight: bold;
+                position: absolute;
+                right: -7rem;
+                top: 0.8rem;
+            }
         }
-    }
-    .fuel-height{
-        height: 200px;
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        text-align: center;
-        .fuel-capacity{
-            width: 100%;
-            background-color: #FFC301;
+        .fuel-height{
+            height: 200px;
             position: absolute;
+            bottom: 0;
             left: 0;
             right: 0;
             text-align: center;
-            .fuel-line{
-                height: 2px;
-                width: 130px;
-                background-image: linear-gradient(90deg, transparent, transparent 50%, #fff 50%, #fff 100%), linear-gradient(90deg, #bf9201, #bf9201, #bf9201, #bf9201, #bf9201);
-                background-size: 14px 3px, 100% 3px;
-                border: none;
+            .fuel-capacity{
+                width: 100%;
+                background-color: #FFC301;
                 position: absolute;
-                top: -2px;
+                left: 0;
+                right: 0;
+                text-align: center;
+                //animation: wave 5s infinite;
+                transition: 800ms;
+                .fuel-line{
+                    height: 2px;
+                    width: 300px;
+                    background-size: 14px 3px, 100% 3px;
+                    border: none;
+                    position: absolute;
+                    top: -2px;
+                }
+                .fuel-attr{
+                    color: #FFC301;
+                    font-weight: bold;
+                    position: absolute;
+                    top: -19px;
+                    right: 2.5rem;
+                }
             }
-            .fuel-attr{
-                color: #FFC301;
-                font-weight: bold;
+            .water-capacity{
+                width: 100%;
+                background-color: #1fafed8c;
                 position: absolute;
-                top: -12px;
-                right: -5.5rem;
+                left: 0;
+                right: 0;
+                border-bottom-left-radius: 8px;
+                border-bottom-right-radius: 8px;
+                //animation: wave 5s infinite;
+                transition: 800ms;
+                .water-line{
+                    height: 2px;
+                    width: 300px;
+                    background-size: 14px 3px, 100% 3px;
+                    border: none;
+                    position: absolute;
+                    top: -2px;
+                }
+                .water-attr{
+                    color: #00B3FF;
+                    font-weight: bold;
+                    position: absolute;
+                    top: -20px;
+                    left: 3.5rem;
+                }
             }
         }
-        .water-capacity{
-            width: 100%;
-            background-color: #1fafed8c;
-            position: absolute;
-            left: 0;
-            right: 0;
-            border-bottom-left-radius: 8px;
-            border-bottom-right-radius: 8px;
-            .water-line{
-                height: 2px;
-                width: 130px;
-                background-image: linear-gradient(90deg, transparent, transparent 50%, #fff 50%, #fff 100%), linear-gradient(90deg, #00B3FF, #00B3FF, #00B3FF, #00B3FF, #00B3FF);
-                background-size: 14px 3px, 100% 3px;
-                border: none;
-                position: absolute;
-                top: -2px;
-            }
-            .water-attr{
-                color: #00B3FF;
-                font-weight: bold;
-                position: absolute;
-                right: -5.5rem;
-                top: -12px;
-            }
-        }
+    }
+}
+@keyframes wave {
+    0% {
+        transform: rotateZ(0deg);
+        transition: 800ms
+    }
+    25% {
+        transform: rotateZ(3deg);
+        transition: 800ms
+    }
+    75% {
+        transform: rotateZ(0deg);
+        transition: 800ms
+    }
+    100% {
+        transform: rotateZ(-3deg);
+        transition: 800ms
     }
 }
 .tt{
