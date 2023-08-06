@@ -138,6 +138,8 @@ class InvoiceController extends Controller
         $category['address'] = $others->address ?? '';
         $invoice['customer_company'] = $category;
         $invoice['company'] = $company;
+        $transaction = Transaction::find($invoice['transaction_id']);
+        $invoice['description'] = $transaction['description'] ?? '';
         return response()->json(['status' => 200, 'data' => $invoice]);
     }
     public function downloadPdf(Request $request)
@@ -165,7 +167,9 @@ class InvoiceController extends Controller
         $category['address'] = $others->address ?? '';
         $invoice['customer_company'] = $category;
         $invoice['company'] = $company;
+        $transaction = Transaction::find($invoice['transaction_id']);
+        $invoice['description'] = $transaction['description'] ?? '';
         $pdf = Pdf::loadView('pdf.invoice', ['data' => $invoice]);
-        return $pdf->stream();
+        return $pdf->output();
     }
 }
