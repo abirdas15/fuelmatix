@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\SessionUser;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -19,9 +20,11 @@ class TrailBalanceController extends Controller
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
+        $sessionUser = SessionUser::getUser();
         $result = Transaction::select('categories.category', DB::raw('SUM(debit_amount) as debit_amount'), DB::raw('SUM(credit_amount) as credit_amount'))
             ->whereBetween('date', [$inputData['start_date'], $inputData['end_date']])
             ->leftJoin('categories', 'categories.id', '=', 'transactions.account_id')
+            ->where('transactions.client_company_id', $sessionUser['client_company_id'])
             ->groupBy('account_id')
             ->get()
             ->toArray();

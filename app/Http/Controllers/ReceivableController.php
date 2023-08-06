@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Common\AccountCategory;
+use App\Helpers\SessionUser;
+use App\Models\Category;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -19,10 +22,13 @@ class ReceivableController extends Controller
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
+        $sessionUser = SessionUser::getUser();
+        $receivableCategory = Category::where('client_company_id', $sessionUser['client_company_id'])->where('category', AccountCategory::ACCOUNT_RECEIVABLE)->first();
         $result = Transaction::select('categories.category', DB::raw('SUM(credit_amount - debit_amount) as balance'))
             ->whereBetween('date', [$inputData['start_date'], $inputData['end_date']])
             ->leftJoin('categories', 'categories.id', '=', 'transactions.account_id')
-            ->where('account_category', 6)
+            ->where('categories.parent_category', $receivableCategory['id'])
+            ->where('transactions.client_company_id', $sessionUser['client_company_id'])
             ->groupBy('account_id')
             ->get()
             ->toArray();
