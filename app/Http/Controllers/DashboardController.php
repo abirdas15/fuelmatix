@@ -51,20 +51,29 @@ class DashboardController extends Controller
     public static function getInvoiceAmount()
     {
         $sessionUser = SessionUser::getUser();
-        $result = Invoice::select(DB::raw('SUM(invoices.amount - invoices.paid_amount) as amount'), 'categories.category as name')
+        $queryResult = Invoice::select(DB::raw('SUM(invoices.amount - invoices.paid_amount) as amount'), 'categories.category as name')
             ->leftJoin('categories', 'categories.id', '=', 'invoices.category_id')
             ->where('invoices.client_company_id', $sessionUser['client_company_id'])
             ->having('amount','>', 0)
             ->groupBy('invoices.category_id')
             ->get()
             ->toArray();
-        return $result;
+        $data = [];
+        $label = [];
+        foreach ($queryResult as $row) {
+            $data[] = $row['amount'];
+            $label[] = $row['name'];
+        }
+        return [
+            'label' => $label,
+            'data' => $data
+        ];
     }
     public static function getPayableAmount()
     {
         $sessionUser = SessionUser::getUser();
         $payableCategory = Category::where('client_company_id', $sessionUser['client_company_id'])->where('category', AccountCategory::ACCOUNT_PAYABLE)->first();
-        $result = Transaction::select('categories.category as name', DB::raw('SUM(debit_amount - credit_amount) as amount'))
+        $queryResult = Transaction::select('categories.category as name', DB::raw('SUM(debit_amount - credit_amount) as amount'))
             ->leftJoin('categories', 'categories.id', '=', 'transactions.account_id')
             ->where('categories.parent_category', $payableCategory->id)
             ->where('transactions.client_company_id', $sessionUser['client_company_id'])
@@ -72,6 +81,15 @@ class DashboardController extends Controller
             ->groupBy('account_id')
             ->get()
             ->toArray();
-        return $result;
+        $data = [];
+        $label = [];
+        foreach ($queryResult as $row) {
+            $data[] = $row['amount'];
+            $label[] = $row['name'];
+        }
+        return [
+            'label' => $label,
+            'data' => $data
+        ];
     }
 }
