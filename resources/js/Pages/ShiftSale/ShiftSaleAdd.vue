@@ -126,7 +126,7 @@
                                                                 <option v-for="c in allAmountCategory" :value="c.id">{{c.name}}</option>
                                                             </select>
                                                             <div class="form-group">
-                                                                <input class="form-control me-3"  style="max-width: 210px" type="text" v-model="category.amount" :id="'categories.'+index+'.amount'"
+                                                                <input class="form-control me-3"  style="max-width: 210px" type="number" v-model="category.amount" :id="'categories.'+index+'.amount'"
                                                                        @input="calculateValue(category.amount)"
                                                                        :name="'categories.'+index+'.amount'">
                                                                 <div class="invalid-feedback"></div>
@@ -140,7 +140,7 @@
                                                     </div>
                                                     <div class="col-sm-6"></div>
                                                     <div class="col-sm-6">
-                                                        <h4>Amount: {{totalPaid}} Tk</h4>
+                                                        <h4>Amount: {{isNaN(totalPaid) ? 0 : totalPaid}} Tk</h4>
                                                     </div>
                                                 </div>
                                             </template>
@@ -191,7 +191,6 @@ export default {
     },
     methods: {
         calculateValue: function (amount) {
-            console.log(amount)
             this.totalPaid = 0
             this.categories.map(v => {
                 this.totalPaid += parseInt(v.amount)
@@ -207,6 +206,8 @@ export default {
             });
         },
         getTotalSale: function () {
+            this.totalSale = 0
+            this.totalAmount = 0
             this.listDispenser.dispensers.map((dispenser) => {
                 dispenser.nozzle.map((nozzle) => {
                     this.totalSale += nozzle.consumption
