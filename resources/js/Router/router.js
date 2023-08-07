@@ -34,6 +34,7 @@ import NozzleReadingAdd from "../Pages/Fuel/NozzleReading/Add";
 import NozzleReadingEdit from "../Pages/Fuel/NozzleReading/Edit";
 import ShiftSaleStart from "../Pages/ShiftSale/ShiftSaleAdd";
 import ShiftSaleList from "../Pages/ShiftSale/List.vue";
+import ShiftSaleListStart from "../Pages/ShiftSale/ListStart.vue";
 import ShiftSaleEdit from "../Pages/ShiftSale/ShiftSaleEdit.vue";
 import Pos from "../Pages/Pos/Pos";
 import PosList from "../Pages/Pos/List.vue";
@@ -116,6 +117,7 @@ const router = new VueRouter({
                 { path: ROOT_URL + "/nozzle/reading/edit/:id", name: "NozzleReadingEdit", component: NozzleReadingEdit},
                 { path: ROOT_URL + "/shift/sale/start", name: "ShiftSaleAdd", component: ShiftSaleStart},
                 { path: ROOT_URL + "/shift/sale/list", name: "ShiftSaleList", component: ShiftSaleList},
+                { path: ROOT_URL + "/shift/sale/list/start", name: "ShiftSaleListStart", component: ShiftSaleListStart},
                 { path: ROOT_URL + "/shift/sale/edit/:id", name: "ShiftSaleEdit", component: ShiftSaleEdit},
                 { path: ROOT_URL + "/pos", name: "Pos", component: Pos},
                 { path: ROOT_URL + "/pos/list", name: "PosList", component: PosList},

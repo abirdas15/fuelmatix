@@ -36,15 +36,15 @@
                             <div class="row mt-4">
                                 <div class="col-sm-4 mb-5" v-for="f in listData">
                                     <div class="taank">
-                                        <div class="tank-height">
+<!--                                        <div class="tank-height">
                                             <div class="height">{{ f.height != null ? f.height : 'N/A' }}</div>
                                             <div class="height-line"></div>
-                                        </div>
+                                        </div>-->
                                         <div id="waterLevelDiags" class="water-tank">
-                                            <div class="tank-capacity">
+<!--                                            <div class="tank-capacity">
                                                 <div class="capacity">{{f.capacity != null ? f.capacity : 'N/A'}}</div>
                                                 <div class="capacity-line"></div>
-                                            </div>
+                                            </div>-->
                                             <div class="fuel-height">
                                                 <div class="fuel-capacity" :style="{bottom: f.water_percent+'%', height: f.fuel_percent+'%'}">
                                                     <div class="fuel-attr" v-if="f.fuel_percent > 0">{{f.fuel_percent}}%</div>
@@ -247,11 +247,19 @@ export default {
             text-align: center;
             .fuel-capacity{
                 width: 100%;
-                background-color: #FFC301;
                 position: absolute;
                 left: 0;
                 right: 0;
                 text-align: center;
+                &.petrol{
+                    background-color: #D5D783;
+                }
+                &.octane{
+                    background-color: #e76362;
+                }
+                &.octane{
+                    background-color: #e76362;
+                }
                 //animation: wave 5s infinite;
                 transition: 800ms;
                 .fuel-line{

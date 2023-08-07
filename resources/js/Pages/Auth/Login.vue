@@ -2,7 +2,7 @@
     <div class="authincation h-100 align-items-center"
          style="background-image: url('/images/fuelbg.jpg'); background-repeat: no-repeat;width: 100%;background-position: center; background-size: cover;">
         <div class="container h-100">
-            <div class="row justify-content-center h-100">
+            <div class="row justify-content-start h-100">
                 <div class="col-md-6">
                     <div class="authincation-content">
                         <div class="row no-gutters">

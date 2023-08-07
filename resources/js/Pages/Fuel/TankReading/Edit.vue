@@ -46,11 +46,6 @@
                                         <input type="text" class="form-control" name="height" v-model="param.height">
                                         <div class="invalid-feedback"></div>
                                     </div>
-                                    <div class="mb-3 form-group col-md-6">
-                                        <label class="form-label">Water Height:</label>
-                                        <input type="text" class="form-control" name="water_height" v-model="param.water_height">
-                                        <div class="invalid-feedback"></div>
-                                    </div>
                                 </div>
                                 <div class="row" style="text-align: right;">
                                     <div class="mb-3 col-md-6">

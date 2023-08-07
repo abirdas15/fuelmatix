@@ -5,6 +5,7 @@
                 <ol class="breadcrumb align-items-center ">
                     <li class="breadcrumb-item active"><router-link :to="{name: 'Dashboard'}">Home</router-link></li>
                     <li class="breadcrumb-item"><a href="javascript:void(0)">Shift Sale History</a></li>
+                    <li style="margin-left: auto;"><router-link :to="{name: 'ShiftSaleAdd'}"><i class="fa-solid fa-plus"></i> Start Shift Sale</router-link></li>
                 </ol>
             </div>
             <div class="row">
@@ -58,6 +59,9 @@
 <!--                                                        <router-link :to="{name: 'ShiftSaleEdit', params: { id: f.id }}" class=" btn btn-primary shadow btn-xs sharp me-1">-->
 <!--                                                            <i class="fas fa-pencil-alt"></i>-->
 <!--                                                        </router-link>-->
+                                                        <router-link :to="{name: 'ShiftSaleAdd', query: { product_id: f.product_id }}" class=" btn btn-primary shadow btn-xs sharp me-1">
+                                                            <i class="fas fa-eye"></i>
+                                                        </router-link>
                                                         <a  href="javascript:void(0)"  @click="openModalDelete(f)" class="btn btn-danger shadow btn-xs sharp">
                                                             <i class="fa fa-trash"></i>
                                                         </a>
@@ -112,7 +116,7 @@ export default {
                 order_by: 'id',
                 order_mode: 'DESC',
                 page: 1,
-                status: 'end',
+                status: 'start',
             },
             Loading: false,
             TableLoading: false,

@@ -1,7 +1,7 @@
 <template>
   <div>
       <div class="nav-header">
-          <a href="index.html" class="brand-logo">
+          <a href="javascript:void(0)" class="brand-logo">
               <img src="/images/fuelBL.jpeg" alt="">
           </a>
           <div class="nav-control">

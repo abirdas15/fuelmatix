@@ -10,21 +10,7 @@
                     </div>
                 </div>
                 <div class="col-sm-12 mb-5">
-                    <div class="text-center mt-1 mb-1 fs-3">AC Payable</div>
-                    <div style="height: 300px">
-                        <canvas id="payChart"></canvas>
-                    </div>
-
-                </div>
-                <div class="col-sm-12 mb-5">
-                    <div class="text-center mt-1 mb-1 fs-3">AC Receivable</div>
-                    <div style="height: 300px">
-                        <canvas id="invoiceChart"></canvas>
-                    </div>
-                </div>
-
-                <div class="col-sm-12 mb-5">
-                    <div class="text-center mt-1 mb-1 fs-3">Tank</div>
+                    <div class="text-center mt-1 mb-3 fs-3 ">Tank</div>
                     <div class="row mt-4">
                         <div class="col-sm-4 mb-5" v-for="f in listData">
                             <div class="taank">
@@ -59,6 +45,19 @@
                         </div>
                     </div>
                 </div>
+                <div class="col-sm-12 mb-5">
+                    <div class="text-center mt-1 mb-1 fs-3">AC Payable</div>
+                    <div style="height: 300px">
+                        <canvas id="payChart"></canvas>
+                    </div>
+                </div>
+                <div class="col-sm-12 mb-5">
+                    <div class="text-center mt-1 mb-1 fs-3">AC Receivable</div>
+                    <div style="height: 300px">
+                        <canvas id="invoiceChart"></canvas>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>

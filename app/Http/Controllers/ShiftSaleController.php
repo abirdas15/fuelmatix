@@ -159,7 +159,8 @@ class ShiftSaleController extends Controller
         $result = ShiftSale::select('shift_sale.*', 'products.name as product_name', 'users.name as user_name')
             ->leftJoin('products', 'products.id', 'shift_sale.product_id')
             ->leftJoin('users', 'users.id','=', 'shift_sale.user_id')
-            ->where('shift_sale.client_company_id', $inputData['session_user']['client_company_id']);
+            ->where('shift_sale.client_company_id', $inputData['session_user']['client_company_id'])
+            ->where('shift_sale.status', $inputData['status']);
         if (!empty($keyword)) {
             $result->where(function($q) use ($keyword) {
                 $q->where('products.product_name', 'LIKE', '%'.$keyword.'%');

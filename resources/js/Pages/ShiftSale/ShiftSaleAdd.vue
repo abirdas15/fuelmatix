@@ -186,7 +186,7 @@ export default {
             totalAmount: 0,
             allAmountCategory: null,
             categories: [],
-            totalPaid: 0
+            totalPaid: 0,
         }
     },
     methods: {
@@ -296,9 +296,15 @@ export default {
                 this.loading = false
                 if (parseInt(res.status) === 200) {
                     this.$toast.success(res.message);
-                    this.$router.push({
-                        name: 'ShiftSaleList'
-                    })
+                    if (this.listDispenser.status == 'start') {
+                        this.$router.push({
+                            name: 'ShiftSaleListStart'
+                        })
+                    } else {
+                        this.$router.push({
+                            name: 'ShiftSaleList'
+                        })
+                    }
                 } else {
                     ApiService.ErrorHandler(res.errors);
                 }
@@ -309,6 +315,11 @@ export default {
         this.getProduct()
     },
     mounted() {
+        if (this.$route.query.product_id != undefined) {
+            this.product_id = this.$route.query.product_id
+            this.getProduct()
+            this.getProductDispenser()
+        }
         $('#dashboard_bar').text('Shift Sale Start')
     }
 }

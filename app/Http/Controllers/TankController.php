@@ -89,10 +89,10 @@ class TankController extends Controller
             $data['water_percent'] = 0;
             if ($data['last_reading'] != null) {
                 if ($data['capacity'] > 0 && $data['last_reading']['height'] > 0) {
-                    $data['fuel_percent'] = number_format(($data['last_reading']['height'] / $data['capacity']) * 100, 2);
+                    $data['fuel_percent'] = number_format(($data['last_reading']['height'] / $data['height']) * 100, 2);
                 }
                 if ($data['capacity'] > 0 && $data['last_reading']['water_height'] > 0) {
-                    $data['water_percent'] = number_format(($data['last_reading']['water_height'] / $data['capacity']) * 100, 2);
+                    $data['water_percent'] = number_format(($data['last_reading']['water_height'] / $data['height']) * 100, 2);
                 }
             }
         }
@@ -169,7 +169,6 @@ class TankController extends Controller
             'tank_id' => 'required',
             'date' => 'required',
             'height' => 'required',
-            'water_height' => 'required',
         ]);
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
@@ -181,7 +180,6 @@ class TankController extends Controller
         $reading->tank_id = $inputData['tank_id'];
         $reading->date = $inputData['date'];
         $reading->height = $inputData['height'];
-        $reading->water_height = $inputData['water_height'];
         $reading->type = $inputData['type'];
         $reading->volume = $bstiChart != null ? $bstiChart->volume : 0;
         $reading->client_company_id = $inputData['session_user']['client_company_id'];
@@ -235,7 +233,6 @@ class TankController extends Controller
             'tank_id' => 'required',
             'date' => 'required',
             'height' => 'required',
-            'water_height' => 'required',
         ]);
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
@@ -250,7 +247,6 @@ class TankController extends Controller
         $reading->tank_id = $inputData['tank_id'];
         $reading->date = $inputData['date'];
         $reading->height = $inputData['height'];
-        $reading->water_height = $inputData['water_height'];
         $reading->volume = $bstiChart != null ? $bstiChart->volume : 0;
         if ($reading->save()) {
             return response()->json(['status' => 200, 'message' => 'Successfully updated tank reading.']);
