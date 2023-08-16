@@ -76,6 +76,7 @@ import salaryEdit from "../Pages/Salary/Edit.vue";
 import CompanySale from "../Pages/CompanySale/List.vue";
 import Invoice from "../Pages/Invoices/List.vue";
 import InvoiceView from "../Pages/Invoices/View.vue";
+import dailyReport from "../Pages/DailyReport/dailyReport.vue";
 
 const ROOT_URL = "";
 const router = new VueRouter({
@@ -159,6 +160,7 @@ const router = new VueRouter({
                 { path: ROOT_URL + "/company/sale", name: "CompanySale", component: CompanySale},
                 { path: ROOT_URL + "/invoices", name: "Invoices", component: Invoice},
                 { path: ROOT_URL + "/invoices/view/:id", name: "InvoicesView", component: InvoiceView},
+                { path: ROOT_URL + "/daily/report", name: "dailyReport", component: dailyReport},
             ],
         },
     ],
