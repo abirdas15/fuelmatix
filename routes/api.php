@@ -232,7 +232,10 @@ Route::group(['middleware' => 'AuthReqCheck'], function() {
         Route::post('get', [DashboardController::class, 'get']);
     });
     Route::group(['prefix' => 'report'], function() {
-        Route::post('dailyLog', [ReportController::class, 'dailyLog']);
+        Route::group(['prefix' => 'dailyLog'], function() {
+            Route::post('/', [ReportController::class, 'dailyLog']);
+            Route::post('export/pdf', [ReportController::class, 'dailyLogExportPdf']);
+        });
     });
 });
 
