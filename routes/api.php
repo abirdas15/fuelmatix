@@ -29,6 +29,7 @@ use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\SalaryController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ReportController;
 
 /*
 |--------------------------------------------------------------------------
@@ -229,6 +230,9 @@ Route::group(['middleware' => 'AuthReqCheck'], function() {
     });
     Route::group(['prefix' => 'dashboard'], function() {
         Route::post('get', [DashboardController::class, 'get']);
+    });
+    Route::group(['prefix' => 'report'], function() {
+        Route::post('dailyLog', [ReportController::class, 'dailyLog']);
     });
 });
 
