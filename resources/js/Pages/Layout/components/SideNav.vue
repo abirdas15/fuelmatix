@@ -90,8 +90,8 @@
                     </a>
                     <ul aria-expanded="false" class="bichi">
                         <li>
-                            <a href="javascript:void(0)" >Daily Report
-                            </a>
+                            <router-link :to="{name: 'dailyReport'}" >Daily Report
+                            </router-link>
                         </li>
                         <li>
                             <router-link :to="{name: 'BalanceSheet'}" >Balance
