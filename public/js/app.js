@@ -12590,17 +12590,18 @@ var render = function render() {
     staticClass: "text-end"
   }, [_vm._v("Quantity")]), _vm._v(" "), _c("th", {
     staticClass: "text-end"
-  }, [_vm._v("Amount")])], 2)]), _vm._v(" "), _c("tbody", [_vm._l(_vm.data["shift_sale"]["data"], function (row) {
-    return _c("tr");
-  }), _c("tr", [_c("td", [_vm._v(_vm._s(_vm.row["name"]))]), _vm._v(" "), _vm._l(_vm.row["value"], function (value) {
-    return [_c("td", [_vm._v(_vm._s(value["quantity"]) + "liters")]), _vm._v(" "), _c("td", {
+  }, [_vm._v("Amount")])], 2)]), _vm._v(" "), _c("tbody", _vm._l(_vm.data["shift_sale"]["data"], function (row) {
+    var _row$total, _row$total2;
+    return _c("tr", [_c("td", [_vm._v(_vm._s(row === null || row === void 0 ? void 0 : row.name))]), _vm._v(" "), _vm._l(row === null || row === void 0 ? void 0 : row.value, function (value) {
+      return [_c("td", [_vm._v(_vm._s(value["quantity"]) + "liters")]), _vm._v(" "), _c("td", {
+        staticClass: "text-end"
+      }, [_c("div", [_vm._v(_vm._s(value["amount"]))]), _vm._v(" "), _vm._m(2, true), _vm._v(" "), _c("div", {
+        staticClass: "text-danger"
+      }, [_vm._v("5%")])])];
+    }), _vm._v(" "), _c("td", [_vm._v(_vm._s(row === null || row === void 0 ? void 0 : (_row$total = row.total) === null || _row$total === void 0 ? void 0 : _row$total.quantity) + "liters")]), _vm._v(" "), _c("td", {
       staticClass: "text-end"
-    }, [_c("div", [_vm._v(_vm._s(value["amount"]))]), _vm._v(" "), _vm._m(2, true), _vm._v(" "), _c("div", {
-      staticClass: "text-danger"
-    }, [_vm._v("5%")])])];
-  }), _vm._v(" "), _c("td", [_vm._v(_vm._s(_vm.row["total"]["quantity"]) + "liters")]), _vm._v(" "), _c("td", {
-    staticClass: "text-end"
-  }, [_c("div", [_vm._v(_vm._s(_vm.row["total"]["amount"]))])])], 2)], 2)]), _vm._v(" "), _c("h3", {
+    }, [_c("div", [_vm._v(_vm._s(row === null || row === void 0 ? void 0 : (_row$total2 = row.total) === null || _row$total2 === void 0 ? void 0 : _row$total2.amount))])])], 2);
+  }), 0)]), _vm._v(" "), _c("h3", {
     staticClass: "text-center mb-4"
   }, [_vm._v("Refill")]), _vm._v(" "), _c("table", {
     staticClass: "table table-bordered mb-5"
@@ -12611,7 +12612,7 @@ var render = function render() {
   }, [_vm._v("Stock (tank_log)")]), _vm._v(" "), _c("table", {
     staticClass: "table table-bordered mb-5"
   }, [_vm._m(4), _vm._v(" "), _c("tbody", _vm._l(_vm.data["stock"], function (row) {
-    return _c("tr", [_c("td", [_vm._v(_vm._s(row["name"]))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(row["opening_stock"]) + "litres")]), _vm._v(" "), _c("td", [_vm._v(_vm._s(row["closing_stock"]) + "litres")])]);
+    return _c("tr", [_c("td", [_vm._v(_vm._s(row === null || row === void 0 ? void 0 : row.name))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(row["opening_stock"]) + "litres")]), _vm._v(" "), _c("td", [_vm._v(_vm._s(row["closing_stock"]) + "litres")])]);
   }), 0)]), _vm._v(" "), _c("h3", {
     staticClass: "text-center mb-4"
   }, [_vm._v("Expenses")]), _vm._v(" "), _c("table", {

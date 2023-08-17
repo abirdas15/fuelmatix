@@ -44,21 +44,19 @@
                                 </thead>
                                 <tbody>
                                 <tr v-for="row in data['shift_sale']['data']">
-                                    <tr>
-                                        <td>{{ row['name'] }}</td>
-                                        <template v-for="value in row['value']">
-                                            <td>{{ value['quantity'] }}liters</td>
-                                            <td class="text-end">
-                                                <div>{{ value['amount'] }}</div>
-                                                <div><i class="fa-solid fa-circle-down text-danger"></i></div>
-                                                <div class="text-danger">5%</div>
-                                            </td>
-                                        </template>
-                                        <td>{{ row['total']['quantity'] }}liters</td>
+                                    <td>{{ row?.name }}</td>
+                                    <template v-for="value in row?.value">
+                                        <td>{{ value['quantity'] }}liters</td>
                                         <td class="text-end">
-                                            <div>{{ row['total']['amount'] }}</div>
+                                            <div>{{ value['amount'] }}</div>
+                                            <div><i class="fa-solid fa-circle-down text-danger"></i></div>
+                                            <div class="text-danger">5%</div>
                                         </td>
-                                    </tr>
+                                    </template>
+                                    <td>{{ row?.total?.quantity }}liters</td>
+                                    <td class="text-end">
+                                        <div>{{ row?.total?.amount }}</div>
+                                    </td>
                                 </tr>
                                 </tbody>
                             </table>
@@ -92,7 +90,7 @@
                                 </thead>
                                 <tbody>
                                 <tr v-for="row in data['stock']">
-                                    <td>{{ row['name'] }}</td>
+                                    <td>{{ row?.name }}</td>
                                     <td>{{ row['opening_stock'] }}litres</td>
                                     <td>{{ row['closing_stock'] }}litres</td>
                                 </tr>
