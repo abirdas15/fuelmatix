@@ -4,9 +4,6 @@
     <style>
         @page { margin: 5px; }
         body { margin: 5px; }
-        .table {
-            width: 95%;
-        }
         .table-bordered tr th {
             font-size: 14px;
         }
@@ -18,12 +15,10 @@
             border-collapse: collapse;
             width: 100%;
         }
-
         .table td, .table th {
             border: 1px solid #ddd;
             padding: 8px;
         }
-
         .table tr:nth-child(even){background-color: #f2f2f2;}
 
         .table tr:hover {background-color: #ddd;}
@@ -45,7 +40,7 @@
 <body>
 <div style="width: 100%; margin-top: 20px; padding: 20px">
     <h3 class="text-center mb-4">Product Sale</h3>
-    <table class="table table-bordered mb-5">
+    <table class="table" style="width: 95%; margin-bottom: 30px">
         <thead>
         <tr>
             <th rowspan="2">Sale</th>
@@ -73,7 +68,8 @@
                         <div>{{ $value['amount'] }}</div>
                     </td>
                 @endforeach
-                <td>{{ $row['total']['quantity'] }}liters</td>
+                <td>{{ $row['total']['quantity'] }}liters
+                </td>
                 <td class="text-end">
                     <div>{{ $row['total']['amount'] }}</div>
                 </td>
@@ -82,7 +78,7 @@
         </tbody>
     </table>
     <h3 class="text-center mb-4">Refill</h3>
-    <table class="table table-bordered mb-5">
+    <table class="table" style="width: 95%; margin-bottom: 30px">
         <thead>
         <tr>
             <th>Product</th>
@@ -103,7 +99,7 @@
         </tbody>
     </table>
     <h3 class="text-center mb-4">Stock (tank_log)</h3>
-    <table class="table table-bordered mb-5">
+    <table class="table" style="width: 95%; margin-bottom: 30px">
         <thead>
         <tr>
             <th>Product</th>
@@ -122,7 +118,7 @@
         </tbody>
     </table>
     <h3 class="text-center mb-4">Expenses</h3>
-    <table class="table table-bordered mb-5">
+    <table class="table" style="width: 95%; margin-bottom: 30px">
         <tr>
             <th>Salary</th>
             <td class="text-end">{{ $data['expense']['salary'] }}</td>
@@ -136,7 +132,7 @@
 
     </table>
     <h3 class="text-center mb-4">Due Payments</h3>
-    <table class="table table-bordered mb-5">
+    <table class="table" style="width: 95%; margin-bottom: 30px">
         <thead>
         <tr>
             <th>Provider</th>
@@ -148,7 +144,7 @@
         <tbody>
         @foreach($data['due_payments'] as $row)
             <tr>
-                <td class="text-end">{{ $row['category_name'] }}</td>
+                <td >{{ $row['category_name'] }}</td>
                 {{--            <td>3-3-23 4:34:56</td>--}}
                 {{--            <td>3-3-23 4:34:56</td>--}}
                 <td class="text-end">{{ $row['amount'] }}</td>
@@ -157,7 +153,7 @@
         </tbody>
     </table>
     <h3 class="text-center mb-4">Due Invoices</h3>
-    <table class="table table-bordered mb-5">
+    <table class="table" style="width: 95%; margin-bottom: 30px">
         <thead>
         <tr>
             <th>Party</th>
@@ -170,7 +166,7 @@
         <tbody>
         @foreach($data['due_invoice'] as $row)
             <tr>
-                <td class="text-end">{{ $row['category_name'] }}</td>
+                <td>{{ $row['category_name'] }}</td>
                 {{--            <td>3-3-23 4:34:56</td>--}}
                 {{--            <td>3-3-23 4:34:56</td>--}}
                 <td class="text-end">{{ $row['amount'] }}</td>
@@ -179,7 +175,7 @@
         </tbody>
     </table>
     <h3 class="text-center mb-4">Asset Balance </h3>
-    <table class="table table-bordered mb-5">
+    <table class="table" style="width: 95%; margin-bottom: 30px">
         @foreach($data['asset_balance']['cash'] as $row)
             <tr>
                 <th>{{ $row['category_name'] }}</th>
@@ -194,7 +190,7 @@
         @endforeach
     </table>
     <h3 class="text-center mb-4">Attendance</h3>
-    <table class="table table-bordered mb-5">
+    <table class="table" style="width: 95%; margin-bottom: 30px">
         <thead>
         <tr>
             <th>Shift 1</th>

@@ -3189,10 +3189,25 @@ __webpack_require__.r(__webpack_exports__);
         date: ''
       },
       data: null,
+      loadingFile: false,
       loading: false
     };
   },
   methods: {
+    getClass: function getClass(text) {
+      if (text[0] == '-') {
+        return "fa-circle-down text-danger";
+      } else {
+        return "fa-circle-up text-success";
+      }
+    },
+    getPercent: function getPercent(text) {
+      if (text[0] == '-') {
+        return "<div class=\"text-danger\">".concat(text, " %</div>");
+      } else {
+        return "<div class=\"text-success\">".concat(text, " %</div>");
+      }
+    },
     getReport: function getReport() {
       var _this = this;
       this.loading = true;
@@ -3205,11 +3220,25 @@ __webpack_require__.r(__webpack_exports__);
           _this.data = res.data;
         }
       });
+    },
+    downloadPdf: function downloadPdf() {
+      var _this2 = this;
+      this.loadingFile = true;
+      _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].DOWNLOAD(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].dailyLogPdf, this.param, '', function (res) {
+        _this2.loadingFile = false;
+        var blob = new Blob([res], {
+          type: 'pdf'
+        });
+        var link = document.createElement('a');
+        link.href = window.URL.createObjectURL(blob);
+        link.download = 'Daily Log.pdf';
+        link.click();
+      });
     }
   },
   created: function created() {},
   mounted: function mounted() {
-    var _this2 = this;
+    var _this3 = this;
     setTimeout(function () {
       $('.date').flatpickr({
         altInput: true,
@@ -3217,11 +3246,11 @@ __webpack_require__.r(__webpack_exports__);
         dateFormat: "Y-m-d",
         defaultDate: 'today',
         onChange: function onChange(dateStr, date) {
-          _this2.param.date = date;
-          _this2.getReport();
+          _this3.param.date = date;
+          _this3.getReport();
         }
       });
-      _this2.getReport();
+      _this3.getReport();
     }, 1000);
     $('#dashboard_bar').text('Daily Report');
   }
@@ -12531,7 +12560,7 @@ var render = function render() {
   }, [_vm._m(1), _vm._v(" "), _c("div", {
     staticClass: "card-body"
   }, [_c("div", {
-    staticClass: "row align-items-end"
+    staticClass: "row align-items-end justify-content-between"
   }, [_c("div", {
     staticClass: "col-sm-3"
   }, [_c("label", {
@@ -12559,7 +12588,16 @@ var render = function render() {
     }
   }), _vm._v(" "), _c("div", {
     staticClass: "invalid-feedback"
-  })])]), _vm._v(" "), _vm.data ? _c("div", [_c("h3", {
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "col-sm-2"
+  }, [!_vm.loadingFile ? _c("button", {
+    staticClass: "btn btn-primary",
+    on: {
+      click: _vm.downloadPdf
+    }
+  }, [_vm._v("Download PDF")]) : _vm._e(), _vm._v(" "), _vm.loadingFile ? _c("button", {
+    staticClass: "btn btn-primary"
+  }, [_vm._v("Downloading PDF...")]) : _vm._e()])]), _vm._v(" "), _vm.data ? _c("div", [_c("h3", {
     staticClass: "text-center mb-4"
   }, [_vm._v("Product Sale")]), _vm._v(" "), _c("table", {
     staticClass: "table table-bordered mb-5"
@@ -12572,52 +12610,55 @@ var render = function render() {
       key: index,
       staticClass: "text-center",
       attrs: {
-        colspan: _vm.data["shift_sale"]["totalShift"]
+        colspan: _vm.data["shift_sale"]["totalShift"] + 1
       }
     }, [_vm._v("\n                                        Shift " + _vm._s(index) + "\n                                    ")]);
   }), _vm._v(" "), _c("th", {
     staticClass: "text-center",
     attrs: {
-      rowspan: "2"
+      colspan: "2"
     }
   }, [_vm._v("Total")])], 2), _vm._v(" "), _c("tr", [_vm._l(_vm.data["shift_sale"]["totalShift"], function (index) {
-    return [_c("th", {
-      staticClass: "text-end"
-    }, [_vm._v("Quantity")]), _vm._v(" "), _c("th", {
+    return [_c("th", {}, [_vm._v("Quantity")]), _vm._v(" "), _c("th", {
       staticClass: "text-end"
     }, [_vm._v("Amount")])];
-  }), _vm._v(" "), _c("th", {
-    staticClass: "text-end"
-  }, [_vm._v("Quantity")]), _vm._v(" "), _c("th", {
+  }), _vm._v(" "), _c("th", {}, [_vm._v("Quantity")]), _vm._v(" "), _c("th", {
     staticClass: "text-end"
   }, [_vm._v("Amount")])], 2)]), _vm._v(" "), _c("tbody", _vm._l(_vm.data["shift_sale"]["data"], function (row) {
-    var _row$total, _row$total2;
+    var _row$total, _row$total2, _row$total3, _row$total4;
     return _c("tr", [_c("td", [_vm._v(_vm._s(row === null || row === void 0 ? void 0 : row.name))]), _vm._v(" "), _vm._l(row === null || row === void 0 ? void 0 : row.value, function (value) {
       return [_c("td", [_vm._v(_vm._s(value["quantity"]) + "liters")]), _vm._v(" "), _c("td", {
         staticClass: "text-end"
-      }, [_c("div", [_vm._v(_vm._s(value["amount"]))]), _vm._v(" "), _vm._m(2, true), _vm._v(" "), _c("div", {
-        staticClass: "text-danger"
-      }, [_vm._v("5%")])])];
-    }), _vm._v(" "), _c("td", [_vm._v(_vm._s(row === null || row === void 0 ? void 0 : (_row$total = row.total) === null || _row$total === void 0 ? void 0 : _row$total.quantity) + "liters")]), _vm._v(" "), _c("td", {
+      }, [_c("div", [_vm._v(_vm._s(value["amount"]))])])];
+    }), _vm._v(" "), _c("td", [_c("div", [_vm._v(_vm._s(row === null || row === void 0 ? void 0 : (_row$total = row.total) === null || _row$total === void 0 ? void 0 : _row$total.quantity) + " liters")]), _vm._v(" "), _c("div", [_c("i", {
+      staticClass: "fa-solid",
+      "class": _vm.getClass(row === null || row === void 0 ? void 0 : (_row$total2 = row.total) === null || _row$total2 === void 0 ? void 0 : _row$total2.percent)
+    })]), _vm._v(" "), _c("div", {
+      domProps: {
+        innerHTML: _vm._s(_vm.getPercent(row === null || row === void 0 ? void 0 : (_row$total3 = row.total) === null || _row$total3 === void 0 ? void 0 : _row$total3.percent))
+      }
+    })]), _vm._v(" "), _c("td", {
       staticClass: "text-end"
-    }, [_c("div", [_vm._v(_vm._s(row === null || row === void 0 ? void 0 : (_row$total2 = row.total) === null || _row$total2 === void 0 ? void 0 : _row$total2.amount))])])], 2);
+    }, [_c("div", [_vm._v(_vm._s(row === null || row === void 0 ? void 0 : (_row$total4 = row.total) === null || _row$total4 === void 0 ? void 0 : _row$total4.amount))])])], 2);
   }), 0)]), _vm._v(" "), _c("h3", {
     staticClass: "text-center mb-4"
   }, [_vm._v("Refill")]), _vm._v(" "), _c("table", {
     staticClass: "table table-bordered mb-5"
-  }, [_vm._m(3), _vm._v(" "), _c("tbody", _vm._l(_vm.data["tank_refill"], function (row) {
+  }, [_vm._m(2), _vm._v(" "), _c("tbody", _vm._l(_vm.data["tank_refill"], function (row) {
     return _c("tr", [_c("td", [_vm._v(_vm._s(row["product_name"]))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(row["date"]))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(row["quantity"]) + "litres")]), _vm._v(" "), _c("td", [_vm._v(_vm._s(row["net_profit"]) + " litres")])]);
   }), 0)]), _vm._v(" "), _c("h3", {
     staticClass: "text-center mb-4"
   }, [_vm._v("Stock (tank_log)")]), _vm._v(" "), _c("table", {
     staticClass: "table table-bordered mb-5"
-  }, [_vm._m(4), _vm._v(" "), _c("tbody", _vm._l(_vm.data["stock"], function (row) {
-    return _c("tr", [_c("td", [_vm._v(_vm._s(row === null || row === void 0 ? void 0 : row.name))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(row["opening_stock"]) + "litres")]), _vm._v(" "), _c("td", [_vm._v(_vm._s(row["closing_stock"]) + "litres")])]);
+  }, [_vm._m(3), _vm._v(" "), _c("tbody", _vm._l(_vm.data["stock"], function (row) {
+    return _c("tr", [_c("td", [_vm._v(_vm._s(row === null || row === void 0 ? void 0 : row.name))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(row["opening_stock"]) + " litres")]), _vm._v(" "), _c("td", [_vm._v(_vm._s(row["closing_stock"]) + " litres")])]);
   }), 0)]), _vm._v(" "), _c("h3", {
     staticClass: "text-center mb-4"
   }, [_vm._v("Expenses")]), _vm._v(" "), _c("table", {
     staticClass: "table table-bordered mb-5"
-  }, [_c("tr", [_c("th", [_vm._v("Salary")]), _vm._v(" "), _c("td", [_vm._v(_vm._s(_vm.data["expense"]["salary"]))])]), _vm._v(" "), _vm._l(_vm.data["expense"]["cost_of_good_sold"], function (row) {
+  }, [_c("tr", [_c("th", [_vm._v("Salary")]), _vm._v(" "), _c("td", {
+    staticClass: "text-end"
+  }, [_vm._v(_vm._s(_vm.data["expense"]["salary"]))])]), _vm._v(" "), _vm._l(_vm.data["expense"]["cost_of_good_sold"], function (row) {
     return _c("tr", [_c("th", [_vm._v("COGS (" + _vm._s(row["category_name"]) + ")")]), _vm._v(" "), _c("td", {
       staticClass: "text-end"
     }, [_vm._v(_vm._s(row["amount"]))])]);
@@ -12625,20 +12666,16 @@ var render = function render() {
     staticClass: "text-center mb-4"
   }, [_vm._v("Due Payments")]), _vm._v(" "), _c("table", {
     staticClass: "table table-bordered mb-5"
-  }, [_vm._m(5), _vm._v(" "), _c("tbody", _vm._l(_vm.data["due_payments"], function (row) {
-    return _c("tr", [_c("td", {
-      staticClass: "text-end"
-    }, [_vm._v(_vm._s(row["category_name"]))]), _vm._v(" "), _c("td", {
+  }, [_vm._m(4), _vm._v(" "), _c("tbody", _vm._l(_vm.data["due_payments"], function (row) {
+    return _c("tr", [_c("td", {}, [_vm._v(_vm._s(row["category_name"]))]), _vm._v(" "), _c("td", {
       staticClass: "text-end"
     }, [_vm._v(_vm._s(row["amount"]))])]);
   }), 0)]), _vm._v(" "), _c("h3", {
     staticClass: "text-center mb-4"
   }, [_vm._v("Due Invoices")]), _vm._v(" "), _c("table", {
     staticClass: "table table-bordered mb-5"
-  }, [_vm._m(6), _vm._v(" "), _c("tbody", _vm._l(_vm.data["due_invoice"], function (row) {
-    return _c("tr", [_c("td", {
-      staticClass: "text-end"
-    }, [_vm._v(_vm._s(row["category_name"]))]), _vm._v(" "), _c("td", {
+  }, [_vm._m(5), _vm._v(" "), _c("tbody", _vm._l(_vm.data["due_invoice"], function (row) {
+    return _c("tr", [_c("td", {}, [_vm._v(_vm._s(row["category_name"]))]), _vm._v(" "), _c("td", {
       staticClass: "text-end"
     }, [_vm._v(_vm._s(row["amount"]))])]);
   }), 0)]), _vm._v(" "), _c("h3", {
@@ -12655,7 +12692,7 @@ var render = function render() {
     }, [_vm._v(_vm._s(row["amount"]))])]);
   })], 2), _vm._v(" "), _c("h3", {
     staticClass: "text-center mb-4"
-  }, [_vm._v("Attendance")]), _vm._v(" "), _vm._m(7)]) : _vm._e()])])])])]);
+  }, [_vm._v("Attendance")]), _vm._v(" "), _vm._m(6)]) : _vm._e()])])])])]);
 };
 var staticRenderFns = [function () {
   var _vm = this,
@@ -12678,17 +12715,11 @@ var staticRenderFns = [function () {
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
-  return _c("div", [_c("i", {
-    staticClass: "fa-solid fa-circle-down text-danger"
-  })]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
   return _c("thead", [_c("tr", [_c("th", [_vm._v("Product")]), _vm._v(" "), _c("th", [_vm._v("Time")]), _vm._v(" "), _c("th", [_vm._v("Liters")]), _vm._v(" "), _c("th", [_vm._v("Loss/Gain")])])]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
-  return _c("thead", [_c("tr", [_c("th", [_vm._v("Product")]), _vm._v(" "), _c("th", [_vm._v("Start (3-3-23 4:34:56)")]), _vm._v(" "), _c("th", [_vm._v("End (3-3-23 4:34:56)")])])]);
+  return _c("thead", [_c("tr", [_c("th", [_vm._v("Product")]), _vm._v(" "), _c("th", [_vm._v("Start")]), _vm._v(" "), _c("th", [_vm._v("End")])])]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
@@ -69652,7 +69683,8 @@ var ApiRoutes = {
   //Dashboard
   getDashboard: ApiVersion + '/dashboard/get',
   //Report daily log
-  dailyLog: ApiVersion + '/report/dailyLog'
+  dailyLog: ApiVersion + '/report/dailyLog',
+  dailyLogPdf: ApiVersion + '/report/dailyLog/export/pdf'
 };
 /* harmony default export */ __webpack_exports__["default"] = (ApiRoutes);
 

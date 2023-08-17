@@ -166,6 +166,7 @@ const ApiRoutes = {
     getDashboard: ApiVersion + '/dashboard/get',
     //Report daily log
     dailyLog: ApiVersion + '/report/dailyLog',
+    dailyLogPdf: ApiVersion + '/report/dailyLog/export/pdf',
 
 };
 
