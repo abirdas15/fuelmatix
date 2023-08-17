@@ -3178,7 +3178,54 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony default export */ __webpack_exports__["default"] = ({});
+/* harmony import */ var _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../Services/ApiService */ "./resources/js/Services/ApiService.js");
+/* harmony import */ var _Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../Services/ApiRoutes */ "./resources/js/Services/ApiRoutes.js");
+
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+  data: function data() {
+    return {
+      param: {
+        date: ''
+      },
+      data: null,
+      loading: false
+    };
+  },
+  methods: {
+    getReport: function getReport() {
+      var _this = this;
+      this.loading = true;
+      if (this.param.date == '') {
+        this.param.date = moment().format('YYYY-MM-DD');
+      }
+      _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].dailyLog, this.param, function (res) {
+        _this.loading = false;
+        if (parseInt(res.status) === 200) {
+          _this.data = res.data;
+        }
+      });
+    }
+  },
+  created: function created() {},
+  mounted: function mounted() {
+    var _this2 = this;
+    setTimeout(function () {
+      $('.date').flatpickr({
+        altInput: true,
+        altFormat: "d/m/Y",
+        dateFormat: "Y-m-d",
+        defaultDate: 'today',
+        onChange: function onChange(dateStr, date) {
+          _this2.param.date = date;
+          _this2.getReport();
+        }
+      });
+      _this2.getReport();
+    }, 1000);
+    $('#dashboard_bar').text('Daily Report');
+  }
+});
 
 /***/ }),
 
@@ -12477,7 +12524,137 @@ var render = function render() {
         name: "Dashboard"
       }
     }
-  }, [_vm._v("Home")])], 1), _vm._v(" "), _vm._m(0)])]), _vm._v(" "), _vm._m(1)])]);
+  }, [_vm._v("Home")])], 1), _vm._v(" "), _vm._m(0)])]), _vm._v(" "), _c("div", {
+    staticClass: "col-sm-12"
+  }, [_c("div", {
+    staticClass: "card"
+  }, [_vm._m(1), _vm._v(" "), _c("div", {
+    staticClass: "card-body"
+  }, [_c("div", {
+    staticClass: "row align-items-end"
+  }, [_c("div", {
+    staticClass: "col-sm-3"
+  }, [_c("label", {
+    staticClass: "form-label"
+  }, [_vm._v("Date:")]), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.param.date,
+      expression: "param.date"
+    }],
+    staticClass: "form-control date bg-white",
+    attrs: {
+      type: "text",
+      name: "date"
+    },
+    domProps: {
+      value: _vm.param.date
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.param, "date", $event.target.value);
+      }
+    }
+  }), _vm._v(" "), _c("div", {
+    staticClass: "invalid-feedback"
+  })])]), _vm._v(" "), _vm.data ? _c("div", [_c("h3", {
+    staticClass: "text-center mb-4"
+  }, [_vm._v("Product Sale")]), _vm._v(" "), _c("table", {
+    staticClass: "table table-bordered mb-5"
+  }, [_c("thead", [_c("tr", [_c("th", {
+    attrs: {
+      rowspan: "2"
+    }
+  }, [_vm._v("Sale")]), _vm._v(" "), _vm._l(_vm.data["shift_sale"]["totalShift"], function (index) {
+    return _c("th", {
+      key: index,
+      staticClass: "text-center",
+      attrs: {
+        colspan: _vm.data["shift_sale"]["totalShift"]
+      }
+    }, [_vm._v("\n                                        Shift " + _vm._s(index) + "\n                                    ")]);
+  }), _vm._v(" "), _c("th", {
+    staticClass: "text-center",
+    attrs: {
+      rowspan: "2"
+    }
+  }, [_vm._v("Total")])], 2), _vm._v(" "), _c("tr", [_vm._l(_vm.data["shift_sale"]["totalShift"], function (index) {
+    return [_c("th", {
+      staticClass: "text-end"
+    }, [_vm._v("Quantity")]), _vm._v(" "), _c("th", {
+      staticClass: "text-end"
+    }, [_vm._v("Amount")])];
+  }), _vm._v(" "), _c("th", {
+    staticClass: "text-end"
+  }, [_vm._v("Quantity")]), _vm._v(" "), _c("th", {
+    staticClass: "text-end"
+  }, [_vm._v("Amount")])], 2)]), _vm._v(" "), _c("tbody", [_vm._l(_vm.data["shift_sale"]["data"], function (row) {
+    return _c("tr");
+  }), _c("tr", [_c("td", [_vm._v(_vm._s(_vm.row["name"]))]), _vm._v(" "), _vm._l(_vm.row["value"], function (value) {
+    return [_c("td", [_vm._v(_vm._s(value["quantity"]) + "liters")]), _vm._v(" "), _c("td", {
+      staticClass: "text-end"
+    }, [_c("div", [_vm._v(_vm._s(value["amount"]))]), _vm._v(" "), _vm._m(2, true), _vm._v(" "), _c("div", {
+      staticClass: "text-danger"
+    }, [_vm._v("5%")])])];
+  }), _vm._v(" "), _c("td", [_vm._v(_vm._s(_vm.row["total"]["quantity"]) + "liters")]), _vm._v(" "), _c("td", {
+    staticClass: "text-end"
+  }, [_c("div", [_vm._v(_vm._s(_vm.row["total"]["amount"]))])])], 2)], 2)]), _vm._v(" "), _c("h3", {
+    staticClass: "text-center mb-4"
+  }, [_vm._v("Refill")]), _vm._v(" "), _c("table", {
+    staticClass: "table table-bordered mb-5"
+  }, [_vm._m(3), _vm._v(" "), _c("tbody", _vm._l(_vm.data["tank_refill"], function (row) {
+    return _c("tr", [_c("td", [_vm._v(_vm._s(row["product_name"]))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(row["date"]))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(row["quantity"]) + "litres")]), _vm._v(" "), _c("td", [_vm._v(_vm._s(row["net_profit"]) + " litres")])]);
+  }), 0)]), _vm._v(" "), _c("h3", {
+    staticClass: "text-center mb-4"
+  }, [_vm._v("Stock (tank_log)")]), _vm._v(" "), _c("table", {
+    staticClass: "table table-bordered mb-5"
+  }, [_vm._m(4), _vm._v(" "), _c("tbody", _vm._l(_vm.data["stock"], function (row) {
+    return _c("tr", [_c("td", [_vm._v(_vm._s(row["name"]))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(row["opening_stock"]) + "litres")]), _vm._v(" "), _c("td", [_vm._v(_vm._s(row["closing_stock"]) + "litres")])]);
+  }), 0)]), _vm._v(" "), _c("h3", {
+    staticClass: "text-center mb-4"
+  }, [_vm._v("Expenses")]), _vm._v(" "), _c("table", {
+    staticClass: "table table-bordered mb-5"
+  }, [_c("tr", [_c("th", [_vm._v("Salary")]), _vm._v(" "), _c("td", [_vm._v(_vm._s(_vm.data["expense"]["salary"]))])]), _vm._v(" "), _vm._l(_vm.data["expense"]["cost_of_good_sold"], function (row) {
+    return _c("tr", [_c("th", [_vm._v("COGS (" + _vm._s(row["category_name"]) + ")")]), _vm._v(" "), _c("td", {
+      staticClass: "text-end"
+    }, [_vm._v(_vm._s(row["amount"]))])]);
+  })], 2), _vm._v(" "), _c("h3", {
+    staticClass: "text-center mb-4"
+  }, [_vm._v("Due Payments")]), _vm._v(" "), _c("table", {
+    staticClass: "table table-bordered mb-5"
+  }, [_vm._m(5), _vm._v(" "), _c("tbody", _vm._l(_vm.data["due_payments"], function (row) {
+    return _c("tr", [_c("td", {
+      staticClass: "text-end"
+    }, [_vm._v(_vm._s(row["category_name"]))]), _vm._v(" "), _c("td", {
+      staticClass: "text-end"
+    }, [_vm._v(_vm._s(row["amount"]))])]);
+  }), 0)]), _vm._v(" "), _c("h3", {
+    staticClass: "text-center mb-4"
+  }, [_vm._v("Due Invoices")]), _vm._v(" "), _c("table", {
+    staticClass: "table table-bordered mb-5"
+  }, [_vm._m(6), _vm._v(" "), _c("tbody", _vm._l(_vm.data["due_invoice"], function (row) {
+    return _c("tr", [_c("td", {
+      staticClass: "text-end"
+    }, [_vm._v(_vm._s(row["category_name"]))]), _vm._v(" "), _c("td", {
+      staticClass: "text-end"
+    }, [_vm._v(_vm._s(row["amount"]))])]);
+  }), 0)]), _vm._v(" "), _c("h3", {
+    staticClass: "text-center mb-4"
+  }, [_vm._v("Asset Balance ")]), _vm._v(" "), _c("table", {
+    staticClass: "table table-bordered mb-5"
+  }, [_vm._l(_vm.data["asset_balance"]["cash"], function (row) {
+    return _c("tr", [_c("th", [_vm._v(_vm._s(row["category_name"]))]), _vm._v(" "), _c("td", {
+      staticClass: "text-end"
+    }, [_vm._v(_vm._s(row["amount"]))])]);
+  }), _vm._v(" "), _vm._l(_vm.data["asset_balance"]["bank"], function (row) {
+    return _c("tr", [_c("th", [_vm._v(_vm._s(row["category_name"]))]), _vm._v(" "), _c("td", {
+      staticClass: "text-end"
+    }, [_vm._v(_vm._s(row["amount"]))])]);
+  })], 2), _vm._v(" "), _c("h3", {
+    staticClass: "text-center mb-4"
+  }, [_vm._v("Attendance")]), _vm._v(" "), _vm._m(7)]) : _vm._e()])])])])]);
 };
 var staticRenderFns = [function () {
   var _vm = this,
@@ -12493,111 +12670,38 @@ var staticRenderFns = [function () {
   var _vm = this,
     _c = _vm._self._c;
   return _c("div", {
-    staticClass: "col-sm-12"
-  }, [_c("div", {
-    staticClass: "card"
-  }, [_c("div", {
     staticClass: "card-header"
   }, [_c("h4", {
     staticClass: "card-title"
-  }, [_vm._v("Daily Report")])]), _vm._v(" "), _c("div", {
-    staticClass: "card-body"
-  }, [_c("h3", {
-    staticClass: "text-center mb-4"
-  }, [_vm._v("Product Sale")]), _vm._v(" "), _c("table", {
-    staticClass: "table table-bordered mb-5"
-  }, [_c("thead", [_c("tr", [_c("th", {
-    attrs: {
-      rowspan: "2"
-    }
-  }, [_vm._v("Sale")]), _vm._v(" "), _c("th", {
-    staticClass: "text-center",
-    attrs: {
-      colspan: "2"
-    }
-  }, [_vm._v("Shift 1")]), _vm._v(" "), _c("th", {
-    staticClass: "text-center",
-    attrs: {
-      colspan: "2"
-    }
-  }, [_vm._v("Shift 2")]), _vm._v(" "), _c("th", {
-    staticClass: "text-center",
-    attrs: {
-      rowspan: "2"
-    }
-  }, [_vm._v("Total")])]), _vm._v(" "), _c("tr", [_c("th", {
-    staticClass: "text-end"
-  }, [_vm._v("Quantity")]), _vm._v(" "), _c("th", {
-    staticClass: "text-end"
-  }, [_vm._v("Amount")]), _vm._v(" "), _c("th", {
-    staticClass: "text-end"
-  }, [_vm._v("Quantity")]), _vm._v(" "), _c("th", {
-    staticClass: "text-end"
-  }, [_vm._v("Amount")])])]), _vm._v(" "), _c("tbody", [_c("tr", [_c("td", [_vm._v("Octane")]), _vm._v(" "), _c("td", {
-    staticClass: "text-end"
-  }, [_vm._v("230")]), _vm._v(" "), _c("td", {
-    staticClass: "text-end"
-  }, [_c("div", [_vm._v("32,000")])]), _vm._v(" "), _c("td", {
-    staticClass: "text-end"
-  }, [_c("div", [_vm._v("32,000")]), _vm._v(" "), _c("div", [_c("i", {
+  }, [_vm._v("Daily Report")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", [_c("i", {
     staticClass: "fa-solid fa-circle-down text-danger"
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "text-danger"
-  }, [_vm._v("5%")])]), _vm._v(" "), _c("td", {
-    staticClass: "text-end"
-  }, [_vm._v("230")]), _vm._v(" "), _c("td", {
-    staticClass: "text-end"
-  }, [_vm._v("64,000")])]), _vm._v(" "), _c("tr", [_c("td", [_vm._v("Octane")]), _vm._v(" "), _c("td", {
-    staticClass: "text-end"
-  }, [_vm._v("230")]), _vm._v(" "), _c("td", {
-    staticClass: "text-end"
-  }, [_c("div", [_vm._v("34,000")])]), _vm._v(" "), _c("td", {
-    staticClass: "text-end"
-  }, [_c("div", [_vm._v("34,000")]), _vm._v(" "), _c("div", [_c("i", {
-    staticClass: "fa-solid fa-circle-up text-success"
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "text-success"
-  }, [_vm._v("+5%")])]), _vm._v(" "), _c("td", {
-    staticClass: "text-end"
-  }, [_vm._v("230")]), _vm._v(" "), _c("td", {
-    staticClass: "text-end"
-  }, [_vm._v("64,000")])])])]), _vm._v(" "), _c("h3", {
-    staticClass: "text-center mb-4"
-  }, [_vm._v("Refill")]), _vm._v(" "), _c("table", {
+  })]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("thead", [_c("tr", [_c("th", [_vm._v("Product")]), _vm._v(" "), _c("th", [_vm._v("Time")]), _vm._v(" "), _c("th", [_vm._v("Liters")]), _vm._v(" "), _c("th", [_vm._v("Loss/Gain")])])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("thead", [_c("tr", [_c("th", [_vm._v("Product")]), _vm._v(" "), _c("th", [_vm._v("Start (3-3-23 4:34:56)")]), _vm._v(" "), _c("th", [_vm._v("End (3-3-23 4:34:56)")])])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("thead", [_c("tr", [_c("th", [_vm._v("Provider")]), _vm._v(" "), _c("th", [_vm._v("Amount")])])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("thead", [_c("tr", [_c("th", [_vm._v("Party")]), _vm._v(" "), _c("th", [_vm._v("Total ")])])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("table", {
     staticClass: "table table-bordered mb-5"
-  }, [_c("thead", [_c("tr", [_c("th", [_vm._v("Product")]), _vm._v(" "), _c("th", [_vm._v("Time")]), _vm._v(" "), _c("th", [_vm._v("Liters")]), _vm._v(" "), _c("th", [_vm._v("Loss/Gain")])])]), _vm._v(" "), _c("tbody", [_c("tr", [_c("td", [_vm._v("Octane")]), _vm._v(" "), _c("td", [_vm._v("3-3-23 4:34:56")]), _vm._v(" "), _c("td", [_vm._v("287 Litres")]), _vm._v(" "), _c("td", [_vm._v("-5 litres")])])])]), _vm._v(" "), _c("h3", {
-    staticClass: "text-center mb-4"
-  }, [_vm._v("Stock (tank_log)")]), _vm._v(" "), _c("table", {
-    staticClass: "table table-bordered mb-5"
-  }, [_c("thead", [_c("tr", [_c("th", [_vm._v("Product")]), _vm._v(" "), _c("th", [_vm._v("Start (3-3-23 4:34:56)")]), _vm._v(" "), _c("th", [_vm._v("End (3-3-23 4:34:56)")])])]), _vm._v(" "), _c("tbody", [_c("tr", [_c("td", [_vm._v("Octane")]), _vm._v(" "), _c("td", [_vm._v("400litres")]), _vm._v(" "), _c("td", [_vm._v("287 Litres")])])])]), _vm._v(" "), _c("h3", {
-    staticClass: "text-center mb-4"
-  }, [_vm._v("Expenses")]), _vm._v(" "), _c("table", {
-    staticClass: "table table-bordered mb-5"
-  }, [_c("tr", [_c("th", [_vm._v("Salary")]), _vm._v(" "), _c("td", [_vm._v("3,00,000")])]), _vm._v(" "), _c("tr", [_c("th", [_vm._v("Maintenance")]), _vm._v(" "), _c("td", [_vm._v("34,0000")])]), _vm._v(" "), _c("tr", [_c("th", [_vm._v("COGS (Octane)")]), _vm._v(" "), _c("td", [_vm._v("7,00,000")])])]), _vm._v(" "), _c("h3", {
-    staticClass: "text-center mb-4"
-  }, [_vm._v("Due Payments")]), _vm._v(" "), _c("table", {
-    staticClass: "table table-bordered mb-5"
-  }, [_c("thead", [_c("tr", [_c("th", [_vm._v("Provider")]), _vm._v(" "), _c("th", [_vm._v("Date Submitted")]), _vm._v(" "), _c("th", [_vm._v("Due Date")]), _vm._v(" "), _c("th", [_vm._v("Amount")])])]), _vm._v(" "), _c("tbody", [_c("tr", [_c("td", [_vm._v("Broadbank INternet")]), _vm._v(" "), _c("td", [_vm._v("3-3-23 4:34:56")]), _vm._v(" "), _c("td", [_vm._v("3-3-23 4:34:56")]), _vm._v(" "), _c("td", [_vm._v("32,0000")])]), _vm._v(" "), _c("tr", [_c("td", [_vm._v("COGS (Octane)")]), _vm._v(" "), _c("td", [_vm._v("3-3-23 4:34:56")]), _vm._v(" "), _c("td", [_vm._v("3-3-23 4:34:56")]), _vm._v(" "), _c("td", [_vm._v("32,0000")])]), _vm._v(" "), _c("tr", [_c("td", {
-    attrs: {
-      colspan: "2"
-    }
-  }), _vm._v(" "), _c("td", [_vm._v("Total")]), _vm._v(" "), _c("td", [_vm._v("64,0000")])])])]), _vm._v(" "), _c("h3", {
-    staticClass: "text-center mb-4"
-  }, [_vm._v("Due Invoices")]), _vm._v(" "), _c("table", {
-    staticClass: "table table-bordered mb-5"
-  }, [_c("thead", [_c("tr", [_c("th", [_vm._v("Party")]), _vm._v(" "), _c("th", [_vm._v("Billed/Invoiced")]), _vm._v(" "), _c("th", [_vm._v("Due")]), _vm._v(" "), _c("th", [_vm._v("Overdue ")]), _vm._v(" "), _c("th", [_vm._v("Total ")])])]), _vm._v(" "), _c("tbody", [_c("tr", [_c("td", [_vm._v("Boisakhi")]), _vm._v(" "), _c("td", [_vm._v("32,000")]), _vm._v(" "), _c("td", [_vm._v("32,0000")]), _vm._v(" "), _c("td", [_vm._v("30,000")]), _vm._v(" "), _c("td", [_vm._v("32,0000")])]), _vm._v(" "), _c("tr", [_c("td", [_vm._v("Akij Grojp")]), _vm._v(" "), _c("td", [_vm._v("32,000")]), _vm._v(" "), _c("td", [_vm._v("32,0000")]), _vm._v(" "), _c("td", [_vm._v("30,000")]), _vm._v(" "), _c("td", [_vm._v("32,0000")])]), _vm._v(" "), _c("tr", [_c("td", {
-    attrs: {
-      colspan: "3"
-    }
-  }), _vm._v(" "), _c("td", [_vm._v("Total")]), _vm._v(" "), _c("td", [_vm._v("64,0000")])])])]), _vm._v(" "), _c("h3", {
-    staticClass: "text-center mb-4"
-  }, [_vm._v("Asset Balance ")]), _vm._v(" "), _c("table", {
-    staticClass: "table table-bordered mb-5"
-  }, [_c("tr", [_c("th", [_vm._v("Cash")]), _vm._v(" "), _c("td", [_vm._v("3,00,000")])]), _vm._v(" "), _c("tr", [_c("th", [_vm._v("Cash in hand-Rafiq")]), _vm._v(" "), _c("td", [_vm._v("34,0000")])]), _vm._v(" "), _c("tr", [_c("th", [_vm._v("Exim Bank")]), _vm._v(" "), _c("td", [_vm._v("7,00,000")])])]), _vm._v(" "), _c("h3", {
-    staticClass: "text-center mb-4"
-  }, [_vm._v("Attendance")]), _vm._v(" "), _c("table", {
-    staticClass: "table table-bordered mb-5"
-  }, [_c("thead", [_c("tr", [_c("th", [_vm._v("Shift 1")]), _vm._v(" "), _c("th", [_vm._v("Shift 2")])])]), _vm._v(" "), _c("tbody", [_c("tr", [_c("td", [_c("div", [_vm._v("Fuelman -3")]), _vm._v(" "), _c("div", [_vm._v("Guard -2")]), _vm._v(" "), _c("div", [_vm._v("Suprevisor (suvo)-1")]), _vm._v(" "), _c("div", [_vm._v("Engineer (Yasin) -1")])]), _vm._v(" "), _c("td", [_c("div", [_vm._v("Fuelman -3")]), _vm._v(" "), _c("div", [_vm._v("Guard -2")]), _vm._v(" "), _c("div", [_vm._v("Suprevisor (suvo)-1")]), _vm._v(" "), _c("div", [_vm._v("Engineer (Yasin) -1")])])]), _vm._v(" "), _c("tr", [_c("td", [_vm._v("\n                                Leave\n                            ")]), _vm._v(" "), _c("td")])])])])])]);
+  }, [_c("thead", [_c("tr", [_c("th", [_vm._v("Shift 1")]), _vm._v(" "), _c("th", [_vm._v("Shift 2")])])]), _vm._v(" "), _c("tbody", [_c("tr", [_c("td", [_c("div", [_vm._v("Fuelman -3")]), _vm._v(" "), _c("div", [_vm._v("Guard -2")]), _vm._v(" "), _c("div", [_vm._v("Suprevisor (suvo)-1")]), _vm._v(" "), _c("div", [_vm._v("Engineer (Yasin) -1")])]), _vm._v(" "), _c("td", [_c("div", [_vm._v("Fuelman -3")]), _vm._v(" "), _c("div", [_vm._v("Guard -2")]), _vm._v(" "), _c("div", [_vm._v("Suprevisor (suvo)-1")]), _vm._v(" "), _c("div", [_vm._v("Engineer (Yasin) -1")])])]), _vm._v(" "), _c("tr", [_c("td", [_vm._v("\n                                        Leave\n                                    ")]), _vm._v(" "), _c("td")])])]);
 }];
 render._withStripped = true;
 
@@ -29668,7 +29772,7 @@ exports = module.exports = __webpack_require__(/*! ../../../../node_modules/css-
 
 
 // module
-exports.push([module.i, "\n.bill-to[data-v-26966675]{\r\n    background-color: rgba(134,183,255,0.9);\r\n    font-weight: bold;\r\n    padding: 10px 50px;\r\n    width: max-content;\n}\r\n", ""]);
+exports.push([module.i, "\n.bill-to[data-v-26966675]{\n    background-color: rgba(134,183,255,0.9);\n    font-weight: bold;\n    padding: 10px 50px;\n    width: max-content;\n}\n", ""]);
 
 // exports
 
@@ -69545,7 +69649,9 @@ var ApiRoutes = {
   invoiceList: ApiVersion + '/invoice/list',
   invoiceDownloadPdf: ApiVersion + '/invoice/download/pdf',
   //Dashboard
-  getDashboard: ApiVersion + '/dashboard/get'
+  getDashboard: ApiVersion + '/dashboard/get',
+  //Report daily log
+  dailyLog: ApiVersion + '/report/dailyLog'
 };
 /* harmony default export */ __webpack_exports__["default"] = (ApiRoutes);
 
@@ -69876,7 +69982,7 @@ var app = new vue__WEBPACK_IMPORTED_MODULE_1___default.a({
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! D:\xampp7.4\htdocs\fuelmatix\resources\js\app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! D:\xampp\htdocs\projects\fuelmatix\resources\js\app.js */"./resources/js/app.js");
 
 
 /***/ })

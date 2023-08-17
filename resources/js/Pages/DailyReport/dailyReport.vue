@@ -14,215 +14,179 @@
                         <h4 class="card-title">Daily Report</h4>
                     </div>
                     <div class="card-body">
-                        <h3 class="text-center mb-4">Product Sale</h3>
-                        <table class="table table-bordered mb-5">
-                            <thead>
-                            <tr>
-                                <th rowspan="2">Sale</th>
-                                <th colspan="2" class="text-center">Shift 1</th>
-                                <th colspan="2" class="text-center">Shift 2</th>
-                                <th rowspan="2" class="text-center">Total</th>
-                            </tr>
-                            <tr>
-                                <th class="text-end">Quantity</th>
-                                <th class="text-end">Amount</th>
-                                <th class="text-end">Quantity</th>
-                                <th class="text-end">Amount</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr>
-                                <td>Octane</td>
-                                <td class="text-end">230</td>
-                                <td class="text-end">
-                                    <div>32,000</div>
-                                </td>
-                                <td class="text-end">
-                                    <div>32,000</div>
-                                    <div><i class="fa-solid fa-circle-down text-danger"></i></div>
-                                    <div class="text-danger">5%</div>
-                                </td>
-                                <td class="text-end">230</td>
+                        <div class="row align-items-end">
+                            <div class="col-sm-3">
+                                <label class="form-label">Date:</label>
+                                <input type="text" class="form-control date bg-white" name="date" v-model="param.date">
+                                <div class="invalid-feedback"></div>
+                            </div>
+                        </div>
+                        <div  v-if="data">
+                            <h3 class="text-center mb-4">Product Sale</h3>
+                            <table class="table table-bordered mb-5">
+                                <thead>
+                                <tr>
+                                    <th rowspan="2">Sale</th>
+                                    <th :colspan="data['shift_sale']['totalShift']" class="text-center" v-for="index in data['shift_sale']['totalShift']" :key="index">
+                                        Shift {{ index }}
+                                    </th>
+                                    <th rowspan="2" class="text-center">Total</th>
+                                </tr>
+                                <tr>
+                                    <template  v-for="index in data['shift_sale']['totalShift']">
+                                        <th class="text-end">Quantity</th>
+                                        <th class="text-end">Amount</th>
+                                    </template>
 
-                                <td class="text-end">64,000</td>
-                            </tr>
-                            <tr>
-                                <td>Octane</td>
-                                <td class="text-end">230</td>
-                                <td class="text-end">
-                                    <div>34,000</div>
-                                </td>
-                                <td class="text-end">
-                                    <div>34,000</div>
-                                    <div><i class="fa-solid fa-circle-up text-success"></i></div>
-                                    <div class="text-success">+5%</div>
-                                </td>
-                                <td class="text-end">230</td>
-
-                                <td class="text-end">64,000</td>
-                            </tr>
-                            </tbody>
-                        </table>
-                        <h3 class="text-center mb-4">Refill</h3>
-                        <table class="table table-bordered mb-5">
-                            <thead>
-                            <tr>
-                                <th>Product</th>
-                                <th>Time</th>
-                                <th>Liters</th>
-                                <th>Loss/Gain</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr>
-                                <td>Octane</td>
-                                <td>3-3-23 4:34:56</td>
-                                <td>287 Litres</td>
-                                <td>-5 litres</td>
-                            </tr>
-                            </tbody>
-                        </table>
-                        <h3 class="text-center mb-4">Stock (tank_log)</h3>
-                        <table class="table table-bordered mb-5">
-                            <thead>
-                            <tr>
-                                <th>Product</th>
-                                <th>Start (3-3-23 4:34:56)</th>
-                                <th>End (3-3-23 4:34:56)</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr>
-                                <td>Octane</td>
-                                <td>400litres</td>
-                                <td>287 Litres</td>
-                            </tr>
-                            </tbody>
-                        </table>
-                        <h3 class="text-center mb-4">Expenses</h3>
-                        <table class="table table-bordered mb-5">
-                            <tr>
-                                <th>Salary</th>
-                                <td>3,00,000</td>
-                            </tr>
-                            <tr>
-                                <th>Maintenance</th>
-                                <td>34,0000</td>
-                            </tr>
-                            <tr>
-                                <th>COGS (Octane)</th>
-                                <td>7,00,000</td>
-                            </tr>
-                        </table>
-                        <h3 class="text-center mb-4">Due Payments</h3>
-                        <table class="table table-bordered mb-5">
-                            <thead>
-                            <tr>
-                                <th>Provider</th>
-                                <th>Date Submitted</th>
-                                <th>Due Date</th>
-                                <th>Amount</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr>
-                                <td>Broadbank INternet</td>
-                                <td>3-3-23 4:34:56</td>
-                                <td>3-3-23 4:34:56</td>
-                                <td>32,0000</td>
-                            </tr>
-                            <tr>
-                                <td>COGS (Octane)</td>
-                                <td>3-3-23 4:34:56</td>
-                                <td>3-3-23 4:34:56</td>
-                                <td>32,0000</td>
-                            </tr>
-                            <tr>
-                                <td colspan="2"></td>
-                                <td>Total</td>
-                                <td>64,0000</td>
-                            </tr>
-                            </tbody>
-                        </table>
-                        <h3 class="text-center mb-4">Due Invoices</h3>
-                        <table class="table table-bordered mb-5">
-                            <thead>
-                            <tr>
-                                <th>Party</th>
-                                <th>Billed/Invoiced</th>
-                                <th>Due</th>
-                                <th>Overdue </th>
-                                <th>Total </th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr>
-                                <td>Boisakhi</td>
-                                <td>32,000</td>
-                                <td>32,0000</td>
-                                <td>30,000</td>
-                                <td>32,0000</td>
-                            </tr>
-                            <tr>
-                                <td>Akij Grojp</td>
-                                <td>32,000</td>
-                                <td>32,0000</td>
-                                <td>30,000</td>
-                                <td>32,0000</td>
-                            </tr>
-                            <tr>
-                                <td colspan="3"></td>
-                                <td>Total</td>
-                                <td>64,0000</td>
-                            </tr>
-                            </tbody>
-                        </table>
-                        <h3 class="text-center mb-4">Asset Balance </h3>
-                        <table class="table table-bordered mb-5">
-                            <tr>
-                                <th>Cash</th>
-                                <td>3,00,000</td>
-                            </tr>
-                            <tr>
-                                <th>Cash in hand-Rafiq</th>
-                                <td>34,0000</td>
-                            </tr>
-                            <tr>
-                                <th>Exim Bank</th>
-                                <td>7,00,000</td>
-                            </tr>
-                        </table>
-                        <h3 class="text-center mb-4">Attendance</h3>
-                        <table class="table table-bordered mb-5">
-                            <thead>
-                            <tr>
-                                <th>Shift 1</th>
-                                <th>Shift 2</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr>
-                                <td>
-                                    <div>Fuelman -3</div>
-                                    <div>Guard -2</div>
-                                    <div>Suprevisor (suvo)-1</div>
-                                    <div>Engineer (Yasin) -1</div>
-                                </td>
-                                <td>
-                                    <div>Fuelman -3</div>
-                                    <div>Guard -2</div>
-                                    <div>Suprevisor (suvo)-1</div>
-                                    <div>Engineer (Yasin) -1</div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    Leave
-                                </td>
-                                <td></td>
-                            </tr>
-                            </tbody>
-                        </table>
+                                    <th class="text-end">Quantity</th>
+                                    <th class="text-end">Amount</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr v-for="row in data['shift_sale']['data']">
+                                    <tr>
+                                        <td>{{ row['name'] }}</td>
+                                        <template v-for="value in row['value']">
+                                            <td>{{ value['quantity'] }}liters</td>
+                                            <td class="text-end">
+                                                <div>{{ value['amount'] }}</div>
+                                                <div><i class="fa-solid fa-circle-down text-danger"></i></div>
+                                                <div class="text-danger">5%</div>
+                                            </td>
+                                        </template>
+                                        <td>{{ row['total']['quantity'] }}liters</td>
+                                        <td class="text-end">
+                                            <div>{{ row['total']['amount'] }}</div>
+                                        </td>
+                                    </tr>
+                                </tr>
+                                </tbody>
+                            </table>
+                            <h3 class="text-center mb-4">Refill</h3>
+                            <table class="table table-bordered mb-5">
+                                <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Time</th>
+                                    <th>Liters</th>
+                                    <th>Loss/Gain</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr v-for="row in data['tank_refill']">
+                                    <td>{{ row['product_name'] }}</td>
+                                    <td>{{ row['date'] }}</td>
+                                    <td>{{ row['quantity'] }}litres</td>
+                                    <td>{{ row['net_profit'] }} litres</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                            <h3 class="text-center mb-4">Stock (tank_log)</h3>
+                            <table class="table table-bordered mb-5">
+                                <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Start (3-3-23 4:34:56)</th>
+                                    <th>End (3-3-23 4:34:56)</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr v-for="row in data['stock']">
+                                    <td>{{ row['name'] }}</td>
+                                    <td>{{ row['opening_stock'] }}litres</td>
+                                    <td>{{ row['closing_stock'] }}litres</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                            <h3 class="text-center mb-4">Expenses</h3>
+                            <table class="table table-bordered mb-5">
+                                <tr>
+                                    <th>Salary</th>
+                                    <td>{{ data['expense']['salary'] }}</td>
+                                </tr>
+                                <tr v-for="row in data['expense']['cost_of_good_sold']">
+                                    <th>COGS ({{ row['category_name'] }})</th>
+                                    <td class="text-end">{{ row['amount'] }}</td>
+                                </tr>
+                            </table>
+                            <h3 class="text-center mb-4">Due Payments</h3>
+                            <table class="table table-bordered mb-5">
+                                <thead>
+                                <tr>
+                                    <th>Provider</th>
+<!--                                    <th>Date Submitted</th>
+                                    <th>Due Date</th>-->
+                                    <th>Amount</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr v-for="row in data['due_payments']">
+                                    <td class="text-end">{{ row['category_name'] }}</td>
+                                    <td class="text-end">{{ row['amount'] }}</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                            <h3 class="text-center mb-4">Due Invoices</h3>
+                            <table class="table table-bordered mb-5">
+                                <thead>
+                                <tr>
+                                    <th>Party</th>
+<!--                                    <th>Billed/Invoiced</th>
+                                    <th>Due</th>
+                                    <th>Overdue </th>-->
+                                    <th>Total </th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr v-for="row in data['due_invoice']">
+                                    <td class="text-end">{{ row['category_name'] }}</td>
+                                    <td class="text-end">{{ row['amount'] }}</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                            <h3 class="text-center mb-4">Asset Balance </h3>
+                            <table class="table table-bordered mb-5">
+                                <tr v-for="row in data['asset_balance']['cash']">
+                                    <th>{{ row['category_name'] }}</th>
+                                    <td class="text-end">{{ row['amount'] }}</td>
+                                </tr>
+                                <tr v-for="row in data['asset_balance']['bank']">
+                                    <th>{{ row['category_name'] }}</th>
+                                    <td class="text-end">{{ row['amount'] }}</td>
+                                </tr>
+                            </table>
+                            <h3 class="text-center mb-4">Attendance</h3>
+                            <table class="table table-bordered mb-5">
+                                <thead>
+                                <tr>
+                                    <th>Shift 1</th>
+                                    <th>Shift 2</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td>
+                                        <div>Fuelman -3</div>
+                                        <div>Guard -2</div>
+                                        <div>Suprevisor (suvo)-1</div>
+                                        <div>Engineer (Yasin) -1</div>
+                                    </td>
+                                    <td>
+                                        <div>Fuelman -3</div>
+                                        <div>Guard -2</div>
+                                        <div>Suprevisor (suvo)-1</div>
+                                        <div>Engineer (Yasin) -1</div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        Leave
+                                    </td>
+                                    <td></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -231,8 +195,52 @@
 </template>
 
 <script>
-export default {
+import ApiService from "../../Services/ApiService";
+import ApiRoutes from "../../Services/ApiRoutes";
 
+export default {
+    data() {
+        return {
+            param: {
+                date: ''
+            },
+            data: null,
+            loading: false,
+        }
+    },
+    methods: {
+        getReport: function () {
+            this.loading = true
+            if (this.param.date == '') {
+                this.param.date = moment().format('YYYY-MM-DD')
+            }
+            ApiService.POST(ApiRoutes.dailyLog, this.param,res => {
+                this.loading = false
+                if (parseInt(res.status) === 200) {
+                    this.data = res.data
+                }
+            });
+        },
+    },
+    created() {
+
+    },
+    mounted() {
+        setTimeout(() => {
+            $('.date').flatpickr({
+                altInput: true,
+                altFormat: "d/m/Y",
+                dateFormat: "Y-m-d",
+                defaultDate: 'today',
+                onChange: (dateStr, date) => {
+                    this.param.date = date
+                    this.getReport()
+                }
+            })
+            this.getReport()
+        }, 1000)
+        $('#dashboard_bar').text('Daily Report')
+    }
 }
 </script>
 

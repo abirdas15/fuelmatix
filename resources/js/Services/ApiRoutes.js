@@ -164,6 +164,8 @@ const ApiRoutes = {
     invoiceDownloadPdf: ApiVersion + '/invoice/download/pdf',
     //Dashboard
     getDashboard: ApiVersion + '/dashboard/get',
+    //Report daily log
+    dailyLog: ApiVersion + '/report/dailyLog',
 
 };
 
