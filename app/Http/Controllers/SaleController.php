@@ -4,18 +4,25 @@ namespace App\Http\Controllers;
 
 use App\Common\AccountCategory;
 use App\Common\Module;
+use App\Helpers\Helpers;
 use App\Helpers\SessionUser;
 use App\Models\Category;
 use App\Models\Invoice;
 use App\Models\Sale;
 use App\Models\SaleData;
 use App\Models\Transaction;
+use Carbon\Carbon;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class SaleController extends Controller
 {
-    public function save(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function save(Request $request): JsonResponse
     {
         $inputData = $request->all();
         $validator = Validator::make($inputData, [
@@ -30,8 +37,8 @@ class SaleController extends Controller
         }
         $total_amount = array_sum(array_column($inputData['products'], 'subtotal'));
         $sale = new Sale();
-        $sale->date = date('Y-m-d');
-        $sale->invoice_number = self::invoiceNumber($inputData['session_user']['client_company_id']);
+        $sale->date = Carbon::now('UTC');
+        $sale->invoice_number = Sale::getInvoiceNumber();
         $sale->total_amount = $total_amount;
         $sale->user_id = $inputData['session_user']['id'];
         $sale->customer_id = $inputData['customer_id'] ?? null;
@@ -50,15 +57,6 @@ class SaleController extends Controller
             return response()->json(['status' => 200, 'message' => 'Successfully saved sale.', 'data' => $sale->id]);
         }
         return response()->json(['status' => 500, 'error' => 'Cannot saved sale.']);
-    }
-   public static function invoiceNumber($client_company_id)
-    {
-        $latest = Sale::where('client_company_id', $client_company_id)->orderBy('id', 'DESC')->first();
-        if ($latest == null) {
-            return 'inv-0001';
-        }
-        $string = preg_replace("/[^0-9\.]/", '', $latest->invoice_number);
-        return 'inv-' . sprintf('%04d', $string+1);
     }
     public function list(Request $request)
     {
@@ -82,7 +80,11 @@ class SaleController extends Controller
         }
         return response()->json(['status' => 200, 'data' => $result]);
     }
-    public function single(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function single(Request $request): JsonResponse
     {
         $inputData = $request->all();
         $validator = Validator::make($inputData, [
@@ -92,7 +94,14 @@ class SaleController extends Controller
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
         $result = Sale::find($inputData['id']);
-        $result['date'] = date('Y-m-d', strtotime($result['date']));
+        $result['date'] = Helpers::formatDate($result['date'], 'd/m/Y h:iA');
+        $result['customer_name'] = 'Walk in Customer';
+        if (!empty($result['customer_id'])) {
+            $category = Category::where('id', $result['customer_id'])->first();
+            if ($category instanceof Category) {
+                $result['customer_name'] = $category->category;
+            }
+        }
         $result['products'] = SaleData::select('sale_data.*', 'products.name as product_name', 'product_types.name as type_name')
             ->leftJoin('products', 'products.id', '=', 'sale_data.product_id')
             ->leftJoin('product_types', 'products.type_id', '=', 'product_types.id')
