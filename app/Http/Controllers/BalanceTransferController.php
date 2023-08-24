@@ -98,6 +98,9 @@ class BalanceTransferController extends Controller
         if (!$balanceTransfer instanceof BalanceTransfer) {
             return response()->json(['status' => 500, 'message' => 'Cannot find balance transfer..']);
         }
+        if ($balanceTransfer['status'] == FuelMatixStatus::APPROVE) {
+            return response()->json(['status' => 500, 'message' => 'Cannot update balance transfer.']);
+        }
         $balanceTransfer->from_category_id = $requestData['from'];
         $balanceTransfer->to_category_id = $requestData['to'];
         $balanceTransfer->amount = $requestData['amount'];
