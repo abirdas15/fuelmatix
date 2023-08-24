@@ -45,7 +45,7 @@
                 </a>
                     <ul aria-expanded="false" class="bichi">
                         <li><router-link :to="{name: 'PayOrder'}">Pay Orders</router-link></li>
-                        <li><a href="javascript:void(0)">Transfer</a></li>
+                        <li><router-link :to="{name:'balanceTransfer'}">Transfer</router-link></li>
                         <li><router-link :to="{name:'Expense'}">Expense</router-link></li>
                         <li><router-link :to="{name: 'Invoices'}">Bills </router-link></li>
                     </ul>

@@ -4,8 +4,7 @@
             <div class="row page-titles">
                 <ol class="breadcrumb align-items-center ">
                     <li class="breadcrumb-item active"><router-link :to="{name: 'Dashboard'}">Home</router-link></li>
-                    <li class="breadcrumb-item active"><router-link :to="{name: 'employee'}">User</router-link></li>
-                    <li class="breadcrumb-item"><a href="javascript:void(0)">Edit</a></li>
+                    <li class="breadcrumb-item"><a href="javascript:void(0)">Asset Transfer</a></li>
 
                 </ol>
             </div>
@@ -13,43 +12,40 @@
             <div class="col-xl-12 col-lg-12">
                 <div class="card">
                     <div class="card-header">
-                        <h4 class="card-title">User</h4>
+                        <h4 class="card-title">Transfer Edit</h4>
                     </div>
                     <div class="card-body">
                         <div class="basic-form">
                             <form @submit.prevent="save">
                                 <div class="row">
                                     <div class="mb-3 form-group col-md-6">
-                                        <label class="form-label">Name:</label>
-                                        <input type="text" class="form-control" name="name" v-model="param.name">
+                                        <label class="form-label">From:</label>
+                                        <select name="from_category_id" class="form-control form-select" v-model="param.from_category_id">
+                                            <template v-for="c in categories">
+                                                <option v-if="c.id != param.to_category_id" :value="c.id">{{c.category}}</option>
+                                            </template>
+                                        </select>
                                         <div class="invalid-feedback"></div>
                                     </div>
                                     <div class="mb-3 form-group col-md-6">
-                                        <label class="form-label">Email:</label>
-                                        <input type="text" class="form-control" name="email" v-model="param.email">
+                                        <label class="form-label">To:</label>
+                                        <select name="from_category_id" class="form-control form-select" v-model="param.to_category_id">
+                                            <template v-for="c in categories">
+                                                <option v-if="c.id != param.from_category_id" :value="c.id">{{c.category}}</option>
+                                            </template>
+                                        </select>
+
                                         <div class="invalid-feedback"></div>
                                     </div>
                                     <div class="mb-3 form-group col-md-6">
-                                        <label class="form-label">Password:</label>
-                                        <input type="text" class="form-control" name="password" v-model="param.password">
+                                        <label class="form-label">Amount:</label>
+                                        <input type="text" class="form-control" name="amount" v-model="param.amount">
                                         <div class="invalid-feedback"></div>
                                     </div>
                                     <div class="mb-3 form-group col-md-6">
-                                        <label class="form-label">Phone:</label>
-                                        <input type="text" class="form-control" name="phone" v-model="param.phone">
+                                        <label class="form-label">Remarks:</label>
+                                        <input type="text" class="form-control" name="remarks" v-model="param.remarks">
                                         <div class="invalid-feedback"></div>
-                                    </div>
-                                    <div class="mb-3 form-group col-md-6">
-                                        <label class="form-label">Address:</label>
-                                        <input type="text" class="form-control" name="address" v-model="param.address">
-                                        <div class="invalid-feedback"></div>
-                                    </div>
-                                    <div class="mb-3 form-group col-md-6">
-                                        <div class="form-check custom-checkbox ms-1" style="margin-top: 3rem; padding-left: 3rem;">
-                                            <input type="checkbox" class="form-check-input"
-                                                   id="basic_checkbox_1" v-model="param.cashier_balance">
-                                            <label class="form-check-label" for="basic_checkbox_1">Cashier balance</label>
-                                        </div>
                                     </div>
                                 </div>
                                 <div class="row" style="text-align: right;">
@@ -80,11 +76,12 @@ export default {
             param: {},
             loading: false,
             id: '',
+            categories: []
         }
     },
     methods: {
         getSingle: function () {
-            ApiService.POST(ApiRoutes.userSingle, {id: this.id},res => {
+            ApiService.POST(ApiRoutes.balanceTransferSingle, {id: this.id},res => {
                 if (parseInt(res.status) === 200) {
                     this.param = res.data
                 }
@@ -93,24 +90,35 @@ export default {
         save: function () {
             ApiService.ClearErrorHandler();
             this.loading = true
-            ApiService.POST(ApiRoutes.userEdit, this.param,res => {
+            ApiService.POST(ApiRoutes.balanceTransferEdit, this.param,res => {
                 this.loading = false
                 if (parseInt(res.status) === 200) {
                     this.$router.push({
-                        name: 'user'
+                        name: 'balanceTransfer'
                     })
                 } else {
                     ApiService.ErrorHandler(res.errors);
                 }
             });
         },
+        getParentCategory() {
+            ApiService.POST(ApiRoutes.CategoryParent, {type: 'assets'},res => {
+                this.loading = false
+                if (parseInt(res.status) === 200) {
+                    this.categories = res.data
+                } else {
+                    ApiService.ErrorHandler(res.errors);
+                }
+            });
+        }
     },
     created() {
         this.id = this.$route.params.id
         this.getSingle()
+        this.getParentCategory()
     },
     mounted() {
-        $('#dashboard_bar').text('User Edit')
+        $('#dashboard_bar').text('Transfer Edit')
     }
 }
 </script>

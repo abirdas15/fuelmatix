@@ -4,15 +4,15 @@
             <div class="row page-titles">
                 <ol class="breadcrumb align-items-center ">
                     <li class="breadcrumb-item active"><router-link :to="{name: 'Dashboard'}">Home</router-link></li>
-                    <li class="breadcrumb-item"><a href="javascript:void(0)">Users</a></li>
-                    <li style="margin-left: auto;"><router-link :to="{name: 'userAdd'}"><i class="fa-solid fa-plus"></i> Add New Users</router-link></li>
+                    <li class="breadcrumb-item"><a href="javascript:void(0)">Asset Transfer</a></li>
+                    <li style="margin-left: auto;"><router-link :to="{name: 'balanceTransferAdd'}"><i class="fa-solid fa-plus"></i> New Asset Transfer</router-link></li>
                 </ol>
             </div>
             <div class="row">
                 <div class="col-12">
                     <div class="card">
                         <div class="card-header bg-secondary">
-                            <h4 class="card-title">Users</h4>
+                            <h4 class="card-title">Asset Transfer</h4>
                         </div>
                         <div class="card-body">
                             <div class="row mt-4">
@@ -37,20 +37,32 @@
                                         <table class="display  dataTable no-footer" style="min-width: 845px">
                                             <thead>
                                             <tr class="text-white" style="background-color: #4886EE;color:#ffffff">
-                                                <th class="text-white" @click="sortData('name')" :class="sortClass('name')">Name</th>
-                                                <th class="text-white" @click="sortData('email')" :class="sortClass('email')">Email</th>
-                                                <th class="text-white" @click="sortData('address')" :class="sortClass('address')">Address</th>
+                                                <th class="text-white" @click="sortData('date')" :class="sortClass('date')">Date</th>
+                                                <th class="text-white" @click="sortData('type')" :class="sortClass('type')">Type</th>
+                                                <th class="text-white" @click="sortData('from_category_name')" :class="sortClass('from_category_name')">From</th>
+                                                <th class="text-white" @click="sortData('to_category_name')" :class="sortClass('to_category_name')">To</th>
+                                                <th class="text-white" @click="sortData('remarks')" :class="sortClass('remarks')">Note</th>
+                                                <th class="text-white" @click="sortData('status')" :class="sortClass('status')">Status</th>
                                                 <th class="text-white" >Action</th>
                                             </tr>
                                             </thead>
                                             <tbody v-if="listData.length > 0 && TableLoading == false">
                                             <tr v-for="f in listData">
-                                                <td >{{f.name}}</td>
+                                                <td >{{f.date}}</td>
                                                 <td >{{f.email}}</td>
-                                                <td >{{f.address}}</td>
+                                                <td >{{f.from_category_name}}</td>
+                                                <td >{{f.to_category_name}}</td>
+                                                <td >{{f.remarks}}</td>
+                                                <td >
+                                                    <select v-if="f.status == 'pending'" class="form-select" v-model="f.status" @change="approve(f)">
+                                                        <option value="pending">Pending</option>
+                                                        <option value="approve">Approved</option>
+                                                    </select>
+                                                    <span v-else class="text-success">Approved</span>
+                                                </td>
                                                 <td>
-                                                    <div class="d-flex justify-content-end">
-                                                        <router-link :to="{name: 'userEdit', params: { id: f.id }}" class=" btn btn-primary shadow btn-xs sharp me-1">
+                                                    <div class="d-flex justify-content-end" v-if="f.status == 'pending'">
+                                                        <router-link :to="{name: 'balanceTransferEdit', params: { id: f.id }}" class=" btn btn-primary shadow btn-xs sharp me-1">
                                                             <i class="fas fa-pencil-alt"></i>
                                                         </router-link>
                                                         <a  href="javascript:void(0)"  @click="openModalDelete(f)" class="btn btn-danger shadow btn-xs sharp">
@@ -150,7 +162,7 @@ export default {
             }
             this.Param.page = page.page;
             this.TableLoading = true
-            ApiService.POST(ApiRoutes.userList, this.Param,res => {
+            ApiService.POST(ApiRoutes.balanceTransferList, this.Param,res => {
                 this.TableLoading = false
                 if (parseInt(res.status) === 200) {
                     this.paginateData = res.data;
@@ -161,10 +173,20 @@ export default {
             });
         },
         Delete: function (data) {
-            ApiService.POST(ApiRoutes.userDelete, {id: data.id },res => {
+            ApiService.POST(ApiRoutes.balanceTransferDelete, {id: data.id },res => {
                 if (parseInt(res.status) === 200) {
                     this.$toast.success(res.message);
                     this.list()
+                } else {
+                    ApiService.ErrorHandler(res.error);
+                }
+            });
+        },
+        approve: function (data) {
+            ApiService.POST(ApiRoutes.balanceTransferApprove, {id: data.id },res => {
+                if (parseInt(res.status) === 200) {
+                    this.$toast.success(res.message);
+                    // this.list()
                 } else {
                     ApiService.ErrorHandler(res.error);
                 }
