@@ -75,6 +75,7 @@
                         <li><router-link :to="{name: 'Vendor'}">Vendors</router-link></li>
                         <li><router-link :to="{name: 'CreditCompany'}">Credit Company </router-link></li>
                         <li><router-link :to="{name: 'posMachine'}">POS</router-link></li>
+                        <li><router-link :to="{name: 'user'}">Users</router-link></li>
                     </ul>
                 </li>
                 <li>

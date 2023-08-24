@@ -19,7 +19,7 @@
                         <form @submit.prevent="save">
                             <div class="card">
                                 <div class="card-header">
-                                    <h4 class="card-title">DIP</h4>
+                                    <h4 class="card-title">Pay Order</h4>
                                 </div>
                                 <div class="card-body">
                                     <div class="basic-form">
@@ -50,23 +50,31 @@
                                                 <input type="text" disabled class="form-control " name="quantity" v-model="param.quantity">
                                                 <div class="invalid-feedback"></div>
                                             </div>
-                                            <div class="mb-3 form-group col-md-3">
-                                                <div class="fs-3 m-0">DIP</div>
-                                            </div>
-                                            <div class="mb-3 form-group col-md-3">
-                                                <label class="form-label">Reading before refill:</label>
-                                                <input type="text" disabled class="form-control " name="start_reading" v-model="param.start_reading">
-                                                <div class="invalid-feedback"></div>
-                                            </div>
-                                            <div class="mb-3 form-group col-md-3">
-                                                <label class="form-label">Reading after refill:</label>
-                                                <input type="text" disabled class="form-control " name="end_reading" v-model="param.end_reading">
-                                                <div class="invalid-feedback"></div>
-                                            </div>
-                                            <div class="mb-3 form-group col-md-3">
-                                                <label class="form-label">Tank Volume:</label>
-                                                <input type="text" disabled class="form-control " name="dip_sale" v-model="param.dip_sale">
-                                                <div class="invalid-feedback"></div>
+
+                                        </div>
+                                    </div>
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h5 class="card-title">DIP</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="row align-items-center">
+                                                <div class="mb-3 form-group col-md-3"></div>
+                                                <div class="mb-3 form-group col-md-3">
+                                                    <label class="form-label">Reading before refill:</label>
+                                                    <input type="text" disabled class="form-control " name="start_reading" v-model="param.start_reading">
+                                                    <div class="invalid-feedback"></div>
+                                                </div>
+                                                <div class="mb-3 form-group col-md-3">
+                                                    <label class="form-label">Reading after refill:</label>
+                                                    <input type="text" disabled class="form-control " name="end_reading" v-model="param.end_reading">
+                                                    <div class="invalid-feedback"></div>
+                                                </div>
+                                                <div class="mb-3 form-group col-md-3">
+                                                    <label class="form-label">Tank Volume:</label>
+                                                    <input type="text" disabled class="form-control " name="dip_sale" v-model="param.dip_sale">
+                                                    <div class="invalid-feedback"></div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -77,7 +85,7 @@
                                         </div>
                                         <div class="card-body" v-if="d.nozzle.length > 0">
                                             <div class="row align-items-center text-start" v-for="(n, nIndex) in d.nozzle">
-                                                <div class=" col-md-2">
+                                                <div class=" col-md-3">
                                                     <label class="form-label">
                                                         <p class="m-0">{{ n.name }}</p>
                                                     </label>

@@ -70,6 +70,9 @@ import posMachineEdit from "../Pages/posMachine/Edit.vue";
 import employee from "../Pages/Employee/List.vue";
 import employeeAdd from "../Pages/Employee/Add.vue";
 import employeeEdit from "../Pages/Employee/Edit.vue";
+import user from "../Pages/Users/List.vue";
+import userAdd from "../Pages/Users/Add.vue";
+import userEdit from "../Pages/Users/Edit.vue";
 import salary from "../Pages/Salary/List.vue";
 import salaryAdd from "../Pages/Salary/Add.vue";
 import salaryEdit from "../Pages/Salary/Edit.vue";
@@ -161,6 +164,9 @@ const router = new VueRouter({
                 { path: ROOT_URL + "/invoices", name: "Invoices", component: Invoice},
                 { path: ROOT_URL + "/invoices/view/:id", name: "InvoicesView", component: InvoiceView},
                 { path: ROOT_URL + "/daily/report", name: "dailyReport", component: dailyReport},
+                { path: ROOT_URL + "/user", name: "user", component: user},
+                { path: ROOT_URL + "/user/add", name: "userAdd", component: userAdd},
+                { path: ROOT_URL + "/user/edit/:id", name: "userEdit", component: userEdit},
             ],
         },
     ],

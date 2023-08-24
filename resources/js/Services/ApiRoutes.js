@@ -167,6 +167,12 @@ const ApiRoutes = {
     //Report daily log
     dailyLog: ApiVersion + '/report/dailyLog',
     dailyLogPdf: ApiVersion + '/report/dailyLog/export/pdf',
+    //Users
+    userAdd: ApiVersion + '/user/save',
+    userEdit: ApiVersion + '/user/update',
+    userSingle: ApiVersion + '/user/single',
+    userDelete: ApiVersion + '/user/delete',
+    userList: ApiVersion + '/user/list',
 
 };
 
