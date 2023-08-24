@@ -40,13 +40,19 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    public static function ParseData($userInfo)
+    /**
+     * @param User $userInfo
+     * @return array
+     */
+    public static function ParseData(User $userInfo): array
     {
+        $clientCompany = ClientCompany::find($userInfo->client_company_id);
         return [
             'id' => $userInfo->id,
             'name' => $userInfo->name,
             'email' => $userInfo->email,
             'client_company_id' => $userInfo->client_company_id,
+            'company_name' => $clientCompany->name ?? '',
             'permission' => []
         ];
     }

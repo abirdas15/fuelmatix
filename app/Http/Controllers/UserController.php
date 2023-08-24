@@ -143,7 +143,6 @@ class UserController extends Controller
                     $category->updateCategory();
                     $user->category_id = $category->id;
                     $user->save();
-                    return response()->json(['status' => 200, 'message' => 'Successfully updated user.']);
                 }
             } else if (!empty($requestData['cashier_balance']) && !empty($user['category_id'])) {
                 $category = Category::find($user->category_id);
@@ -152,12 +151,12 @@ class UserController extends Controller
                     $category->updateCategory();
                     $user->category_id = $category->id;
                     $user->save();
-                    return response()->json(['status' => 200, 'message' => 'Successfully updated user.']);
                 }
             } else if (empty($requestData['cashier_balance'])) {
                 $user->category_id = null;
                 $user->save();
             }
+            return response()->json(['status' => 200, 'message' => 'Successfully updated user.']);
         }
         return response()->json(['status' => 500, 'message' => 'Cannot updated user.']);
     }
