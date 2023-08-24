@@ -9,4 +9,5 @@ class Module
     const TANK_REFILL = 'tank refill';
     const PRODUCT = 'product';
     const INVOICE  = 'invoice';
+    const BALANCE_TRANSFER = 'balance transfer';
 }

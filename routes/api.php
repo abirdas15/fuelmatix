@@ -249,6 +249,10 @@ Route::group(['middleware' => 'AuthReqCheck'], function() {
     Route::group(['prefix' => 'balanceTransfer'], function() {
         Route::post('save', [BalanceTransferController::class, 'save']);
         Route::post('list', [BalanceTransferController::class, 'list']);
+        Route::post('single', [BalanceTransferController::class, 'single']);
+        Route::post('update', [BalanceTransferController::class, 'update']);
+        Route::post('approve', [BalanceTransferController::class, 'approve']);
+        Route::post('delete', [BalanceTransferController::class, 'delete']);
     });
 });
 

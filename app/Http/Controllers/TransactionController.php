@@ -26,7 +26,11 @@ class TransactionController extends Controller
         self::saveTransaction($inputData);
         return response()->json(['status' => 200, 'message' => 'Successfully save transaction.']);
     }
-    public static function saveTransaction($inputData)
+    /**
+     * @param array $inputData
+     * @return bool
+     */
+    public static function saveTransaction(array $inputData): bool
     {
         $sessionUser = SessionUser::getUser();
         foreach ($inputData['transaction'] as $transaction) {
