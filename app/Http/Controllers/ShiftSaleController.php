@@ -266,18 +266,14 @@ class ShiftSaleController extends Controller
     public function getCategory(Request $request)
     {
         $inputData = $request->all();
-        $accountReceivable = Category::select('id')
-            ->where('category', AccountCategory::ACCOUNT_RECEIVABLE)
+        $categoryId = Category::select('id')
+            ->whereIn('category', [AccountCategory::CASH_IM_HAND, AccountCategory::ACCOUNT_RECEIVABLE,  AccountCategory::POS_MACHINE])
             ->where('client_company_id', $inputData['session_user']['client_company_id'])
-            ->first();
-        $posMachine = Category::select('id')
-            ->where('category', AccountCategory::POS_MACHINE)
-            ->where('client_company_id', $inputData['session_user']['client_company_id'])
-            ->first();
+            ->pluck('id')
+            ->toArray();
         $result = Category::select('id', 'category as name')
-            ->where('parent_category', $accountReceivable->id)
-            ->orWhere('parent_category', $posMachine->id)
-            ->orWhere('category', AccountCategory::CASH)
+            ->whereIn('parent_category', $categoryId)
+            ->orderBy('parent_category', 'ASC')
             ->get()
             ->toArray();
         return response()->json(['status' => 200, 'data' => $result]);

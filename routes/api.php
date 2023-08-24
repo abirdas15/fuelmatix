@@ -30,6 +30,8 @@ use App\Http\Controllers\SalaryController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\BalanceTransferController;
 
 /*
 |--------------------------------------------------------------------------
@@ -236,6 +238,17 @@ Route::group(['middleware' => 'AuthReqCheck'], function() {
             Route::post('/', [ReportController::class, 'dailyLog']);
             Route::post('export/pdf', [ReportController::class, 'dailyLogExportPdf']);
         });
+    });
+    Route::group(['prefix' => 'user'], function() {
+        Route::post('save', [UserController::class, 'save']);
+        Route::post('list', [UserController::class, 'list']);
+        Route::post('single', [UserController::class, 'single']);
+        Route::post('update', [UserController::class, 'update']);
+        Route::post('delete', [UserController::class, 'delete']);
+    });
+    Route::group(['prefix' => 'balanceTransfer'], function() {
+        Route::post('save', [BalanceTransferController::class, 'save']);
+        Route::post('list', [BalanceTransferController::class, 'list']);
     });
 });
 

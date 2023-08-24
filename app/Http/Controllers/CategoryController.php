@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Helpers\SessionUser;
 use App\Models\Category;
 use App\Models\Transaction;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -58,12 +59,16 @@ class CategoryController extends Controller
         }
         return $categories;
     }
-    public function parent(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function parent(Request $request): JsonResponse
     {
         $inputData = $request->all();
         $result = Category::select('id', 'category_hericy', 'type')
             ->where('client_company_id', $inputData['session_user']['client_company_id']);
-        if (isset($inputData['type']) && !empty($inputData['type'])) {
+        if (!empty($inputData['type'])) {
             $result->where(function($q) use ($inputData) {
                 $q->where('type', $inputData['type']);
             });
@@ -78,7 +83,6 @@ class CategoryController extends Controller
         usort($result, function ($item1, $item2) {
             return $item1['category'] <=> $item2['category'];
         });
-
         return response()->json(['status' => 200, 'data' => $result]);
     }
     public function save(Request $request)
