@@ -198,7 +198,7 @@ class SaleController extends Controller
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
         $sale = Sale::find($inputData['id']);
-        if ($sale == null) {
+        if (!$sale instanceof Sale) {
             return response()->json(['status' => 500, 'error' => 'Cannot find sale.']);
         }
         $total_amount = array_sum(array_column($inputData['products'], 'subtotal'));
