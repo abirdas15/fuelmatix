@@ -123,13 +123,17 @@ class SaleController extends Controller
         }
         return response()->json(['status' => 500, 'error' => 'Cannot saved sale.']);
     }
-    public function list(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function list(Request $request): JsonResponse
     {
         $inputData = $request->all();
-        $limit = isset($inputData['limit']) ? $inputData['limit'] : 10;
-        $keyword = isset($inputData['keyword']) ? $inputData['keyword'] : '';
-        $order_by = isset($inputData['order_by']) ? $inputData['order_by'] : 'sale.id';
-        $order_mode = isset($inputData['order_mode']) ? $inputData['order_mode'] : 'DESC';
+        $limit = $inputData['limit'] ?? 10;
+        $keyword = $inputData['keyword'] ?? '';
+        $order_by = $inputData['order_by'] ?? 'sale.id';
+        $order_mode = $inputData['order_mode'] ?? 'DESC';
         $result = Sale::select('sale.id', 'sale.invoice_number', 'sale.date', 'sale.total_amount', 'sale.payment_method', 'users.name as user_name')
             ->leftJoin('users', 'users.id', '=', 'sale.user_id')
             ->where('sale.client_company_id', $inputData['session_user']['client_company_id']);
@@ -216,7 +220,11 @@ class SaleController extends Controller
         }
         return response()->json(['status' => 500, 'error' => 'Cannot updated sale.']);
     }
-    public function delete(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function delete(Request $request): JsonResponse
     {
         $inputData = $request->all();
         $validator = Validator::make($inputData, [
