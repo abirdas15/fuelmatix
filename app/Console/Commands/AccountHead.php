@@ -241,6 +241,16 @@ class AccountHead extends Command
                 'client_company_id' => $clientCompany->id,
                 'category_ids' => json_encode([5,20])
             ],
+            [
+                'category' => 'Driver Tips',
+                'parent_category' => 5,
+                'type' => 'expenses',
+                'balance' => 0,
+                'category_hericy' => json_encode(['Expenses', 'Driver Tips']),
+                'default' => 1,
+                'client_company_id' => $clientCompany->id,
+                'category_ids' => json_encode([5,21])
+            ],
         ];
         Category::truncate();
         Category::insert($data);

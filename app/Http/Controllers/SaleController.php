@@ -96,6 +96,7 @@ class SaleController extends Controller
         $result = Sale::find($inputData['id']);
         $result['date'] = Helpers::formatDate($result['date'], 'd/m/Y h:iA');
         $result['customer_name'] = 'Walk in Customer';
+        $result['payment_method'] = ucfirst($result['payment_method']);
         if (!empty($result['customer_id'])) {
             $category = Category::where('id', $result['customer_id'])->first();
             if ($category instanceof Category) {

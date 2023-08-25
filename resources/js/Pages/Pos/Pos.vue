@@ -140,6 +140,7 @@
                                             <p class="mt-1 mb-0" v-if="i < 9">
                                                 <kbd>Alt</kbd>+<kbd>{{ getProductNumber(i) }}</kbd></p>
                                         </div>
+
                                     </div>
                                 </div>
                             </div>
@@ -150,7 +151,7 @@
         </div>
         <div id="print" v-if="singleSaleData">
             <header class="text-center">
-                <img id="logo" class="media" src="/images/fuelBL.jpeg"></img>
+                {{ Auth.company_name }}
             </header>
             <p>Invoice Number : {{ singleSaleData.invoice_number }}</p>
             <table class="bill-details">
@@ -159,7 +160,7 @@
                     <td>Date : <span>{{ singleSaleData.date }}</span></td>
                 </tr>
                 <tr>
-                    <th class="center-align" colspan="2"><span class="receipt">Original Receipt</span></th>
+                    <td>Billed To: <span>{{ singleSaleData.customer_name }}</span></td>
                 </tr>
                 </tbody>
             </table>
@@ -189,11 +190,19 @@
             </table>
             <section>
                 <p>
-                    Paid by : <span>CASH</span>
+                    Paid by : <span>{{ singleSaleData.payment_method }}</span>
                 </p>
                 <p style="text-align:center">
                     Thank you for your visit!
                 </p>
+            </section>
+            <section style="margin-top: 10px; text-align: center">
+                <qrcode-vue :value="value" :size="100" level="H" render-as="svg"></qrcode-vue>
+            </section>
+            <section style="text-align: center">
+                <sub>
+                    Powered By : <span>Fuel Matix</span>
+                </sub>
             </section>
         </div>
     </div>
@@ -203,8 +212,12 @@
 import ApiService from "../../Services/ApiService";
 import ApiRoutes from "../../Services/ApiRoutes";
 import {Printd} from "printd"
+import QrcodeVue from 'qrcode.vue'
 
 export default {
+    components: {
+        QrcodeVue,
+    },
     data() {
         return {
             sale: [],
@@ -215,6 +228,7 @@ export default {
             loading: false,
             singleSaleData: null,
             printD: null,
+            value: null,
             cssText: `
                  @page {
                     size: 2.8in 11in;
@@ -338,6 +352,11 @@ export default {
             `
         }
     },
+    computed: {
+        Auth: function () {
+            return this.$store.getters.GetAuth;
+        },
+    },
     methods: {
         updateSubtotal: function (i) {
             this.sale[i].subtotal = parseFloat(this.sale[i].price * this.sale[i].quantity).toFixed(2)
@@ -353,6 +372,7 @@ export default {
             ApiService.POST(ApiRoutes.SaleAdd, {payment_method: 'cash', products: this.sale}, res => {
                 if (parseInt(res.status) === 200) {
                     this.saleId = res.data
+                    this.sale = [];
                     this.singleOrder()
                 }
             });
@@ -361,6 +381,7 @@ export default {
             ApiService.POST(ApiRoutes.SaleSingle, {id: this.saleId}, res => {
                 if (parseInt(res.status) === 200) {
                     this.singleSaleData = res.data
+                    this.value = "https://fuel.informatix.asia?billId=" + res.data.invoice_number;
                     setTimeout(() => {
                         this.loading = false
                         this.print()

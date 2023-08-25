@@ -38,19 +38,21 @@ class CategoryController extends Controller
         foreach ($categories as &$category) {
             foreach ($transactions as $transaction) {
                 $categoryIds = json_decode($transaction['category_ids']);
-                if (in_array($category['id'], $categoryIds)) {
-                    if ($category['type'] == 'expenses') {
-                        $balance = $transaction['credit_amount'] - $transaction['debit_amount'];
-                    } else if ($category['type'] == 'income') {
-                        $balance = $transaction['debit_amount'] - $transaction['credit_amount'];
-                    }  else if ($category['type'] == 'assets') {
-                        $balance = $transaction['credit_amount'] - $transaction['debit_amount'];
-                    } else if ($category['type'] == 'liabilities') {
-                        $balance = $transaction['debit_amount'] - $transaction['credit_amount'];
-                    } else if ($category['type'] == 'equity') {
-                        $balance = $transaction['debit_amount'] - $transaction['credit_amount'];
+                if (!empty($category['id']) && !empty($categoryIds)) {
+                    if (in_array($category['id'], $categoryIds)) {
+                        if ($category['type'] == 'expenses') {
+                            $balance = $transaction['credit_amount'] - $transaction['debit_amount'];
+                        } else if ($category['type'] == 'income') {
+                            $balance = $transaction['debit_amount'] - $transaction['credit_amount'];
+                        }  else if ($category['type'] == 'assets') {
+                            $balance = $transaction['credit_amount'] - $transaction['debit_amount'];
+                        } else if ($category['type'] == 'liabilities') {
+                            $balance = $transaction['debit_amount'] - $transaction['credit_amount'];
+                        } else if ($category['type'] == 'equity') {
+                            $balance = $transaction['debit_amount'] - $transaction['credit_amount'];
+                        }
+                        $category['balance'] =  $category['balance'] + $balance;
                     }
-                    $category['balance'] =  $category['balance'] + $balance;
                 }
             }
             if (count($category['children'] )> 0) {
