@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Common\AccountCategory;
+use App\Common\Module;
 use App\Models\Category;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -38,6 +40,18 @@ class CreditCompanyController extends Controller
         $category->others = json_encode($others);
         $category->client_company_id = $inputData['session_user']['client_company_id'];
         if ($category->save()) {
+            $category->updateCategory();
+            $driverTips = Category::where('category', AccountCategory::DRIVER_TIPS)->where('client_company_id', $inputData['session_user']['client_company_id'])->first();
+            $data =  [
+                'category' => $inputData['name'],
+                'parent_category' => $driverTips['id'],
+                'type' => $driverTips['type'],
+                'module' => Module::DRIVER_TIPS,
+                'module_id' => $category->id,
+                'client_company_id' => $inputData['session_user']['client_company_id']
+            ];
+            $category = new Category($data);
+            $category->save();
             $category->updateCategory();
             return response()->json(['status' => 200, 'message' => 'Successfully saved credit company.']);
         }
@@ -89,7 +103,11 @@ class CreditCompanyController extends Controller
         unset($result['others']);
         return response()->json(['status' => 200, 'data' => $result]);
     }
-    public function update(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function update(Request $request): JsonResponse
     {
         $inputData = $request->all();
         $validator = Validator::make($inputData, [
@@ -121,6 +139,23 @@ class CreditCompanyController extends Controller
         $category->credit_limit = $inputData['credit_limit'] ?? null;
         $category->others = json_encode($others);
         if ($category->save()) {
+            $category->updateCategory();
+            $category = Category::where('module', Module::DRIVER_TIPS)->where('module_id', $inputData['id'])->where('client_company_id', $inputData['session_user']['client_company_id'])->first();
+            if (!$category instanceof Category) {
+                $driverTips = Category::where('category', AccountCategory::DRIVER_TIPS)->where('client_company_id', $inputData['session_user']['client_company_id'])->first();
+                $data =  [
+                    'category' => $inputData['name'],
+                    'parent_category' => $driverTips['id'],
+                    'type' => $driverTips['type'],
+                    'module' => Module::DRIVER_TIPS,
+                    'module_id' => $inputData['id'],
+                    'client_company_id' => $inputData['session_user']['client_company_id']
+                ];
+                $category = new Category($data);
+            } else {
+                $category->name = $inputData['name'];
+            }
+            $category->save();
             $category->updateCategory();
             return response()->json(['status' => 200, 'message' => 'Successfully updated credit company.']);
         }

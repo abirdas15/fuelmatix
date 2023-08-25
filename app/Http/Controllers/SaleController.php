@@ -58,11 +58,18 @@ class SaleController extends Controller
         if (!$sessionUser instanceof User) {
             return response()->json(['status' => 500, 'message' => 'Cannot find session user.']);
         }
+        $driverTipsCategory = null;
         $payment_category_id = $requestData['payment_category_id'] ?? '';
         if ($requestData['payment_method'] == PaymentMethod::CASH) {
             $category = Category::where('id', $sessionUser['category_id'])->first();
             if (!$category instanceof Category) {
                 return response()->json(['status' => 500, 'message' => 'You are not a cashier user.']);
+            }
+            if (!empty($requestData['driver_amount'])) {
+                $driverTipsCategory = Category::where('client_company_id', $sessionUser['client_company_id'])->where('module', Module::DRIVER_TIPS)->where('module_id', $category->id)->first();
+                if (!$driverTipsCategory instanceof Category) {
+                    return response()->json(['status' => 500, 'message' => 'Driver tips category is not created. Please update credit company.']);
+                }
             }
             $payment_category_id = $category['id'];
         }
@@ -102,6 +109,13 @@ class SaleController extends Controller
                 $transactionData['linked_id'] = $product['expense_category_id'];
                 $transactionData['transaction'] = [
                     ['date' => date('Y-m-d'), 'account_id' => $product['stock_category_id'], 'debit_amount' => $buyingPrice, 'credit_amount' => 0, 'module' => Module::POS_SALE, 'module_id' => $sale->id],
+                ];
+                TransactionController::saveTransaction($transactionData);
+            }
+            if (!empty($requestData['driver_amount']) && !empty($driverTipsCategory)) {
+                $transactionData['linked_id'] = $payment_category_id;
+                $transactionData['transaction'] = [
+                    ['date' => date('Y-m-d'), 'account_id' => $driverTipsCategory['id'], 'debit_amount' => $requestData['driver_tips_amount'], 'credit_amount' => 0, 'module' => Module::POS_SALE, 'module_id' => $sale->id],
                 ];
                 TransactionController::saveTransaction($transactionData);
             }
@@ -161,7 +175,11 @@ class SaleController extends Controller
             ->get()->toArray();
         return response()->json(['status' => 200, 'data' => $result]);
     }
-    public function update(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function update(Request $request): JsonResponse
     {
         $inputData = $request->all();
         $validator = Validator::make($inputData, [
