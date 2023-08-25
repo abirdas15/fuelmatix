@@ -113,9 +113,9 @@ class SaleController extends Controller
                 TransactionController::saveTransaction($transactionData);
             }
             if (!empty($requestData['driver_amount']) && !empty($driverTipsCategory)) {
-                $transactionData['linked_id'] = $payment_category_id;
+                $transactionData['linked_id'] = $driverTipsCategory['id'];
                 $transactionData['transaction'] = [
-                    ['date' => date('Y-m-d'), 'account_id' => $driverTipsCategory['id'], 'debit_amount' => $requestData['driver_tips_amount'], 'credit_amount' => 0, 'module' => Module::POS_SALE, 'module_id' => $sale->id],
+                    ['date' => date('Y-m-d'), 'account_id' => $payment_category_id, 'debit_amount' => $requestData['driver_tips_amount'], 'credit_amount' => 0, 'module' => Module::POS_SALE, 'module_id' => $sale->id],
                 ];
                 TransactionController::saveTransaction($transactionData);
             }
