@@ -36,6 +36,7 @@ class UserController extends Controller
         $user->phone = $requestData['phone'] ?? null;
         $user->address = $requestData['address'] ?? null;
         $user->client_company_id = $sessionUser['client_company_id'];
+        $user->cashier_balance = !empty($requestData['cashier_balance']) ? 1 : 0;
         if ($user->save()) {
             if (!empty($requestData['cashier_balance'])) {
                 $cashInHandCategory = Category::where('client_company_id', $sessionUser['client_company_id'])->where('category', AccountCategory::CASH_IM_HAND)->first();
@@ -82,7 +83,7 @@ class UserController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-    public function single(Request $request)
+    public function single(Request $request): JsonResponse
     {
         $requestData = $request->all();
         $validator = Validator::make($requestData, [
@@ -91,7 +92,7 @@ class UserController extends Controller
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
-        $result = User::select('id', 'name', 'email', 'phone', 'category_id', 'address')
+        $result = User::select('id', 'name', 'email', 'phone', 'address', 'cashier_balance')
             ->where('id', $requestData['id'])
             ->first();
         return response()->json(['status' => 200, 'data' => $result]);
@@ -131,6 +132,7 @@ class UserController extends Controller
         $user->phone = $requestData['phone'] ?? null;
         $user->address = $requestData['address'] ?? null;
         $user->client_company_id = $sessionUser['client_company_id'];
+        $user->cashier_balance = !empty($requestData['cashier_balance']) ? 1 : 0;
         if ($user->save()) {
             if (!empty($requestData['cashier_balance']) && empty($user['category_id'])) {
                 $cashInHandCategory = Category::where('client_company_id', $sessionUser['client_company_id'])->where('category', AccountCategory::CASH_IM_HAND)->first();
@@ -152,9 +154,6 @@ class UserController extends Controller
                     $user->category_id = $category->id;
                     $user->save();
                 }
-            } else if (empty($requestData['cashier_balance'])) {
-                $user->category_id = null;
-                $user->save();
             }
             return response()->json(['status' => 200, 'message' => 'Successfully updated user.']);
         }

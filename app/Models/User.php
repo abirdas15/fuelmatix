@@ -56,14 +56,4 @@ class User extends Authenticatable
             'permission' => []
         ];
     }
-    public $appends = [
-        'cashier_balance'
-    ];
-    public function getCashierBalanceAttribute(): bool
-    {
-        if (!empty($this['category_id'])) {
-            return true;
-        }
-        return false;
-    }
 }

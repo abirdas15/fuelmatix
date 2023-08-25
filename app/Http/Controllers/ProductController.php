@@ -13,6 +13,7 @@ use App\Models\ShiftSummary;
 use App\Models\Stock;
 use App\Models\Tank;
 use App\Models\TankLog;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -79,17 +80,21 @@ class ProductController extends Controller
         }
         return response()->json(['status' => 500, 'error' => 'Cannot save product.']);
     }
-    public function list(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function list(Request $request): JsonResponse
     {
         $inputData = $request->all();
-        $limit = isset($inputData['limit']) ? $inputData['limit'] : 10;
-        $keyword = isset($inputData['keyword']) ? $inputData['keyword'] : '';
-        $order_by = isset($inputData['order_by']) ? $inputData['order_by'] : 'id';
-        $order_mode = isset($inputData['order_mode']) ? $inputData['order_mode'] : 'DESC';
+        $limit = $inputData['limit'] ?? 10;
+        $keyword = $inputData['keyword'] ?? '';
+        $order_by = $inputData['order_by'] ?? 'id';
+        $order_mode = $inputData['order_mode'] ?? 'DESC';
         $result = Product::select('products.*', 'product_types.name as product_type')
             ->leftJoin('product_types', 'product_types.id', '=', 'products.type_id')
             ->where('client_company_id', $inputData['session_user']['client_company_id']);
-        if (isset($inputData['type_id']) && !empty($inputData['type_id'])) {
+        if (!empty($inputData['type_id'])) {
             $result->where(function($q) use ($inputData) {
                 $q->where('products.type_id', $inputData['type_id']);
             });
@@ -104,6 +109,20 @@ class ProductController extends Controller
         }
         $result = $result->orderBy($order_by, $order_mode)
             ->paginate($limit);
+        $shiftSale = ShiftSale::select('product_id')->where('date', date('Y-m-d'))->where('status', 'start')->get()->keyBy('product_id')->toArray();
+        $productId = [];
+        foreach ($result as &$data) {
+            $productId[] = $data['id'];
+            $data['shift_sale_id'] = isset($shiftSale[$data['id']]) ? $shiftSale[$data['id']]['product_id']: '';
+        }
+        $incomeCategory = Category::select('id', 'module_id')->whereIn('module_id', $productId)->where('type', 'income')->where('module', Module::PRODUCT)->get()->keyBy('module_id')->toArray();
+        $stockCategory = Category::select('id', 'module_id')->whereIn('module_id', $productId)->where('type', 'assets')->where('module', Module::PRODUCT)->get()->keyBy('module_id')->toArray();
+        $expenseCategory = Category::select('id', 'module_id')->whereIn('module_id', $productId)->where('type', 'expenses')->where('module', Module::PRODUCT)->get()->keyBy('module_id')->toArray();
+        foreach ($result as &$data) {
+            $data['income_category_id'] = isset($incomeCategory[$data['id']]) ? $incomeCategory[$data['id']]['id']: '';
+            $data['stock_category_id'] = isset($stockCategory[$data['id']]) ? $stockCategory[$data['id']]['id']: '';
+            $data['expense_category_id'] = isset($expenseCategory[$data['id']]) ? $expenseCategory[$data['id']]['id']: '';
+        }
         return response()->json(['status' => 200, 'data' => $result]);
     }
     public function single(Request $request)

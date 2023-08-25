@@ -370,6 +370,7 @@ export default {
             }
             this.loading = true
             ApiService.POST(ApiRoutes.SaleAdd, {payment_method: 'cash', products: this.sale}, res => {
+                this.loading = false;
                 if (parseInt(res.status) === 200) {
                     this.saleId = res.data
                     this.sale = [];
@@ -424,6 +425,10 @@ export default {
             let product = {
                 name: p.name,
                 type: p.product_type,
+                shift_sale_id: p.shift_sale_id,
+                income_category_id: p.income_category_id,
+                stock_category_id: p.stock_category_id,
+                expense_category_id: p.expense_category_id,
                 product_id: p.id,
                 quantity: parseFloat(1).toFixed(2),
                 price: parseFloat(p.selling_price).toFixed(2),

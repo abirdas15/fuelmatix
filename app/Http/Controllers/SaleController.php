@@ -4,13 +4,17 @@ namespace App\Http\Controllers;
 
 use App\Common\AccountCategory;
 use App\Common\Module;
+use App\Common\PaymentMethod;
 use App\Helpers\Helpers;
 use App\Helpers\SessionUser;
 use App\Models\Category;
 use App\Models\Invoice;
+use App\Models\Product;
+use App\Models\ProductPrice;
 use App\Models\Sale;
 use App\Models\SaleData;
 use App\Models\Transaction;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -26,33 +30,80 @@ class SaleController extends Controller
     {
         $inputData = $request->all();
         $validator = Validator::make($inputData, [
+            'payment_method' => 'required',
             'products' => 'required|array',
+            'payment_category_id' => 'required_unless:payment_method,cash',
+            'products.*.shift_sale_id' => 'required',
             'products.*.product_id' => 'required',
+            'products.*.income_category_id' => 'required',
+            'products.*.stock_category_id' => 'required',
+            'products.*.expense_category_id' => 'required',
             'products.*.quantity' => 'required',
             'products.*.price' => 'required',
             'products.*.subtotal' => 'required',
+        ],[
+            'products.*.shift_sale_id.required' => 'Shift sale is not started. Please start shift sale first.',
+            'products.*.product_id.required' => 'The product field is required.',
+            'products.*.income_category_id.required' => 'Product is not a income category. Please update product first.',
+            'products.*.stock_category_id.required' => 'Product is not a stock category. Please update product first.',
+            'products.*.expense_category_id.required' => 'Product is not a expense category. Please update product first.',
+            'products.*.price.required' => 'The price field is required.',
+            'products.*.subtotal.required' => 'The subtotal field is required.',
         ]);
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
-        $total_amount = array_sum(array_column($inputData['products'], 'subtotal'));
+        $requestData = $request->all();
+        $sessionUser = SessionUser::getUser();
+        if (!$sessionUser instanceof User) {
+            return response()->json(['status' => 500, 'message' => 'Cannot find session user.']);
+        }
+        $payment_category_id = $requestData['payment_category_id'] ?? '';
+        if ($requestData['payment_method'] == PaymentMethod::CASH) {
+            $category = Category::where('id', $sessionUser['category_id'])->first();
+            if (!$category instanceof Category) {
+                return response()->json(['status' => 500, 'message' => 'You are not a cashier user.']);
+            }
+            $payment_category_id = $category['id'];
+        }
+        if (empty($payment_category_id)) {
+            return response()->json(['status' => 500, 'errors' => ['payment_category_id' => ['The payment category field is required.']]]);
+        }
+        $total_amount = array_sum(array_column($requestData['products'], 'subtotal'));
         $sale = new Sale();
         $sale->date = Carbon::now('UTC');
         $sale->invoice_number = Sale::getInvoiceNumber();
         $sale->total_amount = $total_amount;
-        $sale->user_id = $inputData['session_user']['id'];
-        $sale->customer_id = $inputData['customer_id'] ?? null;
-        $sale->payment_method = $inputData['payment_method'] ?? null;
-        $sale->client_company_id = $inputData['session_user']['client_company_id'];
+        $sale->user_id = $requestData['session_user']['id'];
+        $sale->customer_id = $requestData['customer_id'] ?? null;
+        $sale->payment_method = $requestData['payment_method'] ?? null;
+        $sale->payment_category_id = $payment_category_id;
+        $sale->client_company_id = $requestData['session_user']['client_company_id'];
         if ($sale->save()) {
-            foreach ($inputData['products'] as $product) {
+            foreach ($requestData['products'] as $product) {
+                $transactionData['linked_id'] = $payment_category_id;
+                $buyingPrice = 0;
+                $productModel = Product::where('id', $product['product_id'])->first();
+                if (!empty($productModel['buying_price'])) {
+                    $buyingPrice = $productModel['buying_price'] * $product['quantity'];
+                }
                 $saleData = new SaleData();
                 $saleData->sale_id = $sale->id;
                 $saleData->product_id = $product['product_id'];
                 $saleData->quantity = $product['quantity'];
                 $saleData->price = $product['price'];
                 $saleData->subtotal = $product['subtotal'];
+                $saleData->shift_sale_id = $product['shift_sale_id'];
                 $saleData->save();
+                $transactionData['transaction'] = [
+                    ['date' => date('Y-m-d'), 'account_id' => $product['income_category_id'], 'debit_amount' => $product['subtotal'], 'credit_amount' => 0, 'module' => Module::POS_SALE, 'module_id' => $sale->id],
+                ];
+                TransactionController::saveTransaction($transactionData);
+                $transactionData['linked_id'] = $product['expense_category_id'];
+                $transactionData['transaction'] = [
+                    ['date' => date('Y-m-d'), 'account_id' => $product['stock_category_id'], 'debit_amount' => $buyingPrice, 'credit_amount' => 0, 'module' => Module::POS_SALE, 'module_id' => $sale->id],
+                ];
+                TransactionController::saveTransaction($transactionData);
             }
             return response()->json(['status' => 200, 'message' => 'Successfully saved sale.', 'data' => $sale->id]);
         }

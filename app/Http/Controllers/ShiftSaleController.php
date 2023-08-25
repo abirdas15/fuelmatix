@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Common\AccountCategory;
 use App\Models\Category;
 use App\Models\Dispenser;
+use App\Models\Product;
 use App\Models\ProductPrice;
 use App\Models\ShiftSale;
 use App\Models\ShiftSaleTransaction;
@@ -74,7 +75,7 @@ class ShiftSaleController extends Controller
         if ($costOfGoodSoldCategory == null) {
             return response()->json(['status' => 500, 'error' => 'Cannot fin account stock of good sold category.']);
         }
-        $productPrices = ProductPrice::where('client_company_id', $inputData['session_user']['client_company_id'])->where('product_id', $inputData['product_id'])->where('stock_quantity', '>', 0)->get();
+     //   $productPrices = ProductPrice::where('client_company_id', $inputData['session_user']['client_company_id'])->where('product_id', $inputData['product_id'])->where('stock_quantity', '>', 0)->get();
         $shiftSale = new ShiftSale();
         $shiftSale->date = $inputData['date'];
         $shiftSale->product_id = $inputData['product_id'];
@@ -112,19 +113,23 @@ class ShiftSaleController extends Controller
                 }
             }
             $buyingPrice = 0;
-            foreach ($productPrices as $productPrice) {
-                if ($productPrice['stock_quantity'] > $totalNozzleConsumption) {
-                    $productPrice['stock_quantity'] = $productPrice['stock_quantity'] - $totalNozzleConsumption;
-                    $buyingPrice = $productPrice['unit_price'] * $totalNozzleConsumption;
-                    $productPrice->save();
-                    break;
-                } else {
-                    $totalNozzleConsumption = $totalNozzleConsumption - $productPrice['stock_quantity'];
-                    $buyingPrice = $buyingPrice + ($productPrice['unit_price'] * $totalNozzleConsumption);
-                    $productPrice['stock_quantity'] = 0;
-                    $productPrice->save();
-                }
+            $product = Product::where('id', $inputData['product_id'])->first();
+            if (!empty($product['buying_price'])) {
+                $buyingPrice = $product['buying_price'] * $totalNozzleConsumption;
             }
+//            foreach ($productPrices as $productPrice) {
+//                if ($productPrice['stock_quantity'] > $totalNozzleConsumption) {
+//                    $productPrice['stock_quantity'] = $productPrice['stock_quantity'] - $totalNozzleConsumption;
+//                    $buyingPrice = $productPrice['unit_price'] * $totalNozzleConsumption;
+//                    $productPrice->save();
+//                    break;
+//                } else {
+//                    $totalNozzleConsumption = $totalNozzleConsumption - $productPrice['stock_quantity'];
+//                    $buyingPrice = $buyingPrice + ($productPrice['unit_price'] * $totalNozzleConsumption);
+//                    $productPrice['stock_quantity'] = 0;
+//                    $productPrice->save();
+//                }
+//            }
             $transactionData['linked_id'] = $incomeCategory['id'];
             $shiftSaleTransaction = [];
             foreach ($inputData['categories'] as $category) {

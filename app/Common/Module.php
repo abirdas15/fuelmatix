@@ -10,4 +10,6 @@ class Module
     const PRODUCT = 'product';
     const INVOICE  = 'invoice';
     const BALANCE_TRANSFER = 'balance transfer';
+
+    const POS_SALE  = 'pos sale';
 }
