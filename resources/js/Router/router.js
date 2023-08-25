@@ -70,6 +70,9 @@ import posMachineEdit from "../Pages/posMachine/Edit.vue";
 import employee from "../Pages/Employee/List.vue";
 import employeeAdd from "../Pages/Employee/Add.vue";
 import employeeEdit from "../Pages/Employee/Edit.vue";
+import balanceTransfer from "../Pages/AssetTransfer/List.vue";
+import balanceTransferAdd from "../Pages/AssetTransfer/Add.vue";
+import balanceTransferEdit from "../Pages/AssetTransfer/Edit.vue";
 import user from "../Pages/Users/List.vue";
 import userAdd from "../Pages/Users/Add.vue";
 import userEdit from "../Pages/Users/Edit.vue";
@@ -167,6 +170,9 @@ const router = new VueRouter({
                 { path: ROOT_URL + "/user", name: "user", component: user},
                 { path: ROOT_URL + "/user/add", name: "userAdd", component: userAdd},
                 { path: ROOT_URL + "/user/edit/:id", name: "userEdit", component: userEdit},
+                { path: ROOT_URL + "/balanceTransfer", name: "balanceTransfer", component: balanceTransfer},
+                { path: ROOT_URL + "/balanceTransfer/add", name: "balanceTransferAdd", component: balanceTransferAdd},
+                { path: ROOT_URL + "/balanceTransfer/edit/:id", name: "balanceTransferEdit", component: balanceTransferEdit},
             ],
         },
     ],

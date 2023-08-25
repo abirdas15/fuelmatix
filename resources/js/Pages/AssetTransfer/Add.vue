@@ -12,7 +12,7 @@
             <div class="col-xl-12 col-lg-12">
                 <div class="card">
                     <div class="card-header">
-                        <h4 class="card-title">Transfer</h4>
+                        <h4 class="card-title">Transfer Add</h4>
                     </div>
                     <div class="card-body">
                         <div class="basic-form">
@@ -20,22 +20,31 @@
                                 <div class="row">
                                     <div class="mb-3 form-group col-md-6">
                                         <label class="form-label">From:</label>
-                                        <input type="text" class="form-control" name="name" v-model="param.name">
+                                        <select name="from_category_id" class="form-control form-select" v-model="param.from_category_id">
+                                            <template v-for="c in categories">
+                                                <option v-if="c.id != param.to_category_id" :value="c.id">{{c.category}}</option>
+                                            </template>
+                                        </select>
                                         <div class="invalid-feedback"></div>
                                     </div>
                                     <div class="mb-3 form-group col-md-6">
                                         <label class="form-label">To:</label>
-                                        <input type="text" class="form-control" name="email" v-model="param.email">
+                                        <select name="from_category_id" class="form-control form-select" v-model="param.to_category_id">
+                                            <template v-for="c in categories">
+                                                <option v-if="c.id != param.from_category_id" :value="c.id">{{c.category}}</option>
+                                            </template>
+                                        </select>
+
                                         <div class="invalid-feedback"></div>
                                     </div>
                                     <div class="mb-3 form-group col-md-6">
                                         <label class="form-label">Amount:</label>
-                                        <input type="text" class="form-control" name="password" v-model="param.password">
+                                        <input type="text" class="form-control" name="amount" v-model="param.amount">
                                         <div class="invalid-feedback"></div>
                                     </div>
                                     <div class="mb-3 form-group col-md-6">
                                         <label class="form-label">Remarks:</label>
-                                        <input type="text" class="form-control" name="phone" v-model="param.phone">
+                                        <input type="text" class="form-control" name="remarks" v-model="param.remarks">
                                         <div class="invalid-feedback"></div>
                                     </div>
                                 </div>
@@ -65,37 +74,46 @@ export default {
     data() {
         return {
             param: {
-                name: '',
-                email: '',
-                password: '',
-                address: '',
-                phone: '',
-                cashier_balance: '',
+                from_category_id: '',
+                to_category_id: '',
+                amount: '',
+                remarks: '',
             },
             loading: false,
+            categories: []
         }
     },
     methods: {
         save: function () {
             ApiService.ClearErrorHandler();
             this.loading = true
-            ApiService.POST(ApiRoutes.userAdd, this.param,res => {
+            ApiService.POST(ApiRoutes.balanceTransferAdd, this.param,res => {
                 this.loading = false
                 if (parseInt(res.status) === 200) {
                     this.$router.push({
-                        name: 'user'
+                        name: 'balanceTransfer'
                     })
                 } else {
                     ApiService.ErrorHandler(res.errors);
                 }
             });
         },
+        getParentCategory() {
+            ApiService.POST(ApiRoutes.CategoryParent, {type: 'assets'},res => {
+                this.loading = false
+                if (parseInt(res.status) === 200) {
+                    this.categories = res.data
+                } else {
+                    ApiService.ErrorHandler(res.errors);
+                }
+            });
+        }
     },
     created() {
-
+        this.getParentCategory()
     },
     mounted() {
-        $('#dashboard_bar').text('User Add')
+        $('#dashboard_bar').text('Transfer Add')
     }
 }
 </script>

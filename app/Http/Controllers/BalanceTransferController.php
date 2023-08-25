@@ -22,8 +22,8 @@ class BalanceTransferController extends Controller
     {
         $requestData = $request->all();
         $validator = Validator::make($requestData, [
-            'from' => 'required',
-            'to' => 'required',
+            'from_category_id' => 'required',
+            'to_category_id' => 'required',
             'amount' => 'required'
         ]);
         if ($validator->fails()) {
@@ -32,8 +32,8 @@ class BalanceTransferController extends Controller
         $sessionUser = SessionUser::getUser();
         $balanceTransfer = new BalanceTransfer();
         $balanceTransfer->date = Carbon::now('UTC');
-        $balanceTransfer->from_category_id = $requestData['from'];
-        $balanceTransfer->to_category_id = $requestData['to'];
+        $balanceTransfer->from_category_id = $requestData['from_category_id'];
+        $balanceTransfer->to_category_id = $requestData['to_category_id'];
         $balanceTransfer->amount = $requestData['amount'];
         $balanceTransfer->remarks = $requestData['remarks'] ?? null;
         $balanceTransfer->client_company_id = $sessionUser['client_company_id'];
@@ -87,8 +87,8 @@ class BalanceTransferController extends Controller
         $requestData = $request->all();
         $validator = Validator::make($requestData, [
             'id' => 'required',
-            'from' => 'required',
-            'to' => 'required',
+            'from_category_id' => 'required',
+            'to_category_id' => 'required',
             'amount' => 'required'
         ]);
         if ($validator->fails()) {
@@ -101,8 +101,8 @@ class BalanceTransferController extends Controller
         if ($balanceTransfer['status'] == FuelMatixStatus::APPROVE) {
             return response()->json(['status' => 500, 'message' => 'Cannot update balance transfer.']);
         }
-        $balanceTransfer->from_category_id = $requestData['from'];
-        $balanceTransfer->to_category_id = $requestData['to'];
+        $balanceTransfer->from_category_id = $requestData['from_category_id'];
+        $balanceTransfer->to_category_id = $requestData['to_category_id'];
         $balanceTransfer->amount = $requestData['amount'];
         $balanceTransfer->remarks = $requestData['remarks'] ?? null;
         if ($balanceTransfer->save()) {

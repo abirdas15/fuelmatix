@@ -173,6 +173,13 @@ const ApiRoutes = {
     userSingle: ApiVersion + '/user/single',
     userDelete: ApiVersion + '/user/delete',
     userList: ApiVersion + '/user/list',
+    //Asset Transfer
+    balanceTransferAdd: ApiVersion + '/balanceTransfer/save',
+    balanceTransferEdit: ApiVersion + '/balanceTransfer/update',
+    balanceTransferSingle: ApiVersion + '/balanceTransfer/single',
+    balanceTransferDelete: ApiVersion + '/balanceTransfer/delete',
+    balanceTransferList: ApiVersion + '/balanceTransfer/list',
+    balanceTransferApprove: ApiVersion + '/balanceTransfer/approve',
 
 };
 
