@@ -32,6 +32,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\BalanceTransferController;
+use App\Http\Controllers\CompanyController;
 
 /*
 |--------------------------------------------------------------------------
@@ -253,6 +254,10 @@ Route::group(['middleware' => 'AuthReqCheck'], function() {
         Route::post('update', [BalanceTransferController::class, 'update']);
         Route::post('approve', [BalanceTransferController::class, 'approve']);
         Route::post('delete', [BalanceTransferController::class, 'delete']);
+    });
+    Route::group(['prefix' => 'company'], function() {
+        Route::post('save', [CompanyController::class, 'save']);
+        Route::post('single', [CompanyController::class, 'single']);
     });
 });
 
