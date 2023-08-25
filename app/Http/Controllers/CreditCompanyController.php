@@ -29,10 +29,6 @@ class CreditCompanyController extends Controller
             'phone' => $inputData['phone'] ?? null,
             'address' => $inputData['address'] ?? null,
             'contact_person' => $inputData['contact_person'] ?? null,
-            'sale_mismatch_allow' => $inputData['sale_mismatch_allow'] ?? null,
-            'header_text' => $inputData['header_text'] ?? false,
-            'footer_text' => $inputData['footer_text'] ?? false,
-            'expense_approve' => $inputData['expense_approve'] ?? null,
         ];
         $category = new Category();
         $category->category = $inputData['name'];
@@ -90,10 +86,6 @@ class CreditCompanyController extends Controller
         $result['phone'] = $others != null ? $others->phone : null;
         $result['contact_person'] = $others != null ? $others->contact_person : null;
         $result['address'] = $others != null ? $others->address : null;
-        $result['sale_mismatch_allow'] = $others->sale_mismatch_allow ?? null;
-        $result['header_text'] = $others->header_text ?? false;
-        $result['footer_text'] = $others->footer_text ?? false;
-        $result['expense_approve'] = $others->expense_approve ?? null;
         unset($result['others']);
         return response()->json(['status' => 200, 'data' => $result]);
     }
@@ -122,10 +114,6 @@ class CreditCompanyController extends Controller
             'phone' => $inputData['phone'] ?? null,
             'address' => $inputData['address'] ?? null,
             'contact_person' => $inputData['contact_person'] ?? null,
-            'sale_mismatch_allow' => $inputData['sale_mismatch_allow'] ?? null,
-            'header_text' => $inputData['header_text'] ?? false,
-            'footer_text' => $inputData['footer_text'] ?? false,
-            'expense_approve' => $inputData['expense_approve'] ?? null,
         ];
         $category->category = $inputData['name'];
         $category->parent_category = $accountReceivable->id;
