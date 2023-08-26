@@ -76,6 +76,15 @@
                         <li><router-link :to="{name: 'CreditCompany'}">Credit Company </router-link></li>
                         <li><router-link :to="{name: 'posMachine'}">POS</router-link></li>
                         <li><router-link :to="{name: 'user'}">Users</router-link></li>
+                        <li><router-link :to="{name: 'system'}">System setting</router-link></li>
+                    </ul>
+                </li>
+                <li><a class="has-arrow " href="javascript:void(0)" aria-expanded="false">
+                    <i class="fa-solid fa-user-gear"></i>
+                    <span class="nav-text">Settings</span>
+                </a>
+                    <ul aria-expanded="false" class="bichi">
+                        <li><router-link :to="{name: 'system'}">Company</router-link></li>
                     </ul>
                 </li>
                 <li>

@@ -11,7 +11,8 @@ import Vuex from "vuex";
 import VuePageTransition from "vue-page-transition";
 import VueToast from "vue-toast-notification";
 import "vue-toast-notification/dist/theme-default.css";
-
+import "vue-select/dist/vue-select.css";
+import vSelect from "vue-select";
 
 import App from "./App.vue";
 import router from "./Router/router";
@@ -20,6 +21,7 @@ import store from "./Store/store";
 
 Vue.use(VueRouter, axios, Vuex);
 Vue.use(VuePageTransition);
+Vue.component("v-select", vSelect);
 Vue.use(VueToast, { position: "top-right" });
     Vue.mixin({
         data() {

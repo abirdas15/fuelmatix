@@ -20,17 +20,12 @@
                                                 <span class="input-group-text">
                                                     <i class="fa-regular fa-user"></i>
                                                 </span>
-                                            <input type="text" class="form-control">
-                                            <span class="input-group-text">
-                                                    <i class="fa-solid fa-user-plus"></i>
-                                                </span>
+                                            <v-select class="form-control" :options="creditCompany" label="name" v-model="payment_category_id"
+                                                      :reduce="(option) => option.id"></v-select>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-sm-6">
-                                    <div class="blank-white">
-
-                                    </div>
                                 </div>
                             </div>
                             <div class="default-cart">
@@ -46,7 +41,7 @@
                                         </tr>
                                         </thead>
                                         <tbody v-if="sale.length > 0">
-                                        <tr v-for="(s, i) in sale">
+                                        <tr v-for="(s, i) in sale" class="position-relative">
                                             <td>
                                                 <div class="fw-bold">{{ s.name }}</div>
                                                 <div>
@@ -76,6 +71,22 @@
                                                 <i class="fa-regular text-danger fa-trash-can cursor-pointer"
                                                    @click="removeProduct(i)"></i>
                                             </td>
+                                            <div class="form-group error-text">
+                                                <input type="hidden" :name="'products.'+i+'.expense_category_id'">
+                                                <input type="hidden" :name="'products.'+i+'.income_category_id'">
+                                                <input type="hidden" :name="'products.'+i+'.shift_sale_id'">
+                                                <input type="hidden" :name="'products.'+i+'.stock_category_id'">
+                                                <span class="invalid-feedback d-block"></span>
+                                            </div>
+                                        </tr>
+                                        <tr v-if="enableDriverTip">
+                                            <td colspan="3">Driver Tip</td>
+                                            <td > <input class="form-control w-100 control-sm text-end" step="any"
+                                                         type="number" v-model="driver_tip" ></td>
+                                            <td class="text-end">
+                                                <i class="fa-regular text-danger fa-trash-can cursor-pointer"
+                                                   @click="removeDriverTip()"></i>
+                                            </td>
                                         </tr>
                                         <tr>
                                             <td></td>
@@ -91,28 +102,33 @@
                                         </tr>
                                         </tbody>
                                     </table>
+                                    <div class="alert alert-danger" v-if="errorText">{{errorText}}</div>
                                 </div>
                                 <div class="btn-section text-center mt-3">
-                                    <button class="btn btn-warning me-2 width-fixed">Hold <i
-                                        class="fa-regular fa-hand"></i></button>
-                                    <button class="btn btn-danger me-2 width-fixed" @click="this.sale = []">Reset <i
-                                        class="fa-solid fa-arrow-rotate-left"></i></button>
-                                    <button class="btn btn-success width-fixed" v-if="!loading" @click="order">Paynow <i
-                                        class="fa-solid fa-money-bill-1"></i></button>
-                                    <button class="btn btn-success width-fixed" v-if="loading">Paying....
+                                    <button class="btn btn-warning me-2 width-fixed" v-if="!loading" :disabled="payment_category_id != null"  @click="payment_method = 'cash';order('cash')">Cash </button>
+                                    <button class="btn btn-warning width-fixed" v-if="loading">Paying....
                                         <i class="fa fa-spinner fa-spin"></i></button>
+
+                                    <button class="btn btn-info me-2 width-fixed" type="button" :disabled="payment_category_id != null" @click="openCardModal();payment_method = 'card'">Credit Card </button>
+
+                                    <button class="btn btn-success width-fixed" :disabled="payment_category_id == null" v-if="!companyLoading" @click="payment_method = 'company';order('company')">Company </button>
+                                    <button class="btn btn-success width-fixed" v-if="companyLoading">Paying....
+                                        <i class="fa fa-spinner fa-spin"></i></button>
+
                                 </div>
+                                <button style="width: 80%;margin: auto;" class="btn btn-danger btn-block mt-2" @click="this.sale = []">Reset <i
+                                    class="fa-solid fa-arrow-rotate-left"></i></button>
                             </div>
                         </div>
                         <div class="col-sm-7">
                             <div class="row">
                                 <div class="col-sm-12">
-                                    <div class="input-group mb-3">
+<!--                                    <div class="input-group mb-3">
                                         <span class="input-group-text">
                                             <i class="fa-solid fa-magnifying-glass"></i>
                                         </span>
                                         <input type="text" class="form-control" placeholder="Username">
-                                    </div>
+                                    </div>-->
                                 </div>
                             </div>
                             <div class="default-cart">
@@ -140,7 +156,19 @@
                                             <p class="mt-1 mb-0" v-if="i < 9">
                                                 <kbd>Alt</kbd>+<kbd>{{ getProductNumber(i) }}</kbd></p>
                                         </div>
-
+                                    </div>
+                                    <div class="each-product" @click="addDriverTip()" v-if="payment_category_id != null">
+                                        <div class="img">
+                                            <img :src="'https://via.placeholder.com/100x70?text=Driver Tip'" alt="">
+                                        </div>
+                                        <div class="detail">
+                                            <div class="name">Driver Tip</div>
+                                            <div class="d-flex align-items-center justify-content-between">
+                                                <div class="desc"></div>
+                                                <div></div>
+                                            </div>
+                                            <p class="mt-1 mb-0"></p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -148,6 +176,23 @@
                     </div>
                 </div>
             </div>
+        </div>
+        <div class="popup-wrapper-modal card-modal d-none">
+            <form @submit.prevent="order('card')" class="popup-box">
+                <button type="button" class=" btn  closeBtn" @click="closeModal()"><i class="fas fa-times"></i></button>
+                <div class="row">
+                    <div class="col-sm-12 form-group">
+                        <label >Select POS Machine</label>
+                        <select class="form-control sm-control" name="parent_category"  v-model="pos_machine_id">
+                            <option value="">Select POS Machine</option>
+                            <option v-for="p in posMachine" :value="p.id">{{ p.name }}</option>
+                        </select>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary " v-if="!cardLoading">Submit</button>
+                <button type="button" class="btn btn-primary " disabled v-if="cardLoading">SubmitTing...</button>
+            </form>
         </div>
         <div id="print" v-if="singleSaleData">
             <header class="text-center">
@@ -226,9 +271,12 @@ export default {
             selectedProductIndex: null,
             saleId: null,
             loading: false,
+            companyLoading: false,
+            cardLoading: false,
             singleSaleData: null,
             printD: null,
             value: null,
+            errorText: '',
             cssText: `
                  @page {
                     size: 2.8in 11in;
@@ -349,7 +397,14 @@ export default {
                 section, footer {
                     font-size: 12px;
                 }
-            `
+            `,
+            creditCompany: [],
+            posMachine: [],
+            payment_method: '',
+            driver_tip: '',
+            pos_machine_id: '',
+            payment_category_id: null,
+            enableDriverTip: false,
         }
     },
     computed: {
@@ -357,24 +412,85 @@ export default {
             return this.$store.getters.GetAuth;
         },
     },
+    watch: {
+        payment_category_id: function () {
+            if (this.payment_category_id == null) {
+                this.enableDriverTip = false
+            }
+        }
+    },
     methods: {
+        openCardModal: function () {
+            console.log('asdf')
+            $(".card-modal").removeClass('d-none');
+        },
+        closeModal: function () {
+            $(".popup-wrapper-modal").addClass('d-none');
+        },
+        addDriverTip: function () {
+            this.enableDriverTip = true
+        },
+        removeDriverTip: function () {
+            this.driver_tip = '';
+            this.enableDriverTip = false
+        },
         updateSubtotal: function (i) {
             this.sale[i].subtotal = parseFloat(this.sale[i].price * this.sale[i].quantity).toFixed(2)
         },
         updateQuantity: function (i) {
             this.sale[i].quantity = parseFloat(this.sale[i].subtotal / this.sale[i].price).toFixed(2)
         },
-        order: function () {
+        order: function (type) {
+            ApiService.ClearErrorHandler();
             if (this.sale.length == 0) {
                 return;
             }
-            this.loading = true
-            ApiService.POST(ApiRoutes.SaleAdd, {payment_method: 'cash', products: this.sale}, res => {
-                this.loading = false;
+            if (type == 'cash') {
+                this.loading = true
+            } else if (type == 'company') {
+                this.companyLoading = true
+            } else {
+                this.cardLoading = true
+            }
+            this.errorText = ''
+            let param = {
+                payment_method: this.payment_method,
+                products: this.sale,
+            }
+            if (type == 'company') {
+                param.driver_tip = this.driver_tip
+                param.payment_category_id = this.payment_category_id
+            }
+            if (type == 'card') {
+                param.pos_machine_id = this.pos_machine_id
+            }
+
+            ApiService.POST(ApiRoutes.SaleAdd, param, res => {
+                if (type == 'cash') {
+                    this.loading = false
+                } else if (type == 'company') {
+                    this.companyLoading = false
+                } else {
+                    this.cardLoading = false
+                }
                 if (parseInt(res.status) === 200) {
                     this.saleId = res.data
                     this.sale = [];
+                    this.enableDriverTip = false
+                    this.payment_method = ''
+                    this.payment_category_id = null
                     this.singleOrder()
+                    this.closeModal()
+                } else {
+                    if (res.message != undefined) {
+                        this.errorText = res.message
+                    } else {
+                        ApiService.ErrorHandler(res.errors);
+                        if (res.errors.payment_category_id) {
+                            this.errorText = res.errors.payment_category_id[0]
+                        }
+                    }
+
                 }
             });
         },
@@ -390,6 +506,13 @@ export default {
                 }
             });
         },
+        getCompany: function () {
+            ApiService.POST(ApiRoutes.CreditCompanyList, {limit: 5000, page: 1}, res => {
+                if (parseInt(res.status) === 200) {
+                    this.creditCompany = res.data.data
+                }
+            });
+        },
         print () {
             this.printD.print( document.getElementById('print'), [this.cssText])
         },
@@ -397,10 +520,13 @@ export default {
         getProductTotalPrice: function () {
             let total = 0
             this.sale.map(v => {
-                total += parseFloat(v.subtotal)
+                total += parseFloat(v.subtotal ? v.subtotal : 0)
             })
+            if (this.enableDriverTip) {
+                total += parseInt(this.driver_tip ? this.driver_tip : 0)
+            }
             if (isNaN(total)) {
-                return 0
+                return total
             }
             return total
         },
@@ -539,11 +665,20 @@ export default {
                     this.productType = res.data
                 }
             });
+        },
+        getPosMachine: function () {
+            ApiService.POST(ApiRoutes.posMachineList, {limit: 500, page: 1}, res => {
+                if (parseInt(res.status) === 200) {
+                    this.posMachine = res.data.data
+                }
+            });
         }
     },
     created() {
         this.getProducts()
         this.getProductType()
+        this.getCompany()
+        this.getPosMachine()
     },
     mounted() {
         this.printD = new Printd()
@@ -660,5 +795,11 @@ export default {
     margin-right: 10px;
     height: 2.5rem;
 }
-
+.error-text{
+    position: absolute;
+    bottom: -8px;
+    left: 4rem;
+    font-size: 13px;
+    color: red;
+}
 </style>

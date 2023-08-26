@@ -180,7 +180,9 @@ const ApiRoutes = {
     balanceTransferDelete: ApiVersion + '/balanceTransfer/delete',
     balanceTransferList: ApiVersion + '/balanceTransfer/list',
     balanceTransferApprove: ApiVersion + '/balanceTransfer/approve',
-
+    //System Company
+    companyAdd: ApiVersion + '/company/save',
+    companySingle: ApiVersion + '/company/single',
 };
 
 export default ApiRoutes;
