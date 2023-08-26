@@ -32649,7 +32649,7 @@ exports = module.exports = __webpack_require__(/*! ../../../../node_modules/css-
 
 
 // module
-exports.push([module.i, "\n.bill-to[data-v-26966675]{\n    background-color: rgba(134,183,255,0.9);\n    font-weight: bold;\n    padding: 10px 50px;\n    width: max-content;\n}\n", ""]);
+exports.push([module.i, "\n.bill-to[data-v-26966675]{\r\n    background-color: rgba(134,183,255,0.9);\r\n    font-weight: bold;\r\n    padding: 10px 50px;\r\n    width: max-content;\n}\r\n", ""]);
 
 // exports
 
@@ -74586,7 +74586,7 @@ var app = new vue__WEBPACK_IMPORTED_MODULE_1___default.a({
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! D:\xampp\htdocs\projects\fuelmatix\resources\js\app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! D:\xampp7.4\htdocs\fuelmatix\resources\js\app.js */"./resources/js/app.js");
 
 
 /***/ })
