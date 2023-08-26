@@ -27199,7 +27199,11 @@ var render = function render() {
     }, [_vm._v(_vm._s(p.price))]), _vm._v(" "), _c("td", {
       staticClass: "price"
     }, [_vm._v(_vm._s(p.subtotal))])]);
-  }), _vm._v(" "), _c("tr", [_c("th", {
+  }), _vm._v(" "), _vm.singleSaleData.driver_tip > 0 ? _c("tr", [_c("td", {
+    attrs: {
+      colspan: "3"
+    }
+  }, [_vm._v("Driver Tip")]), _vm._v(" "), _c("td", [_vm._v(_vm._s(_vm.singleSaleData.driver_tip))])]) : _vm._e(), _vm._v(" "), _c("tr", [_c("th", {
     staticClass: "total text",
     attrs: {
       colspan: "3"
