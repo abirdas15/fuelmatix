@@ -8945,11 +8945,18 @@ __webpack_require__.r(__webpack_exports__);
     };
   },
   methods: {
+    totalPosSale: function totalPosSale() {
+      var total = 0;
+      this.listDispenser.pos_sale.map(function (v) {
+        total += parseFloat(v.amount);
+      });
+      return total;
+    },
     calculateValue: function calculateValue(amount) {
       var _this = this;
       this.totalPaid = 0;
       this.categories.map(function (v) {
-        _this.totalPaid += parseInt(v.amount);
+        _this.totalPaid += parseFloat(v.amount);
       });
     },
     removeCategory: function removeCategory(index) {
@@ -9051,14 +9058,22 @@ __webpack_require__.r(__webpack_exports__);
       this.listDispenser.categories = this.categories;
       if (this.listDispenser.status == 'end') {
         var totalCategoryAmount = 0;
+        var totalConsumption = 0;
         this.listDispenser.categories.map(function (v) {
-          totalCategoryAmount += parseInt(v.amount);
+          totalCategoryAmount += parseFloat(v.amount);
         });
-        if (this.totalAmount != totalCategoryAmount) {
+        if (this.totalAmount - this.totalPosSale() != totalCategoryAmount) {
           this.loading = false;
           this.$toast.error('Please match the total amount and category list');
           return;
         }
+        this.listDispenser.dispensers.map(function (dispenser) {
+          dispenser.nozzle.map(function (nozzle) {
+            totalConsumption += parseFloat(nozzle.consumption);
+          });
+        });
+        this.listDispenser.amount = totalCategoryAmount;
+        this.listDispenser.consumption = totalConsumption;
       }
       _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].ShiftSaleAdd, this.listDispenser, function (res) {
         _this6.loading = false;
@@ -27199,7 +27214,11 @@ var render = function render() {
     }, [_vm._v(_vm._s(p.price))]), _vm._v(" "), _c("td", {
       staticClass: "price"
     }, [_vm._v(_vm._s(p.subtotal))])]);
-  }), _vm._v(" "), _c("tr", [_c("th", {
+  }), _vm._v(" "), _vm.singleSaleData.driver_tip > 0 ? _c("tr", [_c("td", {
+    attrs: {
+      colspan: "3"
+    }
+  }, [_vm._v("Driver Tip")]), _vm._v(" "), _c("td", [_vm._v(_vm._s(_vm.singleSaleData.driver_tip))])]) : _vm._e(), _vm._v(" "), _c("tr", [_c("th", {
     staticClass: "total text",
     attrs: {
       colspan: "3"
@@ -29026,7 +29045,78 @@ var render = function render() {
     }), 0) : _vm._e()]) : _vm._e();
   }), _vm._v(" "), _vm.listDispenser.status != "start" ? [_c("div", {
     staticClass: "col-sm-11 text-end mb-2"
-  }, [_c("h4", [_vm._v("Total sale: " + _vm._s(_vm.totalSale) + " Liter")]), _vm._v(" "), _c("h4", [_vm._v("Total amount: " + _vm._s(_vm.totalAmount) + " Tk")])]), _vm._v(" "), _c("div", {
+  }, [_c("h4", [_vm._v("Total sale: " + _vm._s(_vm.totalSale) + " Liter")]), _vm._v(" "), _c("h4", [_vm._v("Total amount: " + _vm._s(_vm.totalAmount) + " Tk")])]), _vm._v(" "), _vm.listDispenser.pos_sale.length > 0 ? _c("div", {
+    staticClass: "row"
+  }, [_vm._m(3), _vm._v(" "), _c("div", {
+    staticClass: "col-sm-6 text-end"
+  }, _vm._l(_vm.listDispenser.pos_sale, function (pos) {
+    return _c("div", {
+      staticClass: "d-flex mb-3"
+    }, [_c("select", {
+      directives: [{
+        name: "model",
+        rawName: "v-model",
+        value: pos.category_id,
+        expression: "pos.category_id"
+      }],
+      staticClass: "form-control me-3",
+      staticStyle: {
+        "max-width": "210px"
+      },
+      attrs: {
+        disabled: ""
+      },
+      on: {
+        change: function change($event) {
+          var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
+            return o.selected;
+          }).map(function (o) {
+            var val = "_value" in o ? o._value : o.value;
+            return val;
+          });
+          _vm.$set(pos, "category_id", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
+        }
+      }
+    }, _vm._l(_vm.allAmountCategory, function (c) {
+      return _c("option", {
+        domProps: {
+          value: c.id
+        }
+      }, [_vm._v(_vm._s(c.name))]);
+    }), 0), _vm._v(" "), _c("div", {
+      staticClass: "form-group"
+    }, [_c("input", {
+      directives: [{
+        name: "model",
+        rawName: "v-model",
+        value: pos.amount,
+        expression: "pos.amount"
+      }],
+      staticClass: "form-control me-3",
+      staticStyle: {
+        "max-width": "210px"
+      },
+      attrs: {
+        type: "number",
+        disabled: ""
+      },
+      domProps: {
+        value: pos.amount
+      },
+      on: {
+        input: function input($event) {
+          if ($event.target.composing) return;
+          _vm.$set(pos, "amount", $event.target.value);
+        }
+      }
+    }), _vm._v(" "), _c("div", {
+      staticClass: "invalid-feedback"
+    })])]);
+  }), 0), _vm._v(" "), _c("div", {
+    staticClass: "col-sm-6"
+  }), _vm._v(" "), _c("div", {
+    staticClass: "col-sm-6"
+  }, [_c("h4", [_vm._v("Total POS sale: " + _vm._s(_vm.totalPosSale()) + " Tk")]), _vm._v(" "), _vm.totalAmount > 0 ? _c("h4", [_vm._v("Remaining Balance: " + _vm._s(_vm.totalAmount - _vm.totalPosSale()) + " Tk")]) : _vm._e()])]) : _vm._e(), _vm._v(" "), _c("div", {
     staticClass: "row"
   }, [_c("div", {
     staticClass: "col-sm-6"
@@ -29191,6 +29281,12 @@ var staticRenderFns = [function () {
   }, [_c("p", {
     staticClass: "m-0"
   }, [_vm._v("OIL Stock ")])])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "col-sm-6"
+  }, [_c("div", [_vm._v("POS Sale")])]);
 }];
 render._withStripped = true;
 
@@ -32645,7 +32741,7 @@ exports = module.exports = __webpack_require__(/*! ../../../../node_modules/css-
 
 
 // module
-exports.push([module.i, "\n.bill-to[data-v-26966675]{\r\n    background-color: rgba(134,183,255,0.9);\r\n    font-weight: bold;\r\n    padding: 10px 50px;\r\n    width: max-content;\n}\r\n", ""]);
+exports.push([module.i, "\n.bill-to[data-v-26966675]{\n    background-color: rgba(134,183,255,0.9);\n    font-weight: bold;\n    padding: 10px 50px;\n    width: max-content;\n}\n", ""]);
 
 // exports
 
@@ -74582,7 +74678,7 @@ var app = new vue__WEBPACK_IMPORTED_MODULE_1___default.a({
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! D:\xampp7.4\htdocs\fuelmatix\resources\js\app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! D:\xampp\htdocs\projects\fuelmatix\resources\js\app.js */"./resources/js/app.js");
 
 
 /***/ })
