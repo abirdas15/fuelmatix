@@ -117,6 +117,29 @@
                                                     <h4>Total sale: {{totalSale}} Liter</h4>
                                                     <h4>Total amount: {{totalAmount}} Tk</h4>
                                                 </div>
+                                                <div class="row" v-if="listDispenser.pos_sale.length > 0">
+                                                    <div class="col-sm-6">
+                                                        <div>POS Sale</div>
+                                                    </div>
+                                                    <div class="col-sm-6 text-end">
+                                                        <div class="d-flex mb-3"  v-for="pos in listDispenser.pos_sale">
+                                                            <select class="form-control me-3" style="max-width: 210px" v-model="pos.category_id" disabled>
+                                                                <option v-for="c in allAmountCategory" :value="c.id">{{c.name}}</option>
+                                                            </select>
+                                                            <div class="form-group">
+                                                                <input class="form-control me-3"  style="max-width: 210px" type="number" v-model="pos.amount"
+                                                                      disabled>
+                                                                <div class="invalid-feedback"></div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-6"></div>
+                                                    <div class="col-sm-6">
+                                                        <h4>Total POS sale: {{totalPosSale()}} Tk</h4>
+                                                        <h4 v-if="totalAmount > 0">Remaining Balance: {{totalAmount - totalPosSale() }} Tk</h4>
+                                                    </div>
+                                                </div>
+
                                                 <div class="row">
                                                     <div class="col-sm-6"></div>
                                                     <div class="col-sm-6 text-end">
@@ -190,10 +213,17 @@ export default {
         }
     },
     methods: {
+        totalPosSale: function () {
+            let total = 0
+            this.listDispenser.pos_sale.map((v) => {
+                total += parseFloat(v.amount)
+            })
+            return total
+        },
         calculateValue: function (amount) {
             this.totalPaid = 0
             this.categories.map(v => {
-                this.totalPaid += parseInt(v.amount)
+                this.totalPaid += parseFloat(v.amount)
             })
         },
         removeCategory: function(index) {
@@ -283,14 +313,22 @@ export default {
             this.listDispenser.categories = this.categories;
             if (this.listDispenser.status == 'end') {
                 let totalCategoryAmount = 0
+                let totalConsumption = 0
                 this.listDispenser.categories.map(v => {
-                    totalCategoryAmount += parseInt(v.amount)
+                    totalCategoryAmount += parseFloat(v.amount)
                 })
-                if (this.totalAmount != totalCategoryAmount) {
+                if ((this.totalAmount - this.totalPosSale()) != totalCategoryAmount) {
                     this.loading = false
                     this.$toast.error('Please match the total amount and category list')
                     return
                 }
+                this.listDispenser.dispensers.map(dispenser => {
+                    dispenser.nozzle.map(nozzle => {
+                        totalConsumption += parseFloat(nozzle.consumption)
+                    })
+                })
+                this.listDispenser.amount = totalCategoryAmount;
+                this.listDispenser.consumption = totalConsumption;
             }
             ApiService.POST(ApiRoutes.ShiftSaleAdd, this.listDispenser, res => {
                 this.loading = false
