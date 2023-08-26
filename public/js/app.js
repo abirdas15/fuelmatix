@@ -28879,7 +28879,7 @@ var render = function render() {
       value: _vm.listDispenser.end_reading,
       expression: "listDispenser.end_reading"
     }],
-    staticClass: "form-control",
+    staticClass: "form-control text-end",
     attrs: {
       id: "frReading",
       type: "text"
@@ -28948,7 +28948,7 @@ var render = function render() {
       return _c("div", {
         staticClass: "row align-items-center text-start"
       }, [_c("div", {
-        staticClass: "col-md-2"
+        staticClass: "col-md-4"
       }, [_c("label", {
         staticClass: "form-label"
       }, [_c("p", {
@@ -28985,7 +28985,7 @@ var render = function render() {
           value: n.end_reading,
           expression: "n.end_reading"
         }],
-        staticClass: "form-control",
+        staticClass: "form-control text-end",
         attrs: {
           type: "text"
         },
@@ -29044,14 +29044,49 @@ var render = function render() {
       }) : _vm._e()])]);
     }), 0) : _vm._e()]) : _vm._e();
   }), _vm._v(" "), _vm.listDispenser.status != "start" ? [_c("div", {
-    staticClass: "col-sm-11 text-end mb-2"
-  }, [_c("h4", [_vm._v("Total sale: " + _vm._s(_vm.totalSale) + " Liter")]), _vm._v(" "), _c("h4", [_vm._v("Total amount: " + _vm._s(_vm.totalAmount) + " Tk")])]), _vm._v(" "), _vm.listDispenser.pos_sale.length > 0 ? _c("div", {
     staticClass: "row"
-  }, [_vm._m(3), _vm._v(" "), _c("div", {
+  }, [_c("div", {
+    staticClass: "col-sm-7"
+  }), _vm._v(" "), _c("div", {
+    staticClass: "col-sm-5 text-end mb-2"
+  }, [_c("table", {
+    staticClass: "table"
+  }, [_c("tr", [_c("td", {
+    staticStyle: {
+      "font-size": "18px",
+      padding: "0px"
+    }
+  }, [_vm._v("Total sale:")]), _vm._v(" "), _c("td", {
+    staticClass: "text-end",
+    staticStyle: {
+      "font-size": "18px",
+      padding: "0px"
+    }
+  }, [_vm._v(_vm._s(_vm.totalSale) + " Liter")])]), _vm._v(" "), _c("tr", [_c("td", {
+    staticStyle: {
+      "font-size": "18px",
+      padding: "0px"
+    }
+  }, [_vm._v("Total amount:")]), _vm._v(" "), _c("td", {
+    staticClass: "text-end",
+    staticStyle: {
+      "font-size": "18px",
+      padding: "0px"
+    }
+  }, [_vm._v(_vm._s(_vm.totalAmount) + " Tk")])])])])]), _vm._v(" "), _vm.listDispenser.pos_sale.length > 0 ? _c("div", {
+    staticClass: "row"
+  }, [_c("div", {
+    staticClass: "col-sm-6"
+  }), _vm._v(" "), _c("div", {
     staticClass: "col-sm-6 text-end"
-  }, _vm._l(_vm.listDispenser.pos_sale, function (pos) {
+  }, [_c("h4", {
+    staticStyle: {
+      "text-align": "left",
+      "margin-left": "5rem"
+    }
+  }, [_vm._v("POS Sale")]), _vm._v(" "), _vm._l(_vm.listDispenser.pos_sale, function (pos) {
     return _c("div", {
-      staticClass: "d-flex mb-3"
+      staticClass: "d-flex mb-3 justify-content-end"
     }, [_c("select", {
       directives: [{
         name: "model",
@@ -29092,7 +29127,7 @@ var render = function render() {
         value: pos.amount,
         expression: "pos.amount"
       }],
-      staticClass: "form-control me-3",
+      staticClass: "form-control me-3 text-end",
       staticStyle: {
         "max-width": "210px"
       },
@@ -29112,11 +29147,35 @@ var render = function render() {
     }), _vm._v(" "), _c("div", {
       staticClass: "invalid-feedback"
     })])]);
-  }), 0), _vm._v(" "), _c("div", {
-    staticClass: "col-sm-6"
+  })], 2), _vm._v(" "), _c("div", {
+    staticClass: "col-sm-8"
   }), _vm._v(" "), _c("div", {
-    staticClass: "col-sm-6"
-  }, [_c("h4", [_vm._v("Total POS sale: " + _vm._s(_vm.totalPosSale()) + " Tk")]), _vm._v(" "), _vm.totalAmount > 0 ? _c("h4", [_vm._v("Remaining Balance: " + _vm._s(_vm.totalAmount - _vm.totalPosSale()) + " Tk")]) : _vm._e()])]) : _vm._e(), _vm._v(" "), _c("div", {
+    staticClass: "col-sm-4"
+  }, [_c("table", {
+    staticClass: "table"
+  }, [_c("tr", [_c("td", {
+    staticStyle: {
+      "font-size": "18px",
+      padding: "0px"
+    }
+  }, [_vm._v("Total POS sale:")]), _vm._v(" "), _c("td", {
+    staticClass: "text-end",
+    staticStyle: {
+      "font-size": "18px",
+      padding: "0px"
+    }
+  }, [_vm._v(_vm._s(_vm.totalPosSale()) + " Tk")])]), _vm._v(" "), _vm.totalAmount > 0 ? _c("tr", [_c("td", {
+    staticStyle: {
+      "font-size": "18px",
+      padding: "0px"
+    }
+  }, [_vm._v("Remaining Balance: ")]), _vm._v(" "), _c("td", {
+    staticClass: "text-end",
+    staticStyle: {
+      "font-size": "18px",
+      padding: "0px"
+    }
+  }, [_vm._v(_vm._s(_vm.totalAmount - _vm.totalPosSale()) + " Tk")])]) : _vm._e()])])]) : _vm._e(), _vm._v(" "), _c("div", {
     staticClass: "row"
   }, [_c("div", {
     staticClass: "col-sm-6"
@@ -29124,7 +29183,7 @@ var render = function render() {
     staticClass: "col-sm-6 text-end"
   }, _vm._l(_vm.categories, function (category, index) {
     return _c("div", {
-      staticClass: "d-flex mb-3"
+      staticClass: "d-flex mb-3 justify-content-end"
     }, [_c("select", {
       directives: [{
         name: "model",
@@ -29164,7 +29223,7 @@ var render = function render() {
         value: category.amount,
         expression: "category.amount"
       }],
-      staticClass: "form-control me-3",
+      staticClass: "form-control me-3 text-end",
       staticStyle: {
         "max-width": "210px"
       },
@@ -29214,10 +29273,23 @@ var render = function render() {
       staticClass: "fa-solid fa-xmark"
     })])]);
   }), 0), _vm._v(" "), _c("div", {
-    staticClass: "col-sm-6"
+    staticClass: "col-sm-8"
   }), _vm._v(" "), _c("div", {
-    staticClass: "col-sm-6"
-  }, [_c("h4", [_vm._v("Amount: " + _vm._s(isNaN(_vm.totalPaid) ? 0 : _vm.totalPaid) + " Tk")])])])] : _vm._e()], 2)]) : _c("div", {
+    staticClass: "col-sm-4"
+  }, [_c("table", {
+    staticClass: "table"
+  }, [_c("tr", [_c("td", {
+    staticStyle: {
+      "font-size": "18px",
+      padding: "0px"
+    }
+  }, [_vm._v("Amount:")]), _vm._v(" "), _c("td", {
+    staticClass: "text-end",
+    staticStyle: {
+      "font-size": "18px",
+      padding: "0px"
+    }
+  }, [_vm._v(_vm._s(isNaN(_vm.totalPaid) ? 0 : _vm.totalPaid) + " Tk")])])])])])] : _vm._e()], 2)]) : _c("div", {
     staticClass: "text-center"
   }, [_vm._v("Please Select any product")])]), _vm._v(" "), _vm.product_id ? _c("div", {
     staticClass: "row",
@@ -29275,18 +29347,12 @@ var staticRenderFns = [function () {
   var _vm = this,
     _c = _vm._self._c;
   return _c("div", {
-    staticClass: "col-md-2"
+    staticClass: "col-md-4"
   }, [_c("label", {
     staticClass: "form-label"
   }, [_c("p", {
     staticClass: "m-0"
   }, [_vm._v("OIL Stock ")])])]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("div", {
-    staticClass: "col-sm-6"
-  }, [_c("div", [_vm._v("POS Sale")])]);
 }];
 render._withStripped = true;
 

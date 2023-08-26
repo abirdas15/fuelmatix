@@ -41,7 +41,7 @@
                                                 </div>
                                                 <div class="card-body">
                                                     <div class="row align-items-center text-start">
-                                                        <div class="col-md-2">
+                                                        <div class="col-md-4">
                                                             <label class="form-label">
                                                                 <p class="m-0">OIL Stock </p>
                                                             </label>
@@ -61,7 +61,7 @@
                                                         <div class="mb-3 col-md-2">
                                                             <label>Final Reading </label>
                                                             <input id="frReading" @blur="disableInput('frReading')" v-if="listDispenser.status == 'end'"
-                                                                type="text" class="form-control"  @click="enableInput('frReading')"
+                                                                type="text" class="form-control text-end"  @click="enableInput('frReading')"
                                                                 v-model="listDispenser.end_reading"
                                                                 @input="calculateAmount">
                                                             <input class="form-control" value="0" v-if="listDispenser.status == 'start'" disabled>
@@ -83,7 +83,7 @@
                                                 </div>
                                                 <div class="card-body" v-if="d.nozzle.length > 0">
                                                     <div class="row align-items-center text-start" v-for="(n, nIndex) in d.nozzle">
-                                                        <div class=" col-md-2">
+                                                        <div class=" col-md-4">
                                                             <label class="form-label">
                                                                 <p class="m-0">{{ n.name }}</p>
                                                             </label>
@@ -95,7 +95,7 @@
                                                         </div>
                                                         <div class="mb-3 col-md-3">
                                                             <label>Final Reading </label>
-                                                            <input type="text" class="form-control" @blur="disableInput('frReading'+nIndex+dIndex)"
+                                                            <input type="text" class="form-control text-end" @blur="disableInput('frReading'+nIndex+dIndex)"
                                                                    v-if="listDispenser.status == 'end'"
                                                                    v-model="n.end_reading" @click="enableInput('frReading'+nIndex+dIndex)"
                                                                    @input="calculateAmountNozzle(dIndex, nIndex) ">
@@ -113,43 +113,62 @@
                                                 </div>
                                             </div>
                                             <template v-if="listDispenser.status != 'start'">
-                                                <div class="col-sm-11 text-end mb-2">
-                                                    <h4>Total sale: {{totalSale}} Liter</h4>
-                                                    <h4>Total amount: {{totalAmount}} Tk</h4>
+                                                <div class="row">
+                                                    <div class="col-sm-7"></div>
+                                                    <div class="col-sm-5 text-end mb-2">
+                                                        <table class="table">
+                                                            <tr>
+                                                                <td style="font-size: 18px;padding: 0px;" class="">Total sale:</td>
+                                                                <td style="font-size: 18px;padding: 0px;" class="text-end ">{{totalSale}} Liter</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td style="font-size: 18px;padding: 0px;" class="">Total amount:</td>
+                                                                <td style="font-size: 18px;padding: 0px;" class="text-end ">{{totalAmount}} Tk</td>
+                                                            </tr>
+                                                        </table>
+                                                    </div>
                                                 </div>
                                                 <div class="row" v-if="listDispenser.pos_sale.length > 0">
                                                     <div class="col-sm-6">
-                                                        <div>POS Sale</div>
                                                     </div>
                                                     <div class="col-sm-6 text-end">
-                                                        <div class="d-flex mb-3"  v-for="pos in listDispenser.pos_sale">
+                                                        <h4 style="text-align: left;margin-left: 5rem;">POS Sale</h4>
+                                                        <div class="d-flex mb-3 justify-content-end"  v-for="pos in listDispenser.pos_sale">
                                                             <select class="form-control me-3" style="max-width: 210px" v-model="pos.category_id" disabled>
                                                                 <option v-for="c in allAmountCategory" :value="c.id">{{c.name}}</option>
                                                             </select>
                                                             <div class="form-group">
-                                                                <input class="form-control me-3"  style="max-width: 210px" type="number" v-model="pos.amount"
+                                                                <input class="form-control me-3 text-end"  style="max-width: 210px" type="number" v-model="pos.amount"
                                                                       disabled>
                                                                 <div class="invalid-feedback"></div>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div class="col-sm-6"></div>
-                                                    <div class="col-sm-6">
-                                                        <h4>Total POS sale: {{totalPosSale()}} Tk</h4>
-                                                        <h4 v-if="totalAmount > 0">Remaining Balance: {{totalAmount - totalPosSale() }} Tk</h4>
+                                                    <div class="col-sm-8"></div>
+                                                    <div class="col-sm-4">
+                                                        <table class="table">
+                                                            <tr>
+                                                                <td style="font-size: 18px;padding: 0px;" class="">Total POS sale:</td>
+                                                                <td style="font-size: 18px;padding: 0px;" class="text-end ">{{totalPosSale()}} Tk</td>
+                                                            </tr>
+                                                            <tr v-if="totalAmount > 0">
+                                                                <td style="font-size: 18px;padding: 0px;" class="">Remaining Balance: </td>
+                                                                <td style="font-size: 18px;padding: 0px;" class="text-end ">{{totalAmount - totalPosSale()}} Tk</td>
+                                                            </tr>
+                                                        </table>
                                                     </div>
                                                 </div>
 
                                                 <div class="row">
                                                     <div class="col-sm-6"></div>
                                                     <div class="col-sm-6 text-end">
-                                                        <div class="d-flex mb-3"  v-for="(category,index) in categories">
+                                                        <div class="d-flex mb-3 justify-content-end"  v-for="(category,index) in categories">
                                                             <select class="form-control me-3" style="max-width: 210px" v-model="category.category_id"
                                                                     @change="isDataExist(category.category_id, 'category_id', index, categories)" >
                                                                 <option v-for="c in allAmountCategory" :value="c.id">{{c.name}}</option>
                                                             </select>
                                                             <div class="form-group">
-                                                                <input class="form-control me-3"  style="max-width: 210px" type="number" v-model="category.amount" :id="'categories.'+index+'.amount'"
+                                                                <input class="form-control me-3 text-end"  style="max-width: 210px" type="number" v-model="category.amount" :id="'categories.'+index+'.amount'"
                                                                        @input="calculateValue(category.amount)"
                                                                        :name="'categories.'+index+'.amount'">
                                                                 <div class="invalid-feedback"></div>
@@ -161,9 +180,14 @@
                                                             </button>
                                                         </div>
                                                     </div>
-                                                    <div class="col-sm-6"></div>
-                                                    <div class="col-sm-6">
-                                                        <h4>Amount: {{isNaN(totalPaid) ? 0 : totalPaid}} Tk</h4>
+                                                    <div class="col-sm-8"></div>
+                                                    <div class="col-sm-4">
+                                                        <table class="table">
+                                                            <tr>
+                                                                <td style="font-size: 18px;padding: 0px;" class="">Amount:</td>
+                                                                <td style="font-size: 18px;padding: 0px;" class="text-end ">{{isNaN(totalPaid) ? 0 : totalPaid}} Tk</td>
+                                                            </tr>
+                                                        </table>
                                                     </div>
                                                 </div>
                                             </template>
