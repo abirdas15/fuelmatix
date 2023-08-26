@@ -110,15 +110,15 @@ class ProductController extends Controller
         }
         $result = $result->orderBy($order_by, $order_mode)
             ->paginate($limit);
-        $shiftSale = ShiftSale::select('product_id', 'id')->where('date', date('Y-m-d'))->where('status', 'start')->get()->keyBy('product_id')->toArray();
+        $shiftSale = ShiftSale::select('product_id', 'id')->where('client_company_id', $inputData['session_user']['client_company_id'])->orderBy('id', 'DESC')->where('status', 'start')->get()->keyBy('product_id')->toArray();
         $productId = [];
         foreach ($result as &$data) {
             $productId[] = $data['id'];
             $data['shift_sale_id'] = isset($shiftSale[$data['id']]) ? $shiftSale[$data['id']]['id']: '';
         }
-        $incomeCategory = Category::select('id', 'module_id')->whereIn('module_id', $productId)->where('type', 'income')->where('module', Module::PRODUCT)->get()->keyBy('module_id')->toArray();
-        $stockCategory = Category::select('id', 'module_id')->whereIn('module_id', $productId)->where('type', 'assets')->where('module', Module::PRODUCT)->get()->keyBy('module_id')->toArray();
-        $expenseCategory = Category::select('id', 'module_id')->whereIn('module_id', $productId)->where('type', 'expenses')->where('module', Module::PRODUCT)->get()->keyBy('module_id')->toArray();
+        $incomeCategory = Category::select('id', 'module_id')->where('client_company_id', $inputData['session_user']['client_company_id'])->whereIn('module_id', $productId)->where('type', 'income')->where('module', Module::PRODUCT)->get()->keyBy('module_id')->toArray();
+        $stockCategory = Category::select('id', 'module_id')->where('client_company_id', $inputData['session_user']['client_company_id'])->whereIn('module_id', $productId)->where('type', 'assets')->where('module', Module::PRODUCT)->get()->keyBy('module_id')->toArray();
+        $expenseCategory = Category::select('id', 'module_id')->where('client_company_id', $inputData['session_user']['client_company_id'])->whereIn('module_id', $productId)->where('type', 'expenses')->where('module', Module::PRODUCT)->get()->keyBy('module_id')->toArray();
         foreach ($result as &$data) {
             $data['income_category_id'] = isset($incomeCategory[$data['id']]) ? $incomeCategory[$data['id']]['id']: '';
             $data['stock_category_id'] = isset($stockCategory[$data['id']]) ? $stockCategory[$data['id']]['id']: '';

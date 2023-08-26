@@ -26,7 +26,7 @@ class SaleController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-    public function save(Request $request): JsonResponse
+    public function save(Request $request)
     {
         $inputData = $request->all();
         $validator = Validator::make($inputData, [
@@ -54,35 +54,46 @@ class SaleController extends Controller
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
         $requestData = $request->all();
+        if ($requestData['payment_method'] == PaymentMethod::CARD) {
+            return response()->json(['status' => 500, 'errors' => ['payment_method' => ['The payment category field is required.']]]);
+        }
         $sessionUser = SessionUser::getUser();
         if (!$sessionUser instanceof User) {
             return response()->json(['status' => 500, 'message' => 'Cannot find session user.']);
         }
         $driverTipsCategory = null;
         $payment_category_id = $requestData['payment_category_id'] ?? '';
-        if ($requestData['payment_method'] == PaymentMethod::CASH) {
+        $cash_in_hand_category_id = null;
+        $total_amount = array_sum(array_column($requestData['products'], 'subtotal'));
+        if ($requestData['payment_method'] == PaymentMethod::CASH  || $requestData['payment_method'] == PaymentMethod::COMPANY) {
             $category = Category::where('id', $sessionUser['category_id'])->first();
             if (!$category instanceof Category) {
                 return response()->json(['status' => 500, 'message' => 'You are not a cashier user.']);
             }
-            if (!empty($requestData['driver_amount'])) {
-                $driverTipsCategory = Category::where('client_company_id', $sessionUser['client_company_id'])->where('module', Module::DRIVER_TIPS)->where('module_id', $category->id)->first();
+            if ($requestData['payment_method'] == PaymentMethod::CASH) {
+                $payment_category_id = $category['id'];
+            }
+            $cash_in_hand_category_id = $category['id'];
+            if (!empty($requestData['driver_tip'])) {
+                $driverTipsCategory = Category::where('client_company_id', $sessionUser['client_company_id'])->where('module', Module::DRIVER_TIPS)->where('module_id', $payment_category_id)->first();
                 if (!$driverTipsCategory instanceof Category) {
                     return response()->json(['status' => 500, 'message' => 'Driver tips category is not created. Please update credit company.']);
                 }
+                $total_amount = $total_amount + $requestData['driver_tip'];
             }
-            $payment_category_id = $category['id'];
+
         }
         if (empty($payment_category_id)) {
             return response()->json(['status' => 500, 'errors' => ['payment_category_id' => ['The payment category field is required.']]]);
         }
-        $total_amount = array_sum(array_column($requestData['products'], 'subtotal'));
+
         $sale = new Sale();
         $sale->date = Carbon::now('UTC');
         $sale->invoice_number = Sale::getInvoiceNumber();
         $sale->total_amount = $total_amount;
+        $sale->driver_tip = $requestData['driver_tip'] ?? 0;
         $sale->user_id = $requestData['session_user']['id'];
-        $sale->customer_id = $requestData['customer_id'] ?? null;
+        $sale->customer_id = $requestData['payment_method'] == PaymentMethod::COMPANY ? $payment_category_id : null;
         $sale->payment_method = $requestData['payment_method'] ?? null;
         $sale->payment_category_id = $payment_category_id;
         $sale->client_company_id = $requestData['session_user']['client_company_id'];
@@ -112,10 +123,10 @@ class SaleController extends Controller
                 ];
                 TransactionController::saveTransaction($transactionData);
             }
-            if (!empty($requestData['driver_amount']) && !empty($driverTipsCategory)) {
-                $transactionData['linked_id'] = $driverTipsCategory['id'];
+            if (!empty($requestData['driver_tip']) && !empty($driverTipsCategory)) {
+                $transactionData['linked_id'] = $cash_in_hand_category_id;
                 $transactionData['transaction'] = [
-                    ['date' => date('Y-m-d'), 'account_id' => $payment_category_id, 'debit_amount' => $requestData['driver_tips_amount'], 'credit_amount' => 0, 'module' => Module::POS_SALE, 'module_id' => $sale->id],
+                    ['date' => date('Y-m-d'), 'account_id' => $driverTipsCategory['id'], 'debit_amount' => 0, 'credit_amount' => $requestData['driver_tip'], 'module' => Module::POS_SALE, 'module_id' => $sale->id],
                 ];
                 TransactionController::saveTransaction($transactionData);
             }
