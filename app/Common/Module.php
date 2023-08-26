@@ -12,4 +12,5 @@ class Module
     const BALANCE_TRANSFER = 'balance transfer';
 
     const POS_SALE  = 'pos sale';
+    const DRIVER_TIPS = 'driver tips';
 }

@@ -8,6 +8,7 @@ use App\Models\Category;
 use App\Models\Dispenser;
 use App\Models\NozzleReading;
 use App\Models\Product;
+use App\Models\SaleData;
 use App\Models\ShiftSale;
 use App\Models\ShiftSummary;
 use App\Models\Stock;
@@ -109,11 +110,11 @@ class ProductController extends Controller
         }
         $result = $result->orderBy($order_by, $order_mode)
             ->paginate($limit);
-        $shiftSale = ShiftSale::select('product_id')->where('date', date('Y-m-d'))->where('status', 'start')->get()->keyBy('product_id')->toArray();
+        $shiftSale = ShiftSale::select('product_id', 'id')->where('date', date('Y-m-d'))->where('status', 'start')->get()->keyBy('product_id')->toArray();
         $productId = [];
         foreach ($result as &$data) {
             $productId[] = $data['id'];
-            $data['shift_sale_id'] = isset($shiftSale[$data['id']]) ? $shiftSale[$data['id']]['product_id']: '';
+            $data['shift_sale_id'] = isset($shiftSale[$data['id']]) ? $shiftSale[$data['id']]['id']: '';
         }
         $incomeCategory = Category::select('id', 'module_id')->whereIn('module_id', $productId)->where('type', 'income')->where('module', Module::PRODUCT)->get()->keyBy('module_id')->toArray();
         $stockCategory = Category::select('id', 'module_id')->whereIn('module_id', $productId)->where('type', 'assets')->where('module', Module::PRODUCT)->get()->keyBy('module_id')->toArray();
@@ -319,12 +320,20 @@ class ProductController extends Controller
             ->orderBy('id', 'DESC')
             ->first();
         $result['status'] = 'start';
-        if (!empty($shiftSale)) {
+        $result['pos_sale'] = [];
+        if ($shiftSale instanceof ShiftSale) {
             if ($shiftSale['status'] == 'end') {
                 $result['status'] = 'start';
             } else {
                 $result['status'] = 'end';
             }
+            $posSale = SaleData::select('sale_data.sale_id', 'sale_data.id', DB::raw('SUM(sale_data.subtotal) as amount'), 'sale.payment_category_id as category_id')
+                ->leftJoin('sale', 'sale.id', '=', 'sale_data.sale_id')
+                ->where('shift_sale_id', $shiftSale->id)
+                ->groupBy('sale.payment_category_id')
+                ->get()
+                ->toArray();
+            $result['pos_sale'] = $posSale;
         }
         return response()->json(['status' => 200, 'data' => $result]);
     }
