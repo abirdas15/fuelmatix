@@ -101,7 +101,6 @@ class ShiftSaleController extends Controller
 
             foreach ($inputData['dispensers'] as $dispenser) {
                 foreach ($dispenser['nozzle'] as $nozzle) {
-                    $totalNozzleConsumption += $nozzle['consumption'];
                     $shiftSaleSummary = new ShiftSummary();
                     $shiftSaleSummary->shift_sale_id = $shiftSale->id;
                     $shiftSaleSummary->nozzle_id = $nozzle['id'];
@@ -114,8 +113,9 @@ class ShiftSaleController extends Controller
             }
             $buyingPrice = 0;
             $product = Product::where('id', $inputData['product_id'])->first();
+            $quantity = $inputData['amount'] / $product['selling_price'];
             if (!empty($product['buying_price'])) {
-                $buyingPrice = $product['buying_price'] * $totalNozzleConsumption;
+                $buyingPrice = $product['buying_price'] * $quantity;
             }
 //            foreach ($productPrices as $productPrice) {
 //                if ($productPrice['stock_quantity'] > $totalNozzleConsumption) {

@@ -26,7 +26,7 @@ class SaleController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-    public function save(Request $request)
+    public function save(Request $request): JsonResponse
     {
         $inputData = $request->all();
         $validator = Validator::make($inputData, [

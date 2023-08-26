@@ -148,11 +148,13 @@ class UserController extends Controller
                 }
             } else if (!empty($requestData['cashier_balance']) && !empty($user['category_id'])) {
                 $category = Category::find($user->category_id);
-                $category->category = $requestData['name'];
-                if ($category->save()) {
-                    $category->updateCategory();
-                    $user->category_id = $category->id;
-                    $user->save();
+                if ($category instanceof Category) {
+                    $category->category = $requestData['name'];
+                    if ($category->save()) {
+                        $category->updateCategory();
+                        $user->category_id = $category->id;
+                        $user->save();
+                    }
                 }
             }
             return response()->json(['status' => 200, 'message' => 'Successfully updated user.']);
