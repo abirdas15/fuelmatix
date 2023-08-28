@@ -7,44 +7,89 @@ use App\Helpers\SessionUser;
 use App\Models\Category;
 use App\Models\ClientCompany;
 use App\Models\Invoice;
+use App\Models\InvoiceItem;
+use App\Models\Sale;
+use App\Models\SaleData;
+use App\Models\ShiftSale;
 use App\Models\Transaction;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class InvoiceController extends Controller
 {
-    public function generate(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function generate(Request $request): JsonResponse
     {
         $requestData = $request->all();
         $validator = Validator::make($requestData, [
-            'id' => 'required'
+            'ids' => 'required|array',
         ]);
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
-        $transaction = Transaction::find($requestData['id']);
-        if (!$transaction instanceof Transaction) {
-            return response()->json(['status' => 500, 'error' => 'Cannot find company sale.']);
-        }
-        $invoice = Invoice::where('transaction_id', $requestData['id'])->first();
-        if ($invoice instanceof Invoice) {
-            return response()->json(['status' => 500, 'error' => 'Invoice already have been generated.']);
+        $transaction = Transaction::select('id','module', 'module_id', 'linked_id as category_id', 'debit_amount as amount')
+            ->whereIn('id', $requestData['ids'])
+            ->get()
+            ->toArray();
+        $transactionArray = [];
+        foreach ($transaction as $data) {
+            $transactionArray[$data['category_id']][] = $data;
         }
         $sessionUser = SessionUser::getUser();
-        $invoice = new Invoice();
-        $invoice->invoice_number = Invoice::getInvoiceNumber();
-        $invoice->date = date('Y-m-d');
-        $invoice->transaction_id = $transaction['id'];
-        $invoice->category_id = $transaction['linked_id'];
-        $invoice->amount = $transaction['credit_amount'] == 0 ? $transaction['debit_amount'] : $transaction['credit_amount'];
-        $invoice->status = 'due';
-        $invoice->client_company_id = $sessionUser['client_company_id'];
-        if ($invoice->save()) {
-            return response()->json(['status' => 200, 'message' => 'Successfully generated invoice.']);
+        foreach ($transactionArray as $key =>  $data) {
+            $invoiceItem = [];
+            foreach ($data as $row) {
+                if ($row['module'] == Module::POS_SALE) {
+                    $posSale = SaleData::select('product_id', 'quantity', 'price', 'subtotal')
+                        ->where('sale_id', $row['module_id'])
+                        ->get()
+                        ->toArray();
+                    foreach ($posSale as &$sale) {
+                        $sale['transaction_id'] = $row['id'];
+                        $invoiceItem[] = $sale;
+                    }
+                } else if ($row['module'] == Module::SHIFT_SALE) {
+                    $shiftSale = ShiftSale::select('shift_sale.product_id', 'products.selling_price as price')
+                        ->leftJoin('products', 'products.id', '=', 'shift_sale.product_id')
+                        ->where('shift_sale.id', $row['module_id'])
+                        ->first();
+                    if ($shiftSale instanceof ShiftSale) {
+                        $shiftSale['quantity'] = $row['amount'] / $shiftSale['price'];
+                        $shiftSale['subtotal'] = $row['amount'];
+                        $shiftSale['transaction_id'] = $row['id'];
+                        $shiftSale = $shiftSale->toArray();
+                        $invoiceItem[] = $shiftSale;
+                    }
+                }
+            }
+            $invoice = new Invoice();
+            $invoice->invoice_number = Invoice::getInvoiceNumber();
+            $invoice->date = Carbon::now();
+            $invoice->category_id = $key;
+            $invoice->amount = array_sum(array_column($invoiceItem, 'subtotal'));
+            $invoice->status = 'due';
+            $invoice->client_company_id = $sessionUser['client_company_id'];
+            if ($invoice->save()) {
+                foreach ($invoiceItem as $item) {
+                    $invoiceItemObj = new InvoiceItem();
+                    $invoiceItemObj->invoice_id = $invoice->id;
+                    $invoiceItemObj->transaction_id = $item['transaction_id'];
+                    $invoiceItemObj->product_id = $item['product_id'];
+                    $invoiceItemObj->quantity = $item['quantity'];
+                    $invoiceItemObj->price = $item['price'];
+                    $invoiceItemObj->subtotal = $item['subtotal'];
+                    $invoiceItemObj->save();
+                }
+            }
         }
-        return response()->json(['status' => 500, 'error' => 'Cannot generated invoice.']);
+        return response()->json(['status' => 200, 'message' => 'Successfully generated invoice.']);
     }
     public function list(Request $request)
     {

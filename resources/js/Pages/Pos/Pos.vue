@@ -229,7 +229,6 @@
                 </tr>
                 <tr v-if="singleSaleData.driver_tip > 0">
                     <td colspan="3">Driver Tip</td>
-                    <td>{{singleSaleData.driver_tip}}</td>
                 </tr>
                 <tr>
                     <th colspan="3" class="total text">Total</th>

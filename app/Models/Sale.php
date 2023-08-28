@@ -16,7 +16,7 @@ class Sale extends Model
     protected $hidden = [
         'user_id',
         'client_company_id',
-        'note'
+        'note',
     ];
     public static function getInvoiceNumber(): string
     {

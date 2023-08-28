@@ -9,6 +9,7 @@ use App\Helpers\Helpers;
 use App\Helpers\SessionUser;
 use App\Models\Category;
 use App\Models\Invoice;
+use App\Models\InvoiceItem;
 use App\Models\Product;
 use App\Models\ProductPrice;
 use App\Models\Sale;
@@ -18,6 +19,7 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class SaleController extends Controller
@@ -65,6 +67,7 @@ class SaleController extends Controller
         $payment_category_id = $requestData['payment_category_id'] ?? '';
         $cash_in_hand_category_id = null;
         $total_amount = array_sum(array_column($requestData['products'], 'subtotal'));
+        $driverTips = $requestData['driver_tip'] ?? 0;
         if ($requestData['payment_method'] == PaymentMethod::CASH  || $requestData['payment_method'] == PaymentMethod::COMPANY) {
             $category = Category::where('id', $sessionUser['category_id'])->first();
             if (!$category instanceof Category) {
@@ -79,13 +82,13 @@ class SaleController extends Controller
                 if (!$driverTipsCategory instanceof Category) {
                     return response()->json(['status' => 500, 'message' => 'Driver tips category is not created. Please update credit company.']);
                 }
-                $total_amount = $total_amount + $requestData['driver_tip'];
             }
 
         }
         if (empty($payment_category_id)) {
             return response()->json(['status' => 500, 'errors' => ['payment_category_id' => ['The payment category field is required.']]]);
         }
+        $total_amount = $total_amount + $driverTips;
 
         $sale = new Sale();
         $sale->date = Carbon::now('UTC');
@@ -98,7 +101,17 @@ class SaleController extends Controller
         $sale->payment_category_id = $payment_category_id;
         $sale->client_company_id = $requestData['session_user']['client_company_id'];
         if ($sale->save()) {
+            $totalPrice = array_sum(array_column($requestData['products'], 'subtotal'));
+            $totalQuantity = array_sum(array_column($requestData['products'], 'quantity'));
+            $avgUnitPrice = $totalPrice / $totalQuantity;
+            $extraQuantity = $driverTips != 0 ? ($driverTips / $avgUnitPrice) / $totalQuantity  : 0;
             foreach ($requestData['products'] as $product) {
+                $quantity = $product['quantity'];
+                $subtotal = $product['subtotal'];
+                if (!empty($driverTips)) {
+                    $quantity = ($extraQuantity * $quantity) + $quantity;
+                    $subtotal = $quantity * $product['price'];
+                }
                 $transactionData['linked_id'] = $payment_category_id;
                 $buyingPrice = 0;
                 $productModel = Product::where('id', $product['product_id'])->first();
@@ -108,13 +121,13 @@ class SaleController extends Controller
                 $saleData = new SaleData();
                 $saleData->sale_id = $sale->id;
                 $saleData->product_id = $product['product_id'];
-                $saleData->quantity = $product['quantity'];
+                $saleData->quantity = $quantity;
                 $saleData->price = $product['price'];
-                $saleData->subtotal = $product['subtotal'];
+                $saleData->subtotal = $subtotal;
                 $saleData->shift_sale_id = $product['shift_sale_id'];
                 $saleData->save();
                 $transactionData['transaction'] = [
-                    ['date' => date('Y-m-d'), 'account_id' => $product['income_category_id'], 'debit_amount' => $product['subtotal'], 'credit_amount' => 0, 'module' => Module::POS_SALE, 'module_id' => $sale->id],
+                    ['date' => date('Y-m-d'), 'account_id' => $product['income_category_id'], 'debit_amount' => $subtotal, 'credit_amount' => 0, 'module' => Module::POS_SALE, 'module_id' => $sale->id],
                 ];
                 TransactionController::saveTransaction($transactionData);
                 $transactionData['linked_id'] = $product['expense_category_id'];
@@ -183,11 +196,19 @@ class SaleController extends Controller
                 $result['customer_name'] = $category->category;
             }
         }
-        $result['products'] = SaleData::select('sale_data.*', 'products.name as product_name', 'product_types.name as type_name')
+        $products = SaleData::select('sale_data.*', 'products.name as product_name', 'product_types.name as type_name')
             ->leftJoin('products', 'products.id', '=', 'sale_data.product_id')
             ->leftJoin('product_types', 'products.type_id', '=', 'product_types.id')
             ->where('sale_data.sale_id', $inputData['id'])
-            ->get()->toArray();
+            ->get()
+            ->toArray();
+        foreach ($products as &$product) {
+            $product['price'] = number_format($product['price'], 2);
+            $product['quantity'] = number_format($product['quantity'], 2);
+            $product['subtotal'] = number_format($product['subtotal'], 2);
+        }
+        $result['products'] = $products;
+        $result['total_amount'] = number_format($result['total_amount'], 2);
         return response()->json(['status' => 200, 'data' => $result]);
     }
     /**
@@ -248,7 +269,11 @@ class SaleController extends Controller
         SaleData::where('sale_id', $inputData['id'])->delete();
         return response()->json(['status' => 200, 'message' => 'Successfully deleted sale.']);
     }
-    public function getCompanySale(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function getCompanySale(Request $request): JsonResponse
     {
         $requestData = $request->all();
         $sessionUser = SessionUser::getUser();
@@ -257,10 +282,12 @@ class SaleController extends Controller
         $orderBy = $requestData['order_by'] ?? 'transactions.id';
         $orderMode = $requestData['order_mode'] ?? 'DESC';
         $keyword = $requestData['keyword'] ?? '';
-        $result = Transaction::select('transactions.id', 'transactions.debit_amount as amount', 'transactions.date', 'transactions.description', 'categories.category as name')
+        $result = Transaction::select('transactions.id', DB::raw("SUM(transactions.debit_amount) as amount"), 'transactions.date', 'transactions.description', 'categories.category as name', 'transactions.module', 'transactions.module_id', 'transactions.linked_id as category_id')
             ->leftJoin('categories', 'categories.id', '=', 'transactions.linked_id')
             ->where('categories.parent_category', $accountReceivable->id)
-            ->where('transactions.debit_amount', '>', 0);
+            ->where('transactions.debit_amount', '>', 0)
+            ->where('transactions.client_company_id', $sessionUser['client_company_id'])
+            ->groupBy('module_id');
         if (!empty($keyword)) {
             $result->where(function($q) use ($keyword) {
                 $q->where('categories.category', 'LIKE', '%'.$keyword.'%');
@@ -273,9 +300,10 @@ class SaleController extends Controller
             $transactionId[] = $data['id'];
             $data['date'] = date('d/m/Y', strtotime($data['date']));
         }
-        $invoice = Invoice::select('transaction_id', 'id')->whereIn('transaction_id', $transactionId)->get()->keyBy('transaction_id')->toArray();
+        $invoice = InvoiceItem::select('transaction_id', 'invoice_id as id')->whereIn('transaction_id', $transactionId)->get()->keyBy('transaction_id')->toArray();
         foreach ($result as &$data) {
-            $data['is_invoice'] = isset($invoice[$data['id']]) ? true : false;
+            $data['amount'] = number_format($data['amount'], 2);
+            $data['is_invoice'] = isset($invoice[$data['id']]);
             $data['invoice_id'] = isset($invoice[$data['id']]) ? $invoice[$data['id']]['id'] : '';
         }
         return response()->json(['status' => 200, 'data' => $result]);
