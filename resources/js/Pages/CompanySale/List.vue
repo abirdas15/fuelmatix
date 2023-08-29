@@ -5,6 +5,10 @@
                 <ol class="breadcrumb align-items-center ">
                     <li class="breadcrumb-item active"><router-link :to="{name: 'Dashboard'}">Home</router-link></li>
                     <li class="breadcrumb-item"><a href="javascript:void(0)">Company Sale</a></li>
+                    <li style="margin-left: auto;">
+                        <a class="btn btn-success text-white" style="padding: 8px 20px" v-if="selectedIDs.length > 0 && !generateLoading" @click="generateInvoice()" href="javascript:void(0)">Generate Invoice</a>
+                        <a class="btn btn-success text-white" style="padding: 8px 20px" v-if="selectedIDs.length > 0 && generateLoading" href="javascript:void(0)">Generating....</a>
+                    </li>
                 </ol>
             </div>
             <div class="row">
@@ -36,6 +40,9 @@
                                         <table class="display  dataTable no-footer" style="min-width: 845px">
                                             <thead>
                                             <tr class="text-white" style="background-color: #4886EE;color:#ffffff">
+                                                <th>
+                                                    <input type="checkbox" class="form-check-input" @change="selectAll($event)">
+                                                </th>
                                                 <th class="text-white" @click="sortData('date')" :class="sortClass('date')">Date</th>
                                                 <th class="text-white" @click="sortData('name')" :class="sortClass('name')">Company</th>
                                                 <th class="text-white" @click="sortData('amount')" :class="sortClass('amount')">Amount</th>
@@ -44,6 +51,7 @@
                                             </thead>
                                             <tbody v-if="listData.length > 0 && TableLoading == false">
                                             <tr v-for="(f, i) in listData">
+                                                <td> <input type="checkbox" :checked="isExist(f.id)" class="form-check-input" @change="selectIds($event, f.id)"></td>
                                                 <td >{{f.date}}</td>
                                                 <td><a href="javascript:void(0);">{{f.name}}</a></td>
                                                 <td><a href="javascript:void(0);">{{f?.amount}}</a></td>
@@ -123,6 +131,7 @@ import Swal from 'sweetalert2/dist/sweetalert2.js'
 import ApiService from "../../Services/ApiService";
 import ApiRoutes from "../../Services/ApiRoutes";
 import Pagination from "../../Helpers/Pagination";
+import _ from "lodash";
 export default {
     components: {
         Pagination,
@@ -138,13 +147,15 @@ export default {
                 page: 1,
             },
             Loading: false,
+            generateLoading: false,
             TableLoading: false,
             listData: [],
             selectedData: null,
             expandParam: {
                 id: '',
                 data: []
-            }
+            },
+            selectedIDs: []
         };
     },
     watch: {
@@ -161,6 +172,39 @@ export default {
         },
     },
     methods: {
+        generateInvoice: function () {
+            this.generateLoading = true
+            ApiService.POST(ApiRoutes.invoiceGenerate, {ids: this.selectedIDs},res => {
+                this.generateLoading = false
+                if (parseInt(res.status) === 200) {
+                    this.selectedIDs = []
+                    this.$toast.success(res.message);
+                    this.list();
+                } else {
+                    this.$toast.error(res.error)
+                }
+            });
+        },
+        isExist: function (id) {
+            let index = this.selectedIDs.indexOf(id)
+            return index > -1;
+        },
+        selectIds: function (e, id) {
+            if (e.target.checked) {
+                this.selectedIDs.push(id)
+            } else {
+                this.selectedIDs.splice(this.selectedIDs.indexOf(id), 1)
+            }
+        },
+        selectAll: function (e) {
+            if (e.target.checked) {
+                this.listData.map(v => {
+                    this.selectedIDs.push(v.id)
+                })
+            } else {
+                this.selectedIDs = []
+            }
+        },
         expand: function () {
             ApiService.POST(ApiRoutes.TransactionSplit, this.expandParam,res => {
                 if (parseInt(res.status) === 200) {
