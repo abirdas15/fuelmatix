@@ -261,7 +261,6 @@ class InvoiceController extends Controller
     {
         $requestData = $request->all();
         $validator = Validator::make($requestData, [
-            'type' => 'required',
             'amount' => 'required',
             'company_id' => 'required',
             'payment_category_id' => 'required'
@@ -278,20 +277,12 @@ class InvoiceController extends Controller
             return response()->json(['status' => 500, 'message' => 'Cannot find [payment].']);
         }
         $sessionUser = SessionUser::getUser();
-        if ($requestData['type'] == 'advance payment') {
-            $advancePaymentData = [
-                'amount' => $requestData['amount'],
-                'company_id' => $requestData['company_id'],
-                'payment_category_id' => $requestData['payment_category_id']
-            ];
-            InvoiceRepository::advancePayment($advancePaymentData);
-            return response()->json(['status' => 200, 'message' => 'Successfully saved advance payment.']);
-        } else {
-            $invoices = Invoice::where('client_company_id', $sessionUser['client_company_id'])
-                ->where('status', '!=', 'paid')
-                ->get();
-            $amount = $requestData['amount'];
-            $totalPaidAmount = 0;
+        $invoices = Invoice::where('client_company_id', $sessionUser['client_company_id'])
+            ->where('status', '!=', 'paid')
+            ->get();
+        $amount = $requestData['amount'];
+        $totalPaidAmount = 0;
+        if (count($invoices) > 0) {
             foreach ($invoices as $invoice) {
                 if ($invoice['amount'] < $amount) {
                     $paymentAmount = $invoice['amount'];
@@ -307,20 +298,22 @@ class InvoiceController extends Controller
                 $invoice->status = $status;
                 $invoice->save();
             }
+        }
+        if ($totalPaidAmount > 0) {
             $transaction['linked_id'] = $requestData['payment_category_id'];
             $transaction['transaction'] = [
                 ['date' => date('Y-m-d'), 'account_id' => $requestData['company_id'], 'debit_amount' => $totalPaidAmount, 'credit_amount' => 0, 'module' => Module::INVOICE, 'module_id' => $invoice->id]
             ];
             TransactionController::saveTransaction($transaction);
-            if ($amount > 0) {
-                $advancePaymentData = [
-                    'amount' => $amount,
-                    'company_id' => $requestData['company_id'],
-                    'payment_category_id' => $requestData['payment_category_id']
-                ];
-                InvoiceRepository::advancePayment($advancePaymentData);
-            }
-            return response()->json(['status' => 200, 'message' => 'Successfully saved invoice payment.']);
         }
+        if ($amount > 0) {
+            $advancePaymentData = [
+                'amount' => $amount,
+                'company_id' => $requestData['company_id'],
+                'payment_category_id' => $requestData['payment_category_id']
+            ];
+            InvoiceRepository::advancePayment($advancePaymentData);
+        }
+        return response()->json(['status' => 200, 'message' => 'Successfully saved invoice payment.']);
     }
 }
