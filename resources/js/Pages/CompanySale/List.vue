@@ -51,15 +51,17 @@
                                             </thead>
                                             <tbody v-if="listData.length > 0 && TableLoading == false">
                                             <tr v-for="(f, i) in listData">
-                                                <td> <input type="checkbox" :checked="isExist(f.id)" class="form-check-input" @change="selectIds($event, f.id)"></td>
+                                                <td>
+                                                    <input v-if="!f.invoice_id" type="checkbox" :checked="isExist(f.id)" class="form-check-input" @change="selectIds($event, f.id)">
+                                                </td>
                                                 <td >{{f.date}}</td>
                                                 <td><a href="javascript:void(0);">{{f.name}}</a></td>
                                                 <td><a href="javascript:void(0);">{{f?.amount}}</a></td>
                                                 <td>
                                                     <template v-if="f.module == 'shift sale'">
-                                                        <button class="btn btn-sm btn-primary" v-if="!f.is_invoice"  @click="tableAction('expand', f)">Expand</button>
+                                                        <button class="btn btn-sm btn-primary" v-if="!f.invoice_id"  @click="tableAction('expand', f)">Expand</button>
                                                     </template>
-                                                    <router-link :to="{name: 'InvoicesView', params: { id: f.invoice_id }}" class="btn btn-sm btn-info" v-if="f.is_invoice" @click="tableAction('view', f)">View Invoices</router-link>
+                                                    <router-link :to="{name: 'InvoicesView', params: { id: f.invoice_id }}" class="btn btn-sm btn-info" v-if="f.invoice_id" @click="tableAction('view', f)">View Invoices</router-link>
                                                 </td>
                                             </tr>
                                             </tbody>
@@ -199,7 +201,9 @@ export default {
         selectAll: function (e) {
             if (e.target.checked) {
                 this.listData.map(v => {
-                    this.selectedIDs.push(v.id)
+                    if (!v.invoice_id) {
+                        this.selectedIDs.push(v.id)
+                    }
                 })
             } else {
                 this.selectedIDs = []

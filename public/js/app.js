@@ -3133,7 +3133,9 @@ __webpack_require__.r(__webpack_exports__);
       var _this2 = this;
       if (e.target.checked) {
         this.listData.map(function (v) {
-          _this2.selectedIDs.push(v.id);
+          if (!v.invoice_id) {
+            _this2.selectedIDs.push(v.id);
+          }
         });
       } else {
         this.selectedIDs = [];
@@ -12980,7 +12982,7 @@ var render = function render() {
       width: "375px"
     }
   }, [_vm._v("Action")])])]), _vm._v(" "), _vm.listData.length > 0 && _vm.TableLoading == false ? _c("tbody", _vm._l(_vm.listData, function (f, i) {
-    return _c("tr", [_c("td", [_c("input", {
+    return _c("tr", [_c("td", [!f.invoice_id ? _c("input", {
       staticClass: "form-check-input",
       attrs: {
         type: "checkbox"
@@ -12993,7 +12995,7 @@ var render = function render() {
           return _vm.selectIds($event, f.id);
         }
       }
-    })]), _vm._v(" "), _c("td", [_vm._v(_vm._s(f.date))]), _vm._v(" "), _c("td", [_c("a", {
+    }) : _vm._e()]), _vm._v(" "), _c("td", [_vm._v(_vm._s(f.date))]), _vm._v(" "), _c("td", [_c("a", {
       attrs: {
         href: "javascript:void(0);"
       }
@@ -13001,14 +13003,14 @@ var render = function render() {
       attrs: {
         href: "javascript:void(0);"
       }
-    }, [_vm._v(_vm._s(f === null || f === void 0 ? void 0 : f.amount))])]), _vm._v(" "), _c("td", [f.module == "shift sale" ? [!f.is_invoice ? _c("button", {
+    }, [_vm._v(_vm._s(f === null || f === void 0 ? void 0 : f.amount))])]), _vm._v(" "), _c("td", [f.module == "shift sale" ? [!f.invoice_id ? _c("button", {
       staticClass: "btn btn-sm btn-primary",
       on: {
         click: function click($event) {
           return _vm.tableAction("expand", f);
         }
       }
-    }, [_vm._v("Expand")]) : _vm._e()] : _vm._e(), _vm._v(" "), f.is_invoice ? _c("router-link", {
+    }, [_vm._v("Expand")]) : _vm._e()] : _vm._e(), _vm._v(" "), f.invoice_id ? _c("router-link", {
       staticClass: "btn btn-sm btn-info",
       attrs: {
         to: {
@@ -22939,6 +22941,14 @@ var render = function render() {
     }
   }, [_vm._v("Date")]), _vm._v(" "), _c("th", {
     staticClass: "text-white",
+    "class": _vm.sortClass("due_date"),
+    on: {
+      click: function click($event) {
+        return _vm.sortData("date");
+      }
+    }
+  }, [_vm._v("Due Date")]), _vm._v(" "), _c("th", {
+    staticClass: "text-white",
     "class": _vm.sortClass("name"),
     on: {
       click: function click($event) {
@@ -22988,6 +22998,10 @@ var render = function render() {
       attrs: {
         href: "javascript:void(0);"
       }
+    }, [_vm._v(_vm._s(f.due_date))])]), _vm._v(" "), _c("td", [_c("a", {
+      attrs: {
+        href: "javascript:void(0);"
+      }
     }, [_vm._v(_vm._s(f === null || f === void 0 ? void 0 : f.name))])]), _vm._v(" "), _c("td", [_c("a", {
       attrs: {
         href: "javascript:void(0);"
@@ -23005,11 +23019,13 @@ var render = function render() {
         href: "javascript:void(0);"
       }
     }, [f.status == "due" ? _c("span", {
+      staticClass: "badge bg-warning text-bg-warning"
+    }, [_vm._v(_vm._s(f === null || f === void 0 ? void 0 : f.status))]) : _vm._e(), _vm._v(" "), f.status == "over due" ? _c("span", {
       staticClass: "badge bg-danger text-bg-danger"
     }, [_vm._v(_vm._s(f === null || f === void 0 ? void 0 : f.status))]) : _vm._e(), _vm._v(" "), f.status == "partial paid" ? _c("span", {
-      staticClass: "badge bg-warning text-bg-warning"
-    }, [_vm._v(_vm._s(f === null || f === void 0 ? void 0 : f.status))]) : _vm._e(), _vm._v(" "), f.status == "paid" ? _c("span", {
       staticClass: "badge bg-primary text-bg-primary"
+    }, [_vm._v(_vm._s(f === null || f === void 0 ? void 0 : f.status))]) : _vm._e(), _vm._v(" "), f.status == "paid" ? _c("span", {
+      staticClass: "badge bg-success text-bg-success"
     }, [_vm._v(_vm._s(f === null || f === void 0 ? void 0 : f.status))]) : _vm._e()])]), _vm._v(" "), _c("td", [_c("div", {
       staticClass: "d-flex justify-content-end align-items-center"
     }, [_c("button", {
@@ -23222,6 +23238,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
 var render = function render() {
+  var _vm$param;
   var _vm = this,
     _c = _vm._self._c;
   return _c("div", {
@@ -23295,20 +23312,17 @@ var render = function render() {
     staticClass: "col-sm-12"
   }, [_c("table", {
     staticClass: "table table-bordered align-top"
-  }, [_vm._m(4), _vm._v(" "), _c("tbody", [_c("tr", [_c("td", {
-    staticStyle: {
-      height: "400px",
-      "vertical-align": "top"
-    }
-  }, [_vm._v(_vm._s(_vm.param.description))]), _vm._v(" "), _c("td", {
-    staticClass: "text-end",
-    staticStyle: {
-      height: "400px",
-      "vertical-align": "top"
-    }
-  }, [_vm._v(_vm._s(_vm.param.amount))])]), _vm._v(" "), _c("tr", [_c("td"), _vm._v(" "), _c("td", {
+  }, [_vm._m(4), _vm._v(" "), _c("tbody", [_vm._l((_vm$param = _vm.param) === null || _vm$param === void 0 ? void 0 : _vm$param.invoice_item, function (item) {
+    return _c("tr", [_c("td", [_vm._v(_vm._s(item.product_name))]), _vm._v(" "), _c("td", {
+      staticClass: "text-center"
+    }, [_vm._v(_vm._s(item.quantity))]), _vm._v(" "), _c("td", {
+      staticClass: "text-end"
+    }, [_vm._v(_vm._s(item.price))]), _vm._v(" "), _c("td", {
+      staticClass: "text-end"
+    }, [_vm._v(_vm._s(item.subtotal))])]);
+  }), _vm._v(" "), _c("tr", [_vm._m(5), _vm._v(" "), _c("th", {
     staticClass: "text-end"
-  }, [_c("strong", [_vm._v("Total")]), _vm._v(": " + _vm._s(_vm.param.amount))])])])])])])])])])])])])]);
+  }, [_vm._v(_vm._s(_vm.param.amount))])])], 2)])])])])])])])])])]);
 };
 var staticRenderFns = [function () {
   var _vm = this,
@@ -23360,12 +23374,31 @@ var staticRenderFns = [function () {
     staticStyle: {
       "background-color": "rgba(134,183,255,0.9)"
     }
-  }, [_vm._v("Description")]), _vm._v(" "), _c("th", {
+  }, [_vm._v("Product")]), _vm._v(" "), _c("th", {
+    staticClass: "text-center",
+    staticStyle: {
+      "background-color": "rgba(134,183,255,0.9)"
+    }
+  }, [_vm._v("Quantity")]), _vm._v(" "), _c("th", {
     staticClass: "text-end",
     staticStyle: {
       "background-color": "rgba(134,183,255,0.9)"
     }
-  }, [_vm._v("Amount")])])]);
+  }, [_vm._v("Unit Price")]), _vm._v(" "), _c("th", {
+    staticClass: "text-end",
+    staticStyle: {
+      "background-color": "rgba(134,183,255,0.9)"
+    }
+  }, [_vm._v("Subtotal")])])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("th", {
+    staticClass: "text-end",
+    attrs: {
+      colspan: "3"
+    }
+  }, [_c("strong", [_vm._v("Total")])]);
 }];
 render._withStripped = true;
 
@@ -32883,7 +32916,7 @@ exports = module.exports = __webpack_require__(/*! ../../../../node_modules/css-
 
 
 // module
-exports.push([module.i, "\n.bill-to[data-v-26966675]{\n    background-color: rgba(134,183,255,0.9);\n    font-weight: bold;\n    padding: 10px 50px;\n    width: max-content;\n}\n", ""]);
+exports.push([module.i, "\n.bill-to[data-v-26966675]{\r\n    background-color: rgba(134,183,255,0.9);\r\n    font-weight: bold;\r\n    padding: 10px 50px;\r\n    width: max-content;\n}\r\n", ""]);
 
 // exports
 
@@ -92066,7 +92099,7 @@ var app = new vue__WEBPACK_IMPORTED_MODULE_1___default.a({
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! D:\xampp\htdocs\projects\fuelmatix\resources\js\app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! D:\xampp7.4\htdocs\fuelmatix\resources\js\app.js */"./resources/js/app.js");
 
 
 /***/ })

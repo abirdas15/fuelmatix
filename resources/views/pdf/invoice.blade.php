@@ -73,20 +73,26 @@
     <table class="table" style="width: 95%; margin-bottom: 30px">
         <thead>
         <tr>
-            <th style="width: 70%">Description</th>
-            <th style="width: 30%; text-align: right">Amount</th>
+            <th>Product</th>
+            <th style="text-align: center">Quantity</th>
+            <th style="text-align: right">Unit Price</th>
+            <th style="text-align: right">Subtotal</th>
         </tr>
         </thead>
         <tbody>
-        <tr>
-            <td style="height: 300px; vertical-align: top;">{{ $data['description'] }}</td>
-            <td style="text-align: right; vertical-align: top; height: 300px">{{ number_format($data['amount'] , 2) }}</td>
-        </tr>
+        @foreach($data['invoice_item'] as $item)
+            <tr>
+                <td>{{ $item['product_name'] }}</td>
+                <td style="text-align: center">{{ $item['quantity'] }}</td>
+                <td style="text-align: right">{{ $item['price'] }}</td>
+                <td style="text-align: right">{{ $item['subtotal'] }}</td>
+            </tr>
+        @endforeach
         </tbody>
         <tfoot>
         <tr>
-            <th style="text-align: right">Total</th>
-            <th style="text-align: right">{{ number_format($data['amount'] , 2) }}</th>
+            <th colspan="3" style="text-align: right">Total</th>
+            <th style="text-align: right">{{ $data['amount'] }}</th>
         </tr>
         </tfoot>
     </table>

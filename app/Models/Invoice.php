@@ -26,6 +26,6 @@ class Invoice extends Model
             return 'INV-0001';
         }
         $string = preg_replace("/[^0-9\.]/", '', $invoice->invoice_number);
-        return 'INV' . sprintf('%04d', $string+1);
+        return 'INV-' . sprintf('%04d', $string+1);
     }
 }

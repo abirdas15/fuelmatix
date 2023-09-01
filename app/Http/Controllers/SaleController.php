@@ -282,12 +282,13 @@ class SaleController extends Controller
         $orderBy = $requestData['order_by'] ?? 'transactions.id';
         $orderMode = $requestData['order_mode'] ?? 'DESC';
         $keyword = $requestData['keyword'] ?? '';
-        $result = Transaction::select('transactions.id', DB::raw("SUM(transactions.debit_amount) as amount"), 'transactions.date', 'transactions.description', 'categories.category as name', 'transactions.module', 'transactions.module_id', 'transactions.linked_id as category_id')
+        $result = Transaction::select('transactions.id', 'invoice_item.invoice_id',  DB::raw("SUM(transactions.debit_amount) as amount"), 'transactions.date', 'transactions.description', 'categories.category as name', 'transactions.module', 'transactions.module_id', 'transactions.linked_id as category_id')
             ->leftJoin('categories', 'categories.id', '=', 'transactions.linked_id')
+            ->leftJoin('invoice_item', 'invoice_item.transaction_id', 'transactions.id')
             ->where('categories.parent_category', $accountReceivable->id)
             ->where('transactions.debit_amount', '>', 0)
             ->where('transactions.client_company_id', $sessionUser['client_company_id'])
-            ->groupBy('module_id');
+            ->groupBy(DB::raw('invoice_item.invoice_id  , CASE WHEN invoice_item.invoice_id IS NULL THEN transactions.module_id ELSE 0 END'));
         if (!empty($keyword)) {
             $result->where(function($q) use ($keyword) {
                 $q->where('categories.category', 'LIKE', '%'.$keyword.'%');
@@ -295,16 +296,9 @@ class SaleController extends Controller
         }
         $result = $result->orderBy($orderBy, $orderMode)
             ->paginate($limit);
-        $transactionId = [];
-        foreach ($result as &$data) {
-            $transactionId[] = $data['id'];
-            $data['date'] = date('d/m/Y', strtotime($data['date']));
-        }
-        $invoice = InvoiceItem::select('transaction_id', 'invoice_id as id')->whereIn('transaction_id', $transactionId)->get()->keyBy('transaction_id')->toArray();
         foreach ($result as &$data) {
             $data['amount'] = number_format($data['amount'], 2);
-            $data['is_invoice'] = isset($invoice[$data['id']]);
-            $data['invoice_id'] = isset($invoice[$data['id']]) ? $invoice[$data['id']]['id'] : '';
+            $data['date'] = date('d/m/Y', strtotime($data['date']));
         }
         return response()->json(['status' => 200, 'data' => $result]);
     }

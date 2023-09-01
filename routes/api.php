@@ -227,6 +227,7 @@ Route::group(['middleware' => 'AuthReqCheck'], function() {
         Route::post('generate', [InvoiceController::class, 'generate']);
         Route::post('list', [InvoiceController::class, 'list']);
         Route::post('payment', [InvoiceController::class, 'payment']);
+        Route::post('global/payment', [InvoiceController::class, 'globalPayment']);
         Route::post('delete', [InvoiceController::class, 'delete']);
         Route::post('single', [InvoiceController::class, 'single']);
         Route::post('download/pdf', [InvoiceController::class, 'downloadPdf']);

@@ -38,6 +38,7 @@
                                             <tr class="text-white" style="background-color: #4886EE;color:#ffffff">
                                                 <th class="text-white" @click="sortData('invoice_number')" :class="sortClass('invoice_number')">Invoice Number</th>
                                                 <th class="text-white" @click="sortData('date')" :class="sortClass('date')">Date</th>
+                                                <th class="text-white" @click="sortData('date')" :class="sortClass('due_date')">Due Date</th>
                                                 <th class="text-white" @click="sortData('name')" :class="sortClass('name')">Name</th>
                                                 <th class="text-white" @click="sortData('amount')" :class="sortClass('amount')">Amount</th>
                                                 <th class="text-white" @click="sortData('due_amount')" :class="sortClass('due_amount')">Due Amount</th>
@@ -50,15 +51,17 @@
                                             <tr v-for="f in listData">
                                                 <td >{{f.invoice_number}}</td>
                                                 <td><a href="javascript:void(0);">{{f.date}}</a></td>
+                                                <td><a href="javascript:void(0);">{{f.due_date}}</a></td>
                                                 <td><a href="javascript:void(0);">{{f?.name}}</a></td>
                                                 <td><a href="javascript:void(0);">{{f?.amount}}</a></td>
                                                 <td><a href="javascript:void(0);">{{f?.due_amount}}</a></td>
                                                 <td><a href="javascript:void(0);">{{f?.paid_amount}}</a></td>
                                                 <td>
                                                     <a href="javascript:void(0);">
-                                                        <span class="badge bg-danger text-bg-danger" v-if="f.status == 'due'">{{f?.status}}</span>
-                                                        <span class="badge bg-warning text-bg-warning" v-if="f.status == 'partial paid'">{{f?.status}}</span>
-                                                        <span class="badge bg-primary text-bg-primary" v-if="f.status == 'paid'">{{f?.status}}</span>
+                                                        <span class="badge bg-warning text-bg-warning" v-if="f.status == 'due'">{{f?.status}}</span>
+                                                        <span class="badge bg-danger text-bg-danger" v-if="f.status == 'over due'">{{f?.status}}</span>
+                                                        <span class="badge bg-primary text-bg-primary" v-if="f.status == 'partial paid'">{{f?.status}}</span>
+                                                        <span class="badge bg-success text-bg-success" v-if="f.status == 'paid'">{{f?.status}}</span>
                                                     </a>
                                                 </td>
                                                 <td>

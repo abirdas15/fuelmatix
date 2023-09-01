@@ -3,14 +3,21 @@
 namespace App\Http\Controllers;
 
 use App\Common\AccountCategory;
+use App\Helpers\SessionUser;
 use App\Models\Category;
+use App\Repository\CategoryRepository;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class VendorController extends Controller
 {
 
-    public function save(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function save(Request $request): JsonResponse
     {
         $inputData = $request->all();
         $validator = Validator::make($inputData, [
@@ -20,19 +27,21 @@ class VendorController extends Controller
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
         $accountPayable = Category::where('client_company_id', $inputData['session_user']['client_company_id'])->where('category', AccountCategory::ACCOUNT_PAYABLE)->first();
-        if ($accountPayable == null) {
+        if (!$accountPayable instanceof Category) {
             return response()->json(['status' => 500, 'error' => 'Cannot find vendor group.']);
         }
-        $category = new Category();
-        $category->category = $inputData['name'];
-        $category->parent_category = $accountPayable->id;
-        $category->type = $accountPayable->type;
-        $category->client_company_id = $inputData['session_user']['client_company_id'];
-        if ($category->save()) {
-            $category->updateCategory();
+        $sessionUser = SessionUser::getUser();
+        $categoryData = [
+            'category' => $inputData['name'],
+            'parent_category' => $accountPayable->id,
+            'type' => $accountPayable->type,
+            'client_company_id'=> $sessionUser['id']
+        ];
+        $newCategory = CategoryRepository::save($categoryData);
+        if ($newCategory instanceof Category) {
             return response()->json(['status' => 200, 'message' => 'Successfully saved vendor.']);
         }
-        return response()->json(['status' => 500, 'errors' => 'Cannot save vendor.']);
+        return response()->json(['status' => 500, 'message' => 'Cannot save vendor.']);
     }
     public function list(Request $request)
     {

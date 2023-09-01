@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Common\AccountCategory;
 use App\Common\Module;
 use App\Helpers\SessionUser;
 use App\Models\Category;
@@ -12,6 +13,8 @@ use App\Models\Sale;
 use App\Models\SaleData;
 use App\Models\ShiftSale;
 use App\Models\Transaction;
+use App\Repository\CategoryRepository;
+use App\Repository\InvoiceRepository;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
@@ -75,6 +78,7 @@ class InvoiceController extends Controller
             $invoice->category_id = $key;
             $invoice->amount = array_sum(array_column($invoiceItem, 'subtotal'));
             $invoice->status = 'due';
+            $invoice->due_date = Carbon::now()->add('30D');
             $invoice->client_company_id = $sessionUser['client_company_id'];
             if ($invoice->save()) {
                 foreach ($invoiceItem as $item) {
@@ -91,7 +95,11 @@ class InvoiceController extends Controller
         }
         return response()->json(['status' => 200, 'message' => 'Successfully generated invoice.']);
     }
-    public function list(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function list(Request $request): JsonResponse
     {
         $requestData = $request->all();
         $sessionUser = SessionUser::getUser();
@@ -109,8 +117,12 @@ class InvoiceController extends Controller
                 $q->where('categories.category', 'LIKE', '%'.$keyword.'%');
             });
         }
-        foreach ($result as $data) {
+        foreach ($result as &$data) {
+            if (Carbon::parse($data['due_date'])->lessThan(Carbon::now())) {
+                $data['status'] = 'over due';
+            }
             $data['date'] = date('d/m/Y', strtotime($data['date']));
+            $data['due_date'] = date('d/m/Y', strtotime($data['due_date']));
         }
         return response()->json(['status' => 200, 'data' => $result]);
     }
@@ -141,7 +153,11 @@ class InvoiceController extends Controller
         }
         return response()->json(['status' => 500, 'error' => 'Cannot saved payment.']);
     }
-    public function delete(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function delete(Request $request): JsonResponse
     {
         $requestData = $request->all();
         $validator = Validator::make($requestData, [
@@ -155,6 +171,7 @@ class InvoiceController extends Controller
             return response()->json(['status' => 500, 'error' => 'Cannot find invoice.']);
         }
         Invoice::where('id', $requestData['id'])->delete();
+        Invoice::where('invoice_id', $requestData['id'])->delete();
         Transaction::where('module', Module::INVOICE)->where('module_id', $requestData['id'])->delete();
         return response()->json(['status' => 200, 'message' => 'Successfully deleted invoice.']);
     }
@@ -183,8 +200,18 @@ class InvoiceController extends Controller
         $category['address'] = $others->address ?? '';
         $invoice['customer_company'] = $category;
         $invoice['company'] = $company;
-        $transaction = Transaction::find($invoice['transaction_id']);
-        $invoice['description'] = $transaction['description'] ?? '';
+        $invoice['amount'] = number_format($invoice['amount'], 2);
+        $invoiceItem = InvoiceItem::select('invoice_item.id', 'invoice_item.quantity', 'invoice_item.price', 'invoice_item.subtotal', 'products.name as product_name')
+            ->leftJoin('products', 'products.id', 'invoice_item.product_id')
+            ->where('invoice_item.invoice_id', $requestData['id'])
+            ->get()
+            ->toArray();
+        foreach ($invoiceItem as &$item) {
+            $item['price'] = number_format($item['price'], 2);
+            $item['subtotal'] = number_format($item['subtotal'], 2);
+            $item['quantity'] = number_format($item['quantity'], 2);
+        }
+        $invoice['invoice_item'] = $invoiceItem;
         return response()->json(['status' => 200, 'data' => $invoice]);
     }
     public function downloadPdf(Request $request)
@@ -212,9 +239,88 @@ class InvoiceController extends Controller
         $category['address'] = $others->address ?? '';
         $invoice['customer_company'] = $category;
         $invoice['company'] = $company;
-        $transaction = Transaction::find($invoice['transaction_id']);
-        $invoice['description'] = $transaction['description'] ?? '';
+        $invoice['amount'] = number_format($invoice['amount'], 2);
+        $invoiceItem = InvoiceItem::select('invoice_item.id', 'invoice_item.quantity', 'invoice_item.price', 'invoice_item.subtotal', 'products.name as product_name')
+            ->leftJoin('products', 'products.id', 'invoice_item.product_id')
+            ->where('invoice_item.invoice_id', $requestData['id'])
+            ->get()
+            ->toArray();
+        foreach ($invoiceItem as &$item) {
+            $item['price'] = number_format($item['price'], 2);
+            $item['subtotal'] = number_format($item['subtotal'], 2);
+            $item['quantity'] = number_format($item['quantity'], 2);
+        }
+        $invoice['invoice_item'] = $invoiceItem;
         $pdf = Pdf::loadView('pdf.invoice', ['data' => $invoice]);
         return $pdf->output();
+    }
+    /**
+     * @param Request $request
+     */
+    public function globalPayment(Request $request)
+    {
+        $requestData = $request->all();
+        $validator = Validator::make($requestData, [
+            'type' => 'required',
+            'amount' => 'required',
+            'company_id' => 'required',
+            'payment_category_id' => 'required'
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['status' => 500, 'errors' => $validator->errors()]);
+        }
+        $companyCategory = Category::where('id', $requestData['company_id'])->first();
+        if (!$companyCategory instanceof Category) {
+            return response()->json(['status' => 500, 'message' => 'Cannot find [company].']);
+        }
+        $paymentCategory = Category::where('id', $requestData['payment_category_id'])->first();
+        if (!$paymentCategory instanceof Category) {
+            return response()->json(['status' => 500, 'message' => 'Cannot find [payment].']);
+        }
+        $sessionUser = SessionUser::getUser();
+        if ($requestData['type'] == 'advance payment') {
+            $advancePaymentData = [
+                'amount' => $requestData['amount'],
+                'company_id' => $requestData['company_id'],
+                'payment_category_id' => $requestData['payment_category_id']
+            ];
+            InvoiceRepository::advancePayment($advancePaymentData);
+            return response()->json(['status' => 200, 'message' => 'Successfully saved advance payment.']);
+        } else {
+            $invoices = Invoice::where('client_company_id', $sessionUser['client_company_id'])
+                ->where('status', '!=', 'paid')
+                ->get();
+            $amount = $requestData['amount'];
+            $totalPaidAmount = 0;
+            foreach ($invoices as $invoice) {
+                if ($invoice['amount'] < $amount) {
+                    $paymentAmount = $invoice['amount'];
+                    $amount = $amount - $paymentAmount;
+                    $status = 'paid';
+                } else {
+                    $paymentAmount = $amount;
+                    $status = 'partial paid';
+                    $amount = 0;
+                }
+                $totalPaidAmount += $paymentAmount;
+                $invoice->paid_amount = $paymentAmount;
+                $invoice->status = $status;
+                $invoice->save();
+            }
+            $transaction['linked_id'] = $requestData['payment_category_id'];
+            $transaction['transaction'] = [
+                ['date' => date('Y-m-d'), 'account_id' => $requestData['company_id'], 'debit_amount' => $totalPaidAmount, 'credit_amount' => 0, 'module' => Module::INVOICE, 'module_id' => $invoice->id]
+            ];
+            TransactionController::saveTransaction($transaction);
+            if ($amount > 0) {
+                $advancePaymentData = [
+                    'amount' => $amount,
+                    'company_id' => $requestData['company_id'],
+                    'payment_category_id' => $requestData['payment_category_id']
+                ];
+                InvoiceRepository::advancePayment($advancePaymentData);
+            }
+            return response()->json(['status' => 200, 'message' => 'Successfully saved invoice payment.']);
+        }
     }
 }

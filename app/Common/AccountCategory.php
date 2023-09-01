@@ -26,4 +26,6 @@ class AccountCategory
     const SALARY_EXPENSE = 'Salary Expense';
 
     const DRIVER_TIPS = 'Driver Tips';
+
+    const ADVANCE_PAYABLE = 'Advance Payable';
 }

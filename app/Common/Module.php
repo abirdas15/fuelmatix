@@ -13,4 +13,6 @@ class Module
 
     const POS_SALE  = 'pos sale';
     const DRIVER_TIPS = 'driver tips';
+
+    const ADVANCE_PAYABLE = 'advance payable';
 }
