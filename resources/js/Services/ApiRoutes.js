@@ -157,6 +157,7 @@ const ApiRoutes = {
     //Invoice
     invoiceGenerate: ApiVersion + '/invoice/generate',
     invoicePayment: ApiVersion + '/invoice/payment',
+    invoiceGlobalPayment: ApiVersion + '/invoice/global/payment',
     invoiceEdit: ApiVersion + '/invoice/update',
     invoiceSingle: ApiVersion + '/invoice/single',
     invoiceDelete: ApiVersion + '/invoice/delete',

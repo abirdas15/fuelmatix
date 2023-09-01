@@ -80,6 +80,11 @@ Vue.use(VueToast, { position: "top-right" });
                     {id: 12, name: 'December'},
                 ]
             },
+        },
+        mounted() {
+            $('.closeBtn').click(() => {
+                $('.popup-wrapper-modal').addClass('d-none')
+            })
         }
     });
 const app = new Vue({

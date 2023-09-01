@@ -5,6 +5,9 @@
                 <ol class="breadcrumb align-items-center ">
                     <li class="breadcrumb-item active"><router-link :to="{name: 'Dashboard'}">Home</router-link></li>
                     <li class="breadcrumb-item"><a href="javascript:void(0)">Invoice List</a></li>
+                    <li style="margin-left: auto;">
+                        <a class="btn btn-success text-white" style="padding: 8px 20px"  @click="paymentGlobalModal()" href="javascript:void(0)">Payment</a>
+                    </li>
                 </ol>
             </div>
             <div class="row">
@@ -66,7 +69,7 @@
                                                 </td>
                                                 <td>
                                                     <div class="d-flex justify-content-end align-items-center">
-                                                        <button class="btn btn-sm btn-primary me-2" @click="paymentModal(f)">Payment</button>
+                                                        <button class="btn btn-sm btn-primary me-2" v-if="f.status != 'paid'" @click="paymentModal(f)">Payment</button>
                                                         <router-link :to="{name: 'InvoicesView', params: { id: f.id }}" class="btn btn-sm btn-info me-2">View</router-link>
                                                         <button class="btn btn-sm btn-danger me-2" @click="openModalDelete(f)">Delete</button>
                                                     </div>
@@ -126,6 +129,43 @@
                 <button type="button" class="btn btn-primary " disabled v-if="Loading">Submitting...</button>
             </form>
         </div>
+        <div class="popup-wrapper-modal invoiceModalGlobal d-none">
+            <form @submit.prevent="paymentGlobal" class="popup-box" style="max-width: 800px">
+                <button type="button" class=" btn  closeBtn"><i class="fas fa-times"></i></button>
+                <div class="row align-items-center">
+                    <div class="col-sm-12">
+                        <div class="input-wrapper form-group mb-3">
+                            <label for="amount">Company</label>
+                            <select class="form-control form-select" v-model="paymentParamGlobal.company_id" name="company_id">
+                                <option value="">Select Company</option>
+                                <option v-for="m in allCompany" :value="m.id">{{m.name}}</option>
+                            </select>
+                            <small class="invalid-feedback"></small>
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <div class="input-wrapper form-group mb-3">
+                            <label for="amount">Amount</label>
+                            <input type="text" class="w-100 form-control bg-white" name="amount" id="amount"
+                                   v-model="paymentParamGlobal.amount" placeholder="Amount here">
+                            <small class="invalid-feedback"></small>
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <div class="input-wrapper form-group mb-3">
+                            <label for="description">Payment Method</label>
+                            <select class="form-control form-select" v-model="paymentParamGlobal.payment_id" name="payment_id">
+                                <option value="">Select Method</option>
+                                <option v-for="m in allAmountCategory" :value="m.id">{{m.name}}</option>
+                            </select>
+                            <small class="invalid-feedback"></small>
+                        </div>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary " v-if="!Loading">Submit</button>
+                <button type="button" class="btn btn-primary " disabled v-if="Loading">Submitting...</button>
+            </form>
+        </div>
     </div>
 </template>
 
@@ -157,7 +197,13 @@ export default {
                 amount: '',
                 payment_id: ''
             },
-            allAmountCategory: []
+            paymentParamGlobal: {
+                id: '',
+                amount: '',
+                payment_id: ''
+            },
+            allAmountCategory: [],
+            allCompany: [],
         };
     },
     watch: {
@@ -168,6 +214,7 @@ export default {
     created() {
         this.list();
         this.getCategory();
+        this.getCompany();
     },
     computed: {
         Auth: function () {
@@ -175,6 +222,21 @@ export default {
         },
     },
     methods: {
+        paymentGlobalModal: function (f) {
+            $('.invoiceModalGlobal').removeClass('d-none');
+
+        },
+        paymentGlobal: function () {
+            ApiService.POST(ApiRoutes.invoiceGlobalPayment, this.paymentParamGlobal,res => {
+                if (parseInt(res.status) === 200) {
+                    this.$toast.success(res.message);
+                    $('.invoiceModalGlobal').addClass('d-none');
+                    this.list()
+                } else {
+                    ApiService.ErrorHandler(res.errors);
+                }
+            });
+        },
         paymentModal: function (f) {
             this.paymentInfo = f
             this.paymentParam.id = f.id
@@ -258,6 +320,14 @@ export default {
             ApiService.POST(ApiRoutes.salaryGetCategory, {}, res => {
                 if (parseInt(res.status) === 200) {
                     this.allAmountCategory = res.data;
+                }
+            });
+        },
+        getCompany: function () {
+            this.categories = []
+            ApiService.POST(ApiRoutes.CreditCompanyList, {page:1, limit: 5000}, res => {
+                if (parseInt(res.status) === 200) {
+                    this.allCompany = res.data.data;
                 }
             });
         },

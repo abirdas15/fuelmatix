@@ -6940,7 +6940,13 @@ __webpack_require__.r(__webpack_exports__);
         amount: '',
         payment_id: ''
       },
-      allAmountCategory: []
+      paymentParamGlobal: {
+        id: '',
+        amount: '',
+        payment_id: ''
+      },
+      allAmountCategory: [],
+      allCompany: []
     };
   },
   watch: {
@@ -6951,6 +6957,7 @@ __webpack_require__.r(__webpack_exports__);
   created: function created() {
     this.list();
     this.getCategory();
+    this.getCompany();
   },
   computed: {
     Auth: function Auth() {
@@ -6958,6 +6965,21 @@ __webpack_require__.r(__webpack_exports__);
     }
   },
   methods: {
+    paymentGlobalModal: function paymentGlobalModal(f) {
+      $('.invoiceModalGlobal').removeClass('d-none');
+    },
+    paymentGlobal: function paymentGlobal() {
+      var _this = this;
+      _Services_ApiService__WEBPACK_IMPORTED_MODULE_1__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_2__["default"].invoiceGlobalPayment, this.paymentParamGlobal, function (res) {
+        if (parseInt(res.status) === 200) {
+          _this.$toast.success(res.message);
+          $('.invoiceModalGlobal').addClass('d-none');
+          _this.list();
+        } else {
+          _Services_ApiService__WEBPACK_IMPORTED_MODULE_1__["default"].ErrorHandler(res.errors);
+        }
+      });
+    },
     paymentModal: function paymentModal(f) {
       this.paymentInfo = f;
       this.paymentParam.id = f.id;
@@ -6965,19 +6987,19 @@ __webpack_require__.r(__webpack_exports__);
       $('.invoiceModal').removeClass('d-none');
     },
     payment: function payment() {
-      var _this = this;
+      var _this2 = this;
       _Services_ApiService__WEBPACK_IMPORTED_MODULE_1__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_2__["default"].invoicePayment, this.paymentParam, function (res) {
         if (parseInt(res.status) === 200) {
-          _this.$toast.success(res.message);
+          _this2.$toast.success(res.message);
           $('.invoiceModal').addClass('d-none');
-          _this.list();
+          _this2.list();
         } else {
           _Services_ApiService__WEBPACK_IMPORTED_MODULE_1__["default"].ErrorHandler(res.errors);
         }
       });
     },
     openModalDelete: function openModalDelete(data) {
-      var _this2 = this;
+      var _this3 = this;
       sweetalert2_dist_sweetalert2_js__WEBPACK_IMPORTED_MODULE_0___default.a.fire({
         title: 'Are you sure you want to delete?',
         text: "You won't be able to revert this!",
@@ -6988,12 +7010,12 @@ __webpack_require__.r(__webpack_exports__);
         confirmButtonText: 'Yes, delete it!'
       }).then(function (result) {
         if (result.isConfirmed) {
-          _this2.Delete(data);
+          _this3.Delete(data);
         }
       });
     },
     list: function list(page) {
-      var _this3 = this;
+      var _this4 = this;
       if (page == undefined) {
         page = {
           page: 1
@@ -7002,23 +7024,23 @@ __webpack_require__.r(__webpack_exports__);
       this.Param.page = page.page;
       this.TableLoading = true;
       _Services_ApiService__WEBPACK_IMPORTED_MODULE_1__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_2__["default"].invoiceList, this.Param, function (res) {
-        _this3.TableLoading = false;
+        _this4.TableLoading = false;
         if (parseInt(res.status) === 200) {
-          _this3.paginateData = res.data;
-          _this3.listData = res.data.data;
+          _this4.paginateData = res.data;
+          _this4.listData = res.data.data;
         } else {
           _Services_ApiService__WEBPACK_IMPORTED_MODULE_1__["default"].ErrorHandler(res.error);
         }
       });
     },
     Delete: function Delete(data) {
-      var _this4 = this;
+      var _this5 = this;
       _Services_ApiService__WEBPACK_IMPORTED_MODULE_1__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_2__["default"].invoiceDelete, {
         id: data.id
       }, function (res) {
         if (parseInt(res.status) === 200) {
-          _this4.$toast.success(res.message);
-          _this4.list();
+          _this5.$toast.success(res.message);
+          _this5.list();
         } else {
           _Services_ApiService__WEBPACK_IMPORTED_MODULE_1__["default"].ErrorHandler(res.error);
         }
@@ -7041,11 +7063,23 @@ __webpack_require__.r(__webpack_exports__);
       this.list();
     },
     getCategory: function getCategory() {
-      var _this5 = this;
+      var _this6 = this;
       this.categories = [];
       _Services_ApiService__WEBPACK_IMPORTED_MODULE_1__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_2__["default"].salaryGetCategory, {}, function (res) {
         if (parseInt(res.status) === 200) {
-          _this5.allAmountCategory = res.data;
+          _this6.allAmountCategory = res.data;
+        }
+      });
+    },
+    getCompany: function getCompany() {
+      var _this7 = this;
+      this.categories = [];
+      _Services_ApiService__WEBPACK_IMPORTED_MODULE_1__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_2__["default"].CreditCompanyList, {
+        page: 1,
+        limit: 5000
+      }, function (res) {
+        if (parseInt(res.status) === 200) {
+          _this7.allCompany = res.data.data;
         }
       });
     }
@@ -22834,7 +22868,24 @@ var render = function render() {
         name: "Dashboard"
       }
     }
-  }, [_vm._v("Home")])], 1), _vm._v(" "), _vm._m(0)])]), _vm._v(" "), _c("div", {
+  }, [_vm._v("Home")])], 1), _vm._v(" "), _vm._m(0), _vm._v(" "), _c("li", {
+    staticStyle: {
+      "margin-left": "auto"
+    }
+  }, [_c("a", {
+    staticClass: "btn btn-success text-white",
+    staticStyle: {
+      padding: "8px 20px"
+    },
+    attrs: {
+      href: "javascript:void(0)"
+    },
+    on: {
+      click: function click($event) {
+        return _vm.paymentGlobalModal();
+      }
+    }
+  }, [_vm._v("Payment")])])])]), _vm._v(" "), _c("div", {
     staticClass: "row"
   }, [_c("div", {
     staticClass: "col-12"
@@ -23028,14 +23079,14 @@ var render = function render() {
       staticClass: "badge bg-success text-bg-success"
     }, [_vm._v(_vm._s(f === null || f === void 0 ? void 0 : f.status))]) : _vm._e()])]), _vm._v(" "), _c("td", [_c("div", {
       staticClass: "d-flex justify-content-end align-items-center"
-    }, [_c("button", {
+    }, [f.status != "paid" ? _c("button", {
       staticClass: "btn btn-sm btn-primary me-2",
       on: {
         click: function click($event) {
           return _vm.paymentModal(f);
         }
       }
-    }, [_vm._v("Payment")]), _vm._v(" "), _c("router-link", {
+    }, [_vm._v("Payment")]) : _vm._e(), _vm._v(" "), _c("router-link", {
       staticClass: "btn btn-sm btn-info me-2",
       attrs: {
         to: {
@@ -23171,6 +23222,149 @@ var render = function render() {
       type: "button",
       disabled: ""
     }
+  }, [_vm._v("Submitting...")]) : _vm._e()])]), _vm._v(" "), _c("div", {
+    staticClass: "popup-wrapper-modal invoiceModalGlobal d-none"
+  }, [_c("form", {
+    staticClass: "popup-box",
+    staticStyle: {
+      "max-width": "800px"
+    },
+    on: {
+      submit: function submit($event) {
+        $event.preventDefault();
+        return _vm.paymentGlobal.apply(null, arguments);
+      }
+    }
+  }, [_vm._m(5), _vm._v(" "), _c("div", {
+    staticClass: "row align-items-center"
+  }, [_c("div", {
+    staticClass: "col-sm-12"
+  }, [_c("div", {
+    staticClass: "input-wrapper form-group mb-3"
+  }, [_c("label", {
+    attrs: {
+      "for": "amount"
+    }
+  }, [_vm._v("Company")]), _vm._v(" "), _c("select", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.paymentParamGlobal.company_id,
+      expression: "paymentParamGlobal.company_id"
+    }],
+    staticClass: "form-control form-select",
+    attrs: {
+      name: "company_id"
+    },
+    on: {
+      change: function change($event) {
+        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
+          return o.selected;
+        }).map(function (o) {
+          var val = "_value" in o ? o._value : o.value;
+          return val;
+        });
+        _vm.$set(_vm.paymentParamGlobal, "company_id", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
+      }
+    }
+  }, [_c("option", {
+    attrs: {
+      value: ""
+    }
+  }, [_vm._v("Select Company")]), _vm._v(" "), _vm._l(_vm.allCompany, function (m) {
+    return _c("option", {
+      domProps: {
+        value: m.id
+      }
+    }, [_vm._v(_vm._s(m.name))]);
+  })], 2), _vm._v(" "), _c("small", {
+    staticClass: "invalid-feedback"
+  })])]), _vm._v(" "), _c("div", {
+    staticClass: "col-sm-12"
+  }, [_c("div", {
+    staticClass: "input-wrapper form-group mb-3"
+  }, [_c("label", {
+    attrs: {
+      "for": "amount"
+    }
+  }, [_vm._v("Amount")]), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.paymentParamGlobal.amount,
+      expression: "paymentParamGlobal.amount"
+    }],
+    staticClass: "w-100 form-control bg-white",
+    attrs: {
+      type: "text",
+      name: "amount",
+      id: "amount",
+      placeholder: "Amount here"
+    },
+    domProps: {
+      value: _vm.paymentParamGlobal.amount
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.paymentParamGlobal, "amount", $event.target.value);
+      }
+    }
+  }), _vm._v(" "), _c("small", {
+    staticClass: "invalid-feedback"
+  })])]), _vm._v(" "), _c("div", {
+    staticClass: "col-sm-12"
+  }, [_c("div", {
+    staticClass: "input-wrapper form-group mb-3"
+  }, [_c("label", {
+    attrs: {
+      "for": "description"
+    }
+  }, [_vm._v("Payment Method")]), _vm._v(" "), _c("select", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.paymentParamGlobal.payment_id,
+      expression: "paymentParamGlobal.payment_id"
+    }],
+    staticClass: "form-control form-select",
+    attrs: {
+      name: "payment_id"
+    },
+    on: {
+      change: function change($event) {
+        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
+          return o.selected;
+        }).map(function (o) {
+          var val = "_value" in o ? o._value : o.value;
+          return val;
+        });
+        _vm.$set(_vm.paymentParamGlobal, "payment_id", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
+      }
+    }
+  }, [_c("option", {
+    attrs: {
+      value: ""
+    }
+  }, [_vm._v("Select Method")]), _vm._v(" "), _vm._l(_vm.allAmountCategory, function (m) {
+    return _c("option", {
+      domProps: {
+        value: m.id
+      }
+    }, [_vm._v(_vm._s(m.name))]);
+  })], 2), _vm._v(" "), _c("small", {
+    staticClass: "invalid-feedback"
+  })])])]), _vm._v(" "), !_vm.Loading ? _c("button", {
+    staticClass: "btn btn-primary",
+    attrs: {
+      type: "submit"
+    }
+  }, [_vm._v("Submit")]) : _vm._e(), _vm._v(" "), _vm.Loading ? _c("button", {
+    staticClass: "btn btn-primary",
+    attrs: {
+      type: "button",
+      disabled: ""
+    }
   }, [_vm._v("Submitting...")]) : _vm._e()])])]);
 };
 var staticRenderFns = [function () {
@@ -23209,6 +23403,17 @@ var staticRenderFns = [function () {
       colspan: "10"
     }
   }, [_vm._v("Loading....")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("button", {
+    staticClass: "btn closeBtn",
+    attrs: {
+      type: "button"
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-times"
+  })]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
@@ -27323,11 +27528,7 @@ var render = function render() {
     }, [_vm._v(_vm._s(p.price))]), _vm._v(" "), _c("td", {
       staticClass: "price"
     }, [_vm._v(_vm._s(p.subtotal))])]);
-  }), _vm._v(" "), _vm.singleSaleData.driver_tip > 0 ? _c("tr", [_c("td", {
-    attrs: {
-      colspan: "3"
-    }
-  }, [_vm._v("Driver Tip")])]) : _vm._e(), _vm._v(" "), _c("tr", [_c("th", {
+  }), _vm._v(" "), _c("tr", [_c("th", {
     staticClass: "total text",
     attrs: {
       colspan: "3"
@@ -91736,6 +91937,7 @@ var ApiRoutes = {
   //Invoice
   invoiceGenerate: ApiVersion + '/invoice/generate',
   invoicePayment: ApiVersion + '/invoice/payment',
+  invoiceGlobalPayment: ApiVersion + '/invoice/global/payment',
   invoiceEdit: ApiVersion + '/invoice/update',
   invoiceSingle: ApiVersion + '/invoice/single',
   invoiceDelete: ApiVersion + '/invoice/delete',
@@ -92078,6 +92280,11 @@ vue__WEBPACK_IMPORTED_MODULE_1___default.a.mixin({
         name: 'December'
       }];
     }
+  },
+  mounted: function mounted() {
+    $('.closeBtn').click(function () {
+      $('.popup-wrapper-modal').addClass('d-none');
+    });
   }
 });
 var app = new vue__WEBPACK_IMPORTED_MODULE_1___default.a({
@@ -92099,7 +92306,7 @@ var app = new vue__WEBPACK_IMPORTED_MODULE_1___default.a({
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! D:\xampp7.4\htdocs\fuelmatix\resources\js\app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! D:\xampp\htdocs\projects\fuelmatix\resources\js\app.js */"./resources/js/app.js");
 
 
 /***/ })

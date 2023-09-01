@@ -227,9 +227,6 @@
                     <td class="price">{{ p.price }}</td>
                     <td class="price">{{ p.subtotal }}</td>
                 </tr>
-                <tr v-if="singleSaleData.driver_tip > 0">
-                    <td colspan="3">Driver Tip</td>
-                </tr>
                 <tr>
                     <th colspan="3" class="total text">Total</th>
                     <th class="total price">{{singleSaleData.total_amount}}</th>
