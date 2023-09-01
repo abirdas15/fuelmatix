@@ -263,7 +263,7 @@ class InvoiceController extends Controller
         $validator = Validator::make($requestData, [
             'amount' => 'required',
             'company_id' => 'required',
-            'payment_category_id' => 'required'
+            'payment_id' => 'required'
         ]);
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
@@ -272,7 +272,7 @@ class InvoiceController extends Controller
         if (!$companyCategory instanceof Category) {
             return response()->json(['status' => 500, 'message' => 'Cannot find [company].']);
         }
-        $paymentCategory = Category::where('id', $requestData['payment_category_id'])->first();
+        $paymentCategory = Category::where('id', $requestData['payment_id'])->first();
         if (!$paymentCategory instanceof Category) {
             return response()->json(['status' => 500, 'message' => 'Cannot find [payment].']);
         }
@@ -300,7 +300,7 @@ class InvoiceController extends Controller
             }
         }
         if ($totalPaidAmount > 0) {
-            $transaction['linked_id'] = $requestData['payment_category_id'];
+            $transaction['linked_id'] = $requestData['payment_id'];
             $transaction['transaction'] = [
                 ['date' => date('Y-m-d'), 'account_id' => $requestData['company_id'], 'debit_amount' => $totalPaidAmount, 'credit_amount' => 0, 'module' => Module::INVOICE, 'module_id' => $invoice->id]
             ];
@@ -310,7 +310,7 @@ class InvoiceController extends Controller
             $advancePaymentData = [
                 'amount' => $amount,
                 'company_id' => $requestData['company_id'],
-                'payment_category_id' => $requestData['payment_category_id']
+                'payment_id' => $requestData['payment_id']
             ];
             InvoiceRepository::advancePayment($advancePaymentData);
         }

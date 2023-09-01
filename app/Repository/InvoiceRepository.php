@@ -34,7 +34,7 @@ class InvoiceRepository
                 return response()->json(['status' => 500, 'message' => 'Cannot save advance payable.']);
             }
         }
-        $transactionData['linked_id'] = $data['payment_category_id'];
+        $transactionData['linked_id'] = $data['payment_id'];
         $transactionData['transaction'] = [
             ['date' => date('Y-m-d'), 'account_id' => $advancePayable['id'], 'debit_amount' => $data['amount'], 'credit_amount' => 0]
         ];
