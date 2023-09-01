@@ -6941,7 +6941,6 @@ __webpack_require__.r(__webpack_exports__);
         payment_id: ''
       },
       paymentParamGlobal: {
-        id: '',
         amount: '',
         payment_id: ''
       },
@@ -6970,7 +6969,9 @@ __webpack_require__.r(__webpack_exports__);
     },
     paymentGlobal: function paymentGlobal() {
       var _this = this;
+      this.Loading = true;
       _Services_ApiService__WEBPACK_IMPORTED_MODULE_1__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_2__["default"].invoiceGlobalPayment, this.paymentParamGlobal, function (res) {
+        _this.Loading = false;
         if (parseInt(res.status) === 200) {
           _this.$toast.success(res.message);
           $('.invoiceModalGlobal').addClass('d-none');
@@ -6988,7 +6989,9 @@ __webpack_require__.r(__webpack_exports__);
     },
     payment: function payment() {
       var _this2 = this;
+      this.Loading = true;
       _Services_ApiService__WEBPACK_IMPORTED_MODULE_1__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_2__["default"].invoicePayment, this.paymentParam, function (res) {
+        _this2.Loading = false;
         if (parseInt(res.status) === 200) {
           _this2.$toast.success(res.message);
           $('.invoiceModal').addClass('d-none');
@@ -23070,13 +23073,13 @@ var render = function render() {
         href: "javascript:void(0);"
       }
     }, [f.status == "due" ? _c("span", {
-      staticClass: "badge bg-warning text-bg-warning"
+      staticClass: "badge bg-warning text-bg-warning text-capitalize"
     }, [_vm._v(_vm._s(f === null || f === void 0 ? void 0 : f.status))]) : _vm._e(), _vm._v(" "), f.status == "over due" ? _c("span", {
-      staticClass: "badge bg-danger text-bg-danger"
+      staticClass: "badge bg-danger text-bg-danger text-capitalize"
     }, [_vm._v(_vm._s(f === null || f === void 0 ? void 0 : f.status))]) : _vm._e(), _vm._v(" "), f.status == "partial paid" ? _c("span", {
-      staticClass: "badge bg-primary text-bg-primary"
+      staticClass: "badge bg-primary text-bg-primary text-capitalize"
     }, [_vm._v(_vm._s(f === null || f === void 0 ? void 0 : f.status))]) : _vm._e(), _vm._v(" "), f.status == "paid" ? _c("span", {
-      staticClass: "badge bg-success text-bg-success"
+      staticClass: "badge bg-success text-bg-success text-capitalize"
     }, [_vm._v(_vm._s(f === null || f === void 0 ? void 0 : f.status))]) : _vm._e()])]), _vm._v(" "), _c("td", [_c("div", {
       staticClass: "d-flex justify-content-end align-items-center"
     }, [f.status != "paid" ? _c("button", {
@@ -23096,14 +23099,14 @@ var render = function render() {
           }
         }
       }
-    }, [_vm._v("View")]), _vm._v(" "), _c("button", {
+    }, [_vm._v("View")]), _vm._v(" "), f.status != "paid" ? _c("button", {
       staticClass: "btn btn-sm btn-danger me-2",
       on: {
         click: function click($event) {
           return _vm.openModalDelete(f);
         }
       }
-    }, [_vm._v("Delete")])], 1)])]);
+    }, [_vm._v("Delete")]) : _vm._e()], 1)])]);
   }), 0) : _vm._e(), _vm._v(" "), _vm.listData.length == 0 && _vm.TableLoading == false ? _c("tbody", [_vm._m(2)]) : _vm._e(), _vm._v(" "), _vm.TableLoading == true ? _c("tbody", [_vm._m(3)]) : _vm._e()]), _vm._v(" "), _vm.paginateData != null ? _c("div", {
     staticClass: "dataTables_info",
     attrs: {

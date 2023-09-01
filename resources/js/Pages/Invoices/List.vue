@@ -61,17 +61,17 @@
                                                 <td><a href="javascript:void(0);">{{f?.paid_amount}}</a></td>
                                                 <td>
                                                     <a href="javascript:void(0);">
-                                                        <span class="badge bg-warning text-bg-warning" v-if="f.status == 'due'">{{f?.status}}</span>
-                                                        <span class="badge bg-danger text-bg-danger" v-if="f.status == 'over due'">{{f?.status}}</span>
-                                                        <span class="badge bg-primary text-bg-primary" v-if="f.status == 'partial paid'">{{f?.status}}</span>
-                                                        <span class="badge bg-success text-bg-success" v-if="f.status == 'paid'">{{f?.status}}</span>
+                                                        <span class="badge bg-warning text-bg-warning text-capitalize" v-if="f.status == 'due'">{{f?.status}}</span>
+                                                        <span class="badge bg-danger text-bg-danger text-capitalize" v-if="f.status == 'over due'">{{f?.status}}</span>
+                                                        <span class="badge bg-primary text-bg-primary text-capitalize" v-if="f.status == 'partial paid'">{{f?.status}}</span>
+                                                        <span class="badge bg-success text-bg-success text-capitalize" v-if="f.status == 'paid'">{{f?.status}}</span>
                                                     </a>
                                                 </td>
                                                 <td>
                                                     <div class="d-flex justify-content-end align-items-center">
                                                         <button class="btn btn-sm btn-primary me-2" v-if="f.status != 'paid'" @click="paymentModal(f)">Payment</button>
                                                         <router-link :to="{name: 'InvoicesView', params: { id: f.id }}" class="btn btn-sm btn-info me-2">View</router-link>
-                                                        <button class="btn btn-sm btn-danger me-2" @click="openModalDelete(f)">Delete</button>
+                                                        <button class="btn btn-sm btn-danger me-2" v-if="f.status != 'paid'" @click="openModalDelete(f)">Delete</button>
                                                     </div>
                                                 </td>
                                             </tr>
@@ -198,7 +198,6 @@ export default {
                 payment_id: ''
             },
             paymentParamGlobal: {
-                id: '',
                 amount: '',
                 payment_id: ''
             },
@@ -227,7 +226,9 @@ export default {
 
         },
         paymentGlobal: function () {
+            this.Loading = true
             ApiService.POST(ApiRoutes.invoiceGlobalPayment, this.paymentParamGlobal,res => {
+                this.Loading = false
                 if (parseInt(res.status) === 200) {
                     this.$toast.success(res.message);
                     $('.invoiceModalGlobal').addClass('d-none');
@@ -245,7 +246,9 @@ export default {
 
         },
         payment: function () {
+            this.Loading = true
             ApiService.POST(ApiRoutes.invoicePayment, this.paymentParam,res => {
+                this.Loading = false
                 if (parseInt(res.status) === 200) {
                     this.$toast.success(res.message);
                     $('.invoiceModal').addClass('d-none');
