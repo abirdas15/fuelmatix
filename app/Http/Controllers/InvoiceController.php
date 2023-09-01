@@ -308,6 +308,7 @@ class InvoiceController extends Controller
         }
         if ($amount > 0) {
             $advancePaymentData = [
+                'category' => $companyCategory['category'],
                 'amount' => $amount,
                 'company_id' => $requestData['company_id'],
                 'payment_id' => $requestData['payment_id']
