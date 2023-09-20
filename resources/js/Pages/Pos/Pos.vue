@@ -26,6 +26,12 @@
                                     </div>
                                 </div>
                                 <div class="col-sm-6">
+                                    <template v-if="payment_category_id">
+                                        <div class="form-group">
+                                            <input type="text" name="voucher_number" class="form-control" placeholder="Voucher No" v-model="voucher_number">
+                                            <span class="invalid-feedback d-block"></span>
+                                        </div>
+                                    </template>
                                 </div>
                             </div>
                             <div class="default-cart">
@@ -86,6 +92,29 @@
                                             <td class="text-end">
                                                 <i class="fa-regular text-danger fa-trash-can cursor-pointer"
                                                    @click="removeDriverTip()"></i>
+                                            </td>
+                                        </tr>
+                                        <tr v-if="enableDriverSale">
+                                            <td>Driver Sale</td>
+                                            <td>
+                                                <div class="d-flex align-items-center justify-content-between">
+                                                    <div class="btn-cart-plus cursor-pointer"
+                                                         @click="updateDriveSaleProduct('minus')">-
+                                                    </div>
+                                                    <input class="form-control control-sm" step='0.01' type="number"
+                                                           v-model="driver_sale.quantity">
+                                                    <div class="btn-cart-plus cursor-pointer"
+                                                         @click="updateDriveSaleProduct('plus')">+
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="text-end" style="width: 130px;">
+                                                ৳ {{ sale[0].driver_selling_price }}
+                                            </td>
+                                            <td class="text-end"> ৳ {{ parseFloat(driver_sale.price).toFixed(2) }}</td>
+                                            <td class="text-end">
+                                                <i class="fa-regular text-danger fa-trash-can cursor-pointer"
+                                                   @click="removeDriverSale()"></i>
                                             </td>
                                         </tr>
                                         <tr>
@@ -163,6 +192,19 @@
                                         </div>
                                         <div class="detail">
                                             <div class="name">Driver Tip</div>
+                                            <div class="d-flex align-items-center justify-content-between">
+                                                <div class="desc"></div>
+                                                <div></div>
+                                            </div>
+                                            <p class="mt-1 mb-0"></p>
+                                        </div>
+                                    </div>
+                                    <div class="each-product" @click="addDriverSale()" v-if="payment_category_id != null">
+                                        <div class="img">
+                                            <img :src="'https://via.placeholder.com/100x70?text=Driver Sale'" alt="">
+                                        </div>
+                                        <div class="detail">
+                                            <div class="name">Driver Sale</div>
                                             <div class="d-flex align-items-center justify-content-between">
                                                 <div class="desc"></div>
                                                 <div></div>
@@ -277,6 +319,7 @@ export default {
             printD: null,
             value: null,
             errorText: '',
+            voucher_number: '',
             cssText: `
                  @page {
                     size: 2.8in 11in;
@@ -402,9 +445,15 @@ export default {
             posMachine: [],
             payment_method: '',
             driver_tip: '',
+            driver_sale: {
+                quantity: '',
+                price: 0,
+                buying_price: 0,
+            },
             pos_machine_id: '',
             payment_category_id: null,
             enableDriverTip: false,
+            enableDriverSale: false,
         }
     },
     computed: {
@@ -416,16 +465,33 @@ export default {
         payment_category_id: function () {
             if (this.payment_category_id == null) {
                 this.enableDriverTip = false
+                this.enableDriverSale = false;
+            }
+        },
+        'driver_sale.quantity': function() {
+            if (this.driver_sale.quantity) {
+                this.driver_sale.price = this.sale[0].driver_selling_price * this.driver_sale.quantity;
+                this.driver_sale.buying_price = this.sale[0].buying_price * this.driver_sale.quantity;
             }
         }
     },
     methods: {
         openCardModal: function () {
-            console.log('asdf')
             $(".card-modal").removeClass('d-none');
         },
         closeModal: function () {
             $(".popup-wrapper-modal").addClass('d-none');
+        },
+        removeDriverSale: function() {
+            this.enableDriverSale = false;
+            this.driver_sale = {
+                quantity: '',
+                price: 0,
+                buying_price: 0
+            };
+        },
+        addDriverSale: function() {
+            this.enableDriverSale = true;
         },
         addDriverTip: function () {
             this.enableDriverTip = true
@@ -460,6 +526,8 @@ export default {
             if (type == 'company') {
                 param.driver_tip = this.driver_tip
                 param.payment_category_id = this.payment_category_id
+                param.voucher_number = this.voucher_number;
+                param.driver_sale = this.driver_sale;
             }
             if (type == 'card') {
                 param.pos_machine_id = this.pos_machine_id
@@ -477,8 +545,10 @@ export default {
                     this.saleId = res.data
                     this.sale = [];
                     this.enableDriverTip = false
+                    this.enableDriverSale = false
                     this.payment_method = ''
                     this.payment_category_id = null
+                    this.voucher_number = '';
                     this.singleOrder()
                     this.closeModal()
                 } else {
@@ -523,12 +593,25 @@ export default {
                 total += parseFloat(v.subtotal ? v.subtotal : 0)
             })
             if (this.enableDriverTip) {
-                total += parseInt(this.driver_tip ? this.driver_tip : 0)
+                total += parseFloat(this.driver_tip ? this.driver_tip : 0)
+            }
+            if (this.enableDriverSale) {
+                total += parseFloat(this.driver_sale.price ? this.driver_sale.price : 0)
             }
             if (isNaN(total)) {
                 return total
             }
             return total
+        },
+        updateDriveSaleProduct: function (type) {
+            if (type == 'minus') {
+                if (this.driver_sale.quantity > 1) {
+                    this.driver_sale.quantity--;
+                }
+            }
+            if (type == 'plus') {
+                this.driver_sale.quantity++;
+            }
         },
         updateProduct: function (type, i) {
             if (type == 'minus') {
@@ -558,6 +641,8 @@ export default {
                 product_id: p.id,
                 quantity: parseFloat(1).toFixed(2),
                 price: parseFloat(p.selling_price).toFixed(2),
+                buying_price: parseFloat(p.buying_price).toFixed(2),
+                driver_selling_price: parseFloat(p.driver_selling_price).toFixed(2),
                 subtotal: parseFloat(p.selling_price).toFixed(2),
             }
             let isExist = this.sale.map(v => v.product_id).indexOf(product.product_id);

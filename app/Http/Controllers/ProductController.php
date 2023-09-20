@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Common\AccountCategory;
 use App\Common\Module;
+use App\Helpers\SessionUser;
 use App\Models\Category;
 use App\Models\Dispenser;
 use App\Models\NozzleReading;
@@ -21,7 +22,11 @@ use Illuminate\Support\Facades\Validator;
 
 class ProductController extends Controller
 {
-    public function save(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function save(Request $request): JsonResponse
     {
         $inputData = $request->all();
         $validator = Validator::make($inputData, [
@@ -38,6 +43,7 @@ class ProductController extends Controller
         $product->selling_price = $inputData['selling_price'];
         $product->type_id = $inputData['type_id'];
         $product->buying_price = $inputData['buying_price'] ?? 0;
+        $product->driver_selling_price = $inputData['driver_selling_price'] ?? 0;
         $product->unit = $inputData['unit'];
         $product->opening_stock = $inputData['opening_stock'] ?? null;
         $product->client_company_id = $inputData['session_user']['client_company_id'];
@@ -126,7 +132,11 @@ class ProductController extends Controller
         }
         return response()->json(['status' => 200, 'data' => $result]);
     }
-    public function single(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function single(Request $request): JsonResponse
     {
         $inputData = $request->all();
         $validator = Validator::make($inputData, [
@@ -138,7 +148,11 @@ class ProductController extends Controller
         $result = Product::find($inputData['id']);
         return response()->json(['status' => 200, 'data' => $result]);
     }
-    public function update(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function update(Request $request): JsonResponse
     {
         $inputData = $request->all();
         $validator = Validator::make($inputData, [
@@ -152,13 +166,14 @@ class ProductController extends Controller
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
         $product = Product::find($inputData['id']);
-        if ($product == null) {
+        if (!$product instanceof Product) {
             return response()->json(['status' => 500, 'error' => 'Cannot find product.']);
         }
         $product->name = $inputData['name'];
         $product->selling_price = $inputData['selling_price'];
         $product->type_id = $inputData['type_id'];
         $product->buying_price = $inputData['buying_price'] ?? 0;
+        $product->driver_selling_price = $inputData['driver_selling_price'] ?? 0;
         $product->unit = $inputData['unit'];
         $product->opening_stock = $inputData['opening_stock'] ?? null;
         if ($product->save()) {
@@ -219,7 +234,11 @@ class ProductController extends Controller
         }
         return response()->json(['status' => 500, 'error' => 'Cannot updated product.']);
     }
-    public function delete(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function delete(Request $request): JsonResponse
     {
         $inputData = $request->all();
         $validator = Validator::make($inputData, [
@@ -235,7 +254,11 @@ class ProductController extends Controller
         Product::where('id', $inputData['id'])->delete();
         return response()->json(['status' => 200, 'message' => 'Successfully delete product.']);
     }
-    public function getDispenser(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function getDispenser(Request $request): JsonResponse
     {
         $inputData = $request->all();
         $validator = Validator::make($inputData, [
@@ -244,12 +267,13 @@ class ProductController extends Controller
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
-        $product = Product::where('id', $inputData['product_id'])->where('client_company_id', $inputData['session_user']['client_company_id'])->first();
-        if ($product == null) {
+        $sessionUser = SessionUser::getUser();
+        $product = Product::where('id', $inputData['product_id'])->where('client_company_id', $sessionUser['client_company_id'])->first();
+        if (!$product instanceof Product) {
             return response()->json(['status' => 500, 'error' => 'Cannot find product.']);
         }
         $stock = Stock::select('*')
-            ->where('client_company_id', $inputData['session_user']['client_company_id'])
+            ->where('client_company_id', $sessionUser['client_company_id'])
             ->where('date', date('Y-m-d'))
             ->where('module', 'product')->where('module_id', $inputData['product_id'])
             ->orderBy('id', 'DESC')
@@ -257,7 +281,7 @@ class ProductController extends Controller
         $tank_refill = 0;
         $end_reading = 0;
         $start_reading = $product->opening_stock ?? 0;
-        if ($stock != null) {
+        if ($stock instanceof Stock) {
             if ($stock['in_stock'] > 0) {
                 $start_reading = $stock['opening_stock'];
             } else {
@@ -266,22 +290,23 @@ class ProductController extends Controller
             $tank_refill = $stock['in_stock'];
         } else {
             $previousStock = Stock::select('*')
-                ->where('client_company_id', $inputData['session_user']['client_company_id'])
+                ->where('client_company_id', $sessionUser['client_company_id'])
                 ->where('module', 'product')->where('module_id', $inputData['product_id'])
                 ->orderBy('id', 'DESC')
                 ->first();
-            if ($previousStock != null) {
+            if ($previousStock instanceof Stock) {
                 $start_reading = $previousStock->closing_stock;
             }
         }
-        $tank = Tank::where('product_id', $inputData['product_id'])->select('id')->where('client_company_id', $inputData['session_user']['client_company_id'])->first();
-        if ($tank != null) {
+        $tank = Tank::where('product_id', $inputData['product_id'])->select('id')->where('client_company_id', $sessionUser['client_company_id'])->first();
+        if ($tank instanceof Tank) {
             $tankReading = TankLog::select('tank_log.volume')
                 ->where('type', 'shift sell')
                 ->where('tank_id', $tank->id)
+                ->where('client_company_id', $sessionUser['client_company_id'])
                 ->orderBy('tank_log.id', 'DESC')
                 ->first();
-            if ($tankReading != null) {
+            if ($tankReading instanceof TankLog) {
                 $end_reading = $tankReading['volume'];
             }
         }
@@ -299,7 +324,7 @@ class ProductController extends Controller
         ];
         $dispensers = Dispenser::select('id', 'dispenser_name')
             ->where('product_id', $inputData['product_id'])
-            ->where('client_company_id', $inputData['session_user']['client_company_id'])
+            ->where('client_company_id', $sessionUser['client_company_id'])
             ->with(['nozzle' => function($q) {
                 $q->select('nozzles.id', 'nozzles.dispenser_id', 'nozzles.name');
             }])
@@ -307,7 +332,7 @@ class ProductController extends Controller
             ->toArray();
         foreach ($dispensers as &$dispenser) {
             foreach ($dispenser['nozzle'] as &$nozzle) {
-                $reading = NozzleReading::select('*')->where('client_company_id', $inputData['session_user']['client_company_id'])->where('nozzle_id', $nozzle['id'])->orderBy('id', 'DESC')->where('type', 'shift sell')->limit(2)->get()->toArray();
+                $reading = NozzleReading::select('*')->where('client_company_id', $sessionUser['client_company_id'])->where('nozzle_id', $nozzle['id'])->orderBy('id', 'DESC')->where('type', 'shift sell')->limit(2)->get()->toArray();
                 $nozzle['end_reading'] = isset($reading[0]) ? $reading[0]['reading'] : 0;
                 $nozzle['start_reading'] = isset($reading[1]) ? $reading[1]['reading'] : 0;
                 $nozzle['consumption'] =  $nozzle['end_reading']  - $nozzle['start_reading'];
@@ -315,7 +340,7 @@ class ProductController extends Controller
             }
         }
         $result['dispensers'] = $dispensers;
-        $shiftSale = ShiftSale::where('client_company_id', $inputData['session_user']['client_company_id'])
+        $shiftSale = ShiftSale::where('client_company_id', $sessionUser['client_company_id'])
             ->where('product_id', $inputData['product_id'])
             ->orderBy('id', 'DESC')
             ->first();
@@ -337,7 +362,11 @@ class ProductController extends Controller
         }
         return response()->json(['status' => 200, 'data' => $result]);
     }
-    public function getTank(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function getTank(Request $request): JsonResponse
     {
         $inputData = $request->all();
         $validator = Validator::make($inputData, [

@@ -44,6 +44,11 @@
                                         <div class="invalid-feedback"></div>
                                     </div>
                                     <div class="mb-3 form-group col-md-6">
+                                        <label class="form-label">Driver Selling Price: </label>
+                                        <input type="number" class="form-control" name="selling_price" v-model="param.driver_selling_price">
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                    <div class="mb-3 form-group col-md-6">
                                         <label class="form-label">Unit:</label>
                                         <select class="form-control wide" name="unit" v-model="param.unit">
                                             <option value="1">Liter</option>
@@ -88,6 +93,7 @@ export default {
                 buying_price: '',
                 unit: '',
                 opening_stock: '',
+                driver_selling_price: '',
             },
             loading: false,
             productType: [],

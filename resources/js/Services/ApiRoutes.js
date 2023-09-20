@@ -184,6 +184,10 @@ const ApiRoutes = {
     //System Company
     companyAdd: ApiVersion + '/company/save',
     companySingle: ApiVersion + '/company/single',
+
+    // Voucher
+    VoucherSave: ApiVersion + '/voucher/save',
+    VoucherList: ApiVersion + '/voucher/list',
 };
 
 export default ApiRoutes;

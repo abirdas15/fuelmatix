@@ -16,6 +16,7 @@ use App\Models\Sale;
 use App\Models\SaleData;
 use App\Models\Transaction;
 use App\Models\User;
+use App\Models\Voucher;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -35,6 +36,7 @@ class SaleController extends Controller
             'payment_method' => 'required',
             'products' => 'required|array',
             'payment_category_id' => 'required_unless:payment_method,cash',
+            'voucher_number' => 'required_if:payment_method,company|integer',
             'products.*.shift_sale_id' => 'required',
             'products.*.product_id' => 'required',
             'products.*.income_category_id' => 'required',
@@ -44,6 +46,7 @@ class SaleController extends Controller
             'products.*.price' => 'required',
             'products.*.subtotal' => 'required',
         ],[
+            'voucher_number.required_if' => 'The voucher number filed is required',
             'products.*.shift_sale_id.required' => 'Shift sale is not started. Please start shift sale first.',
             'products.*.product_id.required' => 'The product field is required.',
             'products.*.income_category_id.required' => 'Product is not a income category. Please update product first.',
@@ -58,6 +61,17 @@ class SaleController extends Controller
         $requestData = $request->all();
         if ($requestData['payment_method'] == PaymentMethod::CARD) {
             return response()->json(['status' => 500, 'errors' => ['payment_method' => ['The payment category field is required.']]]);
+        }
+        $voucher = null;
+        if ($requestData['payment_method'] == PaymentMethod::COMPANY) {
+            $voucher = Voucher::where('company_id', $requestData['payment_category_id'])
+                ->where('status', 'pending')
+                ->where('validity', '>=', date('Y-m-d'))
+                ->where('voucher_number', $requestData['voucher_number'])
+                ->first();
+            if (!$voucher instanceof Voucher) {
+                return response()->json(['status' => 500, 'errors' => ['voucher_number' => ['The voucher number is not valid.']]]);
+            }
         }
         $sessionUser = SessionUser::getUser();
         if (!$sessionUser instanceof User) {
@@ -77,7 +91,7 @@ class SaleController extends Controller
                 $payment_category_id = $category['id'];
             }
             $cash_in_hand_category_id = $category['id'];
-            if (!empty($requestData['driver_tip'])) {
+            if (!empty($requestData['driver_tip']) || !empty($requestData['driver_sale']['price'])) {
                 $driverTipsCategory = Category::where('client_company_id', $sessionUser['client_company_id'])->where('module', Module::DRIVER_TIPS)->where('module_id', $payment_category_id)->first();
                 if (!$driverTipsCategory instanceof Category) {
                     return response()->json(['status' => 500, 'message' => 'Driver tips category is not created. Please update credit company.']);
@@ -112,6 +126,7 @@ class SaleController extends Controller
                     $quantity = ($extraQuantity * $quantity) + $quantity;
                     $subtotal = $quantity * $product['price'];
                 }
+                $transactionData = [];
                 $transactionData['linked_id'] = $payment_category_id;
                 $buyingPrice = 0;
                 $productModel = Product::where('id', $product['product_id'])->first();
@@ -130,6 +145,8 @@ class SaleController extends Controller
                     ['date' => date('Y-m-d'), 'account_id' => $product['income_category_id'], 'debit_amount' => $subtotal, 'credit_amount' => 0, 'module' => Module::POS_SALE, 'module_id' => $sale->id],
                 ];
                 TransactionController::saveTransaction($transactionData);
+
+                $transactionData = [];
                 $transactionData['linked_id'] = $product['expense_category_id'];
                 $transactionData['transaction'] = [
                     ['date' => date('Y-m-d'), 'account_id' => $product['stock_category_id'], 'debit_amount' => $buyingPrice, 'credit_amount' => 0, 'module' => Module::POS_SALE, 'module_id' => $sale->id],
@@ -137,11 +154,31 @@ class SaleController extends Controller
                 TransactionController::saveTransaction($transactionData);
             }
             if (!empty($requestData['driver_tip']) && !empty($driverTipsCategory)) {
+                $transactionData = [];
                 $transactionData['linked_id'] = $cash_in_hand_category_id;
                 $transactionData['transaction'] = [
                     ['date' => date('Y-m-d'), 'account_id' => $driverTipsCategory['id'], 'debit_amount' => 0, 'credit_amount' => $requestData['driver_tip'], 'module' => Module::POS_SALE, 'module_id' => $sale->id],
                 ];
                 TransactionController::saveTransaction($transactionData);
+            }
+            if (!empty($requestData['driver_sale']['price']) && !empty($driverTipsCategory)) {
+                $transactionData = [];
+                $transactionData['linked_id'] = $cash_in_hand_category_id;
+                $transactionData['transaction'] = [
+                    ['date' => date('Y-m-d'), 'account_id' => $driverTipsCategory['id'], 'debit_amount' => 0, 'credit_amount' => $requestData['driver_sale']['price'], 'module' => Module::POS_SALE, 'module_id' => $sale->id],
+                ];
+                TransactionController::saveTransaction($transactionData);
+
+                $transactionData = [];
+                $transactionData['linked_id'] = $requestData['products'][0]['stock_category_id'];
+                $transactionData['transaction'] = [
+                    ['date' => date('Y-m-d'), 'account_id' => $requestData['products'][0]['expense_category_id'], 'debit_amount' => $requestData['driver_sale']['buying_price'], 'credit_amount' => 0, 'module' => Module::POS_SALE, 'module_id' => $sale->id],
+                ];
+                TransactionController::saveTransaction($transactionData);
+            }
+            if ($voucher instanceof Voucher) {
+                $voucher->status = 'done';
+                $voucher->save();
             }
             return response()->json(['status' => 200, 'message' => 'Successfully saved sale.', 'data' => $sale->id]);
         }

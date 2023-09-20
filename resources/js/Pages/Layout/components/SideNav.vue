@@ -77,6 +77,7 @@
                         <li><router-link :to="{name: 'posMachine'}">POS</router-link></li>
                         <li><router-link :to="{name: 'user'}">Users</router-link></li>
                         <li><router-link :to="{name: 'system'}">System setting</router-link></li>
+                        <li><router-link :to="{name: 'voucher'}">Voucher</router-link></li>
                     </ul>
                 </li>
                 <li><a class="has-arrow " href="javascript:void(0)" aria-expanded="false">

@@ -33,6 +33,7 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\BalanceTransferController;
 use App\Http\Controllers\CompanyController;
+use App\Http\Controllers\VoucherController;
 
 /*
 |--------------------------------------------------------------------------
@@ -259,6 +260,10 @@ Route::group(['middleware' => 'AuthReqCheck'], function() {
     Route::group(['prefix' => 'company'], function() {
         Route::post('save', [CompanyController::class, 'save']);
         Route::post('single', [CompanyController::class, 'single']);
+    });
+    Route::group(['prefix' => 'voucher'], function() {
+        Route::post('save', [VoucherController::class, 'save']);
+        Route::post('list', [VoucherController::class, 'list']);
     });
 });
 

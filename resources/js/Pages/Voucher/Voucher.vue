@@ -4,34 +4,17 @@
             <div class="row page-titles">
                 <ol class="breadcrumb align-items-center ">
                     <li class="breadcrumb-item active"><router-link :to="{name: 'Dashboard'}">Home</router-link></li>
-                    <li class="breadcrumb-item"><a href="javascript:void(0)">Product List</a></li>
-                    <li style="margin-left: auto;"><router-link :to="{name: 'ProductAdd'}"><i class="fa-solid fa-plus"></i> Add New Product</router-link></li>
+                    <li class="breadcrumb-item"><a href="javascript:void(0)">Voucher List</a></li>
+                    <li style="margin-left: auto;"><a href="javascript:void(0)" @click="openVoucherModal"><i class="fa-solid fa-plus"></i> Add Voucher</a></li>
                 </ol>
             </div>
             <div class="row">
                 <div class="col-12">
                     <div class="card">
                         <div class="card-header bg-secondary">
-                            <h4 class="card-title">Product List</h4>
+                            <h4 class="card-title">Voucher List</h4>
                         </div>
                         <div class="card-body">
-                            <div class="row align-items-end">
-                                <div class="col-xl-3 mb-3">
-                                    <div class="example">
-                                        <p class="mb-1">Product type </p>
-                                        <select class="me-sm-2 form-control wide" id="inlineFormCustomSelect" v-model="Param.type_id">
-                                            <option value="">Select Type</option>
-                                            <option v-for="t of productType" :value="t.id">{{t.name}}</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-xl-3 mb-3">
-                                    <button type="button" class="btn btn-rounded btn-white border" @click="list"><span
-                                        class="btn-icon-start text-info"><i class="fa fa-filter color-white"></i>
-											</span>Filter</button>
-
-                                </div>
-                            </div>
                             <div class="row mt-4">
                                 <div class="table-responsive">
                                     <div class="dataTables_wrapper no-footer">
@@ -54,28 +37,21 @@
                                         <table class="display  dataTable no-footer" style="min-width: 845px">
                                             <thead>
                                             <tr class="text-white" style="background-color: #4886EE;color:#ffffff">
-                                                <th class="text-white" @click="sortData('name')" :class="sortClass('name')">Product</th>
-                                                <th class="text-white" @click="sortData('product_type')" :class="sortClass('product_type')">Product Type</th>
-                                                <th class="text-white" @click="sortData('buying_price')" :class="sortClass('buying_price')">Buying Price</th>
-                                                <th class="text-white" @click="sortData('selling_price')" :class="sortClass('selling_price')">Selling Price</th>
-                                                <th class="text-white" @click="sortData('driver_selling_price')" :class="sortClass('driver_selling_price')">Driver Selling Price</th>
-                                                <th class="text-white" @click="sortData('unit')" :class="sortClass('unit')" >Unit</th>
+                                                <th class="text-white" @click="sortData('company_name')" :class="sortClass('company_name')">Company Name</th>
+                                                <th class="text-white" @click="sortData('voucher_number')" :class="sortClass('voucher_number')">Voucher Number</th>
+                                                <th class="text-white" @click="sortData('validity')" :class="sortClass('validity')">Validity</th>
+                                                <th class="text-white" @click="sortData('status')" :class="sortClass('status')">Status</th>
                                                 <th class="text-white" >Action</th>
                                             </tr>
                                             </thead>
                                             <tbody v-if="listData.length > 0 && TableLoading == false">
                                             <tr v-for="f in listData">
-                                                <td >{{f.name}}</td>
-                                                <td><a href="javascript:void(0);">{{f.product_type}}</a></td>
-                                                <td><a href="javascript:void(0);">{{f?.buying_price}}</a></td>
-                                                <td><a href="javascript:void(0);">{{f.selling_price}}</a></td>
-                                                <td><a href="javascript:void(0);">{{f.driver_selling_price}}</a></td>
-                                                <td><a href="javascript:void(0);">{{f?.unit}}</a></td>
+                                                <td >{{f.company_name}}</td>
+                                                <td >{{f.voucher_number}}</td>
+                                                <td >{{f.validity}}</td>
+                                                <td >{{f.status}}</td>
                                                 <td>
                                                     <div class="d-flex justify-content-end">
-                                                        <router-link :to="{name: 'ProductEdit', params: { id: f.id }}" class=" btn btn-primary shadow btn-xs sharp me-1">
-                                                            <i class="fas fa-pencil-alt"></i>
-                                                        </router-link>
                                                         <a  href="javascript:void(0)"  @click="openModalDelete(f)" class="btn btn-danger shadow btn-xs sharp">
                                                             <i class="fa fa-trash"></i>
                                                         </a>
@@ -109,16 +85,57 @@
                 </div>
             </div>
         </div>
+        <div class="popup-wrapper-modal voucherModal d-none">
+            <form @submit.prevent="saveVoucher" class="popup-box" style="max-width: 800px">
+                <button type="button" class=" btn  closeBtn"><i class="fas fa-times"></i></button>
+                <div class="row align-items-center">
+                    <div class="col-sm-12">
+                        <div class="input-wrapper form-group mb-3">
+                            <label for="company_id">Company</label>
+                            <select class="form-control form-select" v-model="voucherParam.company_id" name="company_id">
+                                <option value="">Select Company</option>
+                                <option v-for="m in allCompany" :value="m.id">{{m.name}}</option>
+                            </select>
+                            <small class="invalid-feedback"></small>
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <div class="input-wrapper form-group mb-3">
+                            <label for="from_number">From Number</label>
+                            <input type="number" class="w-100 form-control bg-white" name="from_number" id="from_number"
+                                   v-model="voucherParam.from_number" placeholder="From Number">
+                            <small class="invalid-feedback"></small>
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <div class="input-wrapper form-group mb-3">
+                            <label for="to_number">To Number</label>
+                            <input type="number" class="w-100 form-control bg-white" name="to_number" id="to_number"
+                                   v-model="voucherParam.to_number" placeholder="To Number">
+                            <small class="invalid-feedback"></small>
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <div class="input-wrapper form-group mb-3">
+                            <label for="validity">Validity</label>
+                            <input type="text" class="form-control date bg-white" name="date" v-model="voucherParam.validity">
+                            <small class="invalid-feedback"></small>
+                        </div>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary " v-if="!Loading">Submit</button>
+                <button type="button" class="btn btn-primary " disabled v-if="Loading">Submitting...</button>
+            </form>
+        </div>
     </div>
 </template>
 
 <script>
 import Swal from 'sweetalert2/dist/sweetalert2.js'
-import ApiService from "../../../Services/ApiService";
-import ApiRoutes from "../../../Services/ApiRoutes";
-import Pagination from "../../../Helpers/Pagination";
+import ApiService from "../../Services/ApiService";
+import ApiRoutes from "../../Services/ApiRoutes";
+import Pagination from "../../Helpers/Pagination.vue";
 export default {
-    name: "Agent",
     components: {
         Pagination,
     },
@@ -131,12 +148,17 @@ export default {
                 order_by: 'id',
                 order_mode: 'DESC',
                 page: 1,
-                type_id: '',
             },
             Loading: false,
             TableLoading: false,
-            productType: [],
             listData: [],
+            allCompany: [],
+            voucherParam: {
+                company_id: '',
+                from_number: '',
+                to_number: '',
+                validity: ''
+            }
         };
     },
     watch: {
@@ -146,7 +168,7 @@ export default {
     },
     created() {
         this.list();
-        this.getProductType();
+        this.getCompany();
     },
     computed: {
         Auth: function () {
@@ -154,10 +176,27 @@ export default {
         },
     },
     methods: {
-        getProductType: function () {
-            ApiService.POST(ApiRoutes.ProductType, {},res => {
+        saveVoucher: function() {
+            this.Loading = true;
+            ApiService.POST(ApiRoutes.VoucherSave, this.voucherParam, (res) => {
+                this.Loading = false;
                 if (parseInt(res.status) === 200) {
-                    this.productType = res.data
+                    this.$toast.success(res.message);
+                    $('.voucherModal').addClass('d-none');
+                    this.list();
+                } else {
+                    ApiService.ErrorHandler(res.errors);
+                }
+            });
+        },
+        openVoucherModal: function (f) {
+            $('.voucherModal').removeClass('d-none');
+        },
+        getCompany: function () {
+            this.categories = []
+            ApiService.POST(ApiRoutes.CreditCompanyList, {page:1, limit: 5000}, res => {
+                if (parseInt(res.status) === 200) {
+                    this.allCompany = res.data.data;
                 }
             });
         },
@@ -184,7 +223,7 @@ export default {
             }
             this.Param.page = page.page;
             this.TableLoading = true
-            ApiService.POST(ApiRoutes.ProductList, this.Param,res => {
+            ApiService.POST(ApiRoutes.VoucherList, this.Param,res => {
                 this.TableLoading = false
                 if (parseInt(res.status) === 200) {
                     this.paginateData = res.data;
@@ -195,7 +234,7 @@ export default {
             });
         },
         Delete: function (data) {
-            ApiService.POST(ApiRoutes.ProductDelete, {id: data.id },res => {
+            ApiService.POST(ApiRoutes.TankDelete, {id: data.id },res => {
                 if (parseInt(res.status) === 200) {
                     this.$toast.success(res.message);
                     this.list()
@@ -224,7 +263,17 @@ export default {
 
     },
     mounted() {
-        $('#dashboard_bar').text('Product List')
+        setTimeout(() => {
+            $('.date').flatpickr({
+                altInput: true,
+                altFormat: "d/m/Y",
+                dateFormat: "Y-m-d",
+                onChange: (dateStr, date) => {
+                    this.voucherParam.validity = date
+                }
+            })
+        }, 1000)
+        $('#dashboard_bar').text('Voucher')
     }
 }
 </script>
