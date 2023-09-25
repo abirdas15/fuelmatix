@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Common\AccountCategory;
 use App\Common\Module;
+use App\Helpers\SessionUser;
 use App\Models\Category;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -41,29 +42,47 @@ class CreditCompanyController extends Controller
         $category->client_company_id = $inputData['session_user']['client_company_id'];
         if ($category->save()) {
             $category->updateCategory();
-            $driverTips = Category::where('category', AccountCategory::DRIVER_TIPS)->where('client_company_id', $inputData['session_user']['client_company_id'])->first();
-            $data =  [
-                'category' => $inputData['name'],
-                'parent_category' => $driverTips['id'],
-                'type' => $driverTips['type'],
-                'module' => Module::DRIVER_TIPS,
-                'module_id' => $category->id,
-                'client_company_id' => $inputData['session_user']['client_company_id']
+            $driverSaleData = [
+                'name' => $request['name'],
+                'category_id' => $category['id']
             ];
-            $category = new Category($data);
-            $category->save();
-            $category->updateCategory();
+            self::saveCompanyDriverCategory($driverSaleData);
             return response()->json(['status' => 200, 'message' => 'Successfully saved credit company.']);
         }
         return response()->json(['status' => 500, 'errors' => 'Cannot saved credit company.']);
     }
-    public function list(Request $request)
+    /**
+     * @param array $data
+     * @return Category
+     */
+    public static function saveCompanyDriverCategory(array $data): Category
+    {
+        $sessionUser = SessionUser::getUser();
+        $driverTips = Category::where('category', AccountCategory::DRIVER_TIPS)->where('client_company_id', $sessionUser['client_company_id'])->first();
+        $data =  [
+            'category' => $data['name'],
+            'parent_category' => $driverTips['id'],
+            'type' => $driverTips['type'],
+            'module' => Module::DRIVER_TIPS,
+            'module_id' => $data['category_id'],
+            'client_company_id' => $sessionUser['client_company_id']
+        ];
+        $category = new Category($data);
+        $category->save();
+        $category->updateCategory();
+        return $category;
+    }
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function list(Request $request): JsonResponse
     {
         $inputData = $request->all();
-        $limit = isset($inputData['limit']) ? $inputData['limit'] : 10;
-        $keyword = isset($inputData['keyword']) ? $inputData['keyword'] : '';
-        $order_by = isset($inputData['order_by']) ? $inputData['order_by'] : 'id';
-        $order_mode = isset($inputData['order_mode']) ? $inputData['order_mode'] : 'DESC';
+        $limit = $inputData['limit'] ?? 10;
+        $keyword = $inputData['keyword'] ?? '';
+        $order_by = $inputData['order_by'] ?? 'id';
+        $order_mode = $inputData['order_mode'] ?? 'DESC';
         $accountReceivable = Category::select('id')->where('client_company_id', $inputData['session_user']['client_company_id'])->where('category', AccountCategory::ACCOUNT_RECEIVABLE)->first();
         $result = Category::select('id', 'category as name', 'credit_limit', 'others')
             ->where('client_company_id', $inputData['session_user']['client_company_id'])

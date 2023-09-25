@@ -15,4 +15,8 @@ class Module
     const DRIVER_TIPS = 'driver tips';
 
     const ADVANCE_PAYABLE = 'advance payable';
+
+    const DRIVER = 'driver';
+    const ADVANCE_PAYMENT = 'advance payment';
+
 }

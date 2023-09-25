@@ -20,7 +20,7 @@
                                                 <span class="input-group-text">
                                                     <i class="fa-regular fa-user"></i>
                                                 </span>
-                                            <v-select class="form-control" :options="creditCompany" label="name" v-model="payment_category_id"
+                                            <v-select class="form-control form-control-sm" :options="creditCompany" placeholder="Choose Company" label="name" v-model="payment_category_id"
                                                       :reduce="(option) => option.id"></v-select>
                                         </div>
                                     </div>
@@ -28,10 +28,22 @@
                                 <div class="col-sm-6">
                                     <template v-if="payment_category_id">
                                         <div class="form-group">
-                                            <input type="text" name="voucher_number" class="form-control" placeholder="Voucher No" v-model="voucher_number">
+                                            <input type="text" name="voucher_number" class="form-control form-control-sm" placeholder="Voucher No" v-model="voucher_number">
                                             <span class="invalid-feedback d-block"></span>
                                         </div>
                                     </template>
+                                </div>
+                                <div class="col-sm-6" v-if="payment_category_id">
+                                    <div class="user-search form-group">
+                                        <div class="input-group mb-3">
+                                                <span class="input-group-text">
+                                                    <i class="fa-regular fa-user"></i>
+                                                </span>
+                                            <v-select class="form-control form-control-sm" name="driver_sale.driver_id" placeholder="Choose Driver" :options="drivers" label="driver_name" v-model="driver_sale.driver_id"
+                                                      :reduce="(option) => option.id"></v-select>
+                                            <span class="invalid-feedback d-block"></span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             <div class="default-cart">
@@ -47,76 +59,103 @@
                                         </tr>
                                         </thead>
                                         <tbody v-if="sale.length > 0">
-                                        <tr v-for="(s, i) in sale" class="position-relative">
-                                            <td>
-                                                <div class="fw-bold">{{ s.name }}</div>
-                                                <div>
-                                                    <span class="badge badge-primary">{{ s.type }}</span>
+                                            <tr v-for="(s, i) in sale" class="position-relative">
+                                                <td>
+                                                    <div class="fw-bold">{{ s.name }}</div>
+                                                    <div>
+                                                        <span class="badge badge-primary">{{ s.type }}</span>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="d-flex align-items-center justify-content-between">
+                                                        <div class="btn-cart-plus cursor-pointer"
+                                                             @click="updateProduct('minus', i)">-
+                                                        </div>
+                                                        <input class="form-control control-sm" step='0.01' type="number"
+                                                               v-model="s.quantity" @input="updateSubtotal(i)">
+                                                        <div class="btn-cart-plus cursor-pointer"
+                                                             @click="updateProduct('plus', i)">+
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td class="text-end" style="width: 130px;">
+                                                    ৳ {{ s.price }}
+                                                </td>
+                                                <td class="text-end">
+                                                    <input class="form-control w-100 control-sm text-end" step="any"
+                                                           type="number" v-model="s.subtotal" @input="updateQuantity(i)">
+                                                </td>
+                                                <td class="text-end">
+                                                    <i class="fa-regular text-danger fa-trash-can cursor-pointer"
+                                                       @click="removeProduct(i)"></i>
+                                                </td>
+                                                <div class="form-group error-text">
+                                                    <input type="hidden" :name="'products.'+i+'.expense_category_id'">
+                                                    <input type="hidden" :name="'products.'+i+'.income_category_id'">
+                                                    <input type="hidden" :name="'products.'+i+'.shift_sale_id'">
+                                                    <input type="hidden" :name="'products.'+i+'.stock_category_id'">
+                                                    <span class="invalid-feedback d-block"></span>
                                                 </div>
-                                            </td>
-                                            <td>
-                                                <div class="d-flex align-items-center justify-content-between">
-                                                    <div class="btn-cart-plus cursor-pointer"
-                                                         @click="updateProduct('minus', i)">-
+                                            </tr>
+                                            <tr v-if="enableDriverTip">
+                                                <td colspan="3">Driver Tip</td>
+                                                <td > <input class="form-control w-100 control-sm text-end" step="any"
+                                                             type="number" v-model="driver_tip" ></td>
+                                                <td class="text-end">
+                                                    <i class="fa-regular text-danger fa-trash-can cursor-pointer"
+                                                       @click="removeDriverTip()"></i>
+                                                </td>
+                                            </tr>
+                                            <tr v-if="enableDriverSale">
+                                                <td>Driver Sale</td>
+                                                <td>
+                                                    <div class="d-flex align-items-center justify-content-between">
+                                                        <div class="btn-cart-plus cursor-pointer"
+                                                             @click="updateDriveSaleProduct('minus')">-
+                                                        </div>
+                                                        <input class="form-control control-sm" step='0.01' type="number"
+                                                               v-model="driver_sale.quantity">
+                                                        <div class="btn-cart-plus cursor-pointer"
+                                                             @click="updateDriveSaleProduct('plus')">+
+                                                        </div>
                                                     </div>
-                                                    <input class="form-control control-sm" step='0.01' type="number"
-                                                           v-model="s.quantity" @input="updateSubtotal(i)">
-                                                    <div class="btn-cart-plus cursor-pointer"
-                                                         @click="updateProduct('plus', i)">+
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td class="text-end" style="width: 130px;">
-                                                ৳ {{ s.price }}
-                                            </td>
-                                            <td class="text-end">
-                                                <input class="form-control w-100 control-sm text-end" step="any"
-                                                       type="number" v-model="s.subtotal" @input="updateQuantity(i)">
-                                            </td>
-                                            <td class="text-end">
-                                                <i class="fa-regular text-danger fa-trash-can cursor-pointer"
-                                                   @click="removeProduct(i)"></i>
-                                            </td>
-                                            <div class="form-group error-text">
-                                                <input type="hidden" :name="'products.'+i+'.expense_category_id'">
-                                                <input type="hidden" :name="'products.'+i+'.income_category_id'">
-                                                <input type="hidden" :name="'products.'+i+'.shift_sale_id'">
-                                                <input type="hidden" :name="'products.'+i+'.stock_category_id'">
-                                                <span class="invalid-feedback d-block"></span>
-                                            </div>
-                                        </tr>
-                                        <tr v-if="enableDriverTip">
-                                            <td colspan="3">Driver Tip</td>
-                                            <td > <input class="form-control w-100 control-sm text-end" step="any"
-                                                         type="number" v-model="driver_tip" ></td>
-                                            <td class="text-end">
-                                                <i class="fa-regular text-danger fa-trash-can cursor-pointer"
-                                                   @click="removeDriverTip()"></i>
-                                            </td>
-                                        </tr>
-                                        <tr v-if="enableDriverSale">
-                                            <td>Driver Sale</td>
-                                            <td>
-                                                <div class="d-flex align-items-center justify-content-between">
-                                                    <div class="btn-cart-plus cursor-pointer"
-                                                         @click="updateDriveSaleProduct('minus')">-
-                                                    </div>
-                                                    <input class="form-control control-sm" step='0.01' type="number"
-                                                           v-model="driver_sale.quantity">
-                                                    <div class="btn-cart-plus cursor-pointer"
-                                                         @click="updateDriveSaleProduct('plus')">+
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td class="text-end" style="width: 130px;">
-                                                ৳ {{ sale[0].driver_selling_price }}
-                                            </td>
-                                            <td class="text-end"> ৳ {{ parseFloat(driver_sale.price).toFixed(2) }}</td>
-                                            <td class="text-end">
-                                                <i class="fa-regular text-danger fa-trash-can cursor-pointer"
-                                                   @click="removeDriverSale()"></i>
-                                            </td>
-                                        </tr>
+                                                </td>
+                                                <td class="text-end" style="width: 130px;">
+                                                    ৳ {{ sale[0].driver_selling_price }}
+                                                </td>
+                                                <td class="text-end"> ৳ {{ parseFloat(driver_sale.price).toFixed(2) }}</td>
+                                                <td class="text-end">
+                                                    <i class="fa-regular text-danger fa-trash-can cursor-pointer"
+                                                       @click="removeDriverSale()"></i>
+                                                </td>
+                                            </tr>
+                                            <tr v-if="enableAdvancePay">
+                                                <td colspan="3">Advance Pay</td>
+                                                <td> <input class="form-control w-100 control-sm text-end" step="any"
+                                                             type="number" v-model="advance_amount" ></td>
+                                                <td class="text-end">
+                                                    <i class="fa-regular text-danger fa-trash-can cursor-pointer"
+                                                       @click="removeAdvancePay"></i>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td class="text-end">Total: ৳ <strong>{{ getProductTotalPrice() }}</strong>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                        <tbody v-if="enableAdvancePay">
+                                            <tr>
+                                                <td colspan="3">Advance Pay</td>
+                                                <td style="width: 30%"> <input class="form-control w-100 control-sm text-end" step="any"
+                                                            type="number" v-model="advance_amount" ></td>
+                                                <td class="text-end">
+                                                    <i class="fa-regular text-danger fa-trash-can cursor-pointer"
+                                                       @click="removeAdvancePay"></i>
+                                                </td>
+                                            </tr>
                                         <tr>
                                             <td></td>
                                             <td></td>
@@ -125,10 +164,10 @@
                                             </td>
                                         </tr>
                                         </tbody>
-                                        <tbody v-if="sale.length === 0">
-                                        <tr class="text-center">
-                                            <td colspan="20">Please add product</td>
-                                        </tr>
+                                        <tbody v-if="sale.length === 0 && !enableAdvancePay">
+                                            <tr class="text-center">
+                                                <td colspan="20">Please add product</td>
+                                            </tr>
                                         </tbody>
                                     </table>
                                     <div class="alert alert-danger" v-if="errorText">{{errorText}}</div>
@@ -205,6 +244,19 @@
                                         </div>
                                         <div class="detail">
                                             <div class="name">Driver Sale</div>
+                                            <div class="d-flex align-items-center justify-content-between">
+                                                <div class="desc"></div>
+                                                <div></div>
+                                            </div>
+                                            <p class="mt-1 mb-0"></p>
+                                        </div>
+                                    </div>
+                                    <div class="each-product" @click="addAdvancePay" v-if="payment_category_id != null">
+                                        <div class="img">
+                                            <img :src="'https://via.placeholder.com/100x70?text=Advance Pay'" alt="">
+                                        </div>
+                                        <div class="detail">
+                                            <div class="name">Advance Pay</div>
                                             <div class="d-flex align-items-center justify-content-between">
                                                 <div class="desc"></div>
                                                 <div></div>
@@ -449,11 +501,15 @@ export default {
                 quantity: '',
                 price: 0,
                 buying_price: 0,
+                driver_id: '',
             },
             pos_machine_id: '',
             payment_category_id: null,
             enableDriverTip: false,
             enableDriverSale: false,
+            enableAdvancePay: false,
+            drivers: [],
+            advance_amount: ''
         }
     },
     computed: {
@@ -463,6 +519,7 @@ export default {
     },
     watch: {
         payment_category_id: function () {
+            this.getDriver();
             if (this.payment_category_id == null) {
                 this.enableDriverTip = false
                 this.enableDriverSale = false;
@@ -476,6 +533,14 @@ export default {
         }
     },
     methods: {
+        removeAdvancePay: function() {
+            this.enableAdvancePay = false;
+            this.advance_amount = '';
+        },
+        addAdvancePay: function() {
+            this.sale = [];
+            this.enableAdvancePay = true;
+        },
         openCardModal: function () {
             $(".card-modal").removeClass('d-none');
         },
@@ -508,7 +573,7 @@ export default {
         },
         order: function (type) {
             ApiService.ClearErrorHandler();
-            if (this.sale.length == 0) {
+            if (this.sale.length == 0 && !this.enableAdvancePay) {
                 return;
             }
             if (type == 'cash') {
@@ -528,6 +593,7 @@ export default {
                 param.payment_category_id = this.payment_category_id
                 param.voucher_number = this.voucher_number;
                 param.driver_sale = this.driver_sale;
+                param.advance_amount = this.advance_amount;
             }
             if (type == 'card') {
                 param.pos_machine_id = this.pos_machine_id
@@ -576,6 +642,13 @@ export default {
                 }
             });
         },
+        getDriver: function () {
+            ApiService.POST(ApiRoutes.DriverList, {limit: 5000, page: 1, company_id: this.payment_category_id}, res => {
+                if (parseInt(res.status) === 200) {
+                    this.drivers = res.data.data
+                }
+            });
+        },
         getCompany: function () {
             ApiService.POST(ApiRoutes.CreditCompanyList, {limit: 5000, page: 1}, res => {
                 if (parseInt(res.status) === 200) {
@@ -597,6 +670,9 @@ export default {
             }
             if (this.enableDriverSale) {
                 total += parseFloat(this.driver_sale.price ? this.driver_sale.price : 0)
+            }
+            if (this.enableAdvancePay) {
+                total += parseFloat(this.advance_amount ?  this.advance_amount : 0)
             }
             if (isNaN(total)) {
                 return total

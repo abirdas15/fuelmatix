@@ -8,15 +8,13 @@ use App\Common\PaymentMethod;
 use App\Helpers\Helpers;
 use App\Helpers\SessionUser;
 use App\Models\Category;
-use App\Models\Invoice;
-use App\Models\InvoiceItem;
 use App\Models\Product;
-use App\Models\ProductPrice;
 use App\Models\Sale;
 use App\Models\SaleData;
 use App\Models\Transaction;
 use App\Models\User;
 use App\Models\Voucher;
+use App\Repository\SaleRepository;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -32,35 +30,22 @@ class SaleController extends Controller
     public function save(Request $request): JsonResponse
     {
         $inputData = $request->all();
-        $validator = Validator::make($inputData, [
-            'payment_method' => 'required',
-            'products' => 'required|array',
-            'payment_category_id' => 'required_unless:payment_method,cash',
-            'voucher_number' => 'required_if:payment_method,company|integer',
-            'products.*.shift_sale_id' => 'required',
-            'products.*.product_id' => 'required',
-            'products.*.income_category_id' => 'required',
-            'products.*.stock_category_id' => 'required',
-            'products.*.expense_category_id' => 'required',
-            'products.*.quantity' => 'required',
-            'products.*.price' => 'required',
-            'products.*.subtotal' => 'required',
-        ],[
-            'voucher_number.required_if' => 'The voucher number filed is required',
-            'products.*.shift_sale_id.required' => 'Shift sale is not started. Please start shift sale first.',
-            'products.*.product_id.required' => 'The product field is required.',
-            'products.*.income_category_id.required' => 'Product is not a income category. Please update product first.',
-            'products.*.stock_category_id.required' => 'Product is not a stock category. Please update product first.',
-            'products.*.expense_category_id.required' => 'Product is not a expense category. Please update product first.',
-            'products.*.price.required' => 'The price field is required.',
-            'products.*.subtotal.required' => 'The subtotal field is required.',
-        ]);
+
+        if (!empty($inputData['advance_amount'])) {
+            $validator = SaleRepository::validateAdvancePay($inputData);
+        } else {
+            $validator = SaleRepository::validateSale($inputData);
+        }
+
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
         $requestData = $request->all();
         if ($requestData['payment_method'] == PaymentMethod::CARD) {
             return response()->json(['status' => 500, 'errors' => ['payment_method' => ['The payment category field is required.']]]);
+        }
+        if (!empty($requestData['driver_sale']['price']) && empty($requestData['driver_sale']['driver_id'])) {
+            return response()->json(['status' => 500, 'errors' => ['driver_sale.driver_id' => ['The driver field is required.']]]);
         }
         $voucher = null;
         if ($requestData['payment_method'] == PaymentMethod::COMPANY) {
@@ -71,6 +56,19 @@ class SaleController extends Controller
                 ->first();
             if (!$voucher instanceof Voucher) {
                 return response()->json(['status' => 500, 'errors' => ['voucher_number' => ['The voucher number is not valid.']]]);
+            }
+            if (!empty($inputData['advance_amount'])) {
+                $advancePaymentData = [
+                    'company_id' => $inputData['payment_category_id'],
+                    'amount' => $inputData['advance_amount'],
+                    'driver_id' => $inputData['driver_sale']['driver_id']
+                ];
+                $response = SaleRepository::saveAdvancePayment($advancePaymentData);
+                if ($response) {
+                    $voucher->status = 'done';
+                    $voucher->save();
+                    return response()->json(['status' => 200, 'message' => 'Successfully saved advance payment.']);
+                }
             }
         }
         $sessionUser = SessionUser::getUser();
@@ -126,8 +124,6 @@ class SaleController extends Controller
                     $quantity = ($extraQuantity * $quantity) + $quantity;
                     $subtotal = $quantity * $product['price'];
                 }
-                $transactionData = [];
-                $transactionData['linked_id'] = $payment_category_id;
                 $buyingPrice = 0;
                 $productModel = Product::where('id', $product['product_id'])->first();
                 if (!empty($productModel['buying_price'])) {
@@ -141,6 +137,8 @@ class SaleController extends Controller
                 $saleData->subtotal = $subtotal;
                 $saleData->shift_sale_id = $product['shift_sale_id'];
                 $saleData->save();
+                $transactionData = [];
+                $transactionData['linked_id'] = $payment_category_id;
                 $transactionData['transaction'] = [
                     ['date' => date('Y-m-d'), 'account_id' => $product['income_category_id'], 'debit_amount' => $subtotal, 'credit_amount' => 0, 'module' => Module::POS_SALE, 'module_id' => $sale->id],
                 ];
@@ -165,7 +163,7 @@ class SaleController extends Controller
                 $transactionData = [];
                 $transactionData['linked_id'] = $cash_in_hand_category_id;
                 $transactionData['transaction'] = [
-                    ['date' => date('Y-m-d'), 'account_id' => $driverTipsCategory['id'], 'debit_amount' => 0, 'credit_amount' => $requestData['driver_sale']['price'], 'module' => Module::POS_SALE, 'module_id' => $sale->id],
+                    ['date' => date('Y-m-d'), 'account_id' => $requestData['driver_sale']['driver_id'], 'debit_amount' => 0, 'credit_amount' => $requestData['driver_sale']['price'], 'module' => Module::POS_SALE, 'module_id' => $sale->id],
                 ];
                 TransactionController::saveTransaction($transactionData);
 
@@ -184,6 +182,7 @@ class SaleController extends Controller
         }
         return response()->json(['status' => 500, 'error' => 'Cannot saved sale.']);
     }
+
     /**
      * @param Request $request
      * @return JsonResponse

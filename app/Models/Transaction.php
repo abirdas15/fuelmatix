@@ -13,9 +13,9 @@ class Transaction extends Model
     protected $appends = [
         'file_path'
     ];
-    public function getFilePathAttribute()
+    public function getFilePathAttribute(): ?string
     {
-        if ($this->file != null) {
+        if (!empty($this->file)) {
             return asset('uploads/'.$this->file);
         }
         return null;

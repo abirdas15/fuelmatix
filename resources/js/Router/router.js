@@ -85,6 +85,7 @@ import InvoiceView from "../Pages/Invoices/View.vue";
 import dailyReport from "../Pages/DailyReport/dailyReport.vue";
 import system from "../Pages/System/Company.vue";
 import Voucher from "../Pages/Voucher/Voucher.vue";
+import Driver from "../Pages/Driver/Driver.vue";
 
 const ROOT_URL = "";
 const router = new VueRouter({
@@ -133,7 +134,7 @@ const router = new VueRouter({
                 { path: ROOT_URL + "/pos/edit/:id", name: "PosEdit", component: PosEdit},
                 { path: ROOT_URL + "/expense", name: "Expense", component: Expense},
                 { path: ROOT_URL + "/expense/add", name: "ExpenseAdd", component: ExpenseAdd},
-                { path: ROOT_URL + "/expense/edit/:id", name: "ExpenseEdit", component: ExpenseEdit},
+                { path: ROOT_URL + "/expense/edit/:id/:status", name: "ExpenseEdit", component: ExpenseEdit},
                 { path: ROOT_URL + "/tank", name: "Tank", component: Tank},
                 { path: ROOT_URL + "/tank/visual", name: "TankVisual", component: TankVisual},
                 { path: ROOT_URL + "/tank/add", name: "TankAdd", component: TankAdd},
@@ -177,6 +178,7 @@ const router = new VueRouter({
                 { path: ROOT_URL + "/balanceTransfer/edit/:id", name: "balanceTransferEdit", component: balanceTransferEdit},
                 { path: ROOT_URL + "/system/setup", name: "system", component: system},
                 { path: ROOT_URL + "/voucher", name: "voucher", component: Voucher},
+                { path: ROOT_URL + "/driver", name: "driver", component: Driver},
             ],
         },
     ],

@@ -4,15 +4,15 @@
             <div class="row page-titles">
                 <ol class="breadcrumb align-items-center ">
                     <li class="breadcrumb-item active"><router-link :to="{name: 'Dashboard'}">Home</router-link></li>
-                    <li class="breadcrumb-item"><a href="javascript:void(0)">Expense List</a></li>
-                    <li style="margin-left: auto;"><router-link :to="{name: 'ExpenseAdd'}"><i class="fa-solid fa-plus"></i> Add New Expense</router-link></li>
+                    <li class="breadcrumb-item"><a href="javascript:void(0)">Driver</a></li>
+                    <li style="margin-left: auto;"><a href="javascript:void(0)" @click="openDriverModal"><i class="fa-solid fa-plus"></i> Add Driver</a></li>
                 </ol>
             </div>
             <div class="row">
                 <div class="col-12">
                     <div class="card">
                         <div class="card-header bg-secondary">
-                            <h4 class="card-title">Expense List</h4>
+                            <h4 class="card-title">Driver List</h4>
                         </div>
                         <div class="card-body">
                             <div class="row mt-4">
@@ -37,34 +37,26 @@
                                         <table class="display  dataTable no-footer" style="min-width: 845px">
                                             <thead>
                                             <tr class="text-white" style="background-color: #4886EE;color:#ffffff">
-                                                <th class="text-white" @click="sortData('name')" :class="sortClass('expense')">Expense Name</th>
-                                                <th class="text-white" @click="sortData('dispenser_name')" :class="sortClass('amount')">Amount Name</th>
-                                                <th class="text-white" @click="sortData('dispenser_name')" :class="sortClass('payment')">Payment Name</th>
-                                                <th class="text-white">Status</th>
+                                                <th class="text-white" @click="sortData('driver_name')" :class="sortClass('driver_name')">Driver Name</th>
+                                                <th class="text-white" @click="sortData('company_name')" :class="sortClass('company_name')">Company Name</th>
+                                                <th class="text-white">Email</th>
+                                                <th class="text-white">Phone Number</th>
                                                 <th class="text-white" >Action</th>
                                             </tr>
                                             </thead>
                                             <tbody v-if="listData.length > 0 && TableLoading == false">
                                             <tr v-for="f in listData">
-                                                <td >{{f.expense}}</td>
-                                                <td>{{f.amount}}</td>
-                                                <td>{{f.payment}}</td>
-                                                <td >
-                                                    <select v-if="f.status == 'pending'" class="form-select" v-model="f.status" @change="approveExpense(f.id)">
-                                                        <option value="pending">Pending</option>
-                                                        <option value="approve">Approved</option>
-                                                    </select>
-                                                    <span v-else class="text-success">Approved</span>
-                                                </td>
+                                                <td >{{f.driver_name}}</td>
+                                                <td >{{f.company_name}}</td>
+                                                <td >{{f.email}}</td>
+                                                <td >{{f.phone_number}}</td>
                                                 <td>
-                                                    <div class="d-flex justify-content-end">
-                                                        <router-link :to="{name: 'ExpenseEdit', params: { id: f.id, status:f.status }}" class=" btn btn-primary shadow btn-xs sharp me-1">
-                                                            <i class="fas fa-pencil-alt"></i>
-                                                        </router-link>
-                                                        <a  href="javascript:void(0)"  @click="openModalDelete(f)" class="btn btn-danger shadow btn-xs sharp">
-                                                            <i class="fa fa-trash"></i>
-                                                        </a>
-                                                    </div>
+                                                    <a href="javascript:void(0)" @click="openDriverEditModal(f.id)" class=" btn btn-primary shadow btn-xs sharp me-1">
+                                                        <i class="fas fa-pencil-alt"></i>
+                                                    </a>
+                                                    <a  href="javascript:void(0)"  @click="openModalDelete(f.id)" class="btn btn-danger shadow btn-xs sharp">
+                                                        <i class="fa fa-trash"></i>
+                                                    </a>
                                                 </td>
                                             </tr>
                                             </tbody>
@@ -94,6 +86,49 @@
                 </div>
             </div>
         </div>
+        <div class="popup-wrapper-modal driverModal d-none">
+            <form @submit.prevent="saveDriver" class="popup-box" style="max-width: 800px">
+                <button type="button" class=" btn  closeBtn"><i class="fas fa-times"></i></button>
+                <div class="row align-items-center">
+                    <div class="col-sm-12">
+                        <div class="input-wrapper form-group mb-3">
+                            <label for="company_id">Company</label>
+                            <select class="form-control form-select" v-model="driverParam.company_id" name="company_id">
+                                <option value="">Select Company</option>
+                                <option v-for="m in allCompany" :value="m.id">{{m.name}}</option>
+                            </select>
+                            <small class="invalid-feedback"></small>
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <div class="input-wrapper form-group mb-3">
+                            <label for="name">Name</label>
+                            <input type="text" class="w-100 form-control bg-white" name="name" id="name"
+                                   v-model="driverParam.name" placeholder="Name">
+                            <small class="invalid-feedback"></small>
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <div class="input-wrapper form-group mb-3">
+                            <label for="email">Email</label>
+                            <input type="text" class="w-100 form-control bg-white" name="email" id="email"
+                                   v-model="driverParam.email" placeholder="Email">
+                            <small class="invalid-feedback"></small>
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <div class="input-wrapper form-group mb-3">
+                            <label for="phone_number">Phone Number</label>
+                            <input type="text" class="w-100 form-control bg-white" name="phone_number" id="phone_number"
+                                   v-model="driverParam.phone_number" placeholder="Phone">
+                            <small class="invalid-feedback"></small>
+                        </div>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary " v-if="!Loading">Submit</button>
+                <button type="button" class="btn btn-primary " disabled v-if="Loading">Submitting...</button>
+            </form>
+        </div>
     </div>
 </template>
 
@@ -101,7 +136,7 @@
 import Swal from 'sweetalert2/dist/sweetalert2.js'
 import ApiService from "../../Services/ApiService";
 import ApiRoutes from "../../Services/ApiRoutes";
-import Pagination from "../../Helpers/Pagination";
+import Pagination from "../../Helpers/Pagination.vue";
 export default {
     components: {
         Pagination,
@@ -119,6 +154,14 @@ export default {
             Loading: false,
             TableLoading: false,
             listData: [],
+            allCompany: [],
+            driverParam: {
+                id: '',
+                company_id: '',
+                name: '',
+                phone_number: '',
+                email: ''
+            }
         };
     },
     watch: {
@@ -128,6 +171,7 @@ export default {
     },
     created() {
         this.list();
+        this.getCompany();
     },
     computed: {
         Auth: function () {
@@ -135,17 +179,50 @@ export default {
         },
     },
     methods: {
-        approveExpense: function(id) {
-            ApiService.POST(ApiRoutes.ExpenseApprove, {id: id },res => {
+        openDriverEditModal: function(id) {
+            $('.driverModal').removeClass('d-none');
+            ApiService.POST(ApiRoutes.DriverSingle, {id: id}, (res) => {
+                this.Loading = false;
                 if (parseInt(res.status) === 200) {
-                    this.$toast.success(res.message);
-                    this.list()
+                    this.driverParam = res.data;
                 } else {
-                    ApiService.ErrorHandler(res.error);
+                    ApiService.ErrorHandler(res.errors);
                 }
             });
         },
-        openModalDelete(data) {
+        saveDriver: function() {
+            this.Loading = true;
+            let route = this.driverParam.id == '' ? ApiRoutes.DriverSave : ApiRoutes.DriverUpdate;
+            ApiService.POST(route, this.driverParam, (res) => {
+                this.Loading = false;
+                if (parseInt(res.status) === 200) {
+                    this.$toast.success(res.message);
+                    $('.driverModal').addClass('d-none');
+                    this.list();
+                } else {
+                    ApiService.ErrorHandler(res.errors);
+                }
+            });
+        },
+        openDriverModal: function (f) {
+            this.driverParam = {
+                id: '',
+                company_id: '',
+                name: '',
+                phone_number: '',
+                email: ''
+            }
+            $('.driverModal').removeClass('d-none');
+        },
+        getCompany: function () {
+            this.categories = []
+            ApiService.POST(ApiRoutes.CreditCompanyList, {page:1, limit: 5000}, res => {
+                if (parseInt(res.status) === 200) {
+                    this.allCompany = res.data.data;
+                }
+            });
+        },
+        openModalDelete(id) {
             Swal.fire({
                 title: 'Are you sure you want to delete?',
                 text: "You won't be able to revert this!",
@@ -156,7 +233,7 @@ export default {
                 confirmButtonText: 'Yes, delete it!'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    this.Delete(data)
+                    this.Delete(id)
                 }
             })
         },
@@ -168,7 +245,7 @@ export default {
             }
             this.Param.page = page.page;
             this.TableLoading = true
-            ApiService.POST(ApiRoutes.ExpenseList, this.Param,res => {
+            ApiService.POST(ApiRoutes.DriverList, this.Param,res => {
                 this.TableLoading = false
                 if (parseInt(res.status) === 200) {
                     this.paginateData = res.data;
@@ -178,8 +255,8 @@ export default {
                 }
             });
         },
-        Delete: function (data) {
-            ApiService.POST(ApiRoutes.ExpenseDelete, {id: data.id, status: data.status },res => {
+        Delete: function (id) {
+            ApiService.POST(ApiRoutes.DriverDelete, {id: id },res => {
                 if (parseInt(res.status) === 200) {
                     this.$toast.success(res.message);
                     this.list()
@@ -208,7 +285,17 @@ export default {
 
     },
     mounted() {
-        $('#dashboard_bar').text('Expense List')
+        setTimeout(() => {
+            $('.date').flatpickr({
+                altInput: true,
+                altFormat: "d/m/Y",
+                dateFormat: "Y-m-d",
+                onChange: (dateStr, date) => {
+                    this.voucherParam.validity = date
+                }
+            })
+        }, 1000)
+        $('#dashboard_bar').text('Driver')
     }
 }
 </script>

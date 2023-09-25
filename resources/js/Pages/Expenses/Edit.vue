@@ -115,7 +115,7 @@ export default {
             this.param.file = files[0];
         },
         getSingle: function () {
-            ApiService.POST(ApiRoutes.ExpenseSingle, {id: this.id},res => {
+            ApiService.POST(ApiRoutes.ExpenseSingle, {id: this.id, status: this.$route.params.status},res => {
                 if (parseInt(res.status) === 200) {
                     this.param = res.data
                     if (this.param.file != null) {
@@ -128,6 +128,7 @@ export default {
         save: function () {
             ApiService.ClearErrorHandler();
             this.loading = true
+            this.param.status = this.$route.params.status;
             ApiService.POST(ApiRoutes.ExpenseEdit, this.param,res => {
                 this.loading = false
                 if (parseInt(res.status) === 200) {

@@ -34,7 +34,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\BalanceTransferController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\VoucherController;
-
+use App\Http\Controllers\DriverController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -138,6 +138,7 @@ Route::group(['middleware' => 'AuthReqCheck'], function() {
         Route::post('single', [ExpenseController::class, 'single']);
         Route::post('update', [ExpenseController::class, 'update']);
         Route::post('delete', [ExpenseController::class, 'delete']);
+        Route::post('approve', [ExpenseController::class, 'approve']);
     });
     Route::group(['prefix' => 'tank'], function() {
         Route::post('save', [TankController::class, 'save']);
@@ -264,6 +265,13 @@ Route::group(['middleware' => 'AuthReqCheck'], function() {
     Route::group(['prefix' => 'voucher'], function() {
         Route::post('save', [VoucherController::class, 'save']);
         Route::post('list', [VoucherController::class, 'list']);
+    });
+    Route::group(['prefix' => 'driver'], function() {
+        Route::post('save', [DriverController::class, 'save']);
+        Route::post('list', [DriverController::class, 'list']);
+        Route::post('single', [DriverController::class, 'single']);
+        Route::post('update', [DriverController::class, 'update']);
+        Route::post('delete', [DriverController::class, 'delete']);
     });
 });
 

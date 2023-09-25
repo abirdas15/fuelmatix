@@ -76,6 +76,7 @@ const ApiRoutes = {
     ExpenseDelete: ApiVersion + '/expense/delete',
     ExpenseList: ApiVersion + '/expense/list',
     ExpenseSingle: ApiVersion + '/expense/single',
+    ExpenseApprove: ApiVersion + '/expense/approve',
     //Tank
     TankAdd: ApiVersion + '/tank/save',
     TankEdit: ApiVersion + '/tank/update',
@@ -188,6 +189,13 @@ const ApiRoutes = {
     // Voucher
     VoucherSave: ApiVersion + '/voucher/save',
     VoucherList: ApiVersion + '/voucher/list',
+
+    // Driver
+    DriverSave: ApiVersion + '/driver/save',
+    DriverList: ApiVersion + '/driver/list',
+    DriverSingle: ApiVersion + '/driver/single',
+    DriverUpdate: ApiVersion + '/driver/update',
+    DriverDelete: ApiVersion + '/driver/delete',
 };
 
 export default ApiRoutes;
