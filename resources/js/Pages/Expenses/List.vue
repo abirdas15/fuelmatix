@@ -57,8 +57,8 @@
                                                     <span v-else class="text-success">Approved</span>
                                                 </td>
                                                 <td>
-                                                    <div class="d-flex justify-content-end">
-                                                        <router-link :to="{name: 'ExpenseEdit', params: { id: f.id, status:f.status }}" class=" btn btn-primary shadow btn-xs sharp me-1">
+                                                    <div class="d-flex justify-content-end" v-if="f.status == 'pending'">
+                                                        <router-link :to="{name: 'ExpenseEdit', params: { id: f.id }}" class=" btn btn-primary shadow btn-xs sharp me-1">
                                                             <i class="fas fa-pencil-alt"></i>
                                                         </router-link>
                                                         <a  href="javascript:void(0)"  @click="openModalDelete(f)" class="btn btn-danger shadow btn-xs sharp">

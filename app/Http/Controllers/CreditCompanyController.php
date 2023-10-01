@@ -6,13 +6,18 @@ use App\Common\AccountCategory;
 use App\Common\Module;
 use App\Helpers\SessionUser;
 use App\Models\Category;
+use App\Repository\CategoryRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class CreditCompanyController extends Controller
 {
-    public function save(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function save(Request $request): JsonResponse
     {
         $inputData = $request->all();
         $validator = Validator::make($inputData, [
@@ -33,44 +38,44 @@ class CreditCompanyController extends Controller
             'address' => $inputData['address'] ?? null,
             'contact_person' => $inputData['contact_person'] ?? null,
         ];
-        $category = new Category();
-        $category->category = $inputData['name'];
-        $category->parent_category = $accountReceivable->id;
-        $category->type = $accountReceivable->type;
-        $category->credit_limit = $inputData['credit_limit'] ?? null;
-        $category->others = json_encode($others);
-        $category->client_company_id = $inputData['session_user']['client_company_id'];
-        if ($category->save()) {
-            $category->updateCategory();
-            $driverSaleData = [
-                'name' => $request['name'],
-                'category_id' => $category['id']
-            ];
-            self::saveCompanyDriverCategory($driverSaleData);
-            return response()->json(['status' => 200, 'message' => 'Successfully saved credit company.']);
-        }
-        return response()->json(['status' => 500, 'errors' => 'Cannot saved credit company.']);
-    }
-    /**
-     * @param array $data
-     * @return Category
-     */
-    public static function saveCompanyDriverCategory(array $data): Category
-    {
-        $sessionUser = SessionUser::getUser();
-        $driverTips = Category::where('category', AccountCategory::DRIVER_TIPS)->where('client_company_id', $sessionUser['client_company_id'])->first();
-        $data =  [
-            'category' => $data['name'],
-            'parent_category' => $driverTips['id'],
-            'type' => $driverTips['type'],
-            'module' => Module::DRIVER_TIPS,
-            'module_id' => $data['category_id'],
-            'client_company_id' => $sessionUser['client_company_id']
+
+        $data = [
+            'name' => $inputData['name'],
+            'credit_limit' => $inputData['credit_limit'] ?? null,
+            'others' => json_encode($others)
         ];
-        $category = new Category($data);
-        $category->save();
-        $category->updateCategory();
-        return $category;
+
+        $sessionUser = SessionUser::getUser();
+        $category = Category::where('category', AccountCategory::ACCOUNT_RECEIVABLE)->where('client_company_id', $sessionUser['client_company_id'])->first();
+        if (!$category instanceof Category) {
+            return response()->json(['status' => 500, 'errors' => 'Cannot find [account receivable].']);
+        }
+        $accountReceivableCategory = CategoryRepository::saveCategory($data, $category['id'], null);
+        if (!$accountReceivableCategory instanceof Category) {
+            return response()->json(['status' => 500, 'errors' => 'Cannot saved credit company.']);
+        }
+        $data = [
+            'name' => $request['name'],
+            'module_id' => $accountReceivableCategory['id']
+        ];
+        $category = Category::where('category', AccountCategory::DRIVER_SALE)->where('client_company_id', $sessionUser['client_company_id'])->first();
+        if (!$category instanceof Category) {
+            return response()->json(['status' => 500, 'errors' => 'Cannot saved company [driver sale].']);
+        }
+
+        $driverSaleCategory = CategoryRepository::saveCategory($data, $category['id'], Module::DRIVER_SALE);
+        if (!$driverSaleCategory instanceof Category) {
+            return response()->json(['status' => 500, 'errors' => 'Cannot saved company [driver sale].']);
+        }
+        $category = Category::where('category', AccountCategory::UN_EARNED_REVENUE)->where('client_company_id', $sessionUser['client_company_id'])->first();
+        if (!$category instanceof Category) {
+            return response()->json(['status' => 500, 'errors' => 'Cannot saved company [un earned revenue].']);
+        }
+        $unEarnedRevenueCategory = CategoryRepository::saveCategory($data, $category['id'], Module::UN_EARNED_REVENUE);
+        if (!$unEarnedRevenueCategory instanceof Category) {
+            return response()->json(['status' => 500, 'errors' => 'Cannot saved company [un earned revenue].']);
+        }
+        return response()->json(['status' => 200, 'message' => 'Successfully saved credit company.']);
     }
     /**
      * @param Request $request
@@ -104,7 +109,11 @@ class CreditCompanyController extends Controller
         }
         return response()->json(['status' => 200, 'data' => $result]);
     }
-    public function single(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function single(Request $request): JsonResponse
     {
         $inputData = $request->all();
         $validator = Validator::make($inputData, [
@@ -139,12 +148,20 @@ class CreditCompanyController extends Controller
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
         $accountReceivable = Category::where('client_company_id', $inputData['session_user']['client_company_id'])->where('category', AccountCategory::ACCOUNT_RECEIVABLE)->first();
-        if ($accountReceivable == null) {
+        if (!$accountReceivable instanceof Category) {
             return response()->json(['status' => 500, 'error' => 'Cannot find account receivable group.']);
         }
         $category = Category::find($inputData['id']);
-        if ($category == null) {
-            return response()->json(['status' => 500, 'error' => 'Cannot find bank.']);
+        if (!$category instanceof Category) {
+            return response()->json(['status' => 500, 'error' => 'Cannot find company.']);
+        }
+        $driverSaleCategory =  Category::where('client_company_id', $inputData['session_user']['client_company_id'])->where('module_id', $category['id'])->where('module', Module::DRIVER_SALE)->first();
+        if (!$driverSaleCategory instanceof Category) {
+            return response()->json(['status' => 500, 'error' => 'Cannot find category [driver sale].']);
+        }
+        $unEarnRevenueCategory =  Category::where('client_company_id', $inputData['session_user']['client_company_id'])->where('module_id', $category['id'])->where('module', Module::UN_EARNED_REVENUE)->first();
+        if (!$unEarnRevenueCategory instanceof Category) {
+            return response()->json(['status' => 500, 'error' => 'Cannot find category [un eran revenue].']);
         }
         $others = [
             'email' => $inputData['email'] ?? null,
@@ -152,32 +169,26 @@ class CreditCompanyController extends Controller
             'address' => $inputData['address'] ?? null,
             'contact_person' => $inputData['contact_person'] ?? null,
         ];
-        $category->category = $inputData['name'];
-        $category->parent_category = $accountReceivable->id;
-        $category->type = $accountReceivable->type;
-        $category->credit_limit = $inputData['credit_limit'] ?? null;
-        $category->others = json_encode($others);
-        if ($category->save()) {
-            $category->updateCategory();
-            $category = Category::where('module', Module::DRIVER_TIPS)->where('module_id', $inputData['id'])->where('client_company_id', $inputData['session_user']['client_company_id'])->first();
-            if (!$category instanceof Category) {
-                $driverTips = Category::where('category', AccountCategory::DRIVER_TIPS)->where('client_company_id', $inputData['session_user']['client_company_id'])->first();
-                $data =  [
-                    'category' => $inputData['name'],
-                    'parent_category' => $driverTips['id'],
-                    'type' => $driverTips['type'],
-                    'module' => Module::DRIVER_TIPS,
-                    'module_id' => $inputData['id'],
-                    'client_company_id' => $inputData['session_user']['client_company_id']
-                ];
-                $category = new Category($data);
-            } else {
-                $category->name = $inputData['name'];
-            }
-            $category->save();
-            $category->updateCategory();
-            return response()->json(['status' => 200, 'message' => 'Successfully updated credit company.']);
+        $data = [
+            'name' => $inputData['name'],
+            'credit_limit' => $inputData['credit_limit'] ?? null,
+            'others' => json_encode($others),
+        ];
+        $updateCategory = CategoryRepository::updateCategory($category, $data);
+        if (!$updateCategory instanceof Category) {
+            return response()->json(['status' => 500, 'errors' => 'Cannot updated credit company.']);
         }
-        return response()->json(['status' => 500, 'errors' => 'Cannot updated credit company.']);
+        $data = [
+            'name' => $inputData['name']
+        ];
+        $updateCategory = CategoryRepository::updateCategory($driverSaleCategory, $data);
+        if (!$updateCategory instanceof Category) {
+            return response()->json(['status' => 500, 'errors' => 'Cannot updated category [driver sale].']);
+        }
+        $updateCategory = CategoryRepository::updateCategory($unEarnRevenueCategory, $data);
+        if (!$updateCategory instanceof Category) {
+            return response()->json(['status' => 500, 'errors' => 'Cannot updated category [un eran revenue].']);
+        }
+        return response()->json(['status' => 200, 'message' => 'Successfully updated credit company.']);
     }
 }

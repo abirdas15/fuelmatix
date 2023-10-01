@@ -16692,7 +16692,7 @@ var render = function render() {
       }
     }, [_vm._v("Approved")])]) : _c("span", {
       staticClass: "text-success"
-    }, [_vm._v("Approved")])]), _vm._v(" "), _c("td", [_c("div", {
+    }, [_vm._v("Approved")])]), _vm._v(" "), _c("td", [f.status == "pending" ? _c("div", {
       staticClass: "d-flex justify-content-end"
     }, [_c("router-link", {
       staticClass: "btn btn-primary shadow btn-xs sharp me-1",
@@ -16700,8 +16700,7 @@ var render = function render() {
         to: {
           name: "ExpenseEdit",
           params: {
-            id: f.id,
-            status: f.status
+            id: f.id
           }
         }
       }
@@ -16719,7 +16718,7 @@ var render = function render() {
       }
     }, [_c("i", {
       staticClass: "fa fa-trash"
-    })])], 1)])]);
+    })])], 1) : _vm._e()])]);
   }), 0) : _vm._e(), _vm._v(" "), _vm.listData.length == 0 && _vm.TableLoading == false ? _c("tbody", [_vm._m(2)]) : _vm._e(), _vm._v(" "), _vm.TableLoading == true ? _c("tbody", [_vm._m(3)]) : _vm._e()]), _vm._v(" "), _vm.paginateData != null ? _c("div", {
     staticClass: "dataTables_info",
     attrs: {
@@ -93370,7 +93369,7 @@ var router = new vue_router__WEBPACK_IMPORTED_MODULE_1__["default"]({
       name: "ExpenseAdd",
       component: _Pages_Expenses_Add__WEBPACK_IMPORTED_MODULE_39__["default"]
     }, {
-      path: ROOT_URL + "/expense/edit/:id/:status",
+      path: ROOT_URL + "/expense/edit/:id",
       name: "ExpenseEdit",
       component: _Pages_Expenses_Edit__WEBPACK_IMPORTED_MODULE_40__["default"]
     }, {

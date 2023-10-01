@@ -5,7 +5,10 @@ namespace App\Http\Controllers;
 use App\Common\Module;
 use App\Helpers\SessionUser;
 use App\Models\Category;
+use App\Models\Driver;
 use App\Models\Transaction;
+use App\Repository\CategoryRepository;
+use App\Repository\DriverRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -32,32 +35,42 @@ class DriverController extends Controller
         if (!$company instanceof Category) {
             return response()->json(['status' => 500, 'errors' => 'Cannot find [company]']);
         }
-        $category = Category::where('module', Module::DRIVER_TIPS)->where('module_id', $requestData['company_id'])->first();
-        if (!$category instanceof Category) {
-            $driverSaleData = [
-                'name' => $company['category'],
-                'category_id' => $request['company_id']
-            ];
-            $category = CreditCompanyController::saveCompanyDriverCategory($driverSaleData);
-        }
-        $sessionUser = SessionUser::getUser();
-        $others = [
-            'email' => $requestData['email'] ?? null,
-            'phone_number' => $requestData['phone_number'] ?? null,
+        $data = [
+            'name' => $requestData['name'],
+            'module_id' => $requestData['company_id']
         ];
-        $categoryModel = new Category();
-        $categoryModel->category = $requestData['name'];
-        $categoryModel->parent_category = $category->id;
-        $categoryModel->type = $category->type;
-        $categoryModel->others = json_encode($others);
-        $categoryModel->module = Module::DRIVER;
-        $categoryModel->module_id = $request['company_id'];
-        $categoryModel->client_company_id = $sessionUser['client_company_id'];
-        if ($categoryModel->save()) {
-            $categoryModel->updateCategory();
-            return response()->json(['status' => 200, 'message' => 'Successfully saved driver.']);
+        $sessionUser = SessionUser::getUser();
+        $driverSaleCategory = Category::where('module', Module::DRIVER_SALE)->where('module_id', $requestData['company_id'])->where('client_company_id', $sessionUser['client_company_id'])->first();
+        if (!$driverSaleCategory instanceof Category) {
+            return response()->json(['status' => 500, 'error' => 'Cannot find driver sale category.']);
         }
-        return response()->json(['status' => 500, 'errors' => 'Cannot saved driver.']);
+
+        $unEarnRevenueCategory = Category::where('module', Module::UN_EARNED_REVENUE)->where('module_id', $requestData['company_id'])->where('client_company_id', $sessionUser['client_company_id'])->first();
+        if (!$unEarnRevenueCategory instanceof Category) {
+            return response()->json(['status' => 500, 'error' => 'Cannot find driver sale category.']);
+        }
+
+        $driverSaleDriver = CategoryRepository::saveCategory($data, $driverSaleCategory['id'], Module::DRIVER_SALE_DRIVER);
+        if (!$driverSaleDriver instanceof Category) {
+            return response()->json(['status' => 500, 'message' => 'Cannot save [driver]']);
+        }
+        $unEarnRevenueDriver = CategoryRepository::saveCategory($data, $unEarnRevenueCategory['id'], Module::UN_EARNED_REVENUE_DRIVER);
+        if (!$unEarnRevenueDriver instanceof Category) {
+            return response()->json(['status' => 500, 'message' => 'Cannot save [driver]']);
+        }
+        $driverData = [
+            'name' => $requestData['name'],
+            'company_id' => $request['company_id'],
+            'email' => $requestData['email'],
+            'phone_number' => $requestData['phone_number'],
+            'driver_expense_id' => $driverSaleDriver['id'],
+            'driver_liability_id' => $unEarnRevenueDriver['id'],
+        ];
+        $newDriver = DriverRepository::save($driverData, $sessionUser);
+        if (!$newDriver instanceof Driver) {
+            return response()->json(['status' => 500, 'message' => 'Cannot save [driver]']);
+        }
+        return response()->json(['status' => 200, 'message' => 'Successfully saved driver.']);
     }
     /**
      * @param Request $request
@@ -72,29 +85,23 @@ class DriverController extends Controller
         $order_mode = $inputData['order_mode'] ?? 'DESC';
         $company_id = $inputData['company_id'] ?? '';
         $sessionUser = SessionUser::getUser();
-        $result = Category::select('categories.id', 'categories.category as driver_name', 'categories.others', 'company.category as company_name')
-            ->leftJoin('categories as company', 'company.id', '=' , 'categories.module_id')
-            ->where('categories.client_company_id', $sessionUser['client_company_id'])
-            ->where('categories.module', Module::DRIVER);
+        $result = Driver::select('driver.id', 'driver.name as driver_name', 'driver.email', 'driver.phone_number', 'categories.category as company_name')
+            ->leftJoin('categories', 'categories.id', '=', 'driver.company_id')
+            ->where('driver.client_company_id', $sessionUser['client_company_id']);
         if (!empty($keyword)) {
             $result->where(function($q) use ($keyword) {
-                $q->where('categories.category', 'LIKE', '%'.$keyword.'%');
-                $q->orWhere('company.category', 'LIKE', '%'.$keyword.'%');
+                $q->where('driver.name', 'LIKE', '%'.$keyword.'%');
+                $q->orWhere('driver.email', 'LIKE', '%'.$keyword.'%');
+                $q->orWhere('driver.phone_number', 'LIKE', '%'.$keyword.'%');
             });
         }
         if (!empty($company_id)) {
             $result->where(function($q) use ($company_id) {
-                $q->where('categories.module_id', $company_id);
+                $q->where('driver.company_id', $company_id);
             });
         }
         $result = $result->orderBy($order_by, $order_mode)
             ->paginate($limit);
-        foreach ($result as &$data) {
-            $others = json_decode($data['others']);
-            $data['email'] = $others != null ? $others->email : null;
-            $data['phone_number'] = $others != null ? $others->phone_number : null;
-            unset($data['others']);
-        }
         return response()->json(['status' => 200, 'data' => $result]);
     }
     /**
@@ -110,11 +117,7 @@ class DriverController extends Controller
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
-        $result = Category::select('id', 'category as name', 'others', 'module_id as company_id')->find($requestData['id']);
-        $others = json_decode($result['others']);
-        $result['email'] = $others != null ? $others->email : null;
-        $result['phone_number'] = $others != null ? $others->phone_number : null;
-        unset($result['others']);
+        $result = Driver::find($requestData['id']);
         return response()->json(['status' => 200, 'data' => $result]);
     }
     /**
@@ -138,33 +141,38 @@ class DriverController extends Controller
         if (!$company instanceof Category) {
             return response()->json(['status' => 500, 'errors' => 'Cannot find [company]']);
         }
-        $category = Category::where('module', Module::DRIVER_TIPS)->where('module_id', $requestData['company_id'])->first();
-        if (!$category instanceof Category) {
-            $driverSaleData = [
-                'name' => $company['category'],
-                'category_id' => $request['company_id']
-            ];
-            $category = CreditCompanyController::saveCompanyDriverCategory($driverSaleData);
+        $driver = Driver::find($requestData['id']);
+        if (!$driver instanceof Driver) {
+            return response()->json(['status' => 500, 'errors' => 'Cannot find [driver]']);
         }
-        $others = [
-            'email' => $requestData['email'] ?? null,
-            'phone_number' => $requestData['phone_number'] ?? null,
+        $expenseCategory = Category::find($driver['driver_expense_id']);
+        if (!$expenseCategory instanceof Category) {
+            return response()->json(['status' => 500, 'errors' => 'Cannot find [driver sale category]']);
+        }
+        $liabilityCategory = Category::find($driver['driver_liability_id']);
+        if (!$liabilityCategory instanceof Category) {
+            return response()->json(['status' => 500, 'errors' => 'Cannot find [driver un revenue category]']);
+        }
+        $driver->name = $requestData['name'];
+        $driver->company_id = $requestData['company_id'];
+        $driver->phone_number = $requestData['phone_number'];
+        $driver->email = $requestData['email'];
+        if (!$driver->save()) {
+            return response()->json(['status' => 500, 'error' => 'Cannot update driver.']);
+        }
+        $data = [
+            'name' => $requestData['name'],
+            'module_id' => $requestData['company_id']
         ];
-        $categoryModel = Category::find($requestData['id']);
-        if (!$categoryModel instanceof Category) {
-            return response()->json(['status' => 500, 'errors' => 'Cannot find driver.']);
+        $updateCategory = CategoryRepository::updateCategory($expenseCategory, $data);
+        if (!$updateCategory instanceof Category) {
+            return response()->json(['status' => 500, 'error' => 'Cannot update driver.']);
         }
-        $categoryModel->category = $requestData['name'];
-        $categoryModel->parent_category = $category->id;
-        $categoryModel->type = $category->type;
-        $categoryModel->others = json_encode($others);
-        $categoryModel->module = Module::DRIVER;
-        $categoryModel->module_id = $request['company_id'];
-        if ($categoryModel->save()) {
-            $categoryModel->updateCategory();
-            return response()->json(['status' => 200, 'message' => 'Successfully updated driver.']);
+        $updateCategory = CategoryRepository::updateCategory($liabilityCategory,  $data);
+        if (!$updateCategory instanceof Category) {
+            return response()->json(['status' => 500, 'error' => 'Cannot update driver.']);
         }
-        return response()->json(['status' => 500, 'errors' => 'Cannot updated driver.']);
+        return response()->json(['status' => 200, 'message' => 'Successfully updated driver.']);
     }
     /**
      * @param Request $request
@@ -179,15 +187,20 @@ class DriverController extends Controller
         if ($validation->fails()) {
             return response()->json(['status' => 500, 'errors' => $validation->errors()]);
         }
-        $category = Category::find($requestData['id']);
-        if (!$category instanceof Category) {
+        $driver = Driver::find($requestData['id']);
+        if (!$driver instanceof Driver) {
             return response()->json(['status' => 500, 'errors' => 'Cannot find [driver].']);
         }
-        $transaction = Transaction::where('account_id', $requestData['id'])->orWhere('linked_id', $requestData['id'])->first();
+        $transaction = Transaction::where('account_id', $driver['driver_expense_id'])->orWhere('linked_id', $driver['driver_expense_id'])->first();
         if ($transaction instanceof Transaction) {
             return response()->json(['status' => 500, 'errors' => 'Cannot delete [driver].']);
         }
-        Category::where('id', $requestData['id'])->delete();
+        $transaction = Transaction::where('account_id', $driver['driver_liability_id'])->orWhere('linked_id', $driver['driver_liability_id'])->first();
+        if ($transaction instanceof Transaction) {
+            return response()->json(['status' => 500, 'errors' => 'Cannot delete [driver].']);
+        }
+        Driver::where('id', $requestData['id'])->delete();
+        Category::whereIn('id', [$driver['driver_expense_id'], $driver['driver_liability_id']])->delete();
         return response()->json(['status' => 200, 'message' => 'Successfully deleted driver.']);
     }
 }

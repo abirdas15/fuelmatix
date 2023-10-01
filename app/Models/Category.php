@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Helpers\MybosTime;
+use App\Helpers\SessionUser;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -13,7 +14,7 @@ class Category extends Model
     public $timestamps = false;
     protected $guarded = ['id'];
 
-    public function updateCategory()
+    public function updateCategory(): bool
     {
         $category_hericy = [];
         $category_ids = [];

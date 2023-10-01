@@ -244,21 +244,21 @@ class AccountHead extends Command
                 'category_ids' => json_encode([5,20])
             ],
             [
-                'category' => AccountCategory::DRIVER_TIPS,
+                'category' => AccountCategory::DRIVER_SALE,
                 'parent_category' => 5,
                 'type' => 'expenses',
                 'balance' => 0,
-                'category_hericy' => json_encode([AccountCategory::EXPENSES, AccountCategory::DRIVER_TIPS]),
+                'category_hericy' => json_encode([AccountCategory::EXPENSES, AccountCategory::DRIVER_SALE]),
                 'default' => 1,
                 'client_company_id' => $clientCompany->id,
                 'category_ids' => json_encode([5,21])
             ],
             [
-                'category' => AccountCategory::ADVANCE_PAYABLE,
-                'parent_category' => 8,
+                'category' => AccountCategory::UN_EARNED_REVENUE,
+                'parent_category' => 3,
                 'type' => 'liabilities',
                 'balance' => 0,
-                'category_hericy' => json_encode([AccountCategory::LIABILITIES, AccountCategory::CURRENT_LIABILITIES, AccountCategory::ADVANCE_PAYABLE]),
+                'category_hericy' => json_encode([AccountCategory::LIABILITIES, AccountCategory::UN_EARNED_REVENUE]),
                 'default' => 1,
                 'client_company_id' => $clientCompany->id,
                 'category_ids' => json_encode([3,8,22])

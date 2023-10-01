@@ -2,13 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Common\FuelMatixStatus;
+use App\Common\Module;
 use App\Helpers\SessionUser;
 use App\Models\Expense;
-use App\Models\Transaction;
-use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class ExpenseController extends Controller
@@ -44,6 +43,7 @@ class ExpenseController extends Controller
         $expense->payment_id = $inputData['payment_id'];
         $expense->remarks = $inputData['remarks'] ?? null;
         $expense->file = $file_path;
+        $expense->status = FuelMatixStatus::PENDING;
         $expense->client_company_id = $sessionUser['client_company_id'];
         if (!$expense->save()) {
             return response()->json(['status' => 500, 'message' => 'Cannot save expense.']);
@@ -61,18 +61,10 @@ class ExpenseController extends Controller
         $keyword = $inputData['keyword'] ?? '';
         $sessionUser = SessionUser::getUser();
 
-        $pendingExpense = Expense::select('expense.id', 'expense.date', 'expense.amount',  'c.category as expense', 'c1.category as payment', DB::raw("'pending' as status"))
+        $result = Expense::select('expense.id', 'expense.date', 'expense.amount',  'c.category as expense', 'c1.category as payment', 'expense.status')
             ->leftJoin('categories as c', 'c.id', 'expense.category_id')
             ->leftJoin('categories as c1', 'c1.id', 'expense.payment_id')
             ->where('expense.client_company_id', $sessionUser['client_company_id']);
-
-        $result = Transaction::select('transactions.id', 'transactions.date', 'transactions.debit_amount as amount',  'c.category as expense', 'c1.category as payment', DB::raw("'approve' as status"))
-            ->leftJoin('categories as c', 'c.id', 'transactions.linked_id')
-            ->leftJoin('categories as c1', 'c1.id', 'transactions.account_id')
-            ->where('transactions.module', 'expense')
-            ->where('transactions.debit_amount', '>', 0)
-            ->where('transactions.client_company_id', $sessionUser['client_company_id'])
-            ->union($pendingExpense);
         if (!empty($keyword)) {
             $result->where(function($q) use ($keyword) {
                 $q->where('c.category', 'LIKE', '%'.$keyword.'%');
@@ -95,20 +87,13 @@ class ExpenseController extends Controller
         $inputData = $request->all();
         $validator = Validator::make($inputData, [
             'id' => 'required',
-            'status' => 'required'
         ]);
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
-        if ($inputData['status'] == 'pending') {
-            $result = Expense::select('id', 'category_id', 'payment_id', 'amount', 'file', 'remarks')
-                ->where('id', $inputData['id'])
-                ->first();
-        } else {
-            $result = Transaction::select('id', 'debit_amount as amount', 'linked_id as category_id', 'account_id as payment_id', 'file', 'description as remarks')
-                ->where('id', $inputData['id'])
-                ->first();
-        }
+        $result = Expense::select('id', 'category_id', 'payment_id', 'amount', 'file', 'remarks')
+            ->where('id', $inputData['id'])
+            ->first();
         return response()->json(['status' => 200, 'data' => $result]);
     }
     /**
@@ -123,51 +108,29 @@ class ExpenseController extends Controller
             'category_id' => 'required',
             'amount' => 'required',
             'payment_id' => 'required',
-            'status' => 'required'
         ]);
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
-        if ($inputData['status'] == 'pending') {
-            $expense = Expense::find($inputData['id']);
-            if (!$expense instanceof Expense) {
-                return response()->json(['status' => 500, 'error' => 'Cannot find expense.']);
-            }
-            $file_path = $expense->file;
-            if ($request->file('file')) {
-                $file = $_FILES;
-                $file = $file['file'];
-                $destinationPath = public_path('uploads');
-                $file_path = $request->file('file')->getClientOriginalName();
-                move_uploaded_file($file["tmp_name"], $destinationPath.'/'.$file_path);
-            }
-            $expense->category_id = $inputData['category_id'];
-            $expense->amount = $inputData['amount'];
-            $expense->payment_id = $inputData['payment_id'];
-            $expense->remarks = $inputData['remarks'] ?? null;
-            $expense->file = $file_path;
-            if (!$expense->save()) {
-                return response()->json(['status' => 500, 'error' => 'Cannot save expense.']);
-            }
-        } else {
-            $transaction = Transaction::find($inputData['id']);
-            if (!$transaction instanceof Transaction) {
-                return response()->json(['status' => 500, 'error' => 'Cannot find expense.']);
-            }
-            $file_path = $transaction->file;
-            if ($request->file('file')) {
-                $file = $_FILES;
-                $file = $file['file'];
-                $destinationPath = public_path('uploads');
-                $file_path = $request->file('file')->getClientOriginalName();
-                move_uploaded_file($file["tmp_name"], $destinationPath.'/'.$file_path);
-            }
-            $data['id'] = $transaction->id;
-            $data['debit_amount'] = $inputData['amount'];
-            $data['credit_amount'] = 0;
-            $data['description'] = $inputData['remarks'];
-            $data['file'] = $file_path;
-            TransactionController::updateTransaction($data);
+        $expense = Expense::find($inputData['id']);
+        if (!$expense instanceof Expense) {
+            return response()->json(['status' => 500, 'error' => 'Cannot find expense.']);
+        }
+        $file_path = $expense->file;
+        if ($request->file('file')) {
+            $file = $_FILES;
+            $file = $file['file'];
+            $destinationPath = public_path('uploads');
+            $file_path = $request->file('file')->getClientOriginalName();
+            move_uploaded_file($file["tmp_name"], $destinationPath.'/'.$file_path);
+        }
+        $expense->category_id = $inputData['category_id'];
+        $expense->amount = $inputData['amount'];
+        $expense->payment_id = $inputData['payment_id'];
+        $expense->remarks = $inputData['remarks'] ?? null;
+        $expense->file = $file_path;
+        if (!$expense->save()) {
+            return response()->json(['status' => 500, 'error' => 'Cannot save expense.']);
         }
         return response()->json(['status' => 200, 'message' => 'Successfully updated expense.']);
     }
@@ -180,19 +143,18 @@ class ExpenseController extends Controller
         $inputData = $request->all();
         $validator = Validator::make($inputData, [
             'id' => 'required',
-            'status' => 'required'
         ]);
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
-        if ($inputData['status'] == 'pending') {
-            Expense::where('id', $inputData['id'])->delete();
-        } else {
-            $transaction = Transaction::where('id', $inputData['id'])->first();
-            if ($transaction instanceof Transaction) {
-                TransactionController::deleteTransaction($inputData['id']);
-            }
+        $expense = Expense::find($inputData['id']);
+        if (!$expense instanceof Expense) {
+            return response()->json(['status' => 500, 'message' => 'Cannot find expense..']);
         }
+        if ($expense['status'] == FuelMatixStatus::APPROVE) {
+            return response()->json(['status' => 500, 'message' => 'Cannot delete Expense.']);
+        }
+        Expense::where('id', $inputData['id'])->delete();
         return response()->json(['status' => 200, 'message' => 'Successfully deleted expenses.']);
     }
     /**
@@ -212,12 +174,16 @@ class ExpenseController extends Controller
         if (!$expense instanceof Expense) {
             return response()->json(['status' => 500, 'error' => 'Cannot find expense.']);
         }
+        if ($expense['status'] == FuelMatixStatus::APPROVE) {
+            return response()->json(['status' => 500, 'error' => 'Expense already have been approve.']);
+        }
         $data['transaction'] = [
-            ['date' => date('Y-m-d'), 'description' => $expense['remarks'], 'account_id' => $expense['payment_id'], 'debit_amount' => $expense['amount'], 'credit_amount' => 0, 'module' => 'expense', 'file' => $expense['file']]
+            ['date' => date('Y-m-d'), 'description' => $expense['remarks'], 'account_id' => $expense['payment_id'], 'debit_amount' => $expense['amount'], 'credit_amount' => 0, 'module' => Module::EXPENSE, 'module_id' => $expense['id'], 'file' => $expense['file']]
         ];
         $data['linked_id'] = $expense['category_id'];
         TransactionController::saveTransaction($data);
-        Expense::where('id', $inputData['id'])->delete();
+        $expense->status = FuelMatixStatus::APPROVE;
+        $expense->save();
         return response()->json(['status' => 200, 'message' => 'Successfully approve expense.']);
     }
 }

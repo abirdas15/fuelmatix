@@ -25,7 +25,7 @@ class AccountCategory
     const POS_MACHINE = 'Pos Machine';
     const SALARY_EXPENSE = 'Salary Expense';
 
-    const DRIVER_TIPS = 'Driver Tips';
+    const DRIVER_SALE = 'Driver Sale';
 
-    const ADVANCE_PAYABLE = 'Advance Payable';
+    const UN_EARNED_REVENUE = 'Un Earned Revenue';
 }

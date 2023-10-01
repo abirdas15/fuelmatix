@@ -12,11 +12,15 @@ class Module
     const BALANCE_TRANSFER = 'balance transfer';
 
     const POS_SALE  = 'pos sale';
-    const DRIVER_TIPS = 'driver tips';
+    const DRIVER_SALE = 'driver sale';
 
     const ADVANCE_PAYABLE = 'advance payable';
 
-    const DRIVER = 'driver';
+    const DRIVER_SALE_DRIVER = 'driver sale driver';
     const ADVANCE_PAYMENT = 'advance payment';
+
+    const EXPENSE = 'expense';
+    const UN_EARNED_REVENUE = 'un earned revenue';
+    const UN_EARNED_REVENUE_DRIVER = 'un earned revenue driver';
 
 }
