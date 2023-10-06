@@ -47,13 +47,14 @@ class User extends Authenticatable
     public static function ParseData(User $userInfo): array
     {
         $clientCompany = ClientCompany::find($userInfo->client_company_id);
+        $permission = Permission::where('role_id', $userInfo['role_id'])->get()->pluck('name');
         return [
             'id' => $userInfo->id,
             'name' => $userInfo->name,
             'email' => $userInfo->email,
             'client_company_id' => $userInfo->client_company_id,
             'company_name' => $clientCompany->name ?? '',
-            'permission' => []
+            'permission' => $permission
         ];
     }
 }

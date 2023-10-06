@@ -70,10 +70,10 @@
                                                 <td><a href="javascript:void(0);">{{f?.user_name}}</a></td>
                                                 <td>
                                                     <div class="d-flex justify-content-end">
-                                                        <router-link :to="{name: 'PosEdit', params: { id: f.id }}" class=" btn btn-primary shadow btn-xs sharp me-1">
+                                                        <router-link v-if="CheckPermission(Section.POS + '-' + Action.EDIT)" :to="{name: 'PosEdit', params: { id: f.id }}" class=" btn btn-primary shadow btn-xs sharp me-1">
                                                             <i class="fas fa-pencil-alt"></i>
                                                         </router-link>
-                                                        <a  href="javascript:void(0)"  @click="openModalDelete(f)" class="btn btn-danger shadow btn-xs sharp">
+                                                        <a  v-if="CheckPermission(Section.POS + '-' + Action.DELETE)" href="javascript:void(0)"  @click="openModalDelete(f)" class="btn btn-danger shadow btn-xs sharp">
                                                             <i class="fa fa-trash"></i>
                                                         </a>
                                                     </div>
@@ -114,6 +114,8 @@ import Swal from 'sweetalert2/dist/sweetalert2.js'
 import ApiService from "../../Services/ApiService";
 import ApiRoutes from "../../Services/ApiRoutes";
 import Pagination from "../../Helpers/Pagination";
+import Section from "../../Helpers/Section";
+import Action from "../../Helpers/Action";
 export default {
     name: "Agent",
     components: {
@@ -144,6 +146,12 @@ export default {
         this.list();
     },
     computed: {
+        Action() {
+            return Action
+        },
+        Section() {
+            return Section
+        },
         Auth: function () {
             return this.$store.getters.GetAuth;
         },

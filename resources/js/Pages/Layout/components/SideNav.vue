@@ -14,11 +14,11 @@
                     <span class="nav-text">Sales</span>
                 </a>
                     <ul aria-expanded="false" class="bichi">
-                        <li><router-link :to="{name: 'ShiftSaleListStart'}">Start Shift Sale</router-link></li>
-                        <li><router-link :to="{name: 'ShiftSaleList'}">End Shift Sale</router-link></li>
-                        <li><router-link :to="{name: 'Pos'}" >POS</router-link></li>
-                        <li><router-link :to="{name: 'PosList'}" >POS History</router-link></li>
-                        <li><router-link :to="{name: 'CompanySale'}">Company Sale </router-link></li>
+                        <li v-if="CheckPermission(Section.SHIFT_SALE + '-' + Action.VIEW)"><router-link :to="{name: 'ShiftSaleListStart'}">Start Shift Sale</router-link></li>
+                        <li v-if="CheckPermission(Section.SHIFT_SALE + '-' + Action.VIEW)"><router-link :to="{name: 'ShiftSaleList'}">End Shift Sale</router-link></li>
+                        <li v-if="CheckPermission(Section.POS + '-' + Action.VIEW)"><router-link :to="{name: 'Pos'}" >POS</router-link></li>
+                        <li v-if="CheckPermission(Section.POS_HISTORY + '-' + Action.VIEW)"><router-link :to="{name: 'PosList'}" >POS History</router-link></li>
+                        <li v-if="CheckPermission(Section.COMPANY_SALE + '-' + Action.VIEW)"><router-link :to="{name: 'CompanySale'}">Company Sale </router-link></li>
                     </ul>
                 </li>
                 <li><a class="has-arrow " href="javascript:void(0)" aria-expanded="false">
@@ -26,8 +26,8 @@
                     <span class="nav-text">Refill</span>
                 </a>
                     <ul aria-expanded="false" class="bichi">
-                        <li><router-link :to="{name: 'TankRefill'}">Tank Refill</router-link></li>
-                        <li><router-link :to="{name: 'TankVisual'}"> Tank Visual</router-link></li>
+                        <li v-if="CheckPermission(Section.TANK_REFILL + '-' + Action.VIEW)"><router-link :to="{name: 'TankRefill'}">Tank Refill</router-link></li>
+                        <li v-if="CheckPermission(Section.TANK_VISUAL + '-' + Action.VIEW)"><router-link :to="{name: 'TankVisual'}"> Tank Visual</router-link></li>
                     </ul>
                 </li>
                 <li><a class="has-arrow " href="javascript:void(0)" aria-expanded="false">
@@ -35,8 +35,8 @@
                     <span class="nav-text">Reading</span>
                 </a>
                     <ul aria-expanded="false" class="bichi">
-                        <li><router-link :to="{name: 'TankReading'}">Tank</router-link></li>
-                        <li><router-link :to="{name: 'NozzleReading'}">Nozzle</router-link></li>
+                        <li v-if="CheckPermission(Section.TANK_READING + '-' + Action.VIEW)"><router-link :to="{name: 'TankReading'}">Tank</router-link></li>
+                        <li v-if="CheckPermission(Section.NOZZLE_READING + '-' + Action.VIEW)"><router-link :to="{name: 'NozzleReading'}">Nozzle</router-link></li>
                     </ul>
                 </li>
                 <li><a class="has-arrow " href="javascript:void(0)" aria-expanded="false">
@@ -44,10 +44,10 @@
                     <span class="nav-text">Payment</span>
                 </a>
                     <ul aria-expanded="false" class="bichi">
-                        <li><router-link :to="{name: 'PayOrder'}">Pay Orders</router-link></li>
-                        <li><router-link :to="{name:'balanceTransfer'}">Transfer</router-link></li>
-                        <li><router-link :to="{name:'Expense'}">Expense</router-link></li>
-                        <li><router-link :to="{name: 'Invoices'}">Bills </router-link></li>
+                        <li v-if="CheckPermission(Section.PAY_ORDER + '-' + Action.VIEW)"><router-link :to="{name: 'PayOrder'}">Pay Orders</router-link></li>
+                        <li v-if="CheckPermission(Section.TRANSFER + '-' + Action.VIEW)"><router-link :to="{name:'balanceTransfer'}">Transfer</router-link></li>
+                        <li v-if="CheckPermission(Section.EXPENSE + '-' + Action.VIEW)"><router-link :to="{name:'Expense'}">Expense</router-link></li>
+                        <li v-if="CheckPermission(Section.BILL + '-' + Action.VIEW)"><router-link :to="{name: 'Invoices'}">Bills </router-link></li>
                     </ul>
 
                 </li>
@@ -56,9 +56,9 @@
                     <span class="nav-text">HR</span>
                 </a>
                     <ul aria-expanded="false" class="bichi">
-                        <li><router-link :to="{name: 'employee'}">Employees </router-link></li>
-                        <li><router-link :to="{name: 'salary'}">Salary </router-link></li>
-                        <li><a href="javascript:void(0)">Attendance</a></li>
+                        <li v-if="CheckPermission(Section.EMPLOYEE + '-' + Action.VIEW)"><router-link :to="{name: 'employee'}">Employees </router-link></li>
+                        <li v-if="CheckPermission(Section.SALARY + '-' + Action.VIEW)"><router-link :to="{name: 'salary'}">Salary </router-link></li>
+                        <li v-if="CheckPermission(Section.ATTENDANCE + '-' + Action.VIEW)"><a href="javascript:void(0)">Attendance</a></li>
                     </ul>
 
                 </li>
@@ -67,18 +67,18 @@
                     <span class="nav-text">Setup</span>
                 </a>
                     <ul aria-expanded="false" class="bichi">
-                        <li><router-link :to="{name: 'Tank'}"> Tank</router-link></li>
-                        <li><router-link :to="{name: 'Dispenser'}">Dispenser</router-link></li>
-                        <li><router-link :to="{name: 'Nozzle'}">Nozzle</router-link></li>
-                        <li><router-link :to="{name: 'Product'}">Product</router-link></li>
-                        <li><router-link :to="{name: 'Bank'}">Banks </router-link></li>
-                        <li><router-link :to="{name: 'Vendor'}">Vendors</router-link></li>
-                        <li><router-link :to="{name: 'CreditCompany'}">Credit Company </router-link></li>
-                        <li><router-link :to="{name: 'posMachine'}">POS</router-link></li>
-                        <li><router-link :to="{name: 'user'}">Users</router-link></li>
-                        <li><router-link :to="{name: 'system'}">System setting</router-link></li>
-                        <li><router-link :to="{name: 'voucher'}">Voucher</router-link></li>
-                        <li><router-link :to="{name: 'driver'}">Driver</router-link></li>
+                        <li v-if="CheckPermission(Section.TANK + '-' + Action.VIEW)"><router-link :to="{name: 'Tank'}"> Tank</router-link></li>
+                        <li v-if="CheckPermission(Section.DISPENSER + '-' + Action.VIEW)"><router-link :to="{name: 'Dispenser'}">Dispenser</router-link></li>
+                        <li v-if="CheckPermission(Section.NOZZLE + '-' + Action.VIEW)"><router-link :to="{name: 'Nozzle'}">Nozzle</router-link></li>
+                        <li v-if="CheckPermission(Section.PRODUCT + '-' + Action.VIEW)"><router-link :to="{name: 'Product'}">Product</router-link></li>
+                        <li v-if="CheckPermission(Section.BANK + '-' + Action.VIEW)"><router-link :to="{name: 'Bank'}">Banks </router-link></li>
+                        <li v-if="CheckPermission(Section.VENDOR + '-' + Action.VIEW)"><router-link :to="{name: 'Vendor'}">Vendors</router-link></li>
+                        <li v-if="CheckPermission(Section.CREDIT_COMPANY + '-' + Action.VIEW)"><router-link :to="{name: 'CreditCompany'}">Credit Company </router-link></li>
+                        <li v-if="CheckPermission(Section.POS + '-' + Action.VIEW)"><router-link :to="{name: 'posMachine'}">POS</router-link></li>
+                        <li v-if="CheckPermission(Section.USER + '-' + Action.VIEW)"><router-link :to="{name: 'user'}">Users</router-link></li>
+                        <li v-if="CheckPermission(Section.SYSTEM_SETTING + '-' + Action.VIEW)"><router-link :to="{name: 'system'}">System setting</router-link></li>
+                        <li v-if="CheckPermission(Section.VOUCHER + '-' + Action.VIEW)"><router-link :to="{name: 'voucher'}">Voucher</router-link></li>
+                        <li v-if="CheckPermission(Section.DRIVER + '-' + Action.VIEW)"><router-link :to="{name: 'driver'}">Driver</router-link></li>
                     </ul>
                 </li>
                 <li><a class="has-arrow " href="javascript:void(0)" aria-expanded="false">
@@ -86,7 +86,7 @@
                     <span class="nav-text">Settings</span>
                 </a>
                     <ul aria-expanded="false" class="bichi">
-                        <li><router-link :to="{name: 'system'}">Company</router-link></li>
+                        <li v-if="CheckPermission(Section.CREDIT_COMPANY + '-' + Action.VIEW)"><router-link :to="{name: 'system'}">Company</router-link></li>
                     </ul>
                 </li>
                 <li>
@@ -101,44 +101,49 @@
                         <span class="nav-text">Report</span>
                     </a>
                     <ul aria-expanded="false" class="bichi">
-                        <li>
+                        <li v-if="CheckPermission(Section.DAILY_REPORT + '-' + Action.VIEW)">
                             <router-link :to="{name: 'dailyReport'}" >Daily Report
                             </router-link>
                         </li>
-                        <li>
+                        <li v-if="CheckPermission(Section.BALANCE_SHEET + '-' + Action.VIEW)">
                             <router-link :to="{name: 'BalanceSheet'}" >Balance
                                 Sheet
                             </router-link>
                         </li>
-                        <li>
+                        <li v-if="CheckPermission(Section.PROFIT_AND_LOSS + '-' + Action.VIEW)">
                             <router-link :to="{name: 'ProfitLoss'}" >Profit and
                                 loss
                             </router-link>
                         </li>
-                        <li>
+                        <li v-if="CheckPermission(Section.INCOME_STATEMENT + '-' + Action.VIEW)">
                             <router-link :to="{name: 'IncomeStatement'}" >Income
                                 Statement
                             </router-link>
                         </li>
-                        <li>
+                        <li v-if="CheckPermission(Section.ACCOUNT_PAYABLE + '-' + Action.VIEW)">
                             <router-link :to="{name: 'AccountPayable'}" >A/C Payable
                             </router-link>
                         </li>
-                        <li>
+                        <li v-if="CheckPermission(Section.ACCOUNT_RECEIVABLE + '-' + Action.VIEW)">
                             <router-link :to="{name: 'AccountReceivable'}" >A/C Receivable
                             </router-link>
                         </li>
-                        <li>
+                        <li v-if="CheckPermission(Section.TRAIL_BALANCE + '-' + Action.VIEW)">
                             <router-link :to="{name: 'TrailBalance'}" >Trial Balance
                             </router-link>
                         </li>
-                        <li>
+                        <li v-if="CheckPermission(Section.LEDGER + '-' + Action.VIEW)">
                             <router-link :to="{name: 'LedgerSheet'}" >Ledger Sheet
                             </router-link>
                         </li>
                     </ul>
                 </li>
-
+                <li v-if="CheckPermission(Section.ROLE + '-' + Action.VIEW)">
+                    <router-link :to="{name: 'role'}"  aria-expanded="false">
+                        <i class="fas fa-plane"></i>
+                        <span class="nav-text">Role</span>
+                    </router-link>
+                </li>
             </ul>
         </div>
     </div>
@@ -148,12 +153,16 @@
 
 import ApiService from "../../../Services/ApiService";
 import ApiRoutes from "../../../Services/ApiRoutes";
+import Section from "../../../Helpers/Section"
+import Action from "../../../Helpers/Action"
 
 export default {
     components: {},
     data() {
         return {
-            ticketData: {}
+            ticketData: {},
+            Section: Section,
+            Action: Action
         };
     },
     mounted() {

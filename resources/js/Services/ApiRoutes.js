@@ -196,6 +196,16 @@ const ApiRoutes = {
     DriverSingle: ApiVersion + '/driver/single',
     DriverUpdate: ApiVersion + '/driver/update',
     DriverDelete: ApiVersion + '/driver/delete',
+    DriverAmount: ApiVersion + '/driver/amount',
+
+    //Role
+    RoleList: ApiVersion + '/role/list',
+    RoleSave: ApiVersion + '/role/save',
+    RoleSingle: ApiVersion + '/role/single',
+    RoleUpdate: ApiVersion + '/role/update',
+    RoleDelete: ApiVersion + '/role/delete',
+
+    PermissionList: ApiVersion + '/permission/list',
 };
 
 export default ApiRoutes;

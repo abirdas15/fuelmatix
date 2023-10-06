@@ -86,6 +86,9 @@ import dailyReport from "../Pages/DailyReport/dailyReport.vue";
 import system from "../Pages/System/Company.vue";
 import Voucher from "../Pages/Voucher/Voucher.vue";
 import Driver from "../Pages/Driver/Driver.vue";
+import Role from "../Pages/Role/Role.vue";
+import createRole from "../Pages/Role/Create.vue";
+import roleEdit from "../Pages/Role/Edit.vue";
 
 const ROOT_URL = "";
 const router = new VueRouter({
@@ -101,88 +104,409 @@ const router = new VueRouter({
             component: Layout,
             children: [
                 { path: ROOT_URL + "/dashboard", name: "Dashboard", component: Dashboard},
-                { path: ROOT_URL + "/accounts", name: "Accounts", component: Category},
-                { path: ROOT_URL + "/transaction/:id", name: "Transaction", component: Transaction},
-                { path: ROOT_URL + "/balance-sheet", name: "BalanceSheet", component: BalanceSheet},
-                { path: ROOT_URL + "/profit-loss", name: "ProfitLoss", component: ProfitLoss},
-                { path: ROOT_URL + "/income-statement", name: "IncomeStatement", component: IncomeStatement},
-                { path: ROOT_URL + "/account-payable", name: "AccountPayable", component: AccountPayable},
-                { path: ROOT_URL + "/account-receivable", name: "AccountReceivable", component: AccountReceivable},
-                { path: ROOT_URL + "/trial-balance", name: "TrailBalance", component: TrailBalance},
-                { path: ROOT_URL + "/ledger-sheet", name: "LedgerSheet", component: LedgerSheet},
-                { path: ROOT_URL + "/product", name: "Product", component: Product},
-                { path: ROOT_URL + "/product/add", name: "ProductAdd", component: ProductAdd},
-                { path: ROOT_URL + "/product/edit/:id", name: "ProductEdit", component: ProductEdit},
-                { path: ROOT_URL + "/dispenser", name: "Dispenser", component: Dispenser},
-                { path: ROOT_URL + "/dispenser/add", name: "DispenserAdd", component: DispenserAdd},
-                { path: ROOT_URL + "/dispenser/edit/:id", name: "DispenserEdit", component: DispenserEdit},
-                { path: ROOT_URL + "/dispenser/reading", name: "DispenserReading", component: DispenserReading},
-                { path: ROOT_URL + "/dispenser/reading/add", name: "DispenserReadingAdd", component: DispenserReadingAdd},
-                { path: ROOT_URL + "/dispenser/reading/edit/:id", name: "DispenserReadingEdit", component: DispenserReadingEdit},
-                { path: ROOT_URL + "/nozzle", name: "Nozzle", component: Nozzle},
-                { path: ROOT_URL + "/nozzle/add", name: "NozzleAdd", component: NozzleAdd},
-                { path: ROOT_URL + "/nozzle/edit/:id", name: "NozzleEdit", component: NozzleEdit},
-                { path: ROOT_URL + "/nozzle/reading", name: "NozzleReading", component: NozzleReading},
-                { path: ROOT_URL + "/nozzle/reading/add", name: "NozzleReadingAdd", component: NozzleReadingAdd},
-                { path: ROOT_URL + "/nozzle/reading/edit/:id", name: "NozzleReadingEdit", component: NozzleReadingEdit},
-                { path: ROOT_URL + "/shift/sale/start", name: "ShiftSaleAdd", component: ShiftSaleStart},
-                { path: ROOT_URL + "/shift/sale/list", name: "ShiftSaleList", component: ShiftSaleList},
-                { path: ROOT_URL + "/shift/sale/list/start", name: "ShiftSaleListStart", component: ShiftSaleListStart},
-                { path: ROOT_URL + "/shift/sale/edit/:id", name: "ShiftSaleEdit", component: ShiftSaleEdit},
-                { path: ROOT_URL + "/pos", name: "Pos", component: Pos},
-                { path: ROOT_URL + "/pos/list", name: "PosList", component: PosList},
-                { path: ROOT_URL + "/pos/edit/:id", name: "PosEdit", component: PosEdit},
-                { path: ROOT_URL + "/expense", name: "Expense", component: Expense},
-                { path: ROOT_URL + "/expense/add", name: "ExpenseAdd", component: ExpenseAdd},
-                { path: ROOT_URL + "/expense/edit/:id", name: "ExpenseEdit", component: ExpenseEdit},
-                { path: ROOT_URL + "/tank", name: "Tank", component: Tank},
-                { path: ROOT_URL + "/tank/visual", name: "TankVisual", component: TankVisual},
-                { path: ROOT_URL + "/tank/add", name: "TankAdd", component: TankAdd},
-                { path: ROOT_URL + "/tank/edit/:id", name: "TankEdit", component: TankEdit},
-                { path: ROOT_URL + "/tank/reading", name: "TankReading", component: TankReading},
-                { path: ROOT_URL + "/tank/reading/add", name: "TankReadingAdd", component: TankReadingAdd},
-                { path: ROOT_URL + "/tank/reading/edit/:id", name: "TankReadingEdit", component: TankReadingEdit},
-                { path: ROOT_URL + "/tank/refill", name: "TankRefill", component: TankRefill},
-                { path: ROOT_URL + "/tank/refill/add", name: "TankRefillAdd", component: TankRefillAdd},
-                { path: ROOT_URL + "/tank/refill/edit/:id", name: "TankRefillEdit", component: TankRefillEdit},
-                { path: ROOT_URL + "/bank", name: "Bank", component: Bank},
-                { path: ROOT_URL + "/bank/add", name: "BankAdd", component: BankAdd},
-                { path: ROOT_URL + "/bank/edit/:id", name: "BankEdit", component: BankEdit},
-                { path: ROOT_URL + "/vendor", name: "Vendor", component: Vendor},
-                { path: ROOT_URL + "/vendor/add", name: "VendorAdd", component: VendorAdd},
-                { path: ROOT_URL + "/vendor/edit/:id", name: "VendorEdit", component: VendorEdit},
-                { path: ROOT_URL + "/pay/order", name: "PayOrder", component: PayOrder},
-                { path: ROOT_URL + "/pay/order/add", name: "PayOrderAdd", component: PayOrderAdd},
-                { path: ROOT_URL + "/pay/order/edit/:id", name: "PayOrderEdit", component: PayOrderEdit},
-                { path: ROOT_URL + "/credit/company", name: "CreditCompany", component: CreditCompany},
-                { path: ROOT_URL + "/credit/company/add", name: "CreditCompanyAdd", component: CreditCompanyAdd},
-                { path: ROOT_URL + "/credit/company/edit/:id", name: "CreditCompanyEdit", component: CreditCompanyEdit},
-                { path: ROOT_URL + "/pos/machine", name: "posMachine", component: posMachine},
-                { path: ROOT_URL + "/pos/machine/add", name: "posMachineAdd", component: posMachineAdd},
-                { path: ROOT_URL + "/pos/machine/edit/:id", name: "posMachineEdit", component: posMachineEdit},
-                { path: ROOT_URL + "/employee", name: "employee", component: employee},
-                { path: ROOT_URL + "/employee/add", name: "employeeAdd", component: employeeAdd},
-                { path: ROOT_URL + "/employee/edit/:id", name: "employeeEdit", component: employeeEdit},
-                { path: ROOT_URL + "/salary", name: "salary", component: salary},
-                { path: ROOT_URL + "/salary/add", name: "salaryAdd", component: salaryAdd},
-                { path: ROOT_URL + "/salary/edit/:id", name: "salaryEdit", component: salaryEdit},
-                { path: ROOT_URL + "/company/sale", name: "CompanySale", component: CompanySale},
-                { path: ROOT_URL + "/invoices", name: "Invoices", component: Invoice},
-                { path: ROOT_URL + "/invoices/view/:id", name: "InvoicesView", component: InvoiceView},
-                { path: ROOT_URL + "/daily/report", name: "dailyReport", component: dailyReport},
-                { path: ROOT_URL + "/user", name: "user", component: user},
-                { path: ROOT_URL + "/user/add", name: "userAdd", component: userAdd},
-                { path: ROOT_URL + "/user/edit/:id", name: "userEdit", component: userEdit},
-                { path: ROOT_URL + "/balanceTransfer", name: "balanceTransfer", component: balanceTransfer},
-                { path: ROOT_URL + "/balanceTransfer/add", name: "balanceTransferAdd", component: balanceTransferAdd},
-                { path: ROOT_URL + "/balanceTransfer/edit/:id", name: "balanceTransferEdit", component: balanceTransferEdit},
-                { path: ROOT_URL + "/system/setup", name: "system", component: system},
-                { path: ROOT_URL + "/voucher", name: "voucher", component: Voucher},
-                { path: ROOT_URL + "/driver", name: "driver", component: Driver},
+                {
+                    path: ROOT_URL + "/accounts", name: "Accounts", component: Category,  beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.ACCOUNTING + '-' + Action.VIEW)
+                    },
+                },
+                {
+                    path: ROOT_URL + "/transaction/:id", name: "Transaction", component: Transaction,  beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.ACCOUNTING + '-' + Action.CREATE)
+                    },
+                },
+                {
+                    path: ROOT_URL + "/balance-sheet", name: "BalanceSheet", component: BalanceSheet, beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.BALANCE_SHEET + '-' + Action.VIEW)
+                    },
+                },
+                {
+                    path: ROOT_URL + "/profit-loss", name: "ProfitLoss", component: ProfitLoss, beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.PROFIT_AND_LOSS + '-' + Action.VIEW)
+                    },
+                },
+                {
+                    path: ROOT_URL + "/income-statement", name: "IncomeStatement", component: IncomeStatement, beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.INCOME_STATEMENT + '-' + Action.VIEW)
+                    },
+                },
+                {
+                    path: ROOT_URL + "/account-payable", name: "AccountPayable", component: AccountPayable, beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.ACCOUNT_PAYABLE + '-' + Action.VIEW)
+                    },
+                },
+                {
+                    path: ROOT_URL + "/account-receivable", name: "AccountReceivable", component: AccountReceivable, beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.ACCOUNT_RECEIVABLE + '-' + Action.VIEW)
+                    },
+                },
+                {
+                    path: ROOT_URL + "/trial-balance", name: "TrailBalance", component: TrailBalance, beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.TRAIL_BALANCE + '-' + Action.VIEW)
+                    },
+                },
+                {
+                    path: ROOT_URL + "/ledger-sheet", name: "LedgerSheet", component: LedgerSheet, beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.LEDGER + '-' + Action.VIEW)
+                    },
+                },
+                {
+                    path: ROOT_URL + "/product", name: "Product", component: Product, beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.PRODUCT + '-' + Action.VIEW)
+                    },
+                },
+                {
+                    path: ROOT_URL + "/product/add", name: "ProductAdd", component: ProductAdd, beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.PRODUCT + '-' + Action.CREATE)
+                    },
+                },
+                {
+                    path: ROOT_URL + "/product/edit/:id", name: "ProductEdit", component: ProductEdit, beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.PRODUCT + '-' + Action.EDIT)
+                    },
+                },
+                {
+                    path: ROOT_URL + "/dispenser", name: "Dispenser", component: Dispenser, beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.DISPENSER + '-' + Action.VIEW)
+                    },
+                },
+                {
+                    path: ROOT_URL + "/dispenser/add", name: "DispenserAdd", component: DispenserAdd, beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.DISPENSER + '-' + Action.CREATE)
+                    },
+                },
+                {
+                    path: ROOT_URL + "/dispenser/edit/:id", name: "DispenserEdit", component: DispenserEdit, beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.DISPENSER + '-' + Action.EDIT)
+                    },
+                },
+                {
+                    path: ROOT_URL + "/nozzle", name: "Nozzle", component: Nozzle, beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.NOZZLE_READING + '-' + Action.VIEW)
+                    },
+                },
+                {
+                    path: ROOT_URL + "/nozzle/add", name: "NozzleAdd", component: NozzleAdd, beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.NOZZLE_READING + '-' + Action.CREATE)
+                    },
+                },
+                {
+                    path: ROOT_URL + "/nozzle/edit/:id", name: "NozzleEdit", component: NozzleEdit, beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.NOZZLE_READING + '-' + Action.EDIT)
+                    },
+                },
+                {
+                    path: ROOT_URL + "/nozzle/reading", name: "NozzleReading", component: NozzleReading, beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.NOZZLE_READING + '-' + Action.VIEW)
+                    },
+                },
+                {
+                    path: ROOT_URL + "/nozzle/reading/add", name: "NozzleReadingAdd", component: NozzleReadingAdd, beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.NOZZLE_READING + '-' + Action.CREATE)
+                    },
+                },
+                {
+                    path: ROOT_URL + "/nozzle/reading/edit/:id", name: "NozzleReadingEdit", component: NozzleReadingEdit, beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.NOZZLE_READING + '-' + Action.EDIT)
+                    },
+                },
+                {
+                    path: ROOT_URL + "/shift/sale/start", name: "ShiftSaleAdd", component: ShiftSaleStart,  beforeEnter: (to, from, next) => {
+                    CheckPermission(to, from, next, Section.SHIFT_SALE + '-' + Action.CREATE)
+                    },
+                },
+                {
+                    path: ROOT_URL + "/shift/sale/list", name: "ShiftSaleList", component: ShiftSaleList, beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.SHIFT_SALE + '-' + Action.VIEW)
+                    },
+                },
+                {
+                    path: ROOT_URL + "/shift/sale/list/start", name: "ShiftSaleListStart", component: ShiftSaleListStart, beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.SHIFT_SALE + '-' + Action.VIEW)
+                    },
+                },
+                {
+                    path: ROOT_URL + "/shift/sale/edit/:id", name: "ShiftSaleEdit", component: ShiftSaleEdit, beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.SHIFT_SALE + '-' + Action.EDIT)
+                    },
+                },
+                {
+                    path: ROOT_URL + "/pos", name: "Pos", component: Pos, beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.POS + '-' + Action.CREATE)
+                    },
+                },
+                {
+                    path: ROOT_URL + "/pos/list", name: "PosList", component: PosList, beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.POS + '-' + Action.VIEW)
+                    },
+                },
+                {
+                    path: ROOT_URL + "/pos/edit/:id", name: "PosEdit", component: PosEdit, beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.POS + '-' + Action.EDIT)
+                    },
+                },
+                {
+                    path: ROOT_URL + "/expense", name: "Expense", component: Expense, beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.EXPENSE + '-' + Action.VIEW)
+                    },
+                },
+                {
+                    path: ROOT_URL + "/expense/add", name: "ExpenseAdd", component: ExpenseAdd, beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.EXPENSE + '-' + Action.CREATE)
+                    },
+                },
+                {
+                    path: ROOT_URL + "/expense/edit/:id", name: "ExpenseEdit", component: ExpenseEdit, beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.EXPENSE + '-' + Action.EDIT)
+                    },
+                },
+                {
+                    path: ROOT_URL + "/tank", name: "Tank", component: Tank, beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.TANK + '-' + Action.VIEW)
+                    },
+                },
+                {
+                    path: ROOT_URL + "/tank/visual", name: "TankVisual", component: TankVisual, beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.TANK_VISUAL + '-' + Action.VIEW)
+                    },
+                },
+                {
+                    path: ROOT_URL + "/tank/add", name: "TankAdd", component: TankAdd, beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.TANK + '-' + Action.CREATE)
+                    },
+                },
+                {
+                    path: ROOT_URL + "/tank/edit/:id", name: "TankEdit", component: TankEdit, beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.TANK + '-' + Action.EDIT)
+                    },
+                },
+                {
+                    path: ROOT_URL + "/tank/reading", name: "TankReading", component: TankReading, beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.TANK_READING + '-' + Action.VIEW)
+                    },
+                },
+                {
+                    path: ROOT_URL + "/tank/reading/add", name: "TankReadingAdd", component: TankReadingAdd, beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.TANK_READING + '-' + Action.CREATE)
+                    },
+                },
+                {
+                    path: ROOT_URL + "/tank/reading/edit/:id", name: "TankReadingEdit", component: TankReadingEdit, beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.TANK_READING + '-' + Action.EDIT)
+                    },
+                },
+                {
+                    path: ROOT_URL + "/tank/refill", name: "TankRefill", component: TankRefill, beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.TANK_REFILL + '-' + Action.VIEW)
+                    },
+                },
+                {
+                    path: ROOT_URL + "/tank/refill/add", name: "TankRefillAdd", component: TankRefillAdd, beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.TANK_REFILL + '-' + Action.CREATE)
+                    },
+                },
+                {
+                    path: ROOT_URL + "/tank/refill/edit/:id", name: "TankRefillEdit", component: TankRefillEdit, beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.TANK_REFILL + '-' + Action.EDIT)
+                    },
+                },
+                {
+                    path: ROOT_URL + "/bank", name: "Bank", component: Bank, beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.BANK + '-' + Action.VIEW)
+                    },
+                },
+                {
+                    path: ROOT_URL + "/bank/add", name: "BankAdd", component: BankAdd, beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.BANK + '-' + Action.CREATE)
+                    },
+                },
+                {
+                    path: ROOT_URL + "/bank/edit/:id", name: "BankEdit", component: BankEdit, beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.BANK + '-' + Action.EDIT)
+                    },
+                },
+                {
+                    path: ROOT_URL + "/vendor", name: "Vendor", component: Vendor, beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.VENDOR + '-' + Action.VIEW)
+                    },
+                },
+                {
+                    path: ROOT_URL + "/vendor/add", name: "VendorAdd", component: VendorAdd, beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.VENDOR + '-' + Action.CREATE)
+                    },
+                },
+                {
+                    path: ROOT_URL + "/vendor/edit/:id", name: "VendorEdit", component: VendorEdit, beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.VENDOR + '-' + Action.EDIT)
+                    },
+                },
+                {
+                    path: ROOT_URL + "/pay/order", name: "PayOrder", component: PayOrder, beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.PAY_ORDER + '-' + Action.VIEW)
+                    },
+                },
+                {
+                    path: ROOT_URL + "/pay/order/add", name: "PayOrderAdd", component: PayOrderAdd, beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.PAY_ORDER + '-' + Action.CREATE)
+                    },
+                },
+                {
+                    path: ROOT_URL + "/pay/order/edit/:id", name: "PayOrderEdit", component: PayOrderEdit, beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.PAY_ORDER + '-' + Action.EDIT)
+                    },
+                },
+                {
+                    path: ROOT_URL + "/credit/company", name: "CreditCompany", component: CreditCompany, beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.CREDIT_COMPANY + '-' + Action.VIEW)
+                    },
+                },
+                {
+                    path: ROOT_URL + "/credit/company/add", name: "CreditCompanyAdd", component: CreditCompanyAdd, beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.CREDIT_COMPANY + '-' + Action.CREATE)
+                    },
+                },
+                {
+                    path: ROOT_URL + "/credit/company/edit/:id", name: "CreditCompanyEdit", component: CreditCompanyEdit, beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.CREDIT_COMPANY + '-' + Action.EDIT)
+                    },
+                },
+                {
+                    path: ROOT_URL + "/pos/machine", name: "posMachine", component: posMachine, beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.POS_MACHINE + '-' + Action.VIEW)
+                    },
+                },
+                {
+                    path: ROOT_URL + "/pos/machine/add", name: "posMachineAdd", component: posMachineAdd, beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.POS_MACHINE + '-' + Action.CREATE)
+                    },
+                },
+                {
+                    path: ROOT_URL + "/pos/machine/edit/:id", name: "posMachineEdit", component: posMachineEdit, beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.POS_MACHINE + '-' + Action.EDIT)
+                    },
+                },
+                {
+                    path: ROOT_URL + "/employee", name: "employee", component: employee, beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.EMPLOYEE + '-' + Action.VIEW)
+                    },
+                },
+                {
+                    path: ROOT_URL + "/employee/add", name: "employeeAdd", component: employeeAdd, beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.EMPLOYEE + '-' + Action.CREATE)
+                    },
+                },
+                {
+                    path: ROOT_URL + "/employee/edit/:id", name: "employeeEdit", component: employeeEdit, beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.EMPLOYEE + '-' + Action.EDIT)
+                    },
+                },
+                {
+                    path: ROOT_URL + "/salary", name: "salary", component: salary, beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.SALARY + '-' + Action.VIEW)
+                    },
+                },
+                {
+                    path: ROOT_URL + "/salary/add", name: "salaryAdd", component: salaryAdd, beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.SALARY + '-' + Action.CREATE)
+                    },
+                },
+                {
+                    path: ROOT_URL + "/salary/edit/:id", name: "salaryEdit", component: salaryEdit, beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.SALARY + '-' + Action.EDIT)
+                    },
+                },
+                {
+                    path: ROOT_URL + "/company/sale", name: "CompanySale", component: CompanySale, beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.COMPANY_SALE + '-' + Action.VIEW)
+                    },
+                },
+                {
+                    path: ROOT_URL + "/invoices", name: "Invoices", component: Invoice, beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.INVOICE + '-' + Action.VIEW)
+                    },
+                },
+                {
+                    path: ROOT_URL + "/invoices/view/:id", name: "InvoicesView", component: InvoiceView, beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.INVOICE + '-' + Action.VIEW)
+                    },
+                },
+                {
+                    path: ROOT_URL + "/daily/report", name: "dailyReport", component: dailyReport,  beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.DAILY_REPORT + '-' + Action.VIEW)
+                    },
+                },
+                {
+                    path: ROOT_URL + "/user", name: "user", component: user,  beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.USER + '-' + Action.VIEW)
+                    },
+                },
+                {
+                    path: ROOT_URL + "/user/add", name: "userAdd", component: userAdd,  beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.USER + '-' + Action.CREATE)
+                    },
+                },
+                {
+                    path: ROOT_URL + "/user/edit/:id", name: "userEdit", component: userEdit,  beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.USER + '-' + Action.EDIT)
+                    },
+                },
+                {
+                    path: ROOT_URL + "/balanceTransfer", name: "balanceTransfer", component: balanceTransfer,  beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.TRANSFER + '-' + Action.VIEW)
+                    },
+                },
+                {
+                    path: ROOT_URL + "/balanceTransfer/add", name: "balanceTransferAdd", component: balanceTransferAdd,  beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.TRANSFER + '-' + Action.CREATE)
+                    },
+                },
+                {
+                    path: ROOT_URL + "/balanceTransfer/edit/:id", name: "balanceTransferEdit", component: balanceTransferEdit,  beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.TRANSFER + '-' + Action.EDIT)
+                    },
+                },
+                {
+                    path: ROOT_URL + "/system/setup", name: "system", component: system,  beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.SYSTEM_SETTING + '-' + Action.VIEW)
+                    },
+                },
+                {
+                    path: ROOT_URL + "/voucher", name: "voucher", component: Voucher,  beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.VOUCHER + '-' + Action.VIEW)
+                    },
+                },
+                {
+                    path: ROOT_URL + "/driver", name: "driver", component: Driver,  beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.DRIVER + '-' + Action.VIEW)
+                    },
+                },
+                {
+                    path: ROOT_URL + "/role", name: "role", component: Role,  beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.ROLE + '-' + Action.VIEW)
+                    },
+                },
+                {
+                    path: ROOT_URL + "/role/create", name: "createRole", component: createRole,  beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.ROLE + '-' + Action.CREATE)
+                    },
+                },
+                {
+                    path: ROOT_URL + "/role/edit/:id", name: "roleEdit", component: roleEdit,  beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.ROLE + '-' + Action.EDIT)
+                    },
+                },
             ],
         },
     ],
 });
-
-
+function CheckPermission(to, from, next, sectionName) {
+    let auth = JSON.parse(localStorage.getItem('userInfo'));
+    let permission = auth.permission ?? [];
+    if (permission.includes(sectionName)) {
+        next();
+    } else {
+        next('/dashboard');
+    }
+}
+import Section from "../Helpers/Section";
+import Action from "../Helpers/Action";
 export default router;

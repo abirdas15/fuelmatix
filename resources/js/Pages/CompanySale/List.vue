@@ -5,7 +5,7 @@
                 <ol class="breadcrumb align-items-center ">
                     <li class="breadcrumb-item active"><router-link :to="{name: 'Dashboard'}">Home</router-link></li>
                     <li class="breadcrumb-item"><a href="javascript:void(0)">Company Sale</a></li>
-                    <li style="margin-left: auto;">
+                    <li style="margin-left: auto;" v-if="CheckPermission(Section.COMPANY_SALE + '-' + Action.CREATE)">
                         <a class="btn btn-success text-white" style="padding: 8px 20px" v-if="selectedIDs.length > 0 && !generateLoading" @click="generateInvoice()" href="javascript:void(0)">Generate Invoice</a>
                         <a class="btn btn-success text-white" style="padding: 8px 20px" v-if="selectedIDs.length > 0 && generateLoading" href="javascript:void(0)">Generating....</a>
                     </li>
@@ -58,10 +58,10 @@
                                                 <td><a href="javascript:void(0);">{{f.name}}</a></td>
                                                 <td><a href="javascript:void(0);">{{f?.amount}}</a></td>
                                                 <td>
-                                                    <template v-if="f.module == 'shift sale'">
+                                                    <template v-if="f.module == 'shift sale' && CheckPermission(Section.COMPANY_SALE + '-' + Action.CREATE)">
                                                         <button class="btn btn-sm btn-primary" v-if="!f.invoice_id"  @click="tableAction('expand', f)">Expand</button>
                                                     </template>
-                                                    <router-link :to="{name: 'InvoicesView', params: { id: f.invoice_id }}" class="btn btn-sm btn-info" v-if="f.invoice_id" @click="tableAction('view', f)">View Invoices</router-link>
+                                                    <router-link v-if="CheckPermission(Section.INVOICE + '-' + Action.VIEW)" :to="{name: 'InvoicesView', params: { id: f.invoice_id }}" class="btn btn-sm btn-info" v-if="f.invoice_id" @click="tableAction('view', f)">View Invoices</router-link>
                                                 </td>
                                             </tr>
                                             </tbody>
@@ -134,6 +134,8 @@ import ApiService from "../../Services/ApiService";
 import ApiRoutes from "../../Services/ApiRoutes";
 import Pagination from "../../Helpers/Pagination";
 import _ from "lodash";
+import Section from "../../Helpers/Section";
+import Action from "../../Helpers/Action";
 export default {
     components: {
         Pagination,
@@ -169,6 +171,12 @@ export default {
         this.list();
     },
     computed: {
+        Action() {
+            return Action
+        },
+        Section() {
+            return Section
+        },
         Auth: function () {
             return this.$store.getters.GetAuth;
         },

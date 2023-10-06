@@ -28,4 +28,5 @@ class AccountCategory
     const DRIVER_SALE = 'Driver Sale';
 
     const UN_EARNED_REVENUE = 'Un Earned Revenue';
+    const UN_AUTHORIZED_BILL = 'Un Authorized Bill';
 }

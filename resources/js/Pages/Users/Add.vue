@@ -25,6 +25,14 @@
                                         <div class="invalid-feedback"></div>
                                     </div>
                                     <div class="mb-3 form-group col-md-6">
+                                        <label class="form-label">Role:</label>
+                                        <select class="form-control" v-model="param.role_id" name="role_id">
+                                            <option value="">Choose Role</option>
+                                            <option v-for="row in roles" :value="row.id" v-text="row.name"></option>
+                                        </select>
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                    <div class="mb-3 form-group col-md-6">
                                         <label class="form-label">Email:</label>
                                         <input type="text" class="form-control" name="email" v-model="param.email">
                                         <div class="invalid-feedback"></div>
@@ -44,8 +52,8 @@
                                         <input type="text" class="form-control" name="address" v-model="param.address">
                                         <div class="invalid-feedback"></div>
                                     </div>
-                                    <div class="mb-3 form-group col-md-6">
-                                        <div class="form-check custom-checkbox ms-1" style="margin-top: 3rem; padding-left: 3rem;">
+                                    <div class="form-group col-md-6">
+                                        <div class="form-check custom-checkbox ms-1">
                                             <input type="checkbox" class="form-check-input"
                                                    id="basic_checkbox_1" v-model="param.cashier_balance">
                                             <label class="form-check-label" for="basic_checkbox_1">Cashier balance</label>
@@ -84,11 +92,23 @@ export default {
                 address: '',
                 phone: '',
                 cashier_balance: '',
+                role_id: '',
             },
             loading: false,
+            roles: []
         }
     },
     methods: {
+        fetchRole: function() {
+            ApiService.POST(ApiRoutes.RoleList, {limit: 100},res => {
+                this.TableLoading = false
+                if (parseInt(res.status) === 200) {
+                    this.roles = res.data.data;
+                } else {
+                    ApiService.ErrorHandler(res.error);
+                }
+            });
+        },
         save: function () {
             ApiService.ClearErrorHandler();
             this.loading = true
@@ -105,7 +125,7 @@ export default {
         },
     },
     created() {
-
+        this.fetchRole();
     },
     mounted() {
         $('#dashboard_bar').text('User Add')

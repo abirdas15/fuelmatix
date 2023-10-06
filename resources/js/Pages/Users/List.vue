@@ -5,7 +5,7 @@
                 <ol class="breadcrumb align-items-center ">
                     <li class="breadcrumb-item active"><router-link :to="{name: 'Dashboard'}">Home</router-link></li>
                     <li class="breadcrumb-item"><a href="javascript:void(0)">Users</a></li>
-                    <li style="margin-left: auto;"><router-link :to="{name: 'userAdd'}"><i class="fa-solid fa-plus"></i> Add New Users</router-link></li>
+                    <li v-if="CheckPermission(Section.USER + '-' + Action.CREATE)" style="margin-left: auto;"><router-link :to="{name: 'userAdd'}"><i class="fa-solid fa-plus"></i> Add New Users</router-link></li>
                 </ol>
             </div>
             <div class="row">
@@ -38,6 +38,7 @@
                                             <thead>
                                             <tr class="text-white" style="background-color: #4886EE;color:#ffffff">
                                                 <th class="text-white" @click="sortData('name')" :class="sortClass('name')">Name</th>
+                                                <th class="text-white" @click="sortData('role')" :class="sortClass('role')">Role</th>
                                                 <th class="text-white" @click="sortData('email')" :class="sortClass('email')">Email</th>
                                                 <th class="text-white" @click="sortData('address')" :class="sortClass('address')">Address</th>
                                                 <th class="text-white" >Action</th>
@@ -46,14 +47,15 @@
                                             <tbody v-if="listData.length > 0 && TableLoading == false">
                                             <tr v-for="f in listData">
                                                 <td >{{f.name}}</td>
+                                                <td >{{f.role}}</td>
                                                 <td >{{f.email}}</td>
                                                 <td >{{f.address}}</td>
                                                 <td>
                                                     <div class="d-flex justify-content-end">
-                                                        <router-link :to="{name: 'userEdit', params: { id: f.id }}" class=" btn btn-primary shadow btn-xs sharp me-1">
+                                                        <router-link v-if="CheckPermission(Section.USER + '-' + Action.EDIT)" :to="{name: 'userEdit', params: { id: f.id }}" class=" btn btn-primary shadow btn-xs sharp me-1">
                                                             <i class="fas fa-pencil-alt"></i>
                                                         </router-link>
-                                                        <a  href="javascript:void(0)"  @click="openModalDelete(f)" class="btn btn-danger shadow btn-xs sharp">
+                                                        <a v-if="CheckPermission(Section.USER + '-' + Action.DELETE)"  href="javascript:void(0)"  @click="openModalDelete(f)" class="btn btn-danger shadow btn-xs sharp">
                                                             <i class="fa fa-trash"></i>
                                                         </a>
                                                     </div>
@@ -94,6 +96,8 @@ import Swal from 'sweetalert2/dist/sweetalert2.js'
 import ApiService from "../../Services/ApiService";
 import ApiRoutes from "../../Services/ApiRoutes";
 import Pagination from "../../Helpers/Pagination.vue";
+import Section from "../../Helpers/Section";
+import Action from "../../Helpers/Action";
 export default {
     components: {
         Pagination,
@@ -122,6 +126,12 @@ export default {
         this.list();
     },
     computed: {
+        Action() {
+            return Action
+        },
+        Section() {
+            return Section
+        },
         Auth: function () {
             return this.$store.getters.GetAuth;
         },

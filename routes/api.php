@@ -35,6 +35,8 @@ use App\Http\Controllers\BalanceTransferController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\VoucherController;
 use App\Http\Controllers\DriverController;
+use App\Http\Controllers\RoleController;
+use App\Http\Controllers\PermissionController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -272,6 +274,17 @@ Route::group(['middleware' => 'AuthReqCheck'], function() {
         Route::post('single', [DriverController::class, 'single']);
         Route::post('update', [DriverController::class, 'update']);
         Route::post('delete', [DriverController::class, 'delete']);
+        Route::post('amount', [DriverController::class, 'getAmount']);
+    });
+    Route::group(['prefix' => 'role'], function() {
+        Route::post('list', [RoleController::class, 'list']);
+        Route::post('save', [RoleController::class, 'save']);
+        Route::post('single', [RoleController::class, 'single']);
+        Route::post('update', [RoleController::class, 'update']);
+        Route::post('delete', [RoleController::class, 'delete']);
+    });
+    Route::group(['prefix' => 'permission'], function() {
+        Route::post('list', [PermissionController::class, 'getAllPermission']);
     });
 });
 

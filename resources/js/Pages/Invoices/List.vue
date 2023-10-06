@@ -5,7 +5,7 @@
                 <ol class="breadcrumb align-items-center ">
                     <li class="breadcrumb-item active"><router-link :to="{name: 'Dashboard'}">Home</router-link></li>
                     <li class="breadcrumb-item"><a href="javascript:void(0)">Invoice List</a></li>
-                    <li style="margin-left: auto;">
+                    <li v-if="CheckPermission(Section.INVOICE + '-' + Action.CREATE)"  style="margin-left: auto;">
                         <a class="btn btn-success text-white" style="padding: 8px 20px"  @click="paymentGlobalModal()" href="javascript:void(0)">Payment</a>
                     </li>
                 </ol>
@@ -69,9 +69,9 @@
                                                 </td>
                                                 <td>
                                                     <div class="d-flex justify-content-end align-items-center">
-                                                        <button class="btn btn-sm btn-primary me-2" v-if="f.status != 'paid'" @click="paymentModal(f)">Payment</button>
-                                                        <router-link :to="{name: 'InvoicesView', params: { id: f.id }}" class="btn btn-sm btn-info me-2">View</router-link>
-                                                        <button class="btn btn-sm btn-danger me-2" v-if="f.status != 'paid'" @click="openModalDelete(f)">Delete</button>
+                                                        <button v-if="CheckPermission(Section.INVOICE + '-' + Action.CREATE)"  class="btn btn-sm btn-primary me-2" v-if="f.status != 'paid'" @click="paymentModal(f)">Payment</button>
+                                                        <router-link  :to="{name: 'InvoicesView', params: { id: f.id }}" class="btn btn-sm btn-info me-2">View</router-link>
+                                                        <button v-if="CheckPermission(Section.INVOICE + '-' + Action.DELETE)"  class="btn btn-sm btn-danger me-2" v-if="f.status != 'paid'" @click="openModalDelete(f)">Delete</button>
                                                     </div>
                                                 </td>
                                             </tr>
@@ -174,6 +174,8 @@ import Swal from 'sweetalert2/dist/sweetalert2.js'
 import ApiService from "../../Services/ApiService";
 import ApiRoutes from "../../Services/ApiRoutes";
 import Pagination from "../../Helpers/Pagination";
+import Section from "../../Helpers/Section";
+import Action from "../../Helpers/Action";
 export default {
     components: {
         Pagination,
@@ -216,6 +218,12 @@ export default {
         this.getCompany();
     },
     computed: {
+        Action() {
+            return Action
+        },
+        Section() {
+            return Section
+        },
         Auth: function () {
             return this.$store.getters.GetAuth;
         },
