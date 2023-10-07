@@ -3,10 +3,10 @@
         <div class="popup-wrapper">
             <div class="popup">
                 <ul style="padding: 0">
-                    <li><a href="javascript:void(0)" @click="openCategory()">Open Account</a></li>
-                    <li><a href="javascript:void(0)" @click="openCategoryModalEdit()">Edit Account</a></li>
-                    <li><a href="javascript:void(0)" @click="openCategoryModal()">New account</a></li>
-                    <li id="delete"><a href="javascript:void(0)">Delete account</a></li>
+                    <li v-if="CheckPermission(Section.ACCOUNTING + '-' + Action.CREATE)"><a href="javascript:void(0)" @click="openCategory()">Open Account</a></li>
+                    <li v-if="CheckPermission(Section.ACCOUNTING + '-' + Action.EDIT)"><a href="javascript:void(0)" @click="openCategoryModalEdit()">Edit Account</a></li>
+                    <li v-if="CheckPermission(Section.ACCOUNTING + '-' + Action.CREATE)"><a href="javascript:void(0)" @click="openCategoryModal()">New account</a></li>
+                    <li v-if="CheckPermission(Section.ACCOUNTING + '-' + Action.DELETE)" id="delete"><a href="javascript:void(0)">Delete account</a></li>
                 </ul>
             </div>
         </div>
@@ -31,7 +31,17 @@
 import TreeNode from "./TreeNode";
 import ApiService from "../../Services/ApiService";
 import ApiRoutes from "../../Services/ApiRoutes";
+import Section from "../../Helpers/Section";
+import Action from "../../Helpers/Action";
 export default {
+    computed: {
+        Action() {
+            return Action
+        },
+        Section() {
+            return Section
+        }
+    },
     props: ['node', 'parentCategory'],
     name: "TreeNode",
     components: {TreeNode},

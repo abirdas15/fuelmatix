@@ -4,15 +4,15 @@
             <div class="row page-titles">
                 <ol class="breadcrumb align-items-center ">
                     <li class="breadcrumb-item active"><router-link :to="{name: 'Dashboard'}">Home</router-link></li>
-                    <li class="breadcrumb-item"><a href="javascript:void(0)">Tank Reading List</a></li>
-                    <li v-if="CheckPermission(Section.TANK_READING + '-' + Action.CREATE)" style="margin-left: auto;"><router-link :to="{name: 'TankReadingAdd'}"><i class="fa-solid fa-plus"></i> New Tank Reading</router-link></li>
+                    <li class="breadcrumb-item"><a href="javascript:void(0)">Role</a></li>
+                    <li style="margin-left: auto;"><router-link :to="{name: 'createRole'}"><i class="fa-solid fa-plus"></i> Add New Role</router-link></li>
                 </ol>
             </div>
             <div class="row">
                 <div class="col-12">
                     <div class="card">
                         <div class="card-header bg-secondary">
-                            <h4 class="card-title">Tank Reading History</h4>
+                            <h4 class="card-title">Role</h4>
                         </div>
                         <div class="card-body">
                             <div class="row mt-4">
@@ -37,25 +37,19 @@
                                         <table class="display  dataTable no-footer" style="min-width: 845px">
                                             <thead>
                                             <tr class="text-white" style="background-color: #4886EE;color:#ffffff">
-                                                <th class="text-white" @click="sortData('date')" :class="sortClass('date')">Date</th>
-                                                <th class="text-white" @click="sortData('tank_name')" :class="sortClass('tank_name')">Tank ID</th>
-                                                <th class="text-white" @click="sortData('height')" :class="sortClass('height')">Height</th>
-                                                <th class="text-white" @click="sortData('water_height')" :class="sortClass('water_height')">Height Height</th>
-                                                <th class="text-white" >Action</th>
+                                                <th class="text-white">Name</th>
+                                                <th class="text-white text-end">Action</th>
                                             </tr>
                                             </thead>
                                             <tbody v-if="listData.length > 0 && TableLoading == false">
                                             <tr v-for="f in listData">
-                                                <td >{{f.date}}</td>
-                                                <td><a href="javascript:void(0);">{{f.tank_name}}</a></td>
-                                                <td><a href="javascript:void(0);">{{f?.height}}</a></td>
-                                                <td><a href="javascript:void(0);">{{f?.water_height}}</a></td>
+                                                <td >{{f.name}}</td>
                                                 <td>
-                                                    <div class="d-flex justify-content-end">
-                                                        <router-link v-if="CheckPermission(Section.TANK_READING + '-' + Action.EDIT)" :to="{name: 'TankReadingEdit', params: { id: f.id }}" class=" btn btn-primary shadow btn-xs sharp me-1">
+                                                    <div class="d-flex justify-content-end" v-if="f.is_default == 0">
+                                                        <router-link :to="{name: 'roleEdit', params: { id: f.id }}" class=" btn btn-primary shadow btn-xs sharp me-1">
                                                             <i class="fas fa-pencil-alt"></i>
                                                         </router-link>
-                                                        <a v-if="CheckPermission(Section.TANK_READING + '-' + Action.DELETE)"  href="javascript:void(0)"  @click="openModalDelete(f)" class="btn btn-danger shadow btn-xs sharp">
+                                                        <a  href="javascript:void(0)"  @click="openModalDelete(f.id)" class="btn btn-danger shadow btn-xs sharp">
                                                             <i class="fa fa-trash"></i>
                                                         </a>
                                                     </div>
@@ -78,7 +72,7 @@
                                         </div>
 
                                         <div class="dataTables_paginate paging_simple_numbers" id="example3_paginate">
-                                            <Pagination :data="paginateData" :onChange="list" :btn-big="true"></Pagination>
+                                            <Pagination :data="paginateData" :onChange="list"></Pagination>
                                         </div>
                                     </div>
                                 </div>
@@ -93,11 +87,9 @@
 
 <script>
 import Swal from 'sweetalert2/dist/sweetalert2.js'
-import ApiService from "../../../Services/ApiService";
-import ApiRoutes from "../../../Services/ApiRoutes";
-import Pagination from "../../../Helpers/Pagination";
-import Section from "../../../Helpers/Section";
-import Action from "../../../Helpers/Action";
+import ApiService from "../../Services/ApiService";
+import ApiRoutes from "../../Services/ApiRoutes";
+import Pagination from "../../Helpers/Pagination.vue";
 export default {
     components: {
         Pagination,
@@ -126,18 +118,12 @@ export default {
         this.list();
     },
     computed: {
-        Action() {
-            return Action
-        },
-        Section() {
-            return Section
-        },
         Auth: function () {
             return this.$store.getters.GetAuth;
         },
     },
     methods: {
-        openModalDelete(data) {
+        openModalDelete(id) {
             Swal.fire({
                 title: 'Are you sure you want to delete?',
                 text: "You won't be able to revert this!",
@@ -148,7 +134,7 @@ export default {
                 confirmButtonText: 'Yes, delete it!'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    this.Delete(data)
+                    this.Delete(id)
                 }
             })
         },
@@ -160,7 +146,7 @@ export default {
             }
             this.Param.page = page.page;
             this.TableLoading = true
-            ApiService.POST(ApiRoutes.TankReadingList, this.Param,res => {
+            ApiService.POST(ApiRoutes.RoleList, this.Param,res => {
                 this.TableLoading = false
                 if (parseInt(res.status) === 200) {
                     this.paginateData = res.data;
@@ -170,8 +156,8 @@ export default {
                 }
             });
         },
-        Delete: function (data) {
-            ApiService.POST(ApiRoutes.TankReadingDelete, {id: data.id },res => {
+        Delete: function (id) {
+            ApiService.POST(ApiRoutes.RoleDelete, {id: id },res => {
                 if (parseInt(res.status) === 200) {
                     this.$toast.success(res.message);
                     this.list()
@@ -200,7 +186,7 @@ export default {
 
     },
     mounted() {
-        $('#dashboard_bar').text('Tank Reading History')
+        $('#dashboard_bar').text('Role')
     }
 }
 </script>

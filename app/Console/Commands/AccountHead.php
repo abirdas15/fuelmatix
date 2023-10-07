@@ -261,7 +261,17 @@ class AccountHead extends Command
                 'category_hericy' => json_encode([AccountCategory::LIABILITIES, AccountCategory::UN_EARNED_REVENUE]),
                 'default' => 1,
                 'client_company_id' => $clientCompany->id,
-                'category_ids' => json_encode([3,8,22])
+                'category_ids' => json_encode([3, 22])
+            ],
+            [
+                'category' => AccountCategory::UN_AUTHORIZED_BILL,
+                'parent_category' => 3,
+                'type' => 'liabilities',
+                'balance' => 0,
+                'category_hericy' => json_encode([AccountCategory::LIABILITIES, AccountCategory::UN_EARNED_REVENUE]),
+                'default' => 1,
+                'client_company_id' => $clientCompany->id,
+                'category_ids' => json_encode([3, 23])
             ],
         ];
         Category::truncate();

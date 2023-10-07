@@ -11,6 +11,7 @@ use App\Repository\CategoryRepository;
 use App\Repository\DriverRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class DriverController extends Controller
@@ -202,5 +203,29 @@ class DriverController extends Controller
         Driver::where('id', $requestData['id'])->delete();
         Category::whereIn('id', [$driver['driver_expense_id'], $driver['driver_liability_id']])->delete();
         return response()->json(['status' => 200, 'message' => 'Successfully deleted driver.']);
+    }
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function getAmount(Request $request): JsonResponse
+    {
+        $requestData = $request->all();
+        $validation = Validator::make($requestData, [
+            'driver_id' => 'required|integer',
+        ]);
+        if ($validation->fails()) {
+            return response()->json(['status' => 500, 'errors' => $validation->errors()]);
+        }
+        $driver = Driver::find($requestData['driver_id']);
+        if (!$driver instanceof Driver) {
+            return response()->json(['status' => 400, 'message' => 'Cannot find [driver].']);
+        }
+        $driverLiability = Category::find($driver['driver_liability_id']);
+        if (!$driverLiability instanceof Category) {
+            return response()->json(['status' => 400, 'message' => 'Cannot find [driver liability].']);
+        }
+        $result = DriverRepository::getDriverAmount($driverLiability['id']);
+        return response()->json(['status' => 200, 'data' => $result]);
     }
 }

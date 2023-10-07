@@ -25,11 +25,11 @@ class SaleRepository
      * @param $inputData
      * @return \Illuminate\Contracts\Validation\Validator
      */
-    public static function validateAdvancePay($inputData): \Illuminate\Contracts\Validation\Validator
+    public static function validateAdvancePayment($inputData): \Illuminate\Contracts\Validation\Validator
     {
         return Validator::make($inputData, [
-            'payment_method' => 'required',
-            'payment_category_id' => 'required_unless:payment_method,cash',
+            'advance_amount' => 'required|numeric',
+            'company_id' => 'required_unless:payment_method,cash',
             'voucher_number' => 'required_if:payment_method,company|integer',
             'driver_sale.driver_id' => 'required'
         ],[
@@ -47,8 +47,10 @@ class SaleRepository
         return Validator::make($inputData, [
             'payment_method' => 'required',
             'products' => 'required|array',
-            'payment_category_id' => 'required_unless:payment_method,cash',
-            'voucher_number' => 'required_if:payment_method,company|integer',
+            'company_id' => 'required_unless:payment_method,cash',
+            'voucher_number' => empty($inputData['advance_sale']) ? 'required_if:payment_method,company|integer' : 'nullable',
+            'driver_sale.driver_id' => 'required_if:is_driver_sale,true|integer',
+            'driver_sale.price' => 'required_if:is_driver_sale,true|numeric',
             'products.*.shift_sale_id' => 'required',
             'products.*.product_id' => 'required',
             'products.*.income_category_id' => 'required',
@@ -59,6 +61,8 @@ class SaleRepository
             'products.*.subtotal' => 'required',
         ],[
             'voucher_number.required_if' => 'The voucher number filed is required',
+            'driver_sale.driver_id.required_if' => 'The driver filed is required',
+            'driver_sale.price.required_if' => 'The amount filed is required',
             'products.*.shift_sale_id.required' => 'Shift sale is not started. Please start shift sale first.',
             'products.*.product_id.required' => 'The product field is required.',
             'products.*.income_category_id.required' => 'Product is not a income category. Please update product first.',
@@ -67,5 +71,12 @@ class SaleRepository
             'products.*.price.required' => 'The price field is required.',
             'products.*.subtotal.required' => 'The subtotal field is required.',
         ]);
+    }
+    /**
+     * @param array $data
+     * */
+    public static function advancePayment($data)
+    {
+
     }
 }

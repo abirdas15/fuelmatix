@@ -5,7 +5,7 @@
                 <ol class="breadcrumb align-items-center ">
                     <li class="breadcrumb-item active"><router-link :to="{name: 'Dashboard'}">Home</router-link></li>
                     <li class="breadcrumb-item"><a href="javascript:void(0)">Pay Order List</a></li>
-                    <li style="margin-left: auto;"><router-link :to="{name: 'PayOrderAdd'}"><i class="fa-solid fa-plus"></i> Add New Pay Order</router-link></li>
+                    <li v-if="CheckPermission(Section.PAY_ORDER + '-' + Action.CREATE)" style="margin-left: auto;"><router-link :to="{name: 'PayOrderAdd'}"><i class="fa-solid fa-plus"></i> Add New Pay Order</router-link></li>
                 </ol>
             </div>
             <div class="row">
@@ -54,10 +54,10 @@
                                                 <td >{{f.quantity}}</td>
                                                 <td>
                                                     <div class="d-flex justify-content-end">
-                                                        <router-link :to="{name: 'PayOrderEdit', params: { id: f.id }}" class=" btn btn-primary shadow btn-xs sharp me-1">
+                                                        <router-link v-if="CheckPermission(Section.PAY_ORDER + '-' + Action.EDIT)" :to="{name: 'PayOrderEdit', params: { id: f.id }}" class=" btn btn-primary shadow btn-xs sharp me-1">
                                                             <i class="fas fa-pencil-alt"></i>
                                                         </router-link>
-                                                        <a  href="javascript:void(0)"  @click="openModalDelete(f)" class="btn btn-danger shadow btn-xs sharp">
+                                                        <a v-if="CheckPermission(Section.PAY_ORDER + '-' + Action.DELETE)"  href="javascript:void(0)"  @click="openModalDelete(f)" class="btn btn-danger shadow btn-xs sharp">
                                                             <i class="fa fa-trash"></i>
                                                         </a>
                                                     </div>
@@ -98,6 +98,8 @@ import Swal from 'sweetalert2/dist/sweetalert2.js'
 import ApiService from "../../Services/ApiService";
 import ApiRoutes from "../../Services/ApiRoutes";
 import Pagination from "../../Helpers/Pagination";
+import Section from "../../Helpers/Section";
+import Action from "../../Helpers/Action";
 export default {
     components: {
         Pagination,
@@ -126,6 +128,12 @@ export default {
         this.list();
     },
     computed: {
+        Action() {
+            return Action
+        },
+        Section() {
+            return Section
+        },
         Auth: function () {
             return this.$store.getters.GetAuth;
         },

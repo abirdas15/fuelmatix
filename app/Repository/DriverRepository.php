@@ -4,7 +4,9 @@ namespace App\Repository;
 
 use App\Helpers\SessionUser;
 use App\Models\Driver;
+use App\Models\Transaction;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 
 class DriverRepository
 {
@@ -27,5 +29,22 @@ class DriverRepository
             return false;
         }
         return $driverModel;
+    }
+
+    /**
+     * @param integer $id
+     * @return mixed
+     */
+    public static function getDriverAmount(int $id)
+    {
+        $sessionUser = SessionUser::getUser();
+        $result =  Transaction::select(DB::raw('SUM(debit_amount) as debit_amount'), DB::raw('SUM(credit_amount) as credit_amount'))
+            ->where('linked_id', $id)
+            ->where('client_company_id', $sessionUser['client_company_id'])
+            ->first();
+        if (!empty($result)) {
+            return $result['credit_amount'] - $result['debit_amount'];
+        }
+        return 0;
     }
 }

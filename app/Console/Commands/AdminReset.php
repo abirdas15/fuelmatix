@@ -2,6 +2,9 @@
 
 namespace App\Console\Commands;
 
+use App\Models\ClientCompany;
+use App\Models\Permission;
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Console\Command;
 
@@ -38,13 +41,34 @@ class AdminReset extends Command
      */
     public function handle()
     {
-        $data = [
-            'name' => 'Admin',
-            'password'=> bcrypt('12345678'),
-            'email' => 'admin@gmail.com',
-        ];
+        $company = ClientCompany::first();
+        $permission = Permission::getAllPermission();
+        Role::truncate();
         User::truncate();
-        User::insert($data);
+        Permission::truncate();
+
+        $role = new Role();
+        $role->name = 'Admin';
+        $role->is_default = 1;
+        $role->client_company_id = $company['id'];
+        $role->save();
+
+        $user = new User();
+        $user->name = 'Admin';
+        $user->password = bcrypt('12345678');
+        $user->email = 'admin@gmail.com';
+        $user->role_id = $role['id'];
+        $user->client_company_id = $company['id'];
+        $user->save();
+        $permissionData = [];
+        foreach ($permission as $permissionName) {
+            $permissionData[] = [
+                'name' => $permissionName,
+                'role_id' => $role->id,
+                'client_company_id' => $company['id']
+            ];
+        }
+        Permission::insert($permissionData);
         print_r("Successfully generate admin.".PHP_EOL);
     }
 }

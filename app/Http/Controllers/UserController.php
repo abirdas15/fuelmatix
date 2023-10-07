@@ -21,7 +21,8 @@ class UserController extends Controller
     {
         $requestData = $request->all();
         $validator = Validator::make($requestData, [
-            'name' => 'required',
+            'name' => 'required|string',
+            'role_id' => 'required|integer',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|min:8'
         ]);
@@ -32,6 +33,7 @@ class UserController extends Controller
         $user = new User();
         $user->name = $requestData['name'];
         $user->email = $requestData['email'];
+        $user->role_id = $requestData['role_id'];
         $user->password = bcrypt($requestData['password']);
         $user->phone = $requestData['phone'] ?? null;
         $user->address = $requestData['address'] ?? null;
@@ -67,12 +69,13 @@ class UserController extends Controller
         $orderBy = $requestData['order_by'] ?? 'id';
         $orderMode = $requestData['order_mode'] ?? 'DESC';
         $keyword = $requestData['keyword'] ?? '';
-        $result = User::select('id', 'name', 'email', 'phone', 'category_id', 'address')
-            ->where('client_company_id', $sessionUser['client_company_id']);
+        $result = User::select('users.id', 'users.name', 'users.email', 'users.phone', 'users.category_id', 'users.address', 'roles.name as role')
+            ->leftJoin('roles', 'roles.id', '=', 'users.role_id')
+            ->where('users.client_company_id', $sessionUser['client_company_id']);
         if (!empty($keyword)) {
             $result->where(function($q) use ($keyword) {
-                $q->where('name', 'LIKE', '%'.$keyword.'%');
-                $q->owWhere('email', 'LIKE', '%'.$keyword.'%');
+                $q->where('users.name', 'LIKE', '%'.$keyword.'%');
+                $q->owWhere('users.email', 'LIKE', '%'.$keyword.'%');
             });
         }
         $result = $result->orderBy($orderBy, $orderMode)
@@ -92,7 +95,7 @@ class UserController extends Controller
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
-        $result = User::select('id', 'name', 'email', 'phone', 'address', 'cashier_balance')
+        $result = User::select('id', 'name', 'email', 'phone', 'address', 'cashier_balance', 'role_id')
             ->where('id', $requestData['id'])
             ->first();
         return response()->json(['status' => 200, 'data' => $result]);
@@ -106,8 +109,9 @@ class UserController extends Controller
     {
         $requestData = $request->all();
         $validator = Validator::make($requestData, [
-            'id' => 'required',
-            'name' => 'required',
+            'id' => 'required|integer',
+            'name' => 'required|string',
+            'role_id' => 'required|integer',
             'email' => 'required|email',
             'password' => 'sometimes|min:8'
         ]);
@@ -125,6 +129,7 @@ class UserController extends Controller
             return response()->json(['status' => 500, 'message' => 'Cannot find user']);
         }
         $user->name = $requestData['name'];
+        $user->role_id = $requestData['role_id'];
         $user->email = $requestData['email'];
         if (!empty($requestData['password'])) {
             $user->password = bcrypt($requestData['password']);

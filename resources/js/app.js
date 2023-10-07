@@ -24,11 +24,19 @@ Vue.use(VuePageTransition);
 Vue.component("v-select", vSelect);
 Vue.use(VueToast, { position: "top-right" });
     Vue.mixin({
-        data() {
-            return {
-            }
+        computed: {
+            Auth: function () {
+                return this.$store.getters.GetAuth;
+            },
+            routeMatch: function () {
+                return this.$route.name;
+            },
         },
         methods: {
+            CheckPermission:function(sectionName) {
+                let permission = this.Auth.permission ?? [];
+                return permission.includes(sectionName);
+            },
             formatPrice(value) {
                 let formatter = new Intl.NumberFormat('en-US', {
                     style: 'currency',

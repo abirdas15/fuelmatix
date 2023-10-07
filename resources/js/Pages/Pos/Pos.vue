@@ -20,20 +20,20 @@
                                                 <span class="input-group-text">
                                                     <i class="fa-regular fa-user"></i>
                                                 </span>
-                                            <v-select class="form-control form-control-sm" :options="creditCompany" placeholder="Choose Company" label="name" v-model="payment_category_id"
+                                            <v-select class="form-control form-control-sm" :options="creditCompany" placeholder="Choose Company" label="name" v-model="company_id"
                                                       :reduce="(option) => option.id"></v-select>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-sm-6">
-                                    <template v-if="payment_category_id">
+                                    <template v-if="company_id">
                                         <div class="form-group">
                                             <input type="text" name="voucher_number" class="form-control form-control-sm" placeholder="Voucher No" v-model="voucher_number">
                                             <span class="invalid-feedback d-block"></span>
                                         </div>
                                     </template>
                                 </div>
-                                <div class="col-sm-6" v-if="payment_category_id">
+                                <div class="col-sm-6" v-if="company_id">
                                     <div class="user-search form-group">
                                         <div class="input-group mb-3">
                                                 <span class="input-group-text">
@@ -43,6 +43,11 @@
                                                       :reduce="(option) => option.id"></v-select>
                                             <span class="invalid-feedback d-block"></span>
                                         </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6" v-if="advance_sale">
+                                    <div class="user-search form-group" style="padding: 20px">
+                                        <label>Advance Amount: <strong>{{ parseFloat(driver_amount).toFixed(2) }}</strong></label>
                                     </div>
                                 </div>
                             </div>
@@ -129,7 +134,7 @@
                                                        @click="removeDriverSale()"></i>
                                                 </td>
                                             </tr>
-                                            <tr v-if="enableAdvancePay">
+                                            <tr v-if="advance_pay">
                                                 <td colspan="3">Advance Pay</td>
                                                 <td> <input class="form-control w-100 control-sm text-end" step="any"
                                                              type="number" v-model="advance_amount" ></td>
@@ -146,11 +151,15 @@
                                                 </td>
                                             </tr>
                                         </tbody>
-                                        <tbody v-if="enableAdvancePay">
+                                        <tbody v-if="advance_pay">
                                             <tr>
                                                 <td colspan="3">Advance Pay</td>
-                                                <td style="width: 30%"> <input class="form-control w-100 control-sm text-end" step="any"
-                                                            type="number" v-model="advance_amount" ></td>
+                                                <td style="width: 30%">
+                                                    <div class="form-group">
+                                                        <input class="form-control w-100 control-sm text-end" name="advance_amount" step="any" type="number" v-model="advance_amount" >
+                                                        <span class="invalid-feedback d-block"></span>
+                                                    </div>
+                                                </td>
                                                 <td class="text-end">
                                                     <i class="fa-regular text-danger fa-trash-can cursor-pointer"
                                                        @click="removeAdvancePay"></i>
@@ -164,7 +173,7 @@
                                             </td>
                                         </tr>
                                         </tbody>
-                                        <tbody v-if="sale.length === 0 && !enableAdvancePay">
+                                        <tbody v-if="sale.length === 0 && !advance_pay">
                                             <tr class="text-center">
                                                 <td colspan="20">Please add product</td>
                                             </tr>
@@ -173,13 +182,13 @@
                                     <div class="alert alert-danger" v-if="errorText">{{errorText}}</div>
                                 </div>
                                 <div class="btn-section text-center mt-3">
-                                    <button class="btn btn-warning me-2 width-fixed" v-if="!loading" :disabled="payment_category_id != null"  @click="payment_method = 'cash';order('cash')">Cash </button>
+                                    <button class="btn btn-warning me-2 width-fixed" v-if="!loading" :disabled="company_id != null"  @click="payment_method = 'cash';order('cash')">Cash </button>
                                     <button class="btn btn-warning width-fixed" v-if="loading">Paying....
                                         <i class="fa fa-spinner fa-spin"></i></button>
 
-                                    <button class="btn btn-info me-2 width-fixed" type="button" :disabled="payment_category_id != null" @click="openCardModal();payment_method = 'card'">Credit Card </button>
+                                    <button class="btn btn-info me-2 width-fixed" type="button" :disabled="company_id != null" @click="openCardModal();payment_method = 'card'">Credit Card </button>
 
-                                    <button class="btn btn-success width-fixed" :disabled="payment_category_id == null" v-if="!companyLoading" @click="payment_method = 'company';order('company')">Company </button>
+                                    <button class="btn btn-success width-fixed" :disabled="company_id == null" v-if="!companyLoading" @click="payment_method = 'company';order('company')">Company </button>
                                     <button class="btn btn-success width-fixed" v-if="companyLoading">Paying....
                                         <i class="fa fa-spinner fa-spin"></i></button>
 
@@ -225,20 +234,20 @@
                                                 <kbd>Alt</kbd>+<kbd>{{ getProductNumber(i) }}</kbd></p>
                                         </div>
                                     </div>
-                                    <div class="each-product" @click="addDriverTip()" v-if="payment_category_id != null">
-                                        <div class="img">
-                                            <img :src="'https://via.placeholder.com/100x70?text=Driver Tip'" alt="">
-                                        </div>
-                                        <div class="detail">
-                                            <div class="name">Driver Tip</div>
-                                            <div class="d-flex align-items-center justify-content-between">
-                                                <div class="desc"></div>
-                                                <div></div>
-                                            </div>
-                                            <p class="mt-1 mb-0"></p>
-                                        </div>
-                                    </div>
-                                    <div class="each-product" @click="addDriverSale()" v-if="payment_category_id != null">
+<!--                                    <div class="each-product" @click="addDriverTip()" v-if="company_id != null">-->
+<!--                                        <div class="img">-->
+<!--                                            <img :src="'https://via.placeholder.com/100x70?text=Driver Tip'" alt="">-->
+<!--                                        </div>-->
+<!--                                        <div class="detail">-->
+<!--                                            <div class="name">Driver Tip</div>-->
+<!--                                            <div class="d-flex align-items-center justify-content-between">-->
+<!--                                                <div class="desc"></div>-->
+<!--                                                <div></div>-->
+<!--                                            </div>-->
+<!--                                            <p class="mt-1 mb-0"></p>-->
+<!--                                        </div>-->
+<!--                                    </div>-->
+                                    <div class="each-product" @click="addDriverSale()" v-if="company_id != null">
                                         <div class="img">
                                             <img :src="'https://via.placeholder.com/100x70?text=Driver Sale'" alt="">
                                         </div>
@@ -251,12 +260,25 @@
                                             <p class="mt-1 mb-0"></p>
                                         </div>
                                     </div>
-                                    <div class="each-product" @click="addAdvancePay" v-if="payment_category_id != null">
+                                    <div class="each-product" @click="addAdvancePay" v-if="company_id != null">
                                         <div class="img">
                                             <img :src="'https://via.placeholder.com/100x70?text=Advance Pay'" alt="">
                                         </div>
                                         <div class="detail">
-                                            <div class="name">Advance Pay</div>
+                                            <div class="name">Advance Payment</div>
+                                            <div class="d-flex align-items-center justify-content-between">
+                                                <div class="desc"></div>
+                                                <div></div>
+                                            </div>
+                                            <p class="mt-1 mb-0"></p>
+                                        </div>
+                                    </div>
+                                    <div class="each-product" @click="addAdvanceSale" v-if="company_id != null">
+                                        <div class="img">
+                                            <img :src="'https://via.placeholder.com/100x70?text=Advance Pay'" alt="">
+                                        </div>
+                                        <div class="detail">
+                                            <div class="name">Advance Sale</div>
                                             <div class="d-flex align-items-center justify-content-between">
                                                 <div class="desc"></div>
                                                 <div></div>
@@ -504,12 +526,14 @@ export default {
                 driver_id: '',
             },
             pos_machine_id: '',
-            payment_category_id: null,
+            company_id: null,
             enableDriverTip: false,
             enableDriverSale: false,
-            enableAdvancePay: false,
+            advance_pay: false,
             drivers: [],
-            advance_amount: ''
+            advance_amount: '',
+            advance_sale: false,
+            driver_amount: 0.00
         }
     },
     computed: {
@@ -518,9 +542,9 @@ export default {
         },
     },
     watch: {
-        payment_category_id: function () {
+        company_id: function () {
             this.getDriver();
-            if (this.payment_category_id == null) {
+            if (this.company_id == null) {
                 this.enableDriverTip = false
                 this.enableDriverSale = false;
             }
@@ -530,16 +554,37 @@ export default {
                 this.driver_sale.price = this.sale[0].driver_selling_price * this.driver_sale.quantity;
                 this.driver_sale.buying_price = this.sale[0].buying_price * this.driver_sale.quantity;
             }
-        }
+        },
+        'advance_sale': function() {
+            if (this.advance_sale && this.driver_sale.driver_id) {
+                this.fetchDriverAmount();
+            }
+        },
+        'driver_sale.driver_id': function() {
+            if (this.advance_sale && this.driver_sale.driver_id) {
+                this.fetchDriverAmount();
+            }
+        },
     },
     methods: {
+        fetchDriverAmount: function() {
+            ApiService.POST(ApiRoutes.DriverAmount, {driver_id: this.driver_sale.driver_id}, (res) => {
+                if (parseInt(res.status) == 200) {
+                    this.driver_amount = res.data;
+                }
+            });
+        },
+        addAdvanceSale: function() {
+            this.advance_sale = true;
+        },
         removeAdvancePay: function() {
-            this.enableAdvancePay = false;
+            this.advance_pay = false;
             this.advance_amount = '';
         },
         addAdvancePay: function() {
             this.sale = [];
-            this.enableAdvancePay = true;
+            this.advance_pay = true;
+            this.advance_sale = false;
         },
         openCardModal: function () {
             $(".card-modal").removeClass('d-none');
@@ -573,7 +618,7 @@ export default {
         },
         order: function (type) {
             ApiService.ClearErrorHandler();
-            if (this.sale.length == 0 && !this.enableAdvancePay) {
+            if (this.sale.length == 0 && !this.advance_pay) {
                 return;
             }
             if (type == 'cash') {
@@ -590,10 +635,13 @@ export default {
             }
             if (type == 'company') {
                 param.driver_tip = this.driver_tip
-                param.payment_category_id = this.payment_category_id
+                param.company_id = this.company_id
                 param.voucher_number = this.voucher_number;
                 param.driver_sale = this.driver_sale;
                 param.advance_amount = this.advance_amount;
+                param.advance_pay = this.advance_pay;
+                param.is_driver_sale = this.enableDriverSale;
+                param.advance_sale = this.advance_sale;
             }
             if (type == 'card') {
                 param.pos_machine_id = this.pos_machine_id
@@ -613,17 +661,28 @@ export default {
                     this.enableDriverTip = false
                     this.enableDriverSale = false
                     this.payment_method = ''
-                    this.payment_category_id = null
+                    this.company_id = null
                     this.voucher_number = '';
-                    this.singleOrder()
+                    this.advance_amount = '';
+                    this.advance_pay = false;
+                    this.advance_pay= false;
+                    this.advance_amount= '';
+                    this.advance_sale= false;
+                    this.driver_amount= 0.00;
+                    this.$toast.success(res.message);
+                    if (this.saleId != null) {
+                        this.singleOrder()
+                    }
                     this.closeModal()
+                } else if (parseInt(res.status) == 400) {
+                    this.$toast.warning(res.message);
                 } else {
                     if (res.message != undefined) {
                         this.errorText = res.message
                     } else {
                         ApiService.ErrorHandler(res.errors);
-                        if (res.errors.payment_category_id) {
-                            this.errorText = res.errors.payment_category_id[0]
+                        if (res.errors.company_id) {
+                            this.errorText = res.errors.company_id[0]
                         }
                     }
 
@@ -643,7 +702,7 @@ export default {
             });
         },
         getDriver: function () {
-            ApiService.POST(ApiRoutes.DriverList, {limit: 5000, page: 1, company_id: this.payment_category_id}, res => {
+            ApiService.POST(ApiRoutes.DriverList, {limit: 5000, page: 1, company_id: this.company_id}, res => {
                 if (parseInt(res.status) === 200) {
                     this.drivers = res.data.data
                 }
@@ -671,7 +730,7 @@ export default {
             if (this.enableDriverSale) {
                 total += parseFloat(this.driver_sale.price ? this.driver_sale.price : 0)
             }
-            if (this.enableAdvancePay) {
+            if (this.advance_pay) {
                 total += parseFloat(this.advance_amount ?  this.advance_amount : 0)
             }
             if (isNaN(total)) {
@@ -707,6 +766,13 @@ export default {
             this.sale.splice(i, 1)
         },
         cartProduct: function (p) {
+            let quantity =  1;
+            let selling_price = p.selling_price;
+            let subtotal = p.selling_price;
+            if (this.advance_sale) {
+                subtotal = this.driver_amount;
+                quantity = subtotal / selling_price;
+            }
             let product = {
                 name: p.name,
                 type: p.product_type,
@@ -715,11 +781,11 @@ export default {
                 stock_category_id: p.stock_category_id,
                 expense_category_id: p.expense_category_id,
                 product_id: p.id,
-                quantity: parseFloat(1).toFixed(2),
-                price: parseFloat(p.selling_price).toFixed(2),
+                quantity: parseFloat(quantity).toFixed(2),
+                price: parseFloat(selling_price).toFixed(2),
                 buying_price: parseFloat(p.buying_price).toFixed(2),
                 driver_selling_price: parseFloat(p.driver_selling_price).toFixed(2),
-                subtotal: parseFloat(p.selling_price).toFixed(2),
+                subtotal: parseFloat(subtotal).toFixed(2),
             }
             let isExist = this.sale.map(v => v.product_id).indexOf(product.product_id);
             if (isExist > -1) {

@@ -8,12 +8,14 @@ use App\Common\PaymentMethod;
 use App\Helpers\Helpers;
 use App\Helpers\SessionUser;
 use App\Models\Category;
+use App\Models\Driver;
 use App\Models\Product;
 use App\Models\Sale;
 use App\Models\SaleData;
 use App\Models\Transaction;
 use App\Models\User;
 use App\Models\Voucher;
+use App\Repository\DriverRepository;
 use App\Repository\SaleRepository;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
@@ -29,79 +31,85 @@ class SaleController extends Controller
      */
     public function save(Request $request): JsonResponse
     {
-        $inputData = $request->all();
-
-        if (!empty($inputData['advance_amount'])) {
-            $validator = SaleRepository::validateAdvancePay($inputData);
+        $requestData = $request->all();
+        if (!empty($requestData['advance_pay'])) {
+            $validator = SaleRepository::validateAdvancePayment($requestData);
         } else {
-            $validator = SaleRepository::validateSale($inputData);
+            $validator = SaleRepository::validateSale($requestData);
         }
-
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
-        $requestData = $request->all();
-        if ($requestData['payment_method'] == PaymentMethod::CARD) {
-            return response()->json(['status' => 500, 'errors' => ['payment_method' => ['The payment category field is required.']]]);
-        }
-        if (!empty($requestData['driver_sale']['price']) && empty($requestData['driver_sale']['driver_id'])) {
-            return response()->json(['status' => 500, 'errors' => ['driver_sale.driver_id' => ['The driver field is required.']]]);
-        }
+        $driverId = null;
         $voucher = null;
+        $driverLiabilityId = null;
+        $total_amount = array_sum(array_column($requestData['products'], 'subtotal'));
         if ($requestData['payment_method'] == PaymentMethod::COMPANY) {
-            $voucher = Voucher::where('company_id', $requestData['payment_category_id'])
-                ->where('status', 'pending')
-                ->where('validity', '>=', date('Y-m-d'))
-                ->where('voucher_number', $requestData['voucher_number'])
-                ->first();
-            if (!$voucher instanceof Voucher) {
-                return response()->json(['status' => 500, 'errors' => ['voucher_number' => ['The voucher number is not valid.']]]);
+            $company = Category::find($requestData['company_id']);
+            if (!$company instanceof Category) {
+                return response()->json(['status' => 400, 'message' => 'Cannot find [company].']);
             }
-            if (!empty($inputData['advance_amount'])) {
-                $advancePaymentData = [
-                    'company_id' => $inputData['payment_category_id'],
-                    'amount' => $inputData['advance_amount'],
-                    'driver_id' => $inputData['driver_sale']['driver_id']
-                ];
-                $response = SaleRepository::saveAdvancePayment($advancePaymentData);
-                if ($response) {
+            $driver = Driver::find($requestData['driver_sale']['driver_id']);
+            if (!$driver instanceof Driver) {
+                return response()->json(['status' => 400, 'message' => 'Cannot find [driver].']);
+            }
+            if (empty($requestData['advance_sale'])) {
+                $voucher = Voucher::where('company_id', $requestData['company_id'])
+                    ->where('status', 'pending')
+                    ->where('validity', '>=', date('Y-m-d'))
+                    ->where('voucher_number', $requestData['voucher_number'])
+                    ->first();
+                if (!$voucher instanceof Voucher) {
+                    return response()->json(['status' => 500, 'errors' => ['voucher_number' => ['The voucher number is not valid.']]]);
+                }
+            }
+            if (!empty($requestData['advance_pay']) || !empty($requestData['advance_sale'])) {
+                $driverLiability = Category::find($driver['driver_liability_id']);
+                if (!$driverLiability instanceof Category) {
+                    return response()->json(['status' => 400, 'message' => 'Cannot find [driver un revenue category].']);
+                }
+                $driverLiabilityId = $driverLiability['id'];
+                if (!empty($requestData['advance_pay'])) {
+                    $transactionData['linked_id'] = $requestData['company_id'];
+                    $transactionData['transaction'] = [
+                        ['date' => date('Y-m-d'), 'account_id' => $driverLiabilityId, 'debit_amount' => $requestData['advance_amount'], 'credit_amount' => 0, 'module' => Module::ADVANCE_PAYMENT],
+                    ];
+                    $response = TransactionController::saveTransaction($transactionData);
+                    if (!$response) {
+                        return response()->json(['status' => 400, 'message' => 'Cannot saved advance payment.']);
+                    }
                     $voucher->status = 'done';
                     $voucher->save();
                     return response()->json(['status' => 200, 'message' => 'Successfully saved advance payment.']);
                 }
+                if (!empty($requestData['advance_sale'])) {
+                    $driverAmount = DriverRepository::getDriverAmount($driverLiabilityId);
+                    if ($total_amount > $driverAmount) {
+                        return response()->json(['status' => 400, 'message' => 'Not enough driver amount.']);
+                    }
+                }
+            }
+            if (!empty($requestData['is_driver_sale'])) {
+                $driverExpense = Category::find($driver['driver_expense_id']);
+                if (!$driverExpense instanceof Category) {
+                    return response()->json(['status' => 400, 'message' => 'Cannot find [driver expense category].']);
+                }
+                $driverId = $driverExpense['id'];
             }
         }
         $sessionUser = SessionUser::getUser();
         if (!$sessionUser instanceof User) {
-            return response()->json(['status' => 500, 'message' => 'Cannot find session user.']);
+            return response()->json(['status' => 500, 'message' => 'Cannot find session [user].']);
         }
-        $driverTipsCategory = null;
-        $payment_category_id = $requestData['payment_category_id'] ?? '';
-        $cash_in_hand_category_id = null;
-        $total_amount = array_sum(array_column($requestData['products'], 'subtotal'));
-        $driverTips = $requestData['driver_tip'] ?? 0;
-        if ($requestData['payment_method'] == PaymentMethod::CASH  || $requestData['payment_method'] == PaymentMethod::COMPANY) {
-            $category = Category::where('id', $sessionUser['category_id'])->first();
-            if (!$category instanceof Category) {
-                return response()->json(['status' => 500, 'message' => 'You are not a cashier user.']);
-            }
-            if ($requestData['payment_method'] == PaymentMethod::CASH) {
-                $payment_category_id = $category['id'];
-            }
-            $cash_in_hand_category_id = $category['id'];
-            if (!empty($requestData['driver_tip']) || !empty($requestData['driver_sale']['price'])) {
-                $driverTipsCategory = Category::where('client_company_id', $sessionUser['client_company_id'])->where('module', Module::DRIVER_TIPS)->where('module_id', $payment_category_id)->first();
-                if (!$driverTipsCategory instanceof Category) {
-                    return response()->json(['status' => 500, 'message' => 'Driver tips category is not created. Please update credit company.']);
-                }
-            }
-
+        $payment_category_id = $requestData['company_id'] ?? '';
+        $category = Category::where('id', $sessionUser['category_id'])->first();
+        if (!$category instanceof Category) {
+            return response()->json(['status' => 500, 'message' => 'You are not a cashier user.']);
         }
-        if (empty($payment_category_id)) {
-            return response()->json(['status' => 500, 'errors' => ['payment_category_id' => ['The payment category field is required.']]]);
+        if ($requestData['payment_method'] == PaymentMethod::CASH) {
+            $payment_category_id = $category['id'];
         }
-        $total_amount = $total_amount + $driverTips;
-
+        $cash_in_hand_category_id = $category['id'];
         $sale = new Sale();
         $sale->date = Carbon::now('UTC');
         $sale->invoice_number = Sale::getInvoiceNumber();
@@ -112,75 +120,65 @@ class SaleController extends Controller
         $sale->payment_method = $requestData['payment_method'] ?? null;
         $sale->payment_category_id = $payment_category_id;
         $sale->client_company_id = $requestData['session_user']['client_company_id'];
-        if ($sale->save()) {
-            $totalPrice = array_sum(array_column($requestData['products'], 'subtotal'));
-            $totalQuantity = array_sum(array_column($requestData['products'], 'quantity'));
-            $avgUnitPrice = $totalPrice / $totalQuantity;
-            $extraQuantity = $driverTips != 0 ? ($driverTips / $avgUnitPrice) / $totalQuantity  : 0;
-            foreach ($requestData['products'] as $product) {
-                $quantity = $product['quantity'];
-                $subtotal = $product['subtotal'];
-                if (!empty($driverTips)) {
-                    $quantity = ($extraQuantity * $quantity) + $quantity;
-                    $subtotal = $quantity * $product['price'];
-                }
-                $buyingPrice = 0;
-                $productModel = Product::where('id', $product['product_id'])->first();
-                if (!empty($productModel['buying_price'])) {
-                    $buyingPrice = $productModel['buying_price'] * $product['quantity'];
-                }
-                $saleData = new SaleData();
-                $saleData->sale_id = $sale->id;
-                $saleData->product_id = $product['product_id'];
-                $saleData->quantity = $quantity;
-                $saleData->price = $product['price'];
-                $saleData->subtotal = $subtotal;
-                $saleData->shift_sale_id = $product['shift_sale_id'];
-                $saleData->save();
-                $transactionData = [];
-                $transactionData['linked_id'] = $payment_category_id;
-                $transactionData['transaction'] = [
-                    ['date' => date('Y-m-d'), 'account_id' => $product['income_category_id'], 'debit_amount' => $subtotal, 'credit_amount' => 0, 'module' => Module::POS_SALE, 'module_id' => $sale->id],
-                ];
-                TransactionController::saveTransaction($transactionData);
-
-                $transactionData = [];
-                $transactionData['linked_id'] = $product['expense_category_id'];
-                $transactionData['transaction'] = [
-                    ['date' => date('Y-m-d'), 'account_id' => $product['stock_category_id'], 'debit_amount' => $buyingPrice, 'credit_amount' => 0, 'module' => Module::POS_SALE, 'module_id' => $sale->id],
-                ];
-                TransactionController::saveTransaction($transactionData);
-            }
-            if (!empty($requestData['driver_tip']) && !empty($driverTipsCategory)) {
-                $transactionData = [];
-                $transactionData['linked_id'] = $cash_in_hand_category_id;
-                $transactionData['transaction'] = [
-                    ['date' => date('Y-m-d'), 'account_id' => $driverTipsCategory['id'], 'debit_amount' => 0, 'credit_amount' => $requestData['driver_tip'], 'module' => Module::POS_SALE, 'module_id' => $sale->id],
-                ];
-                TransactionController::saveTransaction($transactionData);
-            }
-            if (!empty($requestData['driver_sale']['price']) && !empty($driverTipsCategory)) {
-                $transactionData = [];
-                $transactionData['linked_id'] = $cash_in_hand_category_id;
-                $transactionData['transaction'] = [
-                    ['date' => date('Y-m-d'), 'account_id' => $requestData['driver_sale']['driver_id'], 'debit_amount' => 0, 'credit_amount' => $requestData['driver_sale']['price'], 'module' => Module::POS_SALE, 'module_id' => $sale->id],
-                ];
-                TransactionController::saveTransaction($transactionData);
-
-                $transactionData = [];
-                $transactionData['linked_id'] = $requestData['products'][0]['stock_category_id'];
-                $transactionData['transaction'] = [
-                    ['date' => date('Y-m-d'), 'account_id' => $requestData['products'][0]['expense_category_id'], 'debit_amount' => $requestData['driver_sale']['buying_price'], 'credit_amount' => 0, 'module' => Module::POS_SALE, 'module_id' => $sale->id],
-                ];
-                TransactionController::saveTransaction($transactionData);
-            }
-            if ($voucher instanceof Voucher) {
-                $voucher->status = 'done';
-                $voucher->save();
-            }
-            return response()->json(['status' => 200, 'message' => 'Successfully saved sale.', 'data' => $sale->id]);
+        if (!$sale->save()) {
+            return response()->json(['status' => 400, 'message' => 'Cannot save sale.']);
         }
-        return response()->json(['status' => 500, 'error' => 'Cannot saved sale.']);
+
+        foreach ($requestData['products'] as $product) {
+            $productModel = Product::where('id', $product['product_id'])->first();
+            $buyingPrice = 0;
+            if (!empty($productModel['buying_price'])) {
+                $buyingPrice = $productModel['buying_price'] * $product['quantity'];
+            }
+            $saleData = new SaleData();
+            $saleData->sale_id = $sale->id;
+            $saleData->product_id = $product['product_id'];
+            $saleData->quantity = $product['quantity'];
+            $saleData->price = $product['price'];
+            $saleData->subtotal = $product['subtotal'];
+            $saleData->shift_sale_id = $product['shift_sale_id'];
+            $saleData->save();
+            $transactionData = [];
+            $transactionData['linked_id'] = $payment_category_id;
+            $transactionData['transaction'] = [
+                ['date' => date('Y-m-d'), 'account_id' => $product['income_category_id'], 'debit_amount' => $product['subtotal'], 'credit_amount' => 0, 'module' => Module::POS_SALE, 'module_id' => $sale->id],
+            ];
+            TransactionController::saveTransaction($transactionData);
+
+            $transactionData = [];
+            $transactionData['linked_id'] = $product['expense_category_id'];
+            $transactionData['transaction'] = [
+                ['date' => date('Y-m-d'), 'account_id' => $product['stock_category_id'], 'debit_amount' => $buyingPrice, 'credit_amount' => 0, 'module' => Module::POS_SALE, 'module_id' => $sale->id],
+            ];
+            TransactionController::saveTransaction($transactionData);
+        }
+        if (!empty($requestData['is_driver_sale'])) {
+            $transactionData = [];
+            $transactionData['linked_id'] = $cash_in_hand_category_id;
+            $transactionData['transaction'] = [
+                ['date' => date('Y-m-d'), 'account_id' => $driverId, 'debit_amount' => 0, 'credit_amount' => $requestData['driver_sale']['price'], 'module' => Module::POS_SALE, 'module_id' => $sale->id],
+            ];
+            TransactionController::saveTransaction($transactionData);
+
+            $transactionData = [];
+            $transactionData['linked_id'] = $requestData['products'][0]['stock_category_id'];
+            $transactionData['transaction'] = [
+                ['date' => date('Y-m-d'), 'account_id' => $requestData['products'][0]['expense_category_id'], 'debit_amount' => $requestData['driver_sale']['buying_price'], 'credit_amount' => 0, 'module' => Module::POS_SALE, 'module_id' => $sale->id],
+            ];
+            TransactionController::saveTransaction($transactionData);
+        }
+        if (!empty($requestData['advance_sale'])) {
+            $transactionData['linked_id'] = $requestData['company_id'];
+            $transactionData['transaction'] = [
+                ['date' => date('Y-m-d'), 'account_id' => $driverLiabilityId, 'debit_amount' => 0, 'credit_amount' => $total_amount, 'module' => Module::POS_SALE, 'module_id' => $sale->id],
+            ];
+            TransactionController::saveTransaction($transactionData);
+        }
+        if ($voucher instanceof Voucher) {
+            $voucher->status = 'done';
+            $voucher->save();
+        }
+        return response()->json(['status' => 200, 'message' => 'Successfully saved sale.', 'data' => $sale['id']]);
     }
 
     /**

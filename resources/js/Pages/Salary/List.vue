@@ -5,7 +5,7 @@
                 <ol class="breadcrumb align-items-center ">
                     <li class="breadcrumb-item active"><router-link :to="{name: 'Dashboard'}">Home</router-link></li>
                     <li class="breadcrumb-item"><a href="javascript:void(0)">Salary</a></li>
-                    <li style="margin-left: auto;"><router-link :to="{name: 'salaryAdd'}"><i class="fa-solid fa-plus"></i> Add New Salary</router-link></li>
+                    <li v-if="CheckPermission(Section.SALARY + '-' + Action.CREATE)"  style="margin-left: auto;"><router-link :to="{name: 'salaryAdd'}"><i class="fa-solid fa-plus"></i> Add New Salary</router-link></li>
                 </ol>
             </div>
             <div class="row">
@@ -51,7 +51,7 @@
                                                 <td >{{f.amount}}</td>
                                                 <td >{{f.payment_method}}</td>
                                                 <td>
-                                                    <div class="d-flex justify-content-end">
+                                                    <div v-if="CheckPermission(Section.SALARY + '-' + Action.DELETE)" class="d-flex justify-content-end">
                                                         <a  href="javascript:void(0)"  @click="openModalDelete(f)" class="btn btn-danger shadow btn-xs sharp">
                                                             <i class="fa fa-trash"></i>
                                                         </a>
@@ -93,6 +93,8 @@ import Swal from 'sweetalert2/dist/sweetalert2.js'
 import ApiService from "../../Services/ApiService";
 import ApiRoutes from "../../Services/ApiRoutes";
 import Pagination from "../../Helpers/Pagination.vue";
+import Section from "../../Helpers/Section";
+import Action from "../../Helpers/Action";
 export default {
     components: {
         Pagination,
@@ -121,6 +123,12 @@ export default {
         this.list();
     },
     computed: {
+        Action() {
+            return Action
+        },
+        Section() {
+            return Section
+        },
         Auth: function () {
             return this.$store.getters.GetAuth;
         },
