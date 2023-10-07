@@ -3717,6 +3717,22 @@ __webpack_require__.r(__webpack_exports__);
         _this2.TableLoading = false;
         if (parseInt(res.status) === 200) {
           _this2.listData = res.data.data;
+          setTimeout(function () {
+            $('#feel-the-wave').wavify({
+              height: 80,
+              bones: 8,
+              amplitude: 10,
+              color: '#bf9201',
+              speed: .25
+            }, 500);
+            $('#feel-the-wave2').wavify({
+              height: 160,
+              bones: 8,
+              amplitude: 10,
+              color: '#00B3FF',
+              speed: .15
+            }, 500);
+          });
         } else {
           _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].ErrorHandler(res.error);
         }
@@ -14795,31 +14811,41 @@ var render = function render() {
       staticClass: "capacity-line"
     })]), _vm._v(" "), _c("div", {
       staticClass: "fuel-height"
-    }, [_c("div", {
-      staticClass: "fuel-capacity",
-      style: {
-        bottom: f.water_percent + "%",
-        height: f.fuel_percent + "%"
+    }, [_c("svg", {
+      staticClass: "wave",
+      attrs: {
+        width: "100%",
+        height: "100%",
+        version: "1.1",
+        xmlns: "http://www.w3.org/2000/svg"
       }
-    }, [f.fuel_percent > 0 ? _c("div", {
-      staticClass: "fuel-attr"
-    }, [_vm._v(_vm._s(f.fuel_percent) + "%")]) : _vm._e(), _vm._v(" "), f.fuel_percent > 0 ? _c("div", {
-      staticClass: "fuel-line"
-    }) : _vm._e()]), _vm._v(" "), _c("div", {
-      staticClass: "water-capacity",
-      style: {
-        bottom: 0,
-        height: f.water_percent + "%"
+    }, [_c("defs"), _c("path", {
+      attrs: {
+        id: "feel-the-wave",
+        d: ""
       }
-    }, [f.water_percent > 0 ? _c("div", {
-      staticClass: "water-attr"
-    }, [_vm._v(_vm._s(f.water_percent) + "%")]) : _vm._e(), _vm._v(" "), f.water_percent > 0 ? _c("div", {
-      staticClass: "water-line"
-    }) : _vm._e()])])]), _vm._v(" "), _c("div", {
+    })]), _vm._v(" "), _c("svg", {
+      staticClass: "wave",
+      staticStyle: {
+        position: "absolute",
+        left: "0"
+      },
+      attrs: {
+        width: "100%",
+        height: "100%",
+        version: "1.1",
+        xmlns: "http://www.w3.org/2000/svg"
+      }
+    }, [_c("defs"), _c("path", {
+      attrs: {
+        id: "feel-the-wave2",
+        d: ""
+      }
+    })])])]), _vm._v(" "), _c("div", {
       staticClass: "text-center mt-1 fw-bold"
-    }, [_vm._v("\n                                " + _vm._s(f.tank_name) + "\n                            ")]), _vm._v(" "), _c("div", {
+    }, [_vm._v("\n                                    " + _vm._s(f.tank_name) + "\n                                ")]), _vm._v(" "), _c("div", {
       staticClass: "text-center"
-    }, [_vm._v("\n                                (" + _vm._s(f.product_name) + ")\n                            ")])])]);
+    }, [_vm._v("\n                                    (" + _vm._s(f.product_name) + ")\n                                ")])])]);
   }), 0)]), _vm._v(" "), _vm._m(1), _vm._v(" "), _vm._m(2)])])]);
 };
 var staticRenderFns = [function () {
@@ -34487,7 +34513,7 @@ exports = module.exports = __webpack_require__(/*! ../../../../node_modules/css-
 
 
 // module
-exports.push([module.i, ".taank[data-v-f46ab3c0] {\n  position: relative;\n}\n.taank .tank-height[data-v-f46ab3c0] {\n  position: absolute;\n  right: 40%;\n  text-align: center;\n  top: -24px;\n}\n.taank .tank-height .height-line[data-v-f46ab3c0] {\n  height: 3px;\n  width: 94px;\n  background-image: linear-gradient(90deg, transparent, transparent 50%, #fff 50%, #fff 100%), linear-gradient(90deg, #369D6F, #369D6F, #369D6F, #369D6F, #369D6F);\n  background-size: 12px 3px, 100% 3px;\n  border: none;\n}\n.taank .tank-height .height[data-v-f46ab3c0] {\n  color: #369D6F;\n}\n.taank .tank-height .tank-attr[data-v-f46ab3c0] {\n  color: #369D6F;\n  font-weight: bold;\n  position: absolute;\n  left: -6rem;\n  top: 0.8rem;\n}\n.taank .water-tank[data-v-f46ab3c0] {\n  margin: auto;\n  height: 250px;\n  width: 300px;\n  border-radius: 190px 190px 133px 147px;\n  border-width: 3px;\n  border-color: #a6a6a6;\n  border-style: solid;\n  position: relative;\n  overflow: hidden;\n}\n.taank .water-tank .tank-capacity[data-v-f46ab3c0] {\n  position: absolute;\n  left: 41px;\n  text-align: center;\n  top: 1rem;\n}\n.taank .water-tank .tank-capacity .capacity-line[data-v-f46ab3c0] {\n  height: 3px;\n  width: 209px;\n  background-image: linear-gradient(90deg, transparent, transparent 50%, #fff 50%, #fff 100%), linear-gradient(90deg, red, red, red, red, red);\n  background-size: 12px 3px, 100% 3px;\n  border: none;\n}\n.taank .water-tank .tank-capacity .capacity[data-v-f46ab3c0] {\n  color: red;\n}\n.taank .water-tank .tank-capacity .tank-attr[data-v-f46ab3c0] {\n  color: red;\n  font-weight: bold;\n  position: absolute;\n  right: -7rem;\n  top: 0.8rem;\n}\n.taank .water-tank .fuel-height[data-v-f46ab3c0] {\n  height: 200px;\n  position: absolute;\n  bottom: 0;\n  left: 0;\n  right: 0;\n  text-align: center;\n}\n.taank .water-tank .fuel-height .fuel-capacity[data-v-f46ab3c0] {\n  width: 100%;\n  background-color: #FFC301;\n  position: absolute;\n  left: 0;\n  right: 0;\n  text-align: center;\n  transition: 800ms;\n}\n.taank .water-tank .fuel-height .fuel-capacity .fuel-line[data-v-f46ab3c0] {\n  height: 2px;\n  width: 300px;\n  background-size: 14px 3px, 100% 3px;\n  border: none;\n  position: absolute;\n  top: -2px;\n}\n.taank .water-tank .fuel-height .fuel-capacity .fuel-attr[data-v-f46ab3c0] {\n  color: #FFC301;\n  font-weight: bold;\n  position: absolute;\n  top: -19px;\n  right: 2.5rem;\n}\n.taank .water-tank .fuel-height .water-capacity[data-v-f46ab3c0] {\n  width: 100%;\n  background-color: rgba(31, 175, 237, 0.5490196078);\n  position: absolute;\n  left: 0;\n  right: 0;\n  border-bottom-left-radius: 8px;\n  border-bottom-right-radius: 8px;\n  transition: 800ms;\n}\n.taank .water-tank .fuel-height .water-capacity .water-line[data-v-f46ab3c0] {\n  height: 2px;\n  width: 300px;\n  background-size: 14px 3px, 100% 3px;\n  border: none;\n  position: absolute;\n  top: -2px;\n}\n.taank .water-tank .fuel-height .water-capacity .water-attr[data-v-f46ab3c0] {\n  color: #00B3FF;\n  font-weight: bold;\n  position: absolute;\n  top: -20px;\n  left: 3.5rem;\n}\n@keyframes wave-f46ab3c0 {\n0% {\n    transform: rotateZ(0deg);\n    transition: 800ms;\n}\n25% {\n    transform: rotateZ(3deg);\n    transition: 800ms;\n}\n75% {\n    transform: rotateZ(0deg);\n    transition: 800ms;\n}\n100% {\n    transform: rotateZ(-3deg);\n    transition: 800ms;\n}\n}\n.tt[data-v-f46ab3c0] {\n  width: 70px;\n}\n.tt.text-height[data-v-f46ab3c0] {\n  color: #369D6F;\n}\n.tt.text-capacity[data-v-f46ab3c0] {\n  color: red;\n}\n.tt.text-fuel[data-v-f46ab3c0] {\n  color: #bf9201;\n}\n.tt.text-water[data-v-f46ab3c0] {\n  color: #00B3FF;\n}\n.line[data-v-f46ab3c0] {\n  height: 2px;\n  width: 80px;\n  background-size: 14px 3px, 100% 3px;\n  border: none;\n  margin-left: 20px;\n}\n.line.height[data-v-f46ab3c0] {\n  background-image: linear-gradient(90deg, transparent, transparent 50%, #fff 50%, #fff 100%), linear-gradient(90deg, #369D6F, #369D6F, #369D6F, #369D6F, #369D6F);\n}\n.line.capacity[data-v-f46ab3c0] {\n  background-image: linear-gradient(90deg, transparent, transparent 50%, #fff 50%, #fff 100%), linear-gradient(90deg, red, red, red, red, red);\n}\n.line.fuel[data-v-f46ab3c0] {\n  background-image: linear-gradient(90deg, transparent, transparent 50%, #fff 50%, #fff 100%), linear-gradient(90deg, #bf9201, #bf9201, #bf9201, #bf9201, #bf9201);\n}\n.line.water[data-v-f46ab3c0] {\n  background-image: linear-gradient(90deg, transparent, transparent 50%, #fff 50%, #fff 100%), linear-gradient(90deg, #00B3FF, #00B3FF, #00B3FF, #00B3FF, #00B3FF);\n}", ""]);
+exports.push([module.i, ".taank[data-v-f46ab3c0] {\n  position: relative;\n}\n.taank .tank-height[data-v-f46ab3c0] {\n  position: absolute;\n  right: 40%;\n  text-align: center;\n  top: -24px;\n}\n.taank .tank-height .height-line[data-v-f46ab3c0] {\n  height: 3px;\n  width: 94px;\n  background-image: linear-gradient(90deg, transparent, transparent 50%, #fff 50%, #fff 100%), linear-gradient(90deg, #369D6F, #369D6F, #369D6F, #369D6F, #369D6F);\n  background-size: 12px 3px, 100% 3px;\n  border: none;\n}\n.taank .tank-height .height[data-v-f46ab3c0] {\n  color: #369D6F;\n}\n.taank .tank-height .tank-attr[data-v-f46ab3c0] {\n  color: #369D6F;\n  font-weight: bold;\n  position: absolute;\n  left: -6rem;\n  top: 0.8rem;\n}\n.taank .water-tank[data-v-f46ab3c0] {\n  margin: auto;\n  height: 250px;\n  width: 300px;\n  border-radius: 190px 190px 133px 147px;\n  border-width: 3px;\n  border-color: #a6a6a6;\n  border-style: solid;\n  position: relative;\n  overflow: hidden;\n}\n.taank .water-tank .tank-capacity[data-v-f46ab3c0] {\n  position: absolute;\n  left: 41px;\n  text-align: center;\n  top: 1rem;\n}\n.taank .water-tank .tank-capacity .capacity-line[data-v-f46ab3c0] {\n  height: 3px;\n  width: 209px;\n  background-image: linear-gradient(90deg, transparent, transparent 50%, #fff 50%, #fff 100%), linear-gradient(90deg, red, red, red, red, red);\n  background-size: 12px 3px, 100% 3px;\n  border: none;\n}\n.taank .water-tank .tank-capacity .capacity[data-v-f46ab3c0] {\n  color: red;\n}\n.taank .water-tank .tank-capacity .tank-attr[data-v-f46ab3c0] {\n  color: red;\n  font-weight: bold;\n  position: absolute;\n  right: -7rem;\n  top: 0.8rem;\n}\n.taank .water-tank .fuel-height[data-v-f46ab3c0] {\n  height: 200px;\n  position: absolute;\n  bottom: 0;\n  left: 0;\n  right: 0;\n  text-align: center;\n}\n.taank .water-tank .fuel-height .fuel-capacity[data-v-f46ab3c0] {\n  width: 100%;\n  background-color: #FFC301;\n  position: absolute;\n  left: 0;\n  right: 0;\n  text-align: center;\n  transition: 800ms;\n}\n.taank .water-tank .fuel-height .fuel-capacity .fuel-line[data-v-f46ab3c0] {\n  height: 2px;\n  width: 300px;\n  background-size: 14px 3px, 100% 3px;\n  border: none;\n  position: absolute;\n  top: -2px;\n}\n.taank .water-tank .fuel-height .fuel-capacity .fuel-attr[data-v-f46ab3c0] {\n  color: #FFC301;\n  font-weight: bold;\n  position: absolute;\n  top: -19px;\n  right: 2.5rem;\n}\n.taank .water-tank .fuel-height .water-capacity[data-v-f46ab3c0] {\n  width: 100%;\n  background-color: rgba(31, 175, 237, 0.5490196078);\n  position: absolute;\n  left: 0;\n  right: 0;\n  border-bottom-left-radius: 8px;\n  border-bottom-right-radius: 8px;\n  transition: 800ms;\n}\n.taank .water-tank .fuel-height .water-capacity .water-line[data-v-f46ab3c0] {\n  height: 2px;\n  width: 300px;\n  background-size: 14px 3px, 100% 3px;\n  border: none;\n  position: absolute;\n  top: -2px;\n}\n.taank .water-tank .fuel-height .water-capacity .water-attr[data-v-f46ab3c0] {\n  color: #00B3FF;\n  font-weight: bold;\n  position: absolute;\n  top: -20px;\n  left: 3.5rem;\n}\n.tt[data-v-f46ab3c0] {\n  width: 70px;\n}\n.tt.text-height[data-v-f46ab3c0] {\n  color: #369D6F;\n}\n.tt.text-capacity[data-v-f46ab3c0] {\n  color: red;\n}\n.tt.text-fuel[data-v-f46ab3c0] {\n  color: #bf9201;\n}\n.tt.text-water[data-v-f46ab3c0] {\n  color: #00B3FF;\n}\n.line[data-v-f46ab3c0] {\n  height: 2px;\n  width: 80px;\n  background-size: 14px 3px, 100% 3px;\n  border: none;\n  margin-left: 20px;\n}\n.line.height[data-v-f46ab3c0] {\n  background-image: linear-gradient(90deg, transparent, transparent 50%, #fff 50%, #fff 100%), linear-gradient(90deg, #369D6F, #369D6F, #369D6F, #369D6F, #369D6F);\n}\n.line.capacity[data-v-f46ab3c0] {\n  background-image: linear-gradient(90deg, transparent, transparent 50%, #fff 50%, #fff 100%), linear-gradient(90deg, red, red, red, red, red);\n}\n.line.fuel[data-v-f46ab3c0] {\n  background-image: linear-gradient(90deg, transparent, transparent 50%, #fff 50%, #fff 100%), linear-gradient(90deg, #bf9201, #bf9201, #bf9201, #bf9201, #bf9201);\n}\n.line.water[data-v-f46ab3c0] {\n  background-image: linear-gradient(90deg, transparent, transparent 50%, #fff 50%, #fff 100%), linear-gradient(90deg, #00B3FF, #00B3FF, #00B3FF, #00B3FF, #00B3FF);\n}", ""]);
 
 // exports
 
@@ -94102,7 +94128,7 @@ var app = new vue__WEBPACK_IMPORTED_MODULE_1___default.a({
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! D:\xampp7.4\htdocs\fuelmatix\resources\js\app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! D:\xampp\htdocs\projects\fuelmatix\resources\js\app.js */"./resources/js/app.js");
 
 
 /***/ })

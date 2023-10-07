@@ -48,6 +48,9 @@
 <script src="{{ asset('vendor/chart.js/Chart.bundle.min.js') }}"></script>
 <script src="{{ asset('vendor/jquery-nice-select/js/jquery.nice-select.min.js') }}"></script>
 <script src='{{ asset('vendor/moment/moment.min.js') }}'></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/gsap/latest/TweenMax.min.js'></script>
+<script src='https://rawgit.com/peacepostman/wavify/master/wavify.js'></script>
+<script src='https://rawgit.com/peacepostman/wavify/master/jquery.wavify.js'></script>
 
 <script src="{{ asset('vendor/chart.js/Chart.bundle.min.js') }}"></script>
 

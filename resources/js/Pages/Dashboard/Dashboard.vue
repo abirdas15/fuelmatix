@@ -14,6 +14,7 @@
                     <div class="row mt-4">
                         <div class="col-sm-4 mb-5" v-for="f in listData">
                             <div class="taank">
+
                                 <div class="tank-height">
                                     <div class="height">{{ f.height != null ? f.height : 'N/A' }}</div>
                                     <div class="height-line"></div>
@@ -24,14 +25,16 @@
                                         <div class="capacity-line"></div>
                                     </div>
                                     <div class="fuel-height">
-                                        <div class="fuel-capacity" :style="{bottom: f.water_percent+'%', height: f.fuel_percent+'%'}">
-                                            <div class="fuel-attr" v-if="f.fuel_percent > 0">{{f.fuel_percent}}%</div>
-                                            <div class="fuel-line" v-if="f.fuel_percent > 0"></div>
-                                        </div>
-                                        <div class="water-capacity" :style="{bottom: 0, height: f.water_percent+'%'}">
-                                            <div class="water-attr" v-if="f.water_percent > 0">{{f.water_percent}}%</div>
-                                            <div class="water-line" v-if="f.water_percent > 0"></div>
-                                        </div>
+                                        <svg width="100%" height="100%" version="1.1" xmlns="http://www.w3.org/2000/svg" class="wave"><defs></defs><path id="feel-the-wave" d=""/></svg>
+                                        <svg style="position: absolute; left: 0" width="100%" height="100%" version="1.1" xmlns="http://www.w3.org/2000/svg" class="wave"><defs></defs><path id="feel-the-wave2" d=""/></svg>
+<!--                                        <div class="fuel-capacity" :style="{bottom: f.water_percent+'%', height: f.fuel_percent+'%'}">-->
+<!--                                            <div class="fuel-attr" v-if="f.fuel_percent > 0">{{f.fuel_percent}}%</div>-->
+<!--                                            <div class="fuel-line" v-if="f.fuel_percent > 0"></div>-->
+<!--                                        </div>-->
+<!--                                        <div class="water-capacity" :style="{bottom: 0, height: f.water_percent+'%'}">-->
+<!--                                            <div class="water-attr" v-if="f.water_percent > 0">{{f.water_percent}}%</div>-->
+<!--                                            <div class="water-line" v-if="f.water_percent > 0"></div>-->
+<!--                                        </div>-->
                                     </div>
                                 </div>
                                 <div class="text-center mt-1 fw-bold">
@@ -199,6 +202,22 @@ export default {
                 this.TableLoading = false
                 if (parseInt(res.status) === 200) {
                     this.listData = res.data.data;
+                    setTimeout(() => {
+                        $('#feel-the-wave').wavify({
+                            height: 80,
+                            bones: 8,
+                            amplitude: 10,
+                            color: '#bf9201',
+                            speed: .25
+                        }, 500);
+                        $('#feel-the-wave2').wavify({
+                            height: 160,
+                            bones: 8,
+                            amplitude: 10,
+                            color: '#00B3FF',
+                            speed: .15
+                        }, 500);
+                    })
                 } else {
                     ApiService.ErrorHandler(res.error);
                 }
@@ -330,24 +349,6 @@ export default {
                 }
             }
         }
-    }
-}
-@keyframes wave {
-    0% {
-        transform: rotateZ(0deg);
-        transition: 800ms
-    }
-    25% {
-        transform: rotateZ(3deg);
-        transition: 800ms
-    }
-    75% {
-        transform: rotateZ(0deg);
-        transition: 800ms
-    }
-    100% {
-        transform: rotateZ(-3deg);
-        transition: 800ms
     }
 }
 .tt{
