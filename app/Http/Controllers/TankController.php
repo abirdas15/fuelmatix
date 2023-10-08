@@ -69,7 +69,7 @@ class TankController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-    public function list(Request $request)
+    public function list(Request $request): JsonResponse
     {
         $inputData = $request->all();
         $limit = $inputData['limit'] ?? 10;
@@ -77,7 +77,6 @@ class TankController extends Controller
         $order_by = $inputData['order_by'] ?? 'id';
         $order_mode = $inputData['order_mode'] ?? 'DESC';
         $sessionUser = SessionUser::getUser();
-        $count = Tank::where('client_company_id', $sessionUser['client_company_id'])->count();
         $result = Tank::select('tank.id' ,'tank.tank_name', 'tank.height', 'tank.capacity', 'products.name as product_name')
             ->leftJoin('products', 'products.id', 'tank.product_id')
             ->where('tank.client_company_id', $inputData['session_user']['client_company_id'])
@@ -87,8 +86,6 @@ class TankController extends Controller
                 $q->where('tank.tank_name', 'LIKE', '%'.$keyword.'%');
             });
         }
-
-
         $result = $result->orderBy($order_by, $order_mode)
             ->paginate($limit);
         $tankId = [];
@@ -120,13 +117,21 @@ class TankController extends Controller
         }
         return response()->json(['status' => 200, 'data' => $result]);
     }
-    public function single(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function single(Request $request): JsonResponse
     {
         $inputData = $request->all();
         $result = Tank::select('id', 'tank_name', 'height', 'capacity', 'product_id')->find($inputData['id']);
         return response()->json(['status' => 200, 'data' => $result]);
     }
-    public function update(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function update(Request $request): JsonResponse
     {
         $inputData = $request->all();
         $validator = Validator::make($inputData, [
@@ -171,7 +176,11 @@ class TankController extends Controller
         }
         return response()->json(['status' => 500, 'error' => 'Cannot updated tank.']);
     }
-    public function delete(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function delete(Request $request): JsonResponse
     {
         $inputData = $request->all();
         $validator = Validator::make($inputData, [
@@ -184,7 +193,11 @@ class TankController extends Controller
         BstiChart::where('tank_id', $inputData['id'])->delete();
         return response()->json(['status' => 200, 'message' => 'Successfully deleted tank.']);
     }
-    public function readingSave(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function readingSave(Request $request): JsonResponse
     {
         $inputData = $request->all();
         $validator = Validator::make($inputData, [
@@ -202,6 +215,7 @@ class TankController extends Controller
         $reading->tank_id = $inputData['tank_id'];
         $reading->date = $inputData['date'];
         $reading->height = $inputData['height'];
+        $reading->water_height = $inputData['water_height'] ?? null;
         $reading->type = $inputData['type'];
         $reading->volume = $bstiChart != null ? $bstiChart->volume : 0;
         $reading->client_company_id = $inputData['session_user']['client_company_id'];
@@ -210,13 +224,17 @@ class TankController extends Controller
         }
         return response()->json(['status' => 500, 'error' => 'Cannot saved tank reading.']);
     }
-    public function readingList(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function readingList(Request $request): JsonResponse
     {
         $inputData = $request->all();
-        $limit = isset($inputData['limit']) ? $inputData['limit'] : 10;
-        $keyword = isset($inputData['keyword']) ? $inputData['keyword'] : '';
-        $order_by = isset($inputData['order_by']) ? $inputData['order_by'] : 'tank_log.id';
-        $order_mode = isset($inputData['order_mode']) ? $inputData['order_mode'] : 'DESC';
+        $limit = $inputData['limit'] ?? 10;
+        $keyword = $inputData['keyword'] ?? '';
+        $order_by = $inputData['order_by'] ?? 'tank_log.id';
+        $order_mode = $inputData['order_mode'] ?? 'DESC';
         $result = TankLog::select('tank_log.id', 'tank_log.date', 'tank_log.height', 'tank_log.water_height', 'tank_log.volume', 'tank.tank_name')
             ->leftJoin('tank', 'tank.id', '=', 'tank_log.tank_id')
             ->where('tank_log.client_company_id', $inputData['session_user']['client_company_id']);
@@ -235,7 +253,11 @@ class TankController extends Controller
         }
         return response()->json(['status' => 200, 'data' => $result]);
     }
-    public function readingSingle(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function readingSingle(Request $request): JsonResponse
     {
         $inputData = $request->all();
         $validator = Validator::make($inputData, [
@@ -247,7 +269,11 @@ class TankController extends Controller
         $result = TankLog::select('id', 'height', 'water_height', 'tank_id', 'date', 'type')->find($inputData['id']);
         return response()->json(['status' => 200, 'data' => $result]);
     }
-    public function readingUpdate(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function readingUpdate(Request $request): JsonResponse
     {
         $inputData = $request->all();
         $validator = Validator::make($inputData, [
@@ -269,13 +295,18 @@ class TankController extends Controller
         $reading->tank_id = $inputData['tank_id'];
         $reading->date = $inputData['date'];
         $reading->height = $inputData['height'];
+        $reading->water_height = $inputData['water_height'] ?? null;
         $reading->volume = $bstiChart != null ? $bstiChart->volume : 0;
         if ($reading->save()) {
             return response()->json(['status' => 200, 'message' => 'Successfully updated tank reading.']);
         }
         return response()->json(['status' => 500, 'error' => 'Cannot updated tank reading.']);
     }
-    public function readingDelete(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function readingDelete(Request $request): JsonResponse
     {
         $inputData = $request->all();
         $validator = Validator::make($inputData, [
@@ -287,7 +318,11 @@ class TankController extends Controller
         TankLog::where('id', $inputData['id'])->delete();
         return response()->json(['status' => 200, 'message' => 'Successfully deleted tank reading.']);
     }
-    public function latestReading(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function latestReading(Request $request): JsonResponse
     {
         $inputData = $request->all();
         $validator = Validator::make($inputData, [
@@ -352,7 +387,11 @@ class TankController extends Controller
         }
         return $dispensers;
     }
-    public function refillSave(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function refillSave(Request $request): JsonResponse
     {
         $inputData = $request->all();
         $validator = Validator::make($inputData, [
