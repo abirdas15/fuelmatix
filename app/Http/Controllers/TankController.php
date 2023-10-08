@@ -75,7 +75,7 @@ class TankController extends Controller
             ->leftJoin('products', 'products.id', 'tank.product_id')
             ->where('tank.client_company_id', $inputData['session_user']['client_company_id'])
             ->with('last_reading', function($query) use ($count) {
-                return $query->select('id', 'tank_id', 'height', 'water_height')->orderBy('id', 'DESC')->take($count);
+                return $query->select('id', 'tank_id', 'height', 'water_height', 'volume')->orderBy('id', 'DESC')->take($count);
             });
         if (!empty($keyword)) {
             $result->where(function($q) use ($keyword) {
@@ -89,7 +89,7 @@ class TankController extends Controller
             $data['water_percent'] = 0;
             if ($data['last_reading'] != null) {
                 if ($data['capacity'] > 0 && $data['last_reading']['height'] > 0) {
-                    $data['fuel_percent'] = number_format(($data['last_reading']['height'] / $data['height']) * 100, 2);
+                    $data['fuel_percent'] = number_format(($data['last_reading']['volume'] / $data['height']) * 100, 2);
                 }
                 if ($data['capacity'] > 0 && $data['last_reading']['water_height'] > 0) {
                     $data['water_percent'] = number_format(($data['last_reading']['water_height'] / $data['height']) * 100, 2);

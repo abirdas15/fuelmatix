@@ -5,12 +5,17 @@ namespace App\Http\Controllers;
 use App\Helpers\SessionUser;
 use App\Models\Category;
 use App\Models\Transaction;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class BalanceSheetController extends Controller
 {
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function get(Request $request)
     {
         $inputData = $request->all();
@@ -103,7 +108,14 @@ class BalanceSheetController extends Controller
             ->toArray();
         return CategoryController::updateCategoryBalance($categories, $transactions);
     }
-    public static function buildTree($elements, $parentId = 0) {
+
+    /**
+     * @param array $elements
+     * @param int $parentId
+     * @return array
+     */
+    public static function buildTree(array $elements, int $parentId = 0): array
+    {
         $branch = [];
         foreach ($elements as $element) {
             if ($element['parent_category'] == $parentId) {
@@ -116,14 +128,26 @@ class BalanceSheetController extends Controller
         }
         return $branch;
     }
-    public static function addCategoryAmount($categories, $transactions)
+
+    /**
+     * @param array $categories
+     * @param array $transactions
+     * @return array
+     */
+    public static function addCategoryAmount(array $categories, array $transactions): array
     {
         foreach ($categories as &$category) {
-            $category['balance'] = isset($transactions[$category['id']]) ? $transactions[$category['id']]  : 0;
+            $category['balance'] = $transactions[$category['id']] ?? 0;
         }
         return $categories;
     }
-    public static function getTransactionAmount($date, $type)
+
+    /**
+     * @param string $date
+     * @param string $type
+     * @return array
+     */
+    public static function getTransactionAmount(string $date, string $type): array
     {
         if ($type == 'assets') {
             $select = DB::raw('SUM(credit_amount - debit_amount) as balance');

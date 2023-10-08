@@ -194,7 +194,7 @@ export default {
             ApiService.POST(ApiRoutes.CategorySave, this.accountParam, res => {
                 this.infoLoading = false
                 if (parseInt(res.status) === 200) {
-                    this.$toast.success(res.msg);
+                    this.$toast.success(res.message);
                     this.closeModal()
                     this.getCategory()
                     this.getParentCategory()
@@ -216,7 +216,7 @@ export default {
             ApiService.POST(ApiRoutes.CategoryUpdate, this.accountParamEdit, res => {
                 this.infoLoading = false
                 if (parseInt(res.status) === 200) {
-                    this.$toast.success(res.msg);
+                    this.$toast.success(res.message);
                     this.closeModal()
                     this.getCategory()
                     this.getParentCategory()

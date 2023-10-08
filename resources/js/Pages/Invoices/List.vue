@@ -69,9 +69,9 @@
                                                 </td>
                                                 <td>
                                                     <div class="d-flex justify-content-end align-items-center">
-                                                        <button v-if="CheckPermission(Section.INVOICE + '-' + Action.CREATE)"  class="btn btn-sm btn-primary me-2" v-if="f.status != 'paid'" @click="paymentModal(f)">Payment</button>
+                                                        <button v-if="CheckPermission(Section.INVOICE + '-' + Action.CREATE) && f.status != 'paid'"  class="btn btn-sm btn-primary me-2" @click="paymentModal(f)">Payment</button>
                                                         <router-link  :to="{name: 'InvoicesView', params: { id: f.id }}" class="btn btn-sm btn-info me-2">View</router-link>
-                                                        <button v-if="CheckPermission(Section.INVOICE + '-' + Action.DELETE)"  class="btn btn-sm btn-danger me-2" v-if="f.status != 'paid'" @click="openModalDelete(f)">Delete</button>
+                                                        <button v-if="CheckPermission(Section.INVOICE + '-' + Action.DELETE) && f.status != 'paid'"  class="btn btn-sm btn-danger me-2" @click="openModalDelete(f)">Delete</button>
                                                     </div>
                                                 </td>
                                             </tr>

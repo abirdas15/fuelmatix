@@ -6,13 +6,18 @@ use App\Common\AccountCategory;
 use App\Helpers\SessionUser;
 use App\Models\Category;
 use App\Models\Transaction;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class PayableController extends Controller
 {
-    public static function get(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     * */
+    public static function get(Request $request): JsonResponse
     {
         $inputData = $request->all();
         $validator = Validator::make($inputData, [

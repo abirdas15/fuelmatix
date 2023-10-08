@@ -61,7 +61,7 @@
                                                     <template v-if="f.module == 'shift sale' && CheckPermission(Section.COMPANY_SALE + '-' + Action.CREATE)">
                                                         <button class="btn btn-sm btn-primary" v-if="!f.invoice_id"  @click="tableAction('expand', f)">Expand</button>
                                                     </template>
-                                                    <router-link v-if="CheckPermission(Section.INVOICE + '-' + Action.VIEW)" :to="{name: 'InvoicesView', params: { id: f.invoice_id }}" class="btn btn-sm btn-info" v-if="f.invoice_id" @click="tableAction('view', f)">View Invoices</router-link>
+                                                    <router-link v-if="CheckPermission(Section.INVOICE + '-' + Action.VIEW) && f.invoice_id" :to="{name: 'InvoicesView', params: { id: f.invoice_id }}" class="btn btn-sm btn-info" @click="tableAction('view', f)">View Invoices</router-link>
                                                 </td>
                                             </tr>
                                             </tbody>

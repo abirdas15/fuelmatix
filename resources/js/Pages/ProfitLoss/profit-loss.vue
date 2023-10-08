@@ -62,6 +62,20 @@
                         </div>
                     </div>
                     <div class="d-flex align-items-center justify-content-between line">
+                        <div>Evaporative Expense</div>
+                        <div>
+                            <span v-if="balance.evaporative_expense < 0" class="text-danger">({{formatPrice(Math.abs(balance.evaporative_expense))}})</span>
+                            <span v-else>{{formatPrice(balance.evaporative_expense)}}</span>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center justify-content-between line">
+                        <div>Driver Sale Expense</div>
+                        <div>
+                            <span v-if="balance.driver_sale < 0" class="text-danger">({{formatPrice(Math.abs(balance.driver_sale))}})</span>
+                            <span v-else>{{formatPrice(balance.driver_sale)}}</span>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center justify-content-between line">
                         <div>Income Before Taxes</div>
                         <div>
                             <span v-if="balance.income_before_tax < 0" class="text-danger">({{formatPrice(Math.abs(balance.income_before_tax))}})</span>
