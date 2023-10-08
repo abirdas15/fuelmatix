@@ -12,29 +12,18 @@
                 <div class="col-sm-12 mb-5">
                     <div class="text-center mt-1 mb-3 fs-3 ">Tank</div>
                     <div class="row mt-4">
-                        <div class="col-sm-4 mb-5" v-for="f in listData">
+                        <div class="col-sm-4 mb-5" v-for="(f, i) in listData">
                             <div class="taank">
-
                                 <div class="tank-height">
-                                    <div class="height">{{ f.height != null ? f.height : 'N/A' }}</div>
-                                    <div class="height-line"></div>
+                                    <div class="height">{{ f.height != null ? f.height : 'N/A' }} (Tank Height)</div>
                                 </div>
-                                <div id="waterLevelDiags" class="water-tank">
+                                <div class="water-tank">
                                     <div class="tank-capacity">
-                                        <div class="capacity">{{f.capacity != null ? f.capacity : 'N/A'}}</div>
-                                        <div class="capacity-line"></div>
+                                        <div class="capacity">{{f.capacity != null ? f.capacity : 'N/A'}} (Fuel Capacity)</div>
                                     </div>
                                     <div class="fuel-height">
                                         <svg width="100%" height="100%" version="1.1" xmlns="http://www.w3.org/2000/svg" class="wave"><defs></defs><path id="feel-the-wave" d=""/></svg>
                                         <svg style="position: absolute; left: 0" width="100%" height="100%" version="1.1" xmlns="http://www.w3.org/2000/svg" class="wave"><defs></defs><path id="feel-the-wave2" d=""/></svg>
-<!--                                        <div class="fuel-capacity" :style="{bottom: f.water_percent+'%', height: f.fuel_percent+'%'}">-->
-<!--                                            <div class="fuel-attr" v-if="f.fuel_percent > 0">{{f.fuel_percent}}%</div>-->
-<!--                                            <div class="fuel-line" v-if="f.fuel_percent > 0"></div>-->
-<!--                                        </div>-->
-<!--                                        <div class="water-capacity" :style="{bottom: 0, height: f.water_percent+'%'}">-->
-<!--                                            <div class="water-attr" v-if="f.water_percent > 0">{{f.water_percent}}%</div>-->
-<!--                                            <div class="water-line" v-if="f.water_percent > 0"></div>-->
-<!--                                        </div>-->
                                     </div>
                                 </div>
                                 <div class="text-center mt-1 fw-bold">
@@ -202,16 +191,19 @@ export default {
                 this.TableLoading = false
                 if (parseInt(res.status) === 200) {
                     this.listData = res.data.data;
+                    this.listData.map(tank => {
+
+                    })
                     setTimeout(() => {
                         $('#feel-the-wave').wavify({
-                            height: 80,
+                            height: 200,
                             bones: 8,
                             amplitude: 10,
                             color: '#bf9201',
                             speed: .25
                         }, 500);
                         $('#feel-the-wave2').wavify({
-                            height: 160,
+                            height: 200,
                             bones: 8,
                             amplitude: 10,
                             color: '#00B3FF',
@@ -236,32 +228,18 @@ export default {
     position: relative;
     .tank-height{
         position: absolute;
-        right: 40%;
+        left: 0;
         text-align: center;
-        top: -24px;
-        .height-line{
-            height: 3px;
-            width: 94px;
-            background-image: linear-gradient(90deg, transparent, transparent 50%, #fff 50%, #fff 100%), linear-gradient(90deg, #369D6F, #369D6F, #369D6F, #369D6F, #369D6F);
-            background-size: 12px 3px, 100% 3px;
-            border: none;
-        }
+        top: 0;
         .height{
             color: #369D6F;
-        }
-        .tank-attr{
-            color: #369D6F;
-            font-weight: bold;
-            position: absolute;
-            left: -6rem;
-            top: 0.8rem;
         }
     }
     .water-tank{
         margin: auto;
         height: 250px;
         width: 300px;
-        border-radius : 20px;
+        border-radius : 0;
         border-width: 3px;
         border-top: 0;
         border-color: #a6a6a6;
@@ -270,25 +248,11 @@ export default {
         overflow: hidden;
         .tank-capacity{
             position: absolute;
-            left: 41px;
+            left: 0;
             text-align: center;
-            top: 1rem;
-            .capacity-line{
-                height: 3px;
-                width: 209px;
-                background-image: linear-gradient(90deg, transparent, transparent 50%, #fff 50%, #fff 100%), linear-gradient(90deg, red, red, red, red, red);
-                background-size: 12px 3px, 100% 3px;
-                border: none;
-            }
+            top: 0;
             .capacity{
                 color: red;
-            }
-            .tank-attr{
-                color: red;
-                font-weight: bold;
-                position: absolute;
-                right: -7rem;
-                top: 0.8rem;
             }
         }
         .fuel-height{
@@ -298,57 +262,6 @@ export default {
             left: 0;
             right: 0;
             text-align: center;
-            .fuel-capacity{
-                width: 100%;
-                background-color: #FFC301;
-                position: absolute;
-                left: 0;
-                right: 0;
-                text-align: center;
-                //animation: wave 5s infinite;
-                transition: 800ms;
-                .fuel-line{
-                    height: 2px;
-                    width: 300px;
-                    background-size: 14px 3px, 100% 3px;
-                    border: none;
-                    position: absolute;
-                    top: -2px;
-                }
-                .fuel-attr{
-                    color: #FFC301;
-                    font-weight: bold;
-                    position: absolute;
-                    top: -19px;
-                    right: 2.5rem;
-                }
-            }
-            .water-capacity{
-                width: 100%;
-                background-color: #1fafed8c;
-                position: absolute;
-                left: 0;
-                right: 0;
-                border-bottom-left-radius: 8px;
-                border-bottom-right-radius: 8px;
-                //animation: wave 5s infinite;
-                transition: 800ms;
-                .water-line{
-                    height: 2px;
-                    width: 300px;
-                    background-size: 14px 3px, 100% 3px;
-                    border: none;
-                    position: absolute;
-                    top: -2px;
-                }
-                .water-attr{
-                    color: #00B3FF;
-                    font-weight: bold;
-                    position: absolute;
-                    top: -20px;
-                    left: 3.5rem;
-                }
-            }
         }
     }
 }
