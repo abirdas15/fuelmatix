@@ -16,7 +16,7 @@
                         </div>
                         <div class="card-body">
                             <div class="row mt-4">
-                                <div class="col-sm-4 mb-5" v-for="f in listData">
+                                <div class="col-sm-4 mb-5" v-for="(f, i) in listData">
                                     <div class="taank">
                                         <div class="tank-height">
                                             <div class="height">{{ f.height != null ? f.height : 'N/A' }} (Tank Height)</div>
@@ -30,7 +30,7 @@
                                                 <svg style="position: absolute; left: 0" width="100%" height="100%" version="1.1" xmlns="http://www.w3.org/2000/svg" class="wave"><defs></defs><path :id="'water'+i"d=""/></svg>
                                             </div>
                                             <div class="fuel-vol" :style="{top: calculateTop(f)}">
-                                                <div class="vol">{{f.last_reading.volume != null ? f.last_reading.volume : 'N/A'}} mm</div>
+                                                <div class="vol fw-bold">{{f.last_reading.volume != null ? f.last_reading.volume : 'N/A'}} mm</div>
                                             </div>
                                         </div>
 
@@ -89,6 +89,9 @@ export default {
         },
     },
     methods: {
+        calculateTop: function (tank) {
+            return 200 - (parseInt(tank.fuel_percent) * 2) +27 +'px'
+        },
         openModalDelete(data) {
             Swal.fire({
                 title: 'Are you sure you want to delete?',
@@ -117,10 +120,42 @@ export default {
                 if (parseInt(res.status) === 200) {
                     this.paginateData = res.data;
                     this.listData = res.data.data;
+                    this.listData.map((tank, index) => {
+                        let productColor = this.getProductColor(tank)
+                        setTimeout(() => {
+                            $('#fuel'+index).wavify({
+                                height: tank.fuel_percent == 0 ? 200 : 200 - (parseInt(tank.fuel_percent) * 2),
+                                bones: 8,
+                                amplitude: 10,
+                                color: productColor,
+                                speed: .25
+                            }, 500);
+                            $('#water'+index).wavify({
+                                height: tank.water_percent == 0 ? 200 : 200 - (parseInt(tank.water_percent) * 2),
+                                bones: 8,
+                                amplitude: 10,
+                                color: '#00B3FF',
+                                speed: .15
+                            }, 500);
+                        })
+                    })
                 } else {
                     ApiService.ErrorHandler(res.error);
                 }
             });
+        },
+        getProductColor: function (tank) {
+            if (tank.product_type_name == 'Octane') {
+                return '#D85957'
+            } else if (tank.product_type_name == 'Diesel') {
+                return '#51180E'
+            } else if (tank.product_type_name == 'Petrol') {
+                return '#E2E2E2'
+            } else if (tank.product_type_name == 'LPG') {
+                return '#DA251D'
+            } else if (tank.product_type_name == 'CNG') {
+                return '#858585'
+            }
         },
         Delete: function (data) {
             ApiService.POST(ApiRoutes.TankDelete, {id: data.id },res => {
@@ -181,6 +216,30 @@ export default {
         border-style: solid;
         position: relative;
         overflow: visible;
+        .range{
+            position: absolute;
+            right: 0;
+            background-color: #a6a6a6;
+            height: 3px;
+            z-index: 99;
+            &.r-1{
+                width: 30px;
+            }
+            &.r-2{
+                width: 20px;
+            }
+            &.r-3{
+                width: 10px;
+            }
+            &.r-4{
+                width: 5px;
+            }
+        }
+        @for $i from 0 through 30 {
+            .position-#{$i} {
+                top: $i*10px
+            }
+        }
         .tank-capacity{
             position: absolute;
             left: -11.5rem;

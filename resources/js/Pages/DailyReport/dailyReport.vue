@@ -14,18 +14,22 @@
                         <h4 class="card-title">Daily Report</h4>
                     </div>
                     <div class="card-body">
-                        <div class="row align-items-end justify-content-between">
+                        <div class="row align-items-end">
                             <div class="col-sm-3">
                                 <label class="form-label">Date:</label>
                                 <input type="text" class="form-control date bg-white" name="date" v-model="param.date">
                                 <div class="invalid-feedback"></div>
                             </div>
-                            <div class="col-sm-2">
+                            <div class="col-sm-3">
+                                <button class="btn btn-primary" v-if="!loading" @click="getReport">Filter</button>
+                                <button class="btn btn-primary" v-if="loading">Filtering....</button>
+                            </div>
+                            <div class="col-sm-2 ms-auto">
                                 <button class="btn btn-primary" v-if="!loadingFile" @click="downloadPdf">Download PDF</button>
                                 <button class="btn btn-primary" v-if="loadingFile">Downloading PDF...</button>
                             </div>
                         </div>
-                        <div  v-if="data">
+                        <div  v-if="data && !loading">
                             <h3 class="text-center mb-4">Product Sale</h3>
                             <table class="table table-bordered mb-5">
                                 <thead>
@@ -192,6 +196,10 @@
                                 </tbody>
                             </table>
                         </div>
+                        <div v-else class="text-center">Please Press filter button to get Report</div>
+                        <div v-if="loading" class="text-center">
+                            <i class="fas fa-spinner fa-5x fa-spin"></i>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -266,10 +274,8 @@ export default {
                 defaultDate: 'today',
                 onChange: (dateStr, date) => {
                     this.param.date = date
-                    this.getReport()
                 }
             })
-            this.getReport()
         }, 1000)
         $('#dashboard_bar').text('Daily Report')
     }

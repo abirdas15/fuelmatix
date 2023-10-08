@@ -3619,10 +3619,8 @@ __webpack_require__.r(__webpack_exports__);
         defaultDate: 'today',
         onChange: function onChange(dateStr, date) {
           _this3.param.date = date;
-          _this3.getReport();
         }
       });
-      _this3.getReport();
     }, 1000);
     $('#dashboard_bar').text('Daily Report');
   }
@@ -3773,12 +3771,13 @@ __webpack_require__.r(__webpack_exports__);
         if (parseInt(res.status) === 200) {
           _this2.listData = res.data.data;
           _this2.listData.map(function (tank, index) {
+            var productColor = _this2.getProductColor(tank);
             setTimeout(function () {
               $('#fuel' + index).wavify({
                 height: tank.fuel_percent == 0 ? 200 : 200 - parseInt(tank.fuel_percent) * 2,
                 bones: 8,
                 amplitude: 10,
-                color: '#bf9201',
+                color: productColor,
                 speed: .25
               }, 500);
               $('#water' + index).wavify({
@@ -3794,6 +3793,19 @@ __webpack_require__.r(__webpack_exports__);
           _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].ErrorHandler(res.error);
         }
       });
+    },
+    getProductColor: function getProductColor(tank) {
+      if (tank.product_type_name == 'Octane') {
+        return '#D85957';
+      } else if (tank.product_type_name == 'Diesel') {
+        return '#51180E';
+      } else if (tank.product_type_name == 'Petrol') {
+        return '#E2E2E2';
+      } else if (tank.product_type_name == 'LPG') {
+        return '#DA251D';
+      } else if (tank.product_type_name == 'CNG') {
+        return '#858585';
+      }
     }
   },
   created: function created() {
@@ -6372,7 +6384,8 @@ __webpack_require__.r(__webpack_exports__);
         tank_id: '',
         date: '',
         height: '',
-        type: ''
+        type: '',
+        water_height: ''
       },
       loading: false,
       listData: []
@@ -7164,6 +7177,9 @@ __webpack_require__.r(__webpack_exports__);
     }
   },
   methods: {
+    calculateTop: function calculateTop(tank) {
+      return 200 - parseInt(tank.fuel_percent) * 2 + 27 + 'px';
+    },
     openModalDelete: function openModalDelete(data) {
       var _this = this;
       sweetalert2_dist_sweetalert2_js__WEBPACK_IMPORTED_MODULE_0___default.a.fire({
@@ -7194,10 +7210,42 @@ __webpack_require__.r(__webpack_exports__);
         if (parseInt(res.status) === 200) {
           _this2.paginateData = res.data;
           _this2.listData = res.data.data;
+          _this2.listData.map(function (tank, index) {
+            var productColor = _this2.getProductColor(tank);
+            setTimeout(function () {
+              $('#fuel' + index).wavify({
+                height: tank.fuel_percent == 0 ? 200 : 200 - parseInt(tank.fuel_percent) * 2,
+                bones: 8,
+                amplitude: 10,
+                color: productColor,
+                speed: .25
+              }, 500);
+              $('#water' + index).wavify({
+                height: tank.water_percent == 0 ? 200 : 200 - parseInt(tank.water_percent) * 2,
+                bones: 8,
+                amplitude: 10,
+                color: '#00B3FF',
+                speed: .15
+              }, 500);
+            });
+          });
         } else {
           _Services_ApiService__WEBPACK_IMPORTED_MODULE_1__["default"].ErrorHandler(res.error);
         }
       });
+    },
+    getProductColor: function getProductColor(tank) {
+      if (tank.product_type_name == 'Octane') {
+        return '#D85957';
+      } else if (tank.product_type_name == 'Diesel') {
+        return '#51180E';
+      } else if (tank.product_type_name == 'Petrol') {
+        return '#E2E2E2';
+      } else if (tank.product_type_name == 'LPG') {
+        return '#DA251D';
+      } else if (tank.product_type_name == 'CNG') {
+        return '#858585';
+      }
     },
     Delete: function Delete(data) {
       var _this3 = this;
@@ -15238,7 +15286,7 @@ var render = function render() {
   }, [_vm._m(1), _vm._v(" "), _c("div", {
     staticClass: "card-body"
   }, [_c("div", {
-    staticClass: "row align-items-end justify-content-between"
+    staticClass: "row align-items-end"
   }, [_c("div", {
     staticClass: "col-sm-3"
   }, [_c("label", {
@@ -15267,7 +15315,16 @@ var render = function render() {
   }), _vm._v(" "), _c("div", {
     staticClass: "invalid-feedback"
   })]), _vm._v(" "), _c("div", {
-    staticClass: "col-sm-2"
+    staticClass: "col-sm-3"
+  }, [!_vm.loading ? _c("button", {
+    staticClass: "btn btn-primary",
+    on: {
+      click: _vm.getReport
+    }
+  }, [_vm._v("Filter")]) : _vm._e(), _vm._v(" "), _vm.loading ? _c("button", {
+    staticClass: "btn btn-primary"
+  }, [_vm._v("Filtering....")]) : _vm._e()]), _vm._v(" "), _c("div", {
+    staticClass: "col-sm-2 ms-auto"
   }, [!_vm.loadingFile ? _c("button", {
     staticClass: "btn btn-primary",
     on: {
@@ -15275,7 +15332,7 @@ var render = function render() {
     }
   }, [_vm._v("Download PDF")]) : _vm._e(), _vm._v(" "), _vm.loadingFile ? _c("button", {
     staticClass: "btn btn-primary"
-  }, [_vm._v("Downloading PDF...")]) : _vm._e()])]), _vm._v(" "), _vm.data ? _c("div", [_c("h3", {
+  }, [_vm._v("Downloading PDF...")]) : _vm._e()])]), _vm._v(" "), _vm.data && !_vm.loading ? _c("div", [_c("h3", {
     staticClass: "text-center mb-4"
   }, [_vm._v("Product Sale")]), _vm._v(" "), _c("table", {
     staticClass: "table table-bordered mb-5"
@@ -15370,7 +15427,13 @@ var render = function render() {
     }, [_vm._v(_vm._s(row["amount"]))])]);
   })], 2), _vm._v(" "), _c("h3", {
     staticClass: "text-center mb-4"
-  }, [_vm._v("Attendance")]), _vm._v(" "), _vm._m(6)]) : _vm._e()])])])])]);
+  }, [_vm._v("Attendance")]), _vm._v(" "), _vm._m(6)]) : _c("div", {
+    staticClass: "text-center"
+  }, [_vm._v("Please Press filter button to get Report")]), _vm._v(" "), _vm.loading ? _c("div", {
+    staticClass: "text-center"
+  }, [_c("i", {
+    staticClass: "fas fa-spinner fa-5x fa-spin"
+  })]) : _vm._e()])])])])]);
 };
 var staticRenderFns = [function () {
   var _vm = this,
@@ -15456,6 +15519,56 @@ var render = function render() {
     }, [_vm._v(_vm._s(f.height != null ? f.height : "N/A") + " (Tank Height)")])]), _vm._v(" "), _c("div", {
       staticClass: "water-tank"
     }, [_c("div", {
+      staticClass: "range r-1 position-0"
+    }), _vm._v(" "), _c("div", {
+      staticClass: "range r-3 position-1"
+    }), _vm._v(" "), _c("div", {
+      staticClass: "range r-2 position-2"
+    }), _vm._v(" "), _c("div", {
+      staticClass: "range r-3 position-3"
+    }), _vm._v(" "), _c("div", {
+      staticClass: "range r-1 position-4"
+    }), _vm._v(" "), _c("div", {
+      staticClass: "range r-3 position-5"
+    }), _vm._v(" "), _c("div", {
+      staticClass: "range r-2 position-6"
+    }), _vm._v(" "), _c("div", {
+      staticClass: "range r-3 position-7"
+    }), _vm._v(" "), _c("div", {
+      staticClass: "range r-1 position-8"
+    }), _vm._v(" "), _c("div", {
+      staticClass: "range r-3 position-9"
+    }), _vm._v(" "), _c("div", {
+      staticClass: "range r-2 position-10"
+    }), _vm._v(" "), _c("div", {
+      staticClass: "range r-3 position-11"
+    }), _vm._v(" "), _c("div", {
+      staticClass: "range r-1 position-12"
+    }), _vm._v(" "), _c("div", {
+      staticClass: "range r-3 position-13"
+    }), _vm._v(" "), _c("div", {
+      staticClass: "range r-2 position-14"
+    }), _vm._v(" "), _c("div", {
+      staticClass: "range r-3 position-15"
+    }), _vm._v(" "), _c("div", {
+      staticClass: "range r-1 position-16"
+    }), _vm._v(" "), _c("div", {
+      staticClass: "range r-3 position-17"
+    }), _vm._v(" "), _c("div", {
+      staticClass: "range r-2 position-18"
+    }), _vm._v(" "), _c("div", {
+      staticClass: "range r-3 position-19"
+    }), _vm._v(" "), _c("div", {
+      staticClass: "range r-1 position-20"
+    }), _vm._v(" "), _c("div", {
+      staticClass: "range r-3 position-21"
+    }), _vm._v(" "), _c("div", {
+      staticClass: "range r-2 position-22"
+    }), _vm._v(" "), _c("div", {
+      staticClass: "range r-3 position-23"
+    }), _vm._v(" "), _c("div", {
+      staticClass: "range r-1 position-24"
+    }), _vm._v(" "), _c("div", {
       staticClass: "tank-capacity"
     }, [_c("div", {
       staticClass: "capacity"
@@ -15497,7 +15610,7 @@ var render = function render() {
         top: _vm.calculateTop(f)
       }
     }, [_c("div", {
-      staticClass: "vol"
+      staticClass: "vol fw-bold"
     }, [_vm._v(_vm._s(f.last_reading.volume != null ? f.last_reading.volume : "N/A") + " mm")])])]), _vm._v(" "), _c("div", {
       staticClass: "text-center mt-1 fw-bold"
     }, [_vm._v("\n                                " + _vm._s(f.tank_name) + "\n                            ")]), _vm._v(" "), _c("div", {
@@ -22449,6 +22562,33 @@ var render = function render() {
     }
   }), _vm._v(" "), _c("div", {
     staticClass: "invalid-feedback"
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 form-group col-md-6"
+  }, [_c("label", {
+    staticClass: "form-label"
+  }, [_vm._v("Water Height:")]), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.param.water_height,
+      expression: "param.water_height"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      name: "water_height"
+    },
+    domProps: {
+      value: _vm.param.water_height
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.param, "water_height", $event.target.value);
+      }
+    }
+  }), _vm._v(" "), _c("div", {
+    staticClass: "invalid-feedback"
   })])]), _vm._v(" "), _c("div", {
     staticClass: "row",
     staticStyle: {
@@ -22687,6 +22827,33 @@ var render = function render() {
       input: function input($event) {
         if ($event.target.composing) return;
         _vm.$set(_vm.param, "height", $event.target.value);
+      }
+    }
+  }), _vm._v(" "), _c("div", {
+    staticClass: "invalid-feedback"
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 form-group col-md-6"
+  }, [_c("label", {
+    staticClass: "form-label"
+  }, [_vm._v("Water Height:")]), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.param.water_height,
+      expression: "param.water_height"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      name: "water_height"
+    },
+    domProps: {
+      value: _vm.param.water_height
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.param, "water_height", $event.target.value);
       }
     }
   }), _vm._v(" "), _c("div", {
@@ -24315,7 +24482,7 @@ var render = function render() {
     staticClass: "card-body"
   }, [_c("div", {
     staticClass: "row mt-4"
-  }, _vm._l(_vm.listData, function (f) {
+  }, _vm._l(_vm.listData, function (f, i) {
     return _c("div", {
       staticClass: "col-sm-4 mb-5"
     }, [_c("div", {
@@ -24342,7 +24509,7 @@ var render = function render() {
       }
     }, [_c("defs"), _c("path", {
       attrs: {
-        id: "fuel" + _vm.i,
+        id: "fuel" + i,
         d: ""
       }
     })]), _vm._v(" "), _c("svg", {
@@ -24359,7 +24526,7 @@ var render = function render() {
       }
     }, [_c("defs"), _c("path", {
       attrs: {
-        id: "water" + _vm.i,
+        id: "water" + i,
         d: ""
       }
     })])]), _vm._v(" "), _c("div", {
@@ -24368,7 +24535,7 @@ var render = function render() {
         top: _vm.calculateTop(f)
       }
     }, [_c("div", {
-      staticClass: "vol"
+      staticClass: "vol fw-bold"
     }, [_vm._v(_vm._s(f.last_reading.volume != null ? f.last_reading.volume : "N/A") + " mm")])])]), _vm._v(" "), _c("div", {
       staticClass: "text-center mt-1 fw-bold"
     }, [_vm._v("\n                                        " + _vm._s(f.tank_name) + "\n                                    ")]), _vm._v(" "), _c("div", {
@@ -35865,7 +36032,7 @@ exports = module.exports = __webpack_require__(/*! ../../../../node_modules/css-
 
 
 // module
-exports.push([module.i, ".taank[data-v-f46ab3c0] {\n  position: relative;\n}\n.taank .tank-height[data-v-f46ab3c0] {\n  position: absolute;\n  left: -2rem;\n  text-align: right;\n  top: 0;\n  width: 180px;\n}\n.taank .tank-height .height[data-v-f46ab3c0] {\n  color: #369D6F;\n}\n.taank .water-tank[data-v-f46ab3c0] {\n  margin: auto;\n  height: 250px;\n  width: 200px;\n  border-radius: 0;\n  border-width: 3px;\n  border-top: 0;\n  border-color: #a6a6a6;\n  border-style: solid;\n  position: relative;\n  overflow: visible;\n}\n.taank .water-tank .tank-capacity[data-v-f46ab3c0] {\n  position: absolute;\n  left: -11.5rem;\n  text-align: right;\n  top: 1.7rem;\n  width: 180px;\n}\n.taank .water-tank .tank-capacity .capacity[data-v-f46ab3c0] {\n  color: red;\n}\n.taank .water-tank .tank-capacity .tank-attr[data-v-f46ab3c0] {\n  color: red;\n  font-weight: bold;\n  position: absolute;\n  right: -7rem;\n  top: 0.8rem;\n}\n.taank .water-tank .fuel-vol[data-v-f46ab3c0] {\n  position: absolute;\n  right: -9rem;\n  text-align: left;\n  width: 137px;\n}\n.taank .water-tank .fuel-vol .vol[data-v-f46ab3c0] {\n  color: #424242;\n}\n.taank .water-tank .fuel-height[data-v-f46ab3c0] {\n  height: 200px;\n  position: absolute;\n  bottom: 0;\n  left: 0;\n  right: 0;\n  text-align: center;\n}\n.taank .tank-bar[data-v-f46ab3c0] {\n  height: 250px;\n  width: 2px;\n  background-color: #a6a6a6;\n}", ""]);
+exports.push([module.i, ".taank[data-v-f46ab3c0] {\n  position: relative;\n}\n.taank .tank-height[data-v-f46ab3c0] {\n  position: absolute;\n  left: -2rem;\n  text-align: right;\n  top: 0;\n  width: 180px;\n}\n.taank .tank-height .height[data-v-f46ab3c0] {\n  color: #369D6F;\n}\n.taank .water-tank[data-v-f46ab3c0] {\n  margin: auto;\n  height: 250px;\n  width: 200px;\n  border-radius: 0;\n  border-width: 3px;\n  border-top: 0;\n  border-color: #a6a6a6;\n  border-style: solid;\n  position: relative;\n  overflow: visible;\n}\n.taank .water-tank .range[data-v-f46ab3c0] {\n  position: absolute;\n  right: 0;\n  background-color: #a6a6a6;\n  height: 3px;\n  z-index: 99;\n}\n.taank .water-tank .range.r-1[data-v-f46ab3c0] {\n  width: 30px;\n}\n.taank .water-tank .range.r-2[data-v-f46ab3c0] {\n  width: 20px;\n}\n.taank .water-tank .range.r-3[data-v-f46ab3c0] {\n  width: 10px;\n}\n.taank .water-tank .range.r-4[data-v-f46ab3c0] {\n  width: 5px;\n}\n.taank .water-tank .position-0[data-v-f46ab3c0] {\n  top: 0px;\n}\n.taank .water-tank .position-1[data-v-f46ab3c0] {\n  top: 10px;\n}\n.taank .water-tank .position-2[data-v-f46ab3c0] {\n  top: 20px;\n}\n.taank .water-tank .position-3[data-v-f46ab3c0] {\n  top: 30px;\n}\n.taank .water-tank .position-4[data-v-f46ab3c0] {\n  top: 40px;\n}\n.taank .water-tank .position-5[data-v-f46ab3c0] {\n  top: 50px;\n}\n.taank .water-tank .position-6[data-v-f46ab3c0] {\n  top: 60px;\n}\n.taank .water-tank .position-7[data-v-f46ab3c0] {\n  top: 70px;\n}\n.taank .water-tank .position-8[data-v-f46ab3c0] {\n  top: 80px;\n}\n.taank .water-tank .position-9[data-v-f46ab3c0] {\n  top: 90px;\n}\n.taank .water-tank .position-10[data-v-f46ab3c0] {\n  top: 100px;\n}\n.taank .water-tank .position-11[data-v-f46ab3c0] {\n  top: 110px;\n}\n.taank .water-tank .position-12[data-v-f46ab3c0] {\n  top: 120px;\n}\n.taank .water-tank .position-13[data-v-f46ab3c0] {\n  top: 130px;\n}\n.taank .water-tank .position-14[data-v-f46ab3c0] {\n  top: 140px;\n}\n.taank .water-tank .position-15[data-v-f46ab3c0] {\n  top: 150px;\n}\n.taank .water-tank .position-16[data-v-f46ab3c0] {\n  top: 160px;\n}\n.taank .water-tank .position-17[data-v-f46ab3c0] {\n  top: 170px;\n}\n.taank .water-tank .position-18[data-v-f46ab3c0] {\n  top: 180px;\n}\n.taank .water-tank .position-19[data-v-f46ab3c0] {\n  top: 190px;\n}\n.taank .water-tank .position-20[data-v-f46ab3c0] {\n  top: 200px;\n}\n.taank .water-tank .position-21[data-v-f46ab3c0] {\n  top: 210px;\n}\n.taank .water-tank .position-22[data-v-f46ab3c0] {\n  top: 220px;\n}\n.taank .water-tank .position-23[data-v-f46ab3c0] {\n  top: 230px;\n}\n.taank .water-tank .position-24[data-v-f46ab3c0] {\n  top: 240px;\n}\n.taank .water-tank .position-25[data-v-f46ab3c0] {\n  top: 250px;\n}\n.taank .water-tank .position-26[data-v-f46ab3c0] {\n  top: 260px;\n}\n.taank .water-tank .position-27[data-v-f46ab3c0] {\n  top: 270px;\n}\n.taank .water-tank .position-28[data-v-f46ab3c0] {\n  top: 280px;\n}\n.taank .water-tank .position-29[data-v-f46ab3c0] {\n  top: 290px;\n}\n.taank .water-tank .position-30[data-v-f46ab3c0] {\n  top: 300px;\n}\n.taank .water-tank .tank-capacity[data-v-f46ab3c0] {\n  position: absolute;\n  left: -11.5rem;\n  text-align: right;\n  top: 1.7rem;\n  width: 180px;\n}\n.taank .water-tank .tank-capacity .capacity[data-v-f46ab3c0] {\n  color: red;\n}\n.taank .water-tank .tank-capacity .tank-attr[data-v-f46ab3c0] {\n  color: red;\n  font-weight: bold;\n  position: absolute;\n  right: -7rem;\n  top: 0.8rem;\n}\n.taank .water-tank .fuel-vol[data-v-f46ab3c0] {\n  position: absolute;\n  right: -9rem;\n  text-align: left;\n  width: 137px;\n}\n.taank .water-tank .fuel-vol .vol[data-v-f46ab3c0] {\n  color: #424242;\n}\n.taank .water-tank .fuel-height[data-v-f46ab3c0] {\n  height: 200px;\n  position: absolute;\n  bottom: 0;\n  left: 0;\n  right: 0;\n  text-align: center;\n}\n.taank .tank-bar[data-v-f46ab3c0] {\n  height: 250px;\n  width: 2px;\n  background-color: #a6a6a6;\n}", ""]);
 
 // exports
 
@@ -35884,7 +36051,7 @@ exports = module.exports = __webpack_require__(/*! ../../../../../node_modules/c
 
 
 // module
-exports.push([module.i, ".taank[data-v-2df8ec93] {\n  position: relative;\n}\n.taank .tank-height[data-v-2df8ec93] {\n  position: absolute;\n  left: -2rem;\n  text-align: right;\n  top: 0;\n  width: 180px;\n}\n.taank .tank-height .height[data-v-2df8ec93] {\n  color: #369D6F;\n}\n.taank .water-tank[data-v-2df8ec93] {\n  margin: auto;\n  height: 250px;\n  width: 200px;\n  border-radius: 0;\n  border-width: 3px;\n  border-top: 0;\n  border-color: #a6a6a6;\n  border-style: solid;\n  position: relative;\n  overflow: visible;\n}\n.taank .water-tank .tank-capacity[data-v-2df8ec93] {\n  position: absolute;\n  left: -11.5rem;\n  text-align: right;\n  top: 1.7rem;\n  width: 180px;\n}\n.taank .water-tank .tank-capacity .capacity[data-v-2df8ec93] {\n  color: red;\n}\n.taank .water-tank .tank-capacity .tank-attr[data-v-2df8ec93] {\n  color: red;\n  font-weight: bold;\n  position: absolute;\n  right: -7rem;\n  top: 0.8rem;\n}\n.taank .water-tank .fuel-vol[data-v-2df8ec93] {\n  position: absolute;\n  right: -9rem;\n  text-align: left;\n  width: 137px;\n}\n.taank .water-tank .fuel-vol .vol[data-v-2df8ec93] {\n  color: #424242;\n}\n.taank .water-tank .fuel-height[data-v-2df8ec93] {\n  height: 200px;\n  position: absolute;\n  bottom: 0;\n  left: 0;\n  right: 0;\n  text-align: center;\n}\n.taank .tank-bar[data-v-2df8ec93] {\n  height: 250px;\n  width: 2px;\n  background-color: #a6a6a6;\n}", ""]);
+exports.push([module.i, ".taank[data-v-2df8ec93] {\n  position: relative;\n}\n.taank .tank-height[data-v-2df8ec93] {\n  position: absolute;\n  left: -2rem;\n  text-align: right;\n  top: 0;\n  width: 180px;\n}\n.taank .tank-height .height[data-v-2df8ec93] {\n  color: #369D6F;\n}\n.taank .water-tank[data-v-2df8ec93] {\n  margin: auto;\n  height: 250px;\n  width: 200px;\n  border-radius: 0;\n  border-width: 3px;\n  border-top: 0;\n  border-color: #a6a6a6;\n  border-style: solid;\n  position: relative;\n  overflow: visible;\n}\n.taank .water-tank .range[data-v-2df8ec93] {\n  position: absolute;\n  right: 0;\n  background-color: #a6a6a6;\n  height: 3px;\n  z-index: 99;\n}\n.taank .water-tank .range.r-1[data-v-2df8ec93] {\n  width: 30px;\n}\n.taank .water-tank .range.r-2[data-v-2df8ec93] {\n  width: 20px;\n}\n.taank .water-tank .range.r-3[data-v-2df8ec93] {\n  width: 10px;\n}\n.taank .water-tank .range.r-4[data-v-2df8ec93] {\n  width: 5px;\n}\n.taank .water-tank .position-0[data-v-2df8ec93] {\n  top: 0px;\n}\n.taank .water-tank .position-1[data-v-2df8ec93] {\n  top: 10px;\n}\n.taank .water-tank .position-2[data-v-2df8ec93] {\n  top: 20px;\n}\n.taank .water-tank .position-3[data-v-2df8ec93] {\n  top: 30px;\n}\n.taank .water-tank .position-4[data-v-2df8ec93] {\n  top: 40px;\n}\n.taank .water-tank .position-5[data-v-2df8ec93] {\n  top: 50px;\n}\n.taank .water-tank .position-6[data-v-2df8ec93] {\n  top: 60px;\n}\n.taank .water-tank .position-7[data-v-2df8ec93] {\n  top: 70px;\n}\n.taank .water-tank .position-8[data-v-2df8ec93] {\n  top: 80px;\n}\n.taank .water-tank .position-9[data-v-2df8ec93] {\n  top: 90px;\n}\n.taank .water-tank .position-10[data-v-2df8ec93] {\n  top: 100px;\n}\n.taank .water-tank .position-11[data-v-2df8ec93] {\n  top: 110px;\n}\n.taank .water-tank .position-12[data-v-2df8ec93] {\n  top: 120px;\n}\n.taank .water-tank .position-13[data-v-2df8ec93] {\n  top: 130px;\n}\n.taank .water-tank .position-14[data-v-2df8ec93] {\n  top: 140px;\n}\n.taank .water-tank .position-15[data-v-2df8ec93] {\n  top: 150px;\n}\n.taank .water-tank .position-16[data-v-2df8ec93] {\n  top: 160px;\n}\n.taank .water-tank .position-17[data-v-2df8ec93] {\n  top: 170px;\n}\n.taank .water-tank .position-18[data-v-2df8ec93] {\n  top: 180px;\n}\n.taank .water-tank .position-19[data-v-2df8ec93] {\n  top: 190px;\n}\n.taank .water-tank .position-20[data-v-2df8ec93] {\n  top: 200px;\n}\n.taank .water-tank .position-21[data-v-2df8ec93] {\n  top: 210px;\n}\n.taank .water-tank .position-22[data-v-2df8ec93] {\n  top: 220px;\n}\n.taank .water-tank .position-23[data-v-2df8ec93] {\n  top: 230px;\n}\n.taank .water-tank .position-24[data-v-2df8ec93] {\n  top: 240px;\n}\n.taank .water-tank .position-25[data-v-2df8ec93] {\n  top: 250px;\n}\n.taank .water-tank .position-26[data-v-2df8ec93] {\n  top: 260px;\n}\n.taank .water-tank .position-27[data-v-2df8ec93] {\n  top: 270px;\n}\n.taank .water-tank .position-28[data-v-2df8ec93] {\n  top: 280px;\n}\n.taank .water-tank .position-29[data-v-2df8ec93] {\n  top: 290px;\n}\n.taank .water-tank .position-30[data-v-2df8ec93] {\n  top: 300px;\n}\n.taank .water-tank .tank-capacity[data-v-2df8ec93] {\n  position: absolute;\n  left: -11.5rem;\n  text-align: right;\n  top: 1.7rem;\n  width: 180px;\n}\n.taank .water-tank .tank-capacity .capacity[data-v-2df8ec93] {\n  color: red;\n}\n.taank .water-tank .tank-capacity .tank-attr[data-v-2df8ec93] {\n  color: red;\n  font-weight: bold;\n  position: absolute;\n  right: -7rem;\n  top: 0.8rem;\n}\n.taank .water-tank .fuel-vol[data-v-2df8ec93] {\n  position: absolute;\n  right: -9rem;\n  text-align: left;\n  width: 137px;\n}\n.taank .water-tank .fuel-vol .vol[data-v-2df8ec93] {\n  color: #424242;\n}\n.taank .water-tank .fuel-height[data-v-2df8ec93] {\n  height: 200px;\n  position: absolute;\n  bottom: 0;\n  left: 0;\n  right: 0;\n  text-align: center;\n}\n.taank .tank-bar[data-v-2df8ec93] {\n  height: 250px;\n  width: 2px;\n  background-color: #a6a6a6;\n}", ""]);
 
 // exports
 
@@ -96165,7 +96332,7 @@ var app = new vue__WEBPACK_IMPORTED_MODULE_1___default.a({
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! D:\xampp7.4\htdocs\fuelmatix\resources\js\app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! D:\xampp\htdocs\projects\fuelmatix\resources\js\app.js */"./resources/js/app.js");
 
 
 /***/ })

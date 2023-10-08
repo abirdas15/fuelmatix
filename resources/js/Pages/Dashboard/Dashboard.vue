@@ -18,6 +18,31 @@
                                     <div class="height">{{ f.height != null ? f.height : 'N/A' }} (Tank Height)</div>
                                 </div>
                                 <div class="water-tank">
+                                    <div class="range r-1 position-0"></div>
+                                    <div class="range r-3 position-1"></div>
+                                    <div class="range r-2 position-2"></div>
+                                    <div class="range r-3 position-3"></div>
+                                    <div class="range r-1 position-4"></div>
+                                    <div class="range r-3 position-5"></div>
+                                    <div class="range r-2 position-6"></div>
+                                    <div class="range r-3 position-7"></div>
+                                    <div class="range r-1 position-8"></div>
+                                    <div class="range r-3 position-9"></div>
+                                    <div class="range r-2 position-10"></div>
+                                    <div class="range r-3 position-11"></div>
+                                    <div class="range r-1 position-12"></div>
+                                    <div class="range r-3 position-13"></div>
+                                    <div class="range r-2 position-14"></div>
+                                    <div class="range r-3 position-15"></div>
+                                    <div class="range r-1 position-16"></div>
+                                    <div class="range r-3 position-17"></div>
+                                    <div class="range r-2 position-18"></div>
+                                    <div class="range r-3 position-19"></div>
+                                    <div class="range r-1 position-20"></div>
+                                    <div class="range r-3 position-21"></div>
+                                    <div class="range r-2 position-22"></div>
+                                    <div class="range r-3 position-23"></div>
+                                    <div class="range r-1 position-24"></div>
                                     <div class="tank-capacity">
                                         <div class="capacity">{{f.capacity != null ? f.capacity : 'N/A'}} (Fuel Capacity)</div>
                                     </div>
@@ -26,7 +51,7 @@
                                         <svg style="position: absolute; left: 0" width="100%" height="100%" version="1.1" xmlns="http://www.w3.org/2000/svg" class="wave"><defs></defs><path :id="'water'+i"d=""/></svg>
                                     </div>
                                     <div class="fuel-vol" :style="{top: calculateTop(f)}">
-                                        <div class="vol">{{f.last_reading.volume != null ? f.last_reading.volume : 'N/A'}} mm</div>
+                                        <div class="vol fw-bold">{{f.last_reading.volume != null ? f.last_reading.volume : 'N/A'}} mm</div>
                                     </div>
                                 </div>
 
@@ -199,12 +224,13 @@ export default {
                 if (parseInt(res.status) === 200) {
                     this.listData = res.data.data;
                     this.listData.map((tank, index) => {
+                        let productColor = this.getProductColor(tank)
                         setTimeout(() => {
                             $('#fuel'+index).wavify({
                                 height: tank.fuel_percent == 0 ? 200 : 200 - (parseInt(tank.fuel_percent) * 2),
                                 bones: 8,
                                 amplitude: 10,
-                                color: '#bf9201',
+                                color: productColor,
                                 speed: .25
                             }, 500);
                             $('#water'+index).wavify({
@@ -221,6 +247,19 @@ export default {
                 }
             });
         },
+        getProductColor: function (tank) {
+            if (tank.product_type_name == 'Octane') {
+                return '#D85957'
+            } else if (tank.product_type_name == 'Diesel') {
+                return '#51180E'
+            } else if (tank.product_type_name == 'Petrol') {
+                return '#E2E2E2'
+            } else if (tank.product_type_name == 'LPG') {
+                return '#DA251D'
+            } else if (tank.product_type_name == 'CNG') {
+                return '#858585'
+            }
+        }
     },
     created() {
         this.getChart()
@@ -254,6 +293,30 @@ export default {
         border-style: solid;
         position: relative;
         overflow: visible;
+        .range{
+            position: absolute;
+            right: 0;
+            background-color: #a6a6a6;
+            height: 3px;
+            z-index: 99;
+            &.r-1{
+                width: 30px;
+            }
+            &.r-2{
+                width: 20px;
+            }
+            &.r-3{
+                width: 10px;
+            }
+            &.r-4{
+                width: 5px;
+            }
+        }
+        @for $i from 0 through 30 {
+            .position-#{$i} {
+                top: $i*10px
+            }
+        }
         .tank-capacity{
             position: absolute;
             left: -11.5rem;
