@@ -42,28 +42,28 @@ class TankController extends Controller
         $tank->capacity = $inputData['capacity'];
         $tank->height = $inputData['height'];
         $tank->client_company_id = $inputData['session_user']['client_company_id'];
-        if ($tank->save()) {
-            if ($request->file('file')) {
-                $file = $request->file('file');
-                $spreadsheet = IOFactory::load($file->getRealPath());
-                $sheet = $spreadsheet->getActiveSheet();
-                $row_limit = $sheet->getHighestDataRow();
-                $row_range = range(2, $row_limit);
-                $bstiChartData = [];
-                foreach ($row_range as $row) {
-                    $bstiChartData[] = [
-                        'height' => $sheet->getCell('A' . $row)->getValue(),
-                        'volume' => $sheet->getCell('B' . $row)->getValue(),
-                        'tank_id' => $tank->id,
-                    ];
-                }
-                if (count($bstiChartData) > 0) {
-                    BstiChart::insert($bstiChartData);
-                }
-            }
-            return response()->json(['status' => 200, 'message' => 'Successfully saved tank.']);
+        if (!$tank->save()) {
+            return response()->json(['status' => 500, 'error' => 'Cannot saved tank.']);
         }
-        return response()->json(['status' => 500, 'error' => 'Cannot saved tank.']);
+        if ($request->file('file')) {
+            $file = $request->file('file');
+            $spreadsheet = IOFactory::load($file->getRealPath());
+            $sheet = $spreadsheet->getActiveSheet();
+            $row_limit = $sheet->getHighestDataRow();
+            $row_range = range(2, $row_limit);
+            $bstiChartData = [];
+            foreach ($row_range as $row) {
+                $bstiChartData[] = [
+                    'height' => $sheet->getCell('A' . $row)->getValue(),
+                    'volume' => $sheet->getCell('B' . $row)->getValue(),
+                    'tank_id' => $tank->id,
+                ];
+            }
+            if (count($bstiChartData) > 0) {
+                BstiChart::insert($bstiChartData);
+            }
+        }
+        return response()->json(['status' => 200, 'message' => 'Successfully saved tank.']);
     }
     /**
      * @param Request $request
