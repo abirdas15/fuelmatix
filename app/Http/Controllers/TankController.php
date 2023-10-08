@@ -77,8 +77,9 @@ class TankController extends Controller
         $order_by = $inputData['order_by'] ?? 'id';
         $order_mode = $inputData['order_mode'] ?? 'DESC';
         $sessionUser = SessionUser::getUser();
-        $result = Tank::select('tank.id' ,'tank.tank_name', 'tank.height', 'tank.capacity', 'products.name as product_name')
+        $result = Tank::select('tank.id' ,'tank.tank_name', 'tank.height', 'tank.capacity', 'products.name as product_name', 'product_types.name as product_type_name')
             ->leftJoin('products', 'products.id', 'tank.product_id')
+            ->leftJoin('product_types', 'product_types.id', 'products.type_id')
             ->where('tank.client_company_id', $inputData['session_user']['client_company_id'])
             ->where('tank.client_company_id', $sessionUser['client_company_id']);
         if (!empty($keyword)) {
