@@ -22,8 +22,8 @@
                                         <div class="capacity">{{f.capacity != null ? f.capacity : 'N/A'}} (Fuel Capacity)</div>
                                     </div>
                                     <div class="fuel-height">
-                                        <svg width="100%" height="100%" version="1.1" xmlns="http://www.w3.org/2000/svg" class="wave"><defs></defs><path id="feel-the-wave" d=""/></svg>
-                                        <svg style="position: absolute; left: 0" width="100%" height="100%" version="1.1" xmlns="http://www.w3.org/2000/svg" class="wave"><defs></defs><path id="feel-the-wave2" d=""/></svg>
+                                        <svg width="100%" height="100%" version="1.1" xmlns="http://www.w3.org/2000/svg" class="wave"><defs></defs><path :id="'fuel'+i" d=""/></svg>
+                                        <svg style="position: absolute; left: 0" width="100%" height="100%" version="1.1" xmlns="http://www.w3.org/2000/svg" class="wave"><defs></defs><path :id="'water'+i"d=""/></svg>
                                     </div>
                                 </div>
                                 <div class="text-center mt-1 fw-bold">
@@ -191,24 +191,23 @@ export default {
                 this.TableLoading = false
                 if (parseInt(res.status) === 200) {
                     this.listData = res.data.data;
-                    this.listData.map(tank => {
-
-                    })
-                    setTimeout(() => {
-                        $('#feel-the-wave').wavify({
-                            height: 200,
-                            bones: 8,
-                            amplitude: 10,
-                            color: '#bf9201',
-                            speed: .25
-                        }, 500);
-                        $('#feel-the-wave2').wavify({
-                            height: 200,
-                            bones: 8,
-                            amplitude: 10,
-                            color: '#00B3FF',
-                            speed: .15
-                        }, 500);
+                    this.listData.map((tank, index) => {
+                        setTimeout(() => {
+                            $('#fule'+index).wavify({
+                                height: tank.last_reading.volume,
+                                bones: 8,
+                                amplitude: 10,
+                                color: '#bf9201',
+                                speed: .25
+                            }, 500);
+                            $('#water'+index).wavify({
+                                height: tank.last_reading.water_height,
+                                bones: 8,
+                                amplitude: 10,
+                                color: '#00B3FF',
+                                speed: .15
+                            }, 500);
+                        })
                     })
                 } else {
                     ApiService.ErrorHandler(res.error);

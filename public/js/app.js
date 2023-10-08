@@ -3769,22 +3769,23 @@ __webpack_require__.r(__webpack_exports__);
         _this2.TableLoading = false;
         if (parseInt(res.status) === 200) {
           _this2.listData = res.data.data;
-          _this2.listData.map(function (tank) {});
-          setTimeout(function () {
-            $('#feel-the-wave').wavify({
-              height: 200,
-              bones: 8,
-              amplitude: 10,
-              color: '#bf9201',
-              speed: .25
-            }, 500);
-            $('#feel-the-wave2').wavify({
-              height: 200,
-              bones: 8,
-              amplitude: 10,
-              color: '#00B3FF',
-              speed: .15
-            }, 500);
+          _this2.listData.map(function (tank, index) {
+            setTimeout(function () {
+              $('#fule' + index).wavify({
+                height: tank.last_reading.volume,
+                bones: 8,
+                amplitude: 10,
+                color: '#bf9201',
+                speed: .25
+              }, 500);
+              $('#water' + index).wavify({
+                height: tank.last_reading.water_height,
+                bones: 8,
+                amplitude: 10,
+                color: '#00B3FF',
+                speed: .15
+              }, 500);
+            });
           });
         } else {
           _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].ErrorHandler(res.error);
@@ -15449,7 +15450,7 @@ var render = function render() {
       }
     }, [_c("defs"), _c("path", {
       attrs: {
-        id: "feel-the-wave",
+        id: "fuel" + i,
         d: ""
       }
     })]), _vm._v(" "), _c("svg", {
@@ -15466,7 +15467,7 @@ var render = function render() {
       }
     }, [_c("defs"), _c("path", {
       attrs: {
-        id: "feel-the-wave2",
+        id: "water" + i,
         d: ""
       }
     })])])]), _vm._v(" "), _c("div", {
