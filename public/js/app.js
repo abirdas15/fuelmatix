@@ -6372,7 +6372,8 @@ __webpack_require__.r(__webpack_exports__);
         tank_id: '',
         date: '',
         height: '',
-        type: ''
+        type: '',
+        water_height: ''
       },
       loading: false,
       listData: []
@@ -7164,6 +7165,9 @@ __webpack_require__.r(__webpack_exports__);
     }
   },
   methods: {
+    calculateTop: function calculateTop(tank) {
+      return 200 - parseInt(tank.fuel_percent) * 2 + 27 + 'px';
+    },
     openModalDelete: function openModalDelete(data) {
       var _this = this;
       sweetalert2_dist_sweetalert2_js__WEBPACK_IMPORTED_MODULE_0___default.a.fire({
@@ -22449,6 +22453,33 @@ var render = function render() {
     }
   }), _vm._v(" "), _c("div", {
     staticClass: "invalid-feedback"
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 form-group col-md-6"
+  }, [_c("label", {
+    staticClass: "form-label"
+  }, [_vm._v("Water Height:")]), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.param.water_height,
+      expression: "param.water_height"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      name: "water_height"
+    },
+    domProps: {
+      value: _vm.param.water_height
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.param, "water_height", $event.target.value);
+      }
+    }
+  }), _vm._v(" "), _c("div", {
+    staticClass: "invalid-feedback"
   })])]), _vm._v(" "), _c("div", {
     staticClass: "row",
     staticStyle: {
@@ -22687,6 +22718,33 @@ var render = function render() {
       input: function input($event) {
         if ($event.target.composing) return;
         _vm.$set(_vm.param, "height", $event.target.value);
+      }
+    }
+  }), _vm._v(" "), _c("div", {
+    staticClass: "invalid-feedback"
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 form-group col-md-6"
+  }, [_c("label", {
+    staticClass: "form-label"
+  }, [_vm._v("Water Height:")]), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.param.water_height,
+      expression: "param.water_height"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      name: "water_height"
+    },
+    domProps: {
+      value: _vm.param.water_height
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.param, "water_height", $event.target.value);
       }
     }
   }), _vm._v(" "), _c("div", {
@@ -96165,7 +96223,7 @@ var app = new vue__WEBPACK_IMPORTED_MODULE_1___default.a({
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! D:\xampp7.4\htdocs\fuelmatix\resources\js\app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! D:\xampp\htdocs\projects\fuelmatix\resources\js\app.js */"./resources/js/app.js");
 
 
 /***/ })

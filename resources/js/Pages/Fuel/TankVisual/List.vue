@@ -89,6 +89,9 @@ export default {
         },
     },
     methods: {
+        calculateTop: function (tank) {
+            return 200 - (parseInt(tank.fuel_percent) * 2) +27 +'px'
+        },
         openModalDelete(data) {
             Swal.fire({
                 title: 'Are you sure you want to delete?',
