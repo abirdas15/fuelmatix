@@ -10,21 +10,24 @@
                     </div>
                 </div>
                 <div class="col-sm-12 mb-5">
-                    <div class="text-center mt-1 mb-3 fs-3 ">Tank</div>
+                    <div class="text-center mt-1 mb-4 fs-3 ">Tanks</div>
                     <div class="row mt-4">
                         <div class="col-sm-4 mb-5" v-for="(f, i) in listData">
                             <div class="taank">
                                 <div class="tank-height">
                                     <div class="height">{{ f.height != null ? f.height : 'N/A' }} (Tank Height)</div>
                                 </div>
-                                <div class="water-tank">
-                                    <div class="tank-capacity">
-                                        <div class="capacity">{{f.capacity != null ? f.capacity : 'N/A'}} (Fuel Capacity)</div>
+                                <div class="d-flex align-items-center">
+                                    <div class="water-tank">
+                                        <div class="tank-capacity">
+                                            <div class="capacity">{{f.capacity != null ? f.capacity : 'N/A'}} (Fuel Capacity)</div>
+                                        </div>
+                                        <div class="fuel-height">
+                                            <svg width="100%" height="100%" version="1.1" xmlns="http://www.w3.org/2000/svg" class="wave"><defs></defs><path :id="'fuel'+i" d=""/></svg>
+                                            <svg style="position: absolute; left: 0" width="100%" height="100%" version="1.1" xmlns="http://www.w3.org/2000/svg" class="wave"><defs></defs><path :id="'water'+i"d=""/></svg>
+                                        </div>
                                     </div>
-                                    <div class="fuel-height">
-                                        <svg width="100%" height="100%" version="1.1" xmlns="http://www.w3.org/2000/svg" class="wave"><defs></defs><path :id="'fuel'+i" d=""/></svg>
-                                        <svg style="position: absolute; left: 0" width="100%" height="100%" version="1.1" xmlns="http://www.w3.org/2000/svg" class="wave"><defs></defs><path :id="'water'+i"d=""/></svg>
-                                    </div>
+<!--                                    <div class="tank-bar"></div>-->
                                 </div>
                                 <div class="text-center mt-1 fw-bold">
                                     {{f.tank_name}}
@@ -201,7 +204,7 @@ export default {
                                 speed: .25
                             }, 500);
                             $('#water'+index).wavify({
-                                height: tank.last_reading.water_height,
+                                height: 200,
                                 bones: 8,
                                 amplitude: 10,
                                 color: '#00B3FF',
@@ -227,9 +230,10 @@ export default {
     position: relative;
     .tank-height{
         position: absolute;
-        left: 0;
-        text-align: center;
+        left: -2rem;
+        text-align: right;
         top: 0;
+        width: 180px;
         .height{
             color: #369D6F;
         }
@@ -237,21 +241,29 @@ export default {
     .water-tank{
         margin: auto;
         height: 250px;
-        width: 300px;
+        width: 200px;
         border-radius : 0;
         border-width: 3px;
         border-top: 0;
         border-color: #a6a6a6;
         border-style: solid;
         position: relative;
-        overflow: hidden;
+        overflow: visible;
         .tank-capacity{
             position: absolute;
-            left: 0;
-            text-align: center;
-            top: 0;
+            left: -11.5rem;
+            text-align: right;
+            top: 1.7rem;
+            width: 180px;
             .capacity{
                 color: red;
+            }
+            .tank-attr{
+                color: red;
+                font-weight: bold;
+                position: absolute;
+                right: -7rem;
+                top: 0.8rem;
             }
         }
         .fuel-height{
@@ -263,40 +275,10 @@ export default {
             text-align: center;
         }
     }
-}
-.tt{
-    width: 70px;
-    &.text-height{
-        color: #369D6F;
-    }
-    &.text-capacity{
-        color: red;
-    }
-    &.text-fuel{
-        color: #bf9201;
-    }
-    &.text-water{
-        color: #00B3FF;
-    }
-}
-
-.line{
-    height: 2px;
-    width: 80px;
-    background-size: 14px 3px, 100% 3px;
-    border: none;
-    margin-left: 20px;
-    &.height{
-        background-image: linear-gradient(90deg, transparent, transparent 50%, #fff 50%, #fff 100%), linear-gradient(90deg, #369D6F, #369D6F, #369D6F, #369D6F, #369D6F);
-    }
-    &.capacity{
-        background-image: linear-gradient(90deg, transparent, transparent 50%, #fff 50%, #fff 100%), linear-gradient(90deg, red, red, red, red, red);
-    }
-    &.fuel{
-        background-image: linear-gradient(90deg, transparent, transparent 50%, #fff 50%, #fff 100%), linear-gradient(90deg, #bf9201, #bf9201, #bf9201, #bf9201, #bf9201);
-    }
-    &.water{
-        background-image: linear-gradient(90deg, transparent, transparent 50%, #fff 50%, #fff 100%), linear-gradient(90deg, #00B3FF, #00B3FF, #00B3FF, #00B3FF, #00B3FF);
+    .tank-bar{
+        height: 250px;
+        width: 2px;
+        background-color: #a6a6a6;
     }
 }
 </style>
