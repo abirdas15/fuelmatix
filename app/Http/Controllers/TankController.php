@@ -77,7 +77,6 @@ class TankController extends Controller
         $order_by = $inputData['order_by'] ?? 'id';
         $order_mode = $inputData['order_mode'] ?? 'DESC';
         $sessionUser = SessionUser::getUser();
-        $count = Tank::where('client_company_id', $sessionUser['client_company_id'])->count();
         $result = Tank::select('tank.id' ,'tank.tank_name', 'tank.height', 'tank.capacity', 'products.name as product_name')
             ->leftJoin('products', 'products.id', 'tank.product_id')
             ->where('tank.client_company_id', $inputData['session_user']['client_company_id'])
@@ -87,8 +86,6 @@ class TankController extends Controller
                 $q->where('tank.tank_name', 'LIKE', '%'.$keyword.'%');
             });
         }
-
-
         $result = $result->orderBy($order_by, $order_mode)
             ->paginate($limit);
         $tankId = [];
