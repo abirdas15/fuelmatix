@@ -40,7 +40,7 @@
                                                 <th class="text-white" @click="sortData('date')" :class="sortClass('date')">Date</th>
                                                 <th class="text-white" @click="sortData('tank_name')" :class="sortClass('tank_name')">Tank ID</th>
                                                 <th class="text-white" @click="sortData('height')" :class="sortClass('height')">Height</th>
-                                                <th class="text-white" @click="sortData('water_height')" :class="sortClass('water_height')">Height Height</th>
+                                                <th class="text-white" @click="sortData('water_height')" :class="sortClass('water_height')">Water Height</th>
                                                 <th class="text-white" >Action</th>
                                             </tr>
                                             </thead>
@@ -165,6 +165,24 @@ export default {
                 if (parseInt(res.status) === 200) {
                     this.paginateData = res.data;
                     this.listData = res.data.data;
+                    this.listData.map((tank, index) => {
+                        setTimeout(() => {
+                            $('#fuel'+index).wavify({
+                                height: tank.fuel_percent == 0 ? 200 : 200 - (parseInt(tank.fuel_percent) * 2),
+                                bones: 8,
+                                amplitude: 10,
+                                color: '#bf9201',
+                                speed: .25
+                            }, 500);
+                            $('#water'+index).wavify({
+                                height: tank.water_percent == 0 ? 200 : 200 - (parseInt(tank.water_percent) * 2),
+                                bones: 8,
+                                amplitude: 10,
+                                color: '#00B3FF',
+                                speed: .15
+                            }, 500);
+                        })
+                    })
                 } else {
                     ApiService.ErrorHandler(res.error);
                 }

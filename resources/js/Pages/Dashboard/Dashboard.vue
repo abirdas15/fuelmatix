@@ -17,18 +17,19 @@
                                 <div class="tank-height">
                                     <div class="height">{{ f.height != null ? f.height : 'N/A' }} (Tank Height)</div>
                                 </div>
-                                <div class="d-flex align-items-center">
-                                    <div class="water-tank">
-                                        <div class="tank-capacity">
-                                            <div class="capacity">{{f.capacity != null ? f.capacity : 'N/A'}} (Fuel Capacity)</div>
-                                        </div>
-                                        <div class="fuel-height">
-                                            <svg width="100%" height="100%" version="1.1" xmlns="http://www.w3.org/2000/svg" class="wave"><defs></defs><path :id="'fuel'+i" d=""/></svg>
-                                            <svg style="position: absolute; left: 0" width="100%" height="100%" version="1.1" xmlns="http://www.w3.org/2000/svg" class="wave"><defs></defs><path :id="'water'+i"d=""/></svg>
-                                        </div>
+                                <div class="water-tank">
+                                    <div class="tank-capacity">
+                                        <div class="capacity">{{f.capacity != null ? f.capacity : 'N/A'}} (Fuel Capacity)</div>
                                     </div>
-<!--                                    <div class="tank-bar"></div>-->
+                                    <div class="fuel-height">
+                                        <svg width="100%" height="100%" version="1.1" xmlns="http://www.w3.org/2000/svg" class="wave"><defs></defs><path :id="'fuel'+i" d=""/></svg>
+                                        <svg style="position: absolute; left: 0" width="100%" height="100%" version="1.1" xmlns="http://www.w3.org/2000/svg" class="wave"><defs></defs><path :id="'water'+i"d=""/></svg>
+                                    </div>
+                                    <div class="fuel-vol" :style="{top: calculateTop(f)}">
+                                        <div class="vol">{{f.last_reading.volume != null ? f.last_reading.volume : 'N/A'}} mm</div>
+                                    </div>
                                 </div>
+
                                 <div class="text-center mt-1 fw-bold">
                                     {{f.tank_name}}
                                 </div>
@@ -81,6 +82,9 @@ export default {
         $('#dashboard_bar').text('Dashboard')
     },
     methods: {
+        calculateTop: function (tank) {
+            return 200 - (parseInt(tank.fuel_percent) * 2) +27 +'px'
+        },
         saleChart: function () {
             if(jQuery('#saleChart').length > 0 ){
                 const barChart_1 = document.getElementById("saleChart").getContext('2d');
@@ -196,15 +200,15 @@ export default {
                     this.listData = res.data.data;
                     this.listData.map((tank, index) => {
                         setTimeout(() => {
-                            $('#fule'+index).wavify({
-                                height: tank.last_reading.volume,
+                            $('#fuel'+index).wavify({
+                                height: tank.fuel_percent == 0 ? 200 : 200 - (parseInt(tank.fuel_percent) * 2),
                                 bones: 8,
                                 amplitude: 10,
                                 color: '#bf9201',
                                 speed: .25
                             }, 500);
                             $('#water'+index).wavify({
-                                height: 200,
+                                height: tank.water_percent == 0 ? 200 : 200 - (parseInt(tank.water_percent) * 2),
                                 bones: 8,
                                 amplitude: 10,
                                 color: '#00B3FF',
@@ -238,6 +242,7 @@ export default {
             color: #369D6F;
         }
     }
+
     .water-tank{
         margin: auto;
         height: 250px;
@@ -264,6 +269,15 @@ export default {
                 position: absolute;
                 right: -7rem;
                 top: 0.8rem;
+            }
+        }
+        .fuel-vol{
+            position: absolute;
+            right: -9rem;
+            text-align: left;
+            width: 137px;
+            .vol{
+                color: #424242;
             }
         }
         .fuel-height{
