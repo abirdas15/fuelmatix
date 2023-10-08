@@ -2881,7 +2881,7 @@ __webpack_require__.r(__webpack_exports__);
       _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].CategorySave, this.accountParam, function (res) {
         _this3.infoLoading = false;
         if (parseInt(res.status) === 200) {
-          _this3.$toast.success(res.msg);
+          _this3.$toast.success(res.message);
           _this3.closeModal();
           _this3.getCategory();
           _this3.getParentCategory();
@@ -2904,7 +2904,7 @@ __webpack_require__.r(__webpack_exports__);
       _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].CategoryUpdate, this.accountParamEdit, function (res) {
         _this4.infoLoading = false;
         if (parseInt(res.status) === 200) {
-          _this4.$toast.success(res.msg);
+          _this4.$toast.success(res.message);
           _this4.closeModal();
           _this4.getCategory();
           _this4.getParentCategory();
@@ -13934,8 +13934,412 @@ render._withStripped = true;
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
-var render = function render() {};
-var staticRenderFns = [];
+var render = function render() {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "content-body"
+  }, [_c("div", {
+    staticClass: "container-fluid"
+  }, [_c("div", {
+    staticClass: "row page-titles"
+  }, [_c("ol", {
+    staticClass: "breadcrumb align-items-center"
+  }, [_c("li", {
+    staticClass: "breadcrumb-item active"
+  }, [_c("router-link", {
+    attrs: {
+      to: {
+        name: "Dashboard"
+      }
+    }
+  }, [_vm._v("Home")])], 1), _vm._v(" "), _vm._m(0), _vm._v(" "), _vm.CheckPermission(_vm.Section.COMPANY_SALE + "-" + _vm.Action.CREATE) ? _c("li", {
+    staticStyle: {
+      "margin-left": "auto"
+    }
+  }, [_vm.selectedIDs.length > 0 && !_vm.generateLoading ? _c("a", {
+    staticClass: "btn btn-success text-white",
+    staticStyle: {
+      padding: "8px 20px"
+    },
+    attrs: {
+      href: "javascript:void(0)"
+    },
+    on: {
+      click: function click($event) {
+        return _vm.generateInvoice();
+      }
+    }
+  }, [_vm._v("Generate Invoice")]) : _vm._e(), _vm._v(" "), _vm.selectedIDs.length > 0 && _vm.generateLoading ? _c("a", {
+    staticClass: "btn btn-success text-white",
+    staticStyle: {
+      padding: "8px 20px"
+    },
+    attrs: {
+      href: "javascript:void(0)"
+    }
+  }, [_vm._v("Generating....")]) : _vm._e()]) : _vm._e()])]), _vm._v(" "), _c("div", {
+    staticClass: "row"
+  }, [_c("div", {
+    staticClass: "col-12"
+  }, [_c("div", {
+    staticClass: "card"
+  }, [_vm._m(1), _vm._v(" "), _c("div", {
+    staticClass: "card-body"
+  }, [_c("div", {
+    staticClass: "row mt-4"
+  }, [_c("div", {
+    staticClass: "table-responsive"
+  }, [_c("div", {
+    staticClass: "dataTables_wrapper no-footer"
+  }, [_c("div", {
+    staticClass: "dataTables_length"
+  }, [_c("label", {
+    staticClass: "d-flex align-items-center"
+  }, [_vm._v("Show\n                                            "), _c("select", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.Param.limit,
+      expression: "Param.limit"
+    }],
+    staticClass: "mx-2",
+    on: {
+      change: [function ($event) {
+        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
+          return o.selected;
+        }).map(function (o) {
+          var val = "_value" in o ? o._value : o.value;
+          return val;
+        });
+        _vm.$set(_vm.Param, "limit", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
+      }, _vm.list]
+    }
+  }, [_c("option", {
+    attrs: {
+      value: "10"
+    }
+  }, [_vm._v("10")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "25"
+    }
+  }, [_vm._v("25")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "50"
+    }
+  }, [_vm._v("50")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "100"
+    }
+  }, [_vm._v("100")])]), _vm._v("\n                                            entries\n                                        ")])]), _vm._v(" "), _c("div", {
+    staticClass: "dataTables_filter",
+    attrs: {
+      id: "example3_filter"
+    }
+  }, [_c("label", [_vm._v("Search:\n                                            "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.Param.keyword,
+      expression: "Param.keyword"
+    }],
+    attrs: {
+      type: "search",
+      placeholder: ""
+    },
+    domProps: {
+      value: _vm.Param.keyword
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.Param, "keyword", $event.target.value);
+      }
+    }
+  })])]), _vm._v(" "), _c("table", {
+    staticClass: "display dataTable no-footer",
+    staticStyle: {
+      "min-width": "845px"
+    }
+  }, [_c("thead", [_c("tr", {
+    staticClass: "text-white",
+    staticStyle: {
+      "background-color": "#4886EE",
+      color: "#ffffff"
+    }
+  }, [_c("th", [_c("input", {
+    staticClass: "form-check-input",
+    attrs: {
+      type: "checkbox"
+    },
+    on: {
+      change: function change($event) {
+        return _vm.selectAll($event);
+      }
+    }
+  })]), _vm._v(" "), _c("th", {
+    staticClass: "text-white",
+    "class": _vm.sortClass("date"),
+    on: {
+      click: function click($event) {
+        return _vm.sortData("date");
+      }
+    }
+  }, [_vm._v("Date")]), _vm._v(" "), _c("th", {
+    staticClass: "text-white",
+    "class": _vm.sortClass("name"),
+    on: {
+      click: function click($event) {
+        return _vm.sortData("name");
+      }
+    }
+  }, [_vm._v("Company")]), _vm._v(" "), _c("th", {
+    staticClass: "text-white",
+    "class": _vm.sortClass("amount"),
+    on: {
+      click: function click($event) {
+        return _vm.sortData("amount");
+      }
+    }
+  }, [_vm._v("Amount")]), _vm._v(" "), _c("th", {
+    staticClass: "text-white",
+    staticStyle: {
+      width: "375px"
+    }
+  }, [_vm._v("Action")])])]), _vm._v(" "), _vm.listData.length > 0 && _vm.TableLoading == false ? _c("tbody", _vm._l(_vm.listData, function (f, i) {
+    return _c("tr", [_c("td", [!f.invoice_id ? _c("input", {
+      staticClass: "form-check-input",
+      attrs: {
+        type: "checkbox"
+      },
+      domProps: {
+        checked: _vm.isExist(f.id)
+      },
+      on: {
+        change: function change($event) {
+          return _vm.selectIds($event, f.id);
+        }
+      }
+    }) : _vm._e()]), _vm._v(" "), _c("td", [_vm._v(_vm._s(f.date))]), _vm._v(" "), _c("td", [_c("a", {
+      attrs: {
+        href: "javascript:void(0);"
+      }
+    }, [_vm._v(_vm._s(f.name))])]), _vm._v(" "), _c("td", [_c("a", {
+      attrs: {
+        href: "javascript:void(0);"
+      }
+    }, [_vm._v(_vm._s(f === null || f === void 0 ? void 0 : f.amount))])]), _vm._v(" "), _c("td", [f.module == "shift sale" && _vm.CheckPermission(_vm.Section.COMPANY_SALE + "-" + _vm.Action.CREATE) ? [!f.invoice_id ? _c("button", {
+      staticClass: "btn btn-sm btn-primary",
+      on: {
+        click: function click($event) {
+          return _vm.tableAction("expand", f);
+        }
+      }
+    }, [_vm._v("Expand")]) : _vm._e()] : _vm._e(), _vm._v(" "), _vm.CheckPermission(_vm.Section.INVOICE + "-" + _vm.Action.VIEW) && f.invoice_id ? _c("router-link", {
+      staticClass: "btn btn-sm btn-info",
+      attrs: {
+        to: {
+          name: "InvoicesView",
+          params: {
+            id: f.invoice_id
+          }
+        }
+      },
+      on: {
+        click: function click($event) {
+          return _vm.tableAction("view", f);
+        }
+      }
+    }, [_vm._v("View Invoices")]) : _vm._e()], 2)]);
+  }), 0) : _vm._e(), _vm._v(" "), _vm.listData.length == 0 && _vm.TableLoading == false ? _c("tbody", [_vm._m(2)]) : _vm._e(), _vm._v(" "), _vm.TableLoading == true ? _c("tbody", [_vm._m(3)]) : _vm._e()]), _vm._v(" "), _vm.paginateData != null ? _c("div", {
+    staticClass: "dataTables_info",
+    attrs: {
+      id: "example3_info",
+      role: "status",
+      "aria-live": "polite"
+    }
+  }, [_vm._v("Showing\n                                        " + _vm._s(_vm.paginateData.from) + " to " + _vm._s(_vm.paginateData.to) + " of " + _vm._s(_vm.paginateData.total) + " entries\n                                    ")]) : _vm._e(), _vm._v(" "), _c("div", {
+    staticClass: "dataTables_paginate paging_simple_numbers",
+    attrs: {
+      id: "example3_paginate"
+    }
+  }, [_c("Pagination", {
+    attrs: {
+      data: _vm.paginateData,
+      onChange: _vm.list
+    }
+  })], 1)])])])])])])])]), _vm._v(" "), _c("div", {
+    staticClass: "popup-wrapper-modal createExpand d-none"
+  }, [_c("form", {
+    staticClass: "popup-box",
+    staticStyle: {
+      "max-width": "800px"
+    },
+    on: {
+      submit: function submit($event) {
+        $event.preventDefault();
+        return _vm.expand.apply(null, arguments);
+      }
+    }
+  }, [_vm._m(4), _vm._v(" "), _vm._l(_vm.expandParam.data, function (e, i) {
+    return _c("div", {
+      staticClass: "row align-items-center"
+    }, [_c("div", {
+      staticClass: "col-sm-5"
+    }, [_c("div", {
+      staticClass: "input-wrapper form-group mb-3"
+    }, [_c("label", {
+      attrs: {
+        "for": "description"
+      }
+    }, [_vm._v("Description")]), _vm._v(" "), _c("input", {
+      directives: [{
+        name: "model",
+        rawName: "v-model",
+        value: e.description,
+        expression: "e.description"
+      }],
+      staticClass: "w-100 form-control",
+      attrs: {
+        type: "text",
+        name: "description",
+        id: "description",
+        placeholder: "Description here"
+      },
+      domProps: {
+        value: e.description
+      },
+      on: {
+        input: function input($event) {
+          if ($event.target.composing) return;
+          _vm.$set(e, "description", $event.target.value);
+        }
+      }
+    }), _vm._v(" "), _c("small", {
+      staticClass: "invalid-feedback"
+    })])]), _vm._v(" "), _c("div", {
+      staticClass: "col-sm-5"
+    }, [_c("div", {
+      staticClass: "input-wrapper form-group mb-3"
+    }, [_c("label", {
+      attrs: {
+        "for": "amount"
+      }
+    }, [_vm._v("Amount")]), _vm._v(" "), _c("input", {
+      directives: [{
+        name: "model",
+        rawName: "v-model",
+        value: e.amount,
+        expression: "e.amount"
+      }],
+      staticClass: "w-100 form-control",
+      attrs: {
+        type: "text",
+        name: "amount",
+        id: "amount",
+        placeholder: "Amount here"
+      },
+      domProps: {
+        value: e.amount
+      },
+      on: {
+        input: function input($event) {
+          if ($event.target.composing) return;
+          _vm.$set(e, "amount", $event.target.value);
+        }
+      }
+    }), _vm._v(" "), _c("small", {
+      staticClass: "invalid-feedback"
+    })])]), _vm._v(" "), _c("div", {
+      staticClass: "col-sm-2"
+    }, [_c("button", {
+      staticClass: "btn btn-danger",
+      staticStyle: {
+        height: "54px"
+      },
+      attrs: {
+        type: "button"
+      },
+      on: {
+        click: function click($event) {
+          return _vm.spliceData(i);
+        }
+      }
+    }, [_c("i", {
+      staticClass: "fa-solid fa-xmark"
+    })])])]);
+  }), _vm._v(" "), _c("div", {
+    staticClass: "text-end"
+  }, [_c("button", {
+    staticClass: "btn btn-primary",
+    attrs: {
+      type: "button"
+    },
+    on: {
+      click: _vm.addMore
+    }
+  }, [_vm._v("Add More")])]), _vm._v(" "), !_vm.Loading ? _c("button", {
+    staticClass: "btn btn-primary",
+    attrs: {
+      type: "submit"
+    }
+  }, [_vm._v("Submit")]) : _vm._e(), _vm._v(" "), _vm.Loading ? _c("button", {
+    staticClass: "btn btn-primary",
+    attrs: {
+      type: "button",
+      disabled: ""
+    }
+  }, [_vm._v("Submitting...")]) : _vm._e()], 2)])]);
+};
+var staticRenderFns = [function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("li", {
+    staticClass: "breadcrumb-item"
+  }, [_c("a", {
+    attrs: {
+      href: "javascript:void(0)"
+    }
+  }, [_vm._v("Company Sale")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "card-header bg-secondary"
+  }, [_c("h4", {
+    staticClass: "card-title"
+  }, [_vm._v("Company Sale")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("tr", [_c("td", {
+    staticClass: "text-center",
+    attrs: {
+      colspan: "10"
+    }
+  }, [_vm._v("No data found")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("tr", [_c("td", {
+    staticClass: "text-center",
+    attrs: {
+      colspan: "10"
+    }
+  }, [_vm._v("Loading....")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("button", {
+    staticClass: "btn closeBtn",
+    attrs: {
+      type: "button"
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-times"
+  })]);
+}];
+render._withStripped = true;
 
 
 /***/ }),
@@ -24046,8 +24450,584 @@ render._withStripped = true;
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
-var render = function render() {};
-var staticRenderFns = [];
+var render = function render() {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "content-body"
+  }, [_c("div", {
+    staticClass: "container-fluid"
+  }, [_c("div", {
+    staticClass: "row page-titles"
+  }, [_c("ol", {
+    staticClass: "breadcrumb align-items-center"
+  }, [_c("li", {
+    staticClass: "breadcrumb-item active"
+  }, [_c("router-link", {
+    attrs: {
+      to: {
+        name: "Dashboard"
+      }
+    }
+  }, [_vm._v("Home")])], 1), _vm._v(" "), _vm._m(0), _vm._v(" "), _vm.CheckPermission(_vm.Section.INVOICE + "-" + _vm.Action.CREATE) ? _c("li", {
+    staticStyle: {
+      "margin-left": "auto"
+    }
+  }, [_c("a", {
+    staticClass: "btn btn-success text-white",
+    staticStyle: {
+      padding: "8px 20px"
+    },
+    attrs: {
+      href: "javascript:void(0)"
+    },
+    on: {
+      click: function click($event) {
+        return _vm.paymentGlobalModal();
+      }
+    }
+  }, [_vm._v("Payment")])]) : _vm._e()])]), _vm._v(" "), _c("div", {
+    staticClass: "row"
+  }, [_c("div", {
+    staticClass: "col-12"
+  }, [_c("div", {
+    staticClass: "card"
+  }, [_vm._m(1), _vm._v(" "), _c("div", {
+    staticClass: "card-body"
+  }, [_c("div", {
+    staticClass: "row mt-4"
+  }, [_c("div", {
+    staticClass: "table-responsive"
+  }, [_c("div", {
+    staticClass: "dataTables_wrapper no-footer"
+  }, [_c("div", {
+    staticClass: "dataTables_length"
+  }, [_c("label", {
+    staticClass: "d-flex align-items-center"
+  }, [_vm._v("Show\n                                            "), _c("select", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.Param.limit,
+      expression: "Param.limit"
+    }],
+    staticClass: "mx-2",
+    on: {
+      change: [function ($event) {
+        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
+          return o.selected;
+        }).map(function (o) {
+          var val = "_value" in o ? o._value : o.value;
+          return val;
+        });
+        _vm.$set(_vm.Param, "limit", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
+      }, _vm.list]
+    }
+  }, [_c("option", {
+    attrs: {
+      value: "10"
+    }
+  }, [_vm._v("10")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "25"
+    }
+  }, [_vm._v("25")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "50"
+    }
+  }, [_vm._v("50")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "100"
+    }
+  }, [_vm._v("100")])]), _vm._v("\n                                            entries\n                                        ")])]), _vm._v(" "), _c("div", {
+    staticClass: "dataTables_filter",
+    attrs: {
+      id: "example3_filter"
+    }
+  }, [_c("label", [_vm._v("Search:\n                                            "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.Param.keyword,
+      expression: "Param.keyword"
+    }],
+    attrs: {
+      type: "search",
+      placeholder: ""
+    },
+    domProps: {
+      value: _vm.Param.keyword
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.Param, "keyword", $event.target.value);
+      }
+    }
+  })])]), _vm._v(" "), _c("table", {
+    staticClass: "display dataTable no-footer",
+    staticStyle: {
+      "min-width": "845px"
+    }
+  }, [_c("thead", [_c("tr", {
+    staticClass: "text-white",
+    staticStyle: {
+      "background-color": "#4886EE",
+      color: "#ffffff"
+    }
+  }, [_c("th", {
+    staticClass: "text-white",
+    "class": _vm.sortClass("invoice_number"),
+    on: {
+      click: function click($event) {
+        return _vm.sortData("invoice_number");
+      }
+    }
+  }, [_vm._v("Invoice Number")]), _vm._v(" "), _c("th", {
+    staticClass: "text-white",
+    "class": _vm.sortClass("date"),
+    on: {
+      click: function click($event) {
+        return _vm.sortData("date");
+      }
+    }
+  }, [_vm._v("Date")]), _vm._v(" "), _c("th", {
+    staticClass: "text-white",
+    "class": _vm.sortClass("due_date"),
+    on: {
+      click: function click($event) {
+        return _vm.sortData("date");
+      }
+    }
+  }, [_vm._v("Due Date")]), _vm._v(" "), _c("th", {
+    staticClass: "text-white",
+    "class": _vm.sortClass("name"),
+    on: {
+      click: function click($event) {
+        return _vm.sortData("name");
+      }
+    }
+  }, [_vm._v("Name")]), _vm._v(" "), _c("th", {
+    staticClass: "text-white",
+    "class": _vm.sortClass("amount"),
+    on: {
+      click: function click($event) {
+        return _vm.sortData("amount");
+      }
+    }
+  }, [_vm._v("Amount")]), _vm._v(" "), _c("th", {
+    staticClass: "text-white",
+    "class": _vm.sortClass("due_amount"),
+    on: {
+      click: function click($event) {
+        return _vm.sortData("due_amount");
+      }
+    }
+  }, [_vm._v("Due Amount")]), _vm._v(" "), _c("th", {
+    staticClass: "text-white",
+    "class": _vm.sortClass("paid_amount"),
+    on: {
+      click: function click($event) {
+        return _vm.sortData("paid_amount");
+      }
+    }
+  }, [_vm._v("Paid Amount")]), _vm._v(" "), _c("th", {
+    staticClass: "text-white",
+    "class": _vm.sortClass("status"),
+    on: {
+      click: function click($event) {
+        return _vm.sortData("status");
+      }
+    }
+  }, [_vm._v("Status")]), _vm._v(" "), _c("th", {
+    staticClass: "text-white"
+  }, [_vm._v("Action")])])]), _vm._v(" "), _vm.listData.length > 0 && _vm.TableLoading == false ? _c("tbody", _vm._l(_vm.listData, function (f) {
+    return _c("tr", [_c("td", [_vm._v(_vm._s(f.invoice_number))]), _vm._v(" "), _c("td", [_c("a", {
+      attrs: {
+        href: "javascript:void(0);"
+      }
+    }, [_vm._v(_vm._s(f.date))])]), _vm._v(" "), _c("td", [_c("a", {
+      attrs: {
+        href: "javascript:void(0);"
+      }
+    }, [_vm._v(_vm._s(f.due_date))])]), _vm._v(" "), _c("td", [_c("a", {
+      attrs: {
+        href: "javascript:void(0);"
+      }
+    }, [_vm._v(_vm._s(f === null || f === void 0 ? void 0 : f.name))])]), _vm._v(" "), _c("td", [_c("a", {
+      attrs: {
+        href: "javascript:void(0);"
+      }
+    }, [_vm._v(_vm._s(f === null || f === void 0 ? void 0 : f.amount))])]), _vm._v(" "), _c("td", [_c("a", {
+      attrs: {
+        href: "javascript:void(0);"
+      }
+    }, [_vm._v(_vm._s(f === null || f === void 0 ? void 0 : f.due_amount))])]), _vm._v(" "), _c("td", [_c("a", {
+      attrs: {
+        href: "javascript:void(0);"
+      }
+    }, [_vm._v(_vm._s(f === null || f === void 0 ? void 0 : f.paid_amount))])]), _vm._v(" "), _c("td", [_c("a", {
+      attrs: {
+        href: "javascript:void(0);"
+      }
+    }, [f.status == "due" ? _c("span", {
+      staticClass: "badge bg-warning text-bg-warning text-capitalize"
+    }, [_vm._v(_vm._s(f === null || f === void 0 ? void 0 : f.status))]) : _vm._e(), _vm._v(" "), f.status == "over due" ? _c("span", {
+      staticClass: "badge bg-danger text-bg-danger text-capitalize"
+    }, [_vm._v(_vm._s(f === null || f === void 0 ? void 0 : f.status))]) : _vm._e(), _vm._v(" "), f.status == "partial paid" ? _c("span", {
+      staticClass: "badge bg-primary text-bg-primary text-capitalize"
+    }, [_vm._v(_vm._s(f === null || f === void 0 ? void 0 : f.status))]) : _vm._e(), _vm._v(" "), f.status == "paid" ? _c("span", {
+      staticClass: "badge bg-success text-bg-success text-capitalize"
+    }, [_vm._v(_vm._s(f === null || f === void 0 ? void 0 : f.status))]) : _vm._e()])]), _vm._v(" "), _c("td", [_c("div", {
+      staticClass: "d-flex justify-content-end align-items-center"
+    }, [_vm.CheckPermission(_vm.Section.INVOICE + "-" + _vm.Action.CREATE) && f.status != "paid" ? _c("button", {
+      staticClass: "btn btn-sm btn-primary me-2",
+      on: {
+        click: function click($event) {
+          return _vm.paymentModal(f);
+        }
+      }
+    }, [_vm._v("Payment")]) : _vm._e(), _vm._v(" "), _c("router-link", {
+      staticClass: "btn btn-sm btn-info me-2",
+      attrs: {
+        to: {
+          name: "InvoicesView",
+          params: {
+            id: f.id
+          }
+        }
+      }
+    }, [_vm._v("View")]), _vm._v(" "), _vm.CheckPermission(_vm.Section.INVOICE + "-" + _vm.Action.DELETE) && f.status != "paid" ? _c("button", {
+      staticClass: "btn btn-sm btn-danger me-2",
+      on: {
+        click: function click($event) {
+          return _vm.openModalDelete(f);
+        }
+      }
+    }, [_vm._v("Delete")]) : _vm._e()], 1)])]);
+  }), 0) : _vm._e(), _vm._v(" "), _vm.listData.length == 0 && _vm.TableLoading == false ? _c("tbody", [_vm._m(2)]) : _vm._e(), _vm._v(" "), _vm.TableLoading == true ? _c("tbody", [_vm._m(3)]) : _vm._e()]), _vm._v(" "), _vm.paginateData != null ? _c("div", {
+    staticClass: "dataTables_info",
+    attrs: {
+      id: "example3_info",
+      role: "status",
+      "aria-live": "polite"
+    }
+  }, [_vm._v("Showing\n                                        " + _vm._s(_vm.paginateData.from) + " to " + _vm._s(_vm.paginateData.to) + " of " + _vm._s(_vm.paginateData.total) + " entries\n                                    ")]) : _vm._e(), _vm._v(" "), _c("div", {
+    staticClass: "dataTables_paginate paging_simple_numbers",
+    attrs: {
+      id: "example3_paginate"
+    }
+  }, [_c("Pagination", {
+    attrs: {
+      data: _vm.paginateData,
+      onChange: _vm.list
+    }
+  })], 1)])])])])])])])]), _vm._v(" "), _c("div", {
+    staticClass: "popup-wrapper-modal invoiceModal d-none"
+  }, [_c("form", {
+    staticClass: "popup-box",
+    staticStyle: {
+      "max-width": "800px"
+    },
+    on: {
+      submit: function submit($event) {
+        $event.preventDefault();
+        return _vm.payment.apply(null, arguments);
+      }
+    }
+  }, [_vm._m(4), _vm._v(" "), _c("div", {
+    staticClass: "row align-items-center"
+  }, [_c("div", {
+    staticClass: "col-sm-12"
+  }, [_c("div", {
+    staticClass: "input-wrapper form-group mb-3"
+  }, [_c("label", {
+    attrs: {
+      "for": "amount"
+    }
+  }, [_vm._v("Amount")]), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.paymentParam.amount,
+      expression: "paymentParam.amount"
+    }],
+    staticClass: "w-100 form-control bg-white",
+    attrs: {
+      type: "text",
+      name: "amount",
+      id: "amount",
+      placeholder: "Amount here"
+    },
+    domProps: {
+      value: _vm.paymentParam.amount
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.paymentParam, "amount", $event.target.value);
+      }
+    }
+  }), _vm._v(" "), _c("small", {
+    staticClass: "invalid-feedback"
+  })])]), _vm._v(" "), _c("div", {
+    staticClass: "col-sm-12"
+  }, [_c("div", {
+    staticClass: "input-wrapper form-group mb-3"
+  }, [_c("label", {
+    attrs: {
+      "for": "description"
+    }
+  }, [_vm._v("Payment Method")]), _vm._v(" "), _c("select", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.paymentParam.payment_id,
+      expression: "paymentParam.payment_id"
+    }],
+    staticClass: "form-control form-select",
+    attrs: {
+      name: "payment_id"
+    },
+    on: {
+      change: function change($event) {
+        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
+          return o.selected;
+        }).map(function (o) {
+          var val = "_value" in o ? o._value : o.value;
+          return val;
+        });
+        _vm.$set(_vm.paymentParam, "payment_id", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
+      }
+    }
+  }, [_c("option", {
+    attrs: {
+      value: ""
+    }
+  }, [_vm._v("Select Method")]), _vm._v(" "), _vm._l(_vm.allAmountCategory, function (m) {
+    return _c("option", {
+      domProps: {
+        value: m.id
+      }
+    }, [_vm._v(_vm._s(m.name))]);
+  })], 2), _vm._v(" "), _c("small", {
+    staticClass: "invalid-feedback"
+  })])])]), _vm._v(" "), !_vm.Loading ? _c("button", {
+    staticClass: "btn btn-primary",
+    attrs: {
+      type: "submit"
+    }
+  }, [_vm._v("Submit")]) : _vm._e(), _vm._v(" "), _vm.Loading ? _c("button", {
+    staticClass: "btn btn-primary",
+    attrs: {
+      type: "button",
+      disabled: ""
+    }
+  }, [_vm._v("Submitting...")]) : _vm._e()])]), _vm._v(" "), _c("div", {
+    staticClass: "popup-wrapper-modal invoiceModalGlobal d-none"
+  }, [_c("form", {
+    staticClass: "popup-box",
+    staticStyle: {
+      "max-width": "800px"
+    },
+    on: {
+      submit: function submit($event) {
+        $event.preventDefault();
+        return _vm.paymentGlobal.apply(null, arguments);
+      }
+    }
+  }, [_vm._m(5), _vm._v(" "), _c("div", {
+    staticClass: "row align-items-center"
+  }, [_c("div", {
+    staticClass: "col-sm-12"
+  }, [_c("div", {
+    staticClass: "input-wrapper form-group mb-3"
+  }, [_c("label", {
+    attrs: {
+      "for": "amount"
+    }
+  }, [_vm._v("Company")]), _vm._v(" "), _c("select", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.paymentParamGlobal.company_id,
+      expression: "paymentParamGlobal.company_id"
+    }],
+    staticClass: "form-control form-select",
+    attrs: {
+      name: "company_id"
+    },
+    on: {
+      change: function change($event) {
+        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
+          return o.selected;
+        }).map(function (o) {
+          var val = "_value" in o ? o._value : o.value;
+          return val;
+        });
+        _vm.$set(_vm.paymentParamGlobal, "company_id", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
+      }
+    }
+  }, [_c("option", {
+    attrs: {
+      value: ""
+    }
+  }, [_vm._v("Select Company")]), _vm._v(" "), _vm._l(_vm.allCompany, function (m) {
+    return _c("option", {
+      domProps: {
+        value: m.id
+      }
+    }, [_vm._v(_vm._s(m.name))]);
+  })], 2), _vm._v(" "), _c("small", {
+    staticClass: "invalid-feedback"
+  })])]), _vm._v(" "), _c("div", {
+    staticClass: "col-sm-12"
+  }, [_c("div", {
+    staticClass: "input-wrapper form-group mb-3"
+  }, [_c("label", {
+    attrs: {
+      "for": "amount"
+    }
+  }, [_vm._v("Amount")]), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.paymentParamGlobal.amount,
+      expression: "paymentParamGlobal.amount"
+    }],
+    staticClass: "w-100 form-control bg-white",
+    attrs: {
+      type: "text",
+      name: "amount",
+      id: "amount",
+      placeholder: "Amount here"
+    },
+    domProps: {
+      value: _vm.paymentParamGlobal.amount
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.paymentParamGlobal, "amount", $event.target.value);
+      }
+    }
+  }), _vm._v(" "), _c("small", {
+    staticClass: "invalid-feedback"
+  })])]), _vm._v(" "), _c("div", {
+    staticClass: "col-sm-12"
+  }, [_c("div", {
+    staticClass: "input-wrapper form-group mb-3"
+  }, [_c("label", {
+    attrs: {
+      "for": "description"
+    }
+  }, [_vm._v("Payment Method")]), _vm._v(" "), _c("select", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.paymentParamGlobal.payment_id,
+      expression: "paymentParamGlobal.payment_id"
+    }],
+    staticClass: "form-control form-select",
+    attrs: {
+      name: "payment_id"
+    },
+    on: {
+      change: function change($event) {
+        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
+          return o.selected;
+        }).map(function (o) {
+          var val = "_value" in o ? o._value : o.value;
+          return val;
+        });
+        _vm.$set(_vm.paymentParamGlobal, "payment_id", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
+      }
+    }
+  }, [_c("option", {
+    attrs: {
+      value: ""
+    }
+  }, [_vm._v("Select Method")]), _vm._v(" "), _vm._l(_vm.allAmountCategory, function (m) {
+    return _c("option", {
+      domProps: {
+        value: m.id
+      }
+    }, [_vm._v(_vm._s(m.name))]);
+  })], 2), _vm._v(" "), _c("small", {
+    staticClass: "invalid-feedback"
+  })])])]), _vm._v(" "), !_vm.Loading ? _c("button", {
+    staticClass: "btn btn-primary",
+    attrs: {
+      type: "submit"
+    }
+  }, [_vm._v("Submit")]) : _vm._e(), _vm._v(" "), _vm.Loading ? _c("button", {
+    staticClass: "btn btn-primary",
+    attrs: {
+      type: "button",
+      disabled: ""
+    }
+  }, [_vm._v("Submitting...")]) : _vm._e()])])]);
+};
+var staticRenderFns = [function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("li", {
+    staticClass: "breadcrumb-item"
+  }, [_c("a", {
+    attrs: {
+      href: "javascript:void(0)"
+    }
+  }, [_vm._v("Invoice List")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "card-header bg-secondary"
+  }, [_c("h4", {
+    staticClass: "card-title"
+  }, [_vm._v("Invoice List")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("tr", [_c("td", {
+    staticClass: "text-center",
+    attrs: {
+      colspan: "10"
+    }
+  }, [_vm._v("No data found")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("tr", [_c("td", {
+    staticClass: "text-center",
+    attrs: {
+      colspan: "10"
+    }
+  }, [_vm._v("Loading....")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("button", {
+    staticClass: "btn closeBtn",
+    attrs: {
+      type: "button"
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-times"
+  })]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("button", {
+    staticClass: "btn closeBtn",
+    attrs: {
+      type: "button"
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-times"
+  })]);
+}];
+render._withStripped = true;
 
 
 /***/ }),
@@ -28586,6 +29566,14 @@ var render = function render() {
   }, [_c("div", [_vm._v("Interest Expense")]), _vm._v(" "), _c("div", [_vm.balance.interest_expense < 0 ? _c("span", {
     staticClass: "text-danger"
   }, [_vm._v("(" + _vm._s(_vm.formatPrice(Math.abs(_vm.balance.interest_expense))) + ")")]) : _c("span", [_vm._v(_vm._s(_vm.formatPrice(_vm.balance.interest_expense)))])])]), _vm._v(" "), _c("div", {
+    staticClass: "d-flex align-items-center justify-content-between line"
+  }, [_c("div", [_vm._v("Evaporative Expense")]), _vm._v(" "), _c("div", [_vm.balance.evaporative_expense < 0 ? _c("span", {
+    staticClass: "text-danger"
+  }, [_vm._v("(" + _vm._s(_vm.formatPrice(Math.abs(_vm.balance.evaporative_expense))) + ")")]) : _c("span", [_vm._v(_vm._s(_vm.formatPrice(_vm.balance.evaporative_expense)))])])]), _vm._v(" "), _c("div", {
+    staticClass: "d-flex align-items-center justify-content-between line"
+  }, [_c("div", [_vm._v("Driver Sale Expense")]), _vm._v(" "), _c("div", [_vm.balance.driver_sale < 0 ? _c("span", {
+    staticClass: "text-danger"
+  }, [_vm._v("(" + _vm._s(_vm.formatPrice(Math.abs(_vm.balance.driver_sale))) + ")")]) : _c("span", [_vm._v(_vm._s(_vm.formatPrice(_vm.balance.driver_sale)))])])]), _vm._v(" "), _c("div", {
     staticClass: "d-flex align-items-center justify-content-between line"
   }, [_c("div", [_vm._v("Income Before Taxes")]), _vm._v(" "), _c("div", [_vm.balance.income_before_tax < 0 ? _c("span", {
     staticClass: "text-danger"

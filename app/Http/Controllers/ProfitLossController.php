@@ -2,14 +2,22 @@
 
 namespace App\Http\Controllers;
 
+use App\Common\AccountCategory;
+use App\Helpers\SessionUser;
+use App\Models\Category;
 use App\Models\Transaction;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class ProfitLossController extends Controller
 {
-    public function get(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function get(Request $request): JsonResponse
     {
         $inputData = $request->all();
         $validator = Validator::make($inputData, [
@@ -25,9 +33,11 @@ class ProfitLossController extends Controller
         $total_operating_expenses = self::getTotalOperatingExpense($operating_expenses);
         $gross_profit = $total_revenue - $cost_of_good_sold;
         $operating_profit = $gross_profit - $total_operating_expenses;
-        $interest_expense = self::getInterestExpense($inputData['start_date'], $inputData['end_date']);
-        $income_before_text = $operating_profit - $interest_expense;
-        $tax = self::getTax($inputData['start_date'], $inputData['end_date']);
+        $interest_expense = self::getCategoryExpense($inputData['start_date'], $inputData['end_date'],  AccountCategory::TAX);
+        $evaporative_expense = self::getCategoryExpense($inputData['start_date'], $inputData['end_date'],  AccountCategory::EVAPORATIVE);
+        $driver_sale = self::getCategoryExpense($inputData['start_date'], $inputData['end_date'],  AccountCategory::DRIVER_SALE);
+        $income_before_text = $operating_profit - $interest_expense - $evaporative_expense - $driver_sale;
+        $tax = self::getCategoryExpense($inputData['start_date'], $inputData['end_date'], AccountCategory::INTEREST_EXPENSE);
         $net_income = $income_before_text - $tax;
         $result = [
             'total_revenue' => $total_revenue,
@@ -37,34 +47,30 @@ class ProfitLossController extends Controller
             'total_operating_expenses' => $total_operating_expenses,
             'operating_profit' => $operating_profit,
             'interest_expense' => $interest_expense,
+            'evaporative_expense' => $evaporative_expense,
+            'driver_sale' => $driver_sale,
             'income_before_tax' => $income_before_text,
             'tax' => $tax,
             'net_income' => $net_income
         ];
         return response()->json(['status' => 200, 'data' => $result]);
     }
-    public static function getTax($start_date, $end_date)
+    /**
+     * @param string $start_date
+     * @param string $end_date
+     * @param string $category
+     * @return mixed
+     */
+    public static function getCategoryExpense(string $start_date, string $end_date, string $category)
     {
-        $result = Transaction::select(DB::raw('SUM(debit_amount - credit_amount) as balance'))
+        $sessionUser = SessionUser::getUser();
+        $expenseCategory = Category::select('id')->where('client_company_id', $sessionUser['client_company_id'])->where('category', $category)->first();
+        $result = Transaction::select(DB::raw('SUM(credit_amount - debit_amount) as balance'))
             ->whereBetween('date', [$start_date, $end_date])
             ->leftJoin('categories', 'categories.id', '=', 'transactions.account_id')
-            ->where('account_category', 4)
-            ->groupBy('categories.type')
+            ->whereJsonContains('category_ids', $expenseCategory->id)
             ->first();
-        if ($result != null) {
-            return $result['balance'];
-        }
-        return 0;
-    }
-    public static function getInterestExpense($start_date, $end_date)
-    {
-        $result = Transaction::select(DB::raw('SUM(debit_amount - credit_amount) as balance'))
-            ->whereBetween('date', [$start_date, $end_date])
-            ->leftJoin('categories', 'categories.id', '=', 'transactions.account_id')
-            ->where('account_category', 3)
-            ->groupBy('categories.type')
-            ->first();
-        if ($result != null) {
+        if ($result instanceof Transaction) {
             return $result['balance'];
         }
         return 0;
@@ -77,40 +83,58 @@ class ProfitLossController extends Controller
         }
         return $total;
     }
-    public static function getOperatingExpense($start_date, $end_date)
+
+    /**
+     * @param string $start_date
+     * @param string $end_date
+     * @return mixed
+     */
+    public static function getOperatingExpense(string $start_date, string $end_date)
     {
-        $result = Transaction::select('categories.category', DB::raw('SUM(credit_amount - debit_amount) as balance'))
+        $sessionUser = SessionUser::getUser();
+        $operationExpenseCategory = Category::select('id')->where('client_company_id', $sessionUser['client_company_id'])->where('category', AccountCategory::OPERATING_EXPENSE)->first();
+        return Transaction::select('categories.category', DB::raw('SUM(credit_amount - debit_amount) as balance'))
             ->whereBetween('date', [$start_date, $end_date])
             ->leftJoin('categories', 'categories.id', '=', 'transactions.account_id')
-            ->where('account_category', 2)
+            ->whereJsonContains('category_ids', $operationExpenseCategory->id)
             ->groupBy('account_id')
             ->get()
             ->toArray();
-        return $result;
     }
-    public static function getTotalCostOfGoodSold($start_date, $end_date)
+    /**
+     * @param string $start_date
+     * @param string $end_date
+     * @return int|mixed
+     */
+    public static function getTotalCostOfGoodSold(string $start_date, string $end_date)
     {
-        $result = Transaction::select(DB::raw('SUM(debit_amount - credit_amount) as balance'))
+        $result = Transaction::select(DB::raw('SUM(credit_amount - debit_amount) as balance'))
             ->whereBetween('date', [$start_date, $end_date])
-            ->leftJoin('categories', 'categories.id', '=', 'transactions.account_id')
-            ->where('account_category', 1)
-            ->groupBy('categories.type')
+            ->leftJoin('categories as c1', 'c1.id', '=', 'transactions.account_id')
+            ->leftJoin('categories as c2', 'c2.id', '=', 'c1.parent_category')
+            ->where('c2.category', AccountCategory::COST_OF_GOOD_SOLD)
+            ->groupBy('c1.type')
             ->first();
-        if ($result != null) {
+        if ($result instanceof Transaction) {
             return $result['balance'];
         }
         return 0;
     }
-    public static function getTotalRevenue($start_date, $end_date)
+
+    /**
+     * @param string $start_date
+     * @param string $end_date
+     * @return int|mixed
+     */
+    public static function getTotalRevenue(string $start_date, string $end_date)
     {
         $result = Transaction::select(DB::raw('SUM(debit_amount - credit_amount) as balance'))
             ->whereBetween('date', [$start_date, $end_date])
             ->leftJoin('categories', 'categories.id', '=', 'transactions.account_id')
             ->where('type', '=', 'income')
-            ->where('account_category', '!=', 1)
             ->groupBy('categories.type')
             ->first();
-        if ($result != null) {
+        if ($result instanceof Transaction) {
             return $result['balance'];
         }
         return 0;

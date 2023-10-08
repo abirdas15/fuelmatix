@@ -12,7 +12,11 @@ use Illuminate\Support\Facades\Validator;
 
 class CategoryController extends Controller
 {
-    public function list(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function list(Request $request): JsonResponse
     {
         $inputData = $request->all();
         $sessionUser = SessionUser::getUser();
@@ -33,7 +37,13 @@ class CategoryController extends Controller
         $result = self::updateCategoryBalance($categories, $transaction);
         return response()->json(['status' => 200, 'data' => $result]);
     }
-    public static function updateCategoryBalance($categories, $transactions)
+
+    /**
+     * @param array $categories
+     * @param array $transactions
+     * @return array
+     */
+    public static function updateCategoryBalance(array $categories, array $transactions): array
     {
         foreach ($categories as &$category) {
             foreach ($transactions as $transaction) {
@@ -87,20 +97,20 @@ class CategoryController extends Controller
         });
         return response()->json(['status' => 200, 'data' => $result]);
     }
-    public function save(Request $request)
+
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function save(Request $request): JsonResponse
     {
         $inputData = $request->all();
         $validator = Validator::make($inputData, [
-            'category' => 'required',
-            'type' => 'required'
+            'category' => 'required|string',
+            'type' => 'required|string'
         ]);
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
-        }
-        if ($inputData['type'] == 'expenses') {
-            if ($inputData['account_category'] == '') {
-                return response()->json(['status' => 500, 'errors' => ['account_category' => ['Account category field is required.']]]);
-            }
         }
         $category = new Category();
         $category->category = $inputData['category'];
@@ -108,19 +118,22 @@ class CategoryController extends Controller
         $category->parent_category = !empty($inputData['parent_category']) ? $inputData['parent_category'] : null;
         $category->type = $inputData['type'];
         $category->description = $inputData['description'] ?? null;
-        $category->account_category = $inputData['account_category'] ?? 0;
         $category->client_company_id = $inputData['session_user']['client_company_id'];
-        if ($category->save()) {
-            $category->updateCategory();
-            return response()->json(['status' => 200, 'msg' => 'Successfully save category']);
+        if (!$category->save()) {
+            return response()->json(['status' => 400, 'message' => 'Cannot save [category]']);
         }
-        return response()->json(['status' => 200, 'msg' => 'Can not save category']);
+        $category->updateCategory();
+        return response()->json(['status' => 200, 'message' => 'Successfully save category']);
     }
-    public function single(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function single(Request $request): JsonResponse
     {
         $inputData = $request->all();
         $validator = Validator::make($inputData, [
-            'id' => 'required'
+            'id' => 'required|integer'
         ]);
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
@@ -130,33 +143,34 @@ class CategoryController extends Controller
             ->first();
         return response()->json(['status' => 200, 'data' => $result]);
     }
-    public function update(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function update(Request $request): JsonResponse
     {
         $inputData = $request->all();
         $validator = Validator::make($inputData, [
-            'id' => 'required',
-            'category' => 'required',
-            'type' => 'required'
+            'id' => 'required|integer',
+            'category' => 'required|string',
+            'type' => 'required|string'
         ]);
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
-        if ($inputData['type'] == 'expenses') {
-            if ($inputData['account_category'] == '') {
-                return response()->json(['status' => 500, 'errors' => ['account_category' => ['Account category field is required.']]]);
-            }
-        }
         $category = Category::find($inputData['id']);
+        if ($category instanceof Category) {
+            return response()->json(['status' => 400, 'message' => 'Cannot find [category].']);
+        }
         $category->category = $inputData['category'];
         $category->code = $inputData['code'] ?? null;
         $category->parent_category = !empty($inputData['parent_category']) ? $inputData['parent_category'] : null;
         $category->type = $inputData['type'];
         $category->description = $inputData['description'] ?? null;
-        $category->account_category = $inputData['account_category'] ?? 0;
-        if ($category->save()) {
-            $category->updateCategory();
-            return response()->json(['status' => 200, 'msg' => 'Successfully update category']);
+        if (!$category->save()) {
+            return response()->json(['status' => 200, 'message' => 'Can not update category']);
         }
-        return response()->json(['status' => 200, 'msg' => 'Can not update category']);
+        $category->updateCategory();
+        return response()->json(['status' => 200, 'message' => 'Successfully updated category']);
     }
 }
