@@ -261,8 +261,9 @@ export default {
         margin: auto;
         height: 250px;
         width: 300px;
-        border-radius : 190px 190px 133px 147px;
+        border-radius : 20px;
         border-width: 3px;
+        border-top: 0;
         border-color: #a6a6a6;
         border-style: solid;
         position: relative;
