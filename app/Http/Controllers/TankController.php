@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Common\AccountCategory;
+use App\Helpers\SessionUser;
 use App\Models\BstiChart;
 use App\Models\Category;
 use App\Models\Dispenser;
@@ -15,6 +16,7 @@ use App\Models\Tank;
 use App\Models\TankLog;
 use App\Models\TankRefill;
 use App\Models\TankRefillHistory;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -63,20 +65,26 @@ class TankController extends Controller
         }
         return response()->json(['status' => 500, 'error' => 'Cannot saved tank.']);
     }
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function list(Request $request)
     {
         $inputData = $request->all();
-        $limit = isset($inputData['limit']) ? $inputData['limit'] : 10;
-        $keyword = isset($inputData['keyword']) ? $inputData['keyword'] : '';
-        $order_by = isset($inputData['order_by']) ? $inputData['order_by'] : 'id';
-        $order_mode = isset($inputData['order_mode']) ? $inputData['order_mode'] : 'DESC';
-        $count = Tank::count();
+        $limit = $inputData['limit'] ?? 10;
+        $keyword = $inputData['keyword'] ?? '';
+        $order_by = $inputData['order_by'] ?? 'id';
+        $order_mode = $inputData['order_mode'] ?? 'DESC';
+        $sessionUser = SessionUser::getUser();
+        $count = Tank::where('client_company_id', $sessionUser['client_company_id'])->count();
         $result = Tank::select('tank.id' ,'tank.tank_name', 'tank.height', 'tank.capacity', 'products.name as product_name')
             ->leftJoin('products', 'products.id', 'tank.product_id')
             ->where('tank.client_company_id', $inputData['session_user']['client_company_id'])
             ->with('last_reading', function($query) use ($count) {
                 return $query->select('id', 'tank_id', 'height', 'water_height', 'volume')->orderBy('id', 'DESC')->take($count);
-            });
+            })
+            ->where('tank.client_company_id', $sessionUser['client_company_id']);
         if (!empty($keyword)) {
             $result->where(function($q) use ($keyword) {
                 $q->where('tank.tank_name', 'LIKE', '%'.$keyword.'%');
@@ -88,10 +96,13 @@ class TankController extends Controller
             $data['fuel_percent'] = 0;
             $data['water_percent'] = 0;
             if ($data['last_reading'] != null) {
+                $volume = 200 / $data['height'] * 100;
                 if ($data['capacity'] > 0 && $data['last_reading']['height'] > 0) {
+                    $data['last_reading']['volume']  = $data['last_reading']['volume'] - $volume;
                     $data['fuel_percent'] = number_format(($data['last_reading']['volume'] / $data['height']) * 100, 2);
                 }
                 if ($data['capacity'] > 0 && $data['last_reading']['water_height'] > 0) {
+                    $data['last_reading']['water_height']  = $data['last_reading']['water_height'] - $volume;
                     $data['water_percent'] = number_format(($data['last_reading']['water_height'] / $data['height']) * 100, 2);
                 }
             }
