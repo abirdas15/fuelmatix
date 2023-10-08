@@ -81,23 +81,37 @@ class TankController extends Controller
         $result = Tank::select('tank.id' ,'tank.tank_name', 'tank.height', 'tank.capacity', 'products.name as product_name')
             ->leftJoin('products', 'products.id', 'tank.product_id')
             ->where('tank.client_company_id', $inputData['session_user']['client_company_id'])
-            ->with('last_reading', function($query) use ($count) {
-                return $query->select('id', 'tank_id', 'height', 'water_height', 'volume')->orderBy('id', 'DESC')->take($count);
-            })
             ->where('tank.client_company_id', $sessionUser['client_company_id']);
         if (!empty($keyword)) {
             $result->where(function($q) use ($keyword) {
                 $q->where('tank.tank_name', 'LIKE', '%'.$keyword.'%');
             });
         }
+
+
         $result = $result->orderBy($order_by, $order_mode)
             ->paginate($limit);
+        $tankId = [];
+        foreach ($result as $data) {
+            $tankId[] = $data['id'];
+        }
+        $tankIds = TankLog::select(DB::raw('MAX(id) as id'))
+            ->whereIn('tank_id', $tankId)
+            ->groupBy('tank_id')
+            ->pluck('id')
+            ->toArray();
+        $tankLog = TankLog::select('id', 'tank_id', 'height', 'water_height', 'volume')
+            ->whereIn('id', $tankIds)
+            ->get()
+            ->keyBy('tank_id')
+            ->toArray();
         foreach ($result as &$data) {
+            $data['last_reading'] = $tankLog[$data['id']] ?? null;
             $data['fuel_percent'] = 0;
             $data['water_percent'] = 0;
             if ($data['last_reading'] != null) {
                 if ($data['capacity'] > 0 && $data['last_reading']['height'] > 0) {
-                    $data['fuel_percent'] = number_format(($data['last_reading']['volume'] / $data['height']) * 100, 2);
+                    $data['fuel_percent'] = number_format(($data['last_reading']['height'] / $data['height']) * 100, 2);
                 }
                 if ($data['capacity'] > 0 && $data['last_reading']['water_height'] > 0) {
                     $data['water_percent'] = number_format(($data['last_reading']['water_height'] / $data['height']) * 100, 2);
