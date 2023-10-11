@@ -66,6 +66,9 @@ class FuelAdjustmentController extends Controller
             return response()->json(['status' => 400, 'message' => 'Cannot find [stock] category.'], 422);
         }
         $stockProduct = Category::where('parent_category', $stockCategory['id'])->where('module', Module::PRODUCT)->where('module_id', $product['id'])->first();
+        if (!$stockProduct instanceof Category) {
+            $stockProduct = CategoryRepository::saveCategory($categoryData, $stockCategory['id'], Module::PRODUCT);
+        }
 
         $fuelAdjustmentModel = new FuelAdjustment();
         $fuelAdjustmentModel->product_id = $requestData['product_id'];
