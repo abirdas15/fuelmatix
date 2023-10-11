@@ -633,4 +633,29 @@ class TankController extends Controller
         ProductPrice::where('module', 'tank refill')->where('module_id', $inputData['id'])->delete();
         return response()->json(['status' => 200, 'message' => 'Successfully deleted tank refill.']);
     }
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function getTankByProduct(Request $request): JsonResponse
+    {
+        $requestData = $request->all();
+        $validator = Validator::make($requestData, [
+            'product_id' => 'required|integer'
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['status' => 500, 'errors' => $validator->errors()]);
+        }
+        $product = Product::find($requestData['product_id']);
+        if (!$product instanceof Product) {
+            return response()->json(['status' => 400, 'message' => 'Cannot find [product].']);
+        }
+        $tank = Tank::select('id', 'tank_name')
+            ->where('product_id', $requestData['product_id'])
+            ->first();
+        if (!$tank instanceof Tank) {
+            return response()->json(['status' => 400, 'message' => 'Cannot find [product].']);
+        }
+        return response()->json(['status' => 200, 'data' => $tank]);
+    }
 }

@@ -23,5 +23,6 @@ class Module
     const UN_EARNED_REVENUE = 'un earned revenue';
     const UN_EARNED_REVENUE_DRIVER = 'un earned revenue driver';
     const PAY_ORDER = 'pay order';
+    const FUEL_ADJUSTMENT = 'fuel adjustment';
 
 }
