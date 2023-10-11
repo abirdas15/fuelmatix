@@ -10,7 +10,7 @@
                     <input type="text" class="date form-control m-auto w-25 mb-2" placeholder="Date">
 
                     <select class="form-control m-auto w-25" v-model="param.account_id" @change="getLedger()">
-                        <option v-for="pCat in parentCategory" :value="pCat.id">{{ pCat.category }}</option>
+                        <option v-for="pCat in parentCategory" :value="pCat.id">{{ pCat.name }}</option>
                     </select>
                 </div>
 

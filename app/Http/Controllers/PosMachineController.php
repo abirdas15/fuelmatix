@@ -20,7 +20,7 @@ class PosMachineController extends Controller
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
-        $posMachine = Category::where('client_company_id', $inputData['session_user']['client_company_id'])->where('category', AccountCategory::POS_MACHINE)->first();
+        $posMachine = Category::where('client_company_id', $inputData['session_user']['client_company_id'])->where('slug', strtolower(AccountCategory::POS_MACHINE))->first();
         if ($posMachine == null) {
             return response()->json(['status' => 500, 'error' => 'Cannot find account pos machine group.']);
         }
@@ -47,13 +47,13 @@ class PosMachineController extends Controller
         $keyword = isset($inputData['keyword']) ? $inputData['keyword'] : '';
         $order_by = isset($inputData['order_by']) ? $inputData['order_by'] : 'id';
         $order_mode = isset($inputData['order_mode']) ? $inputData['order_mode'] : 'DESC';
-        $accountReceivable = Category::select('id')->where('client_company_id', $inputData['session_user']['client_company_id'])->where('category', AccountCategory::POS_MACHINE)->first();
+        $accountReceivable = Category::select('id')->where('client_company_id', $inputData['session_user']['client_company_id'])->where('slug', strtolower(AccountCategory::POS_MACHINE))->first();
         $result = Category::select('id', 'category as name', 'others')
             ->where('client_company_id', $inputData['session_user']['client_company_id'])
             ->where('parent_category', $accountReceivable->id);
         if (!empty($keyword)) {
             $result->where(function($q) use ($keyword) {
-                $q->where('category', 'LIKE', '%'.$keyword.'%');
+                $q->where('name', 'LIKE', '%'.$keyword.'%');
             });
         }
         $result = $result->orderBy($order_by, $order_mode)
@@ -103,7 +103,7 @@ class PosMachineController extends Controller
         if ($category == null) {
             return response()->json(['status' => 500, 'error' => 'Cannot find pos machine.']);
         }
-        $posMachine = Category::where('client_company_id', $inputData['session_user']['client_company_id'])->where('category', AccountCategory::POS_MACHINE)->first();
+        $posMachine = Category::where('client_company_id', $inputData['session_user']['client_company_id'])->where('name', strtolower(AccountCategory::POS_MACHINE))->first();
         if ($posMachine == null) {
             return response()->json(['status' => 500, 'error' => 'Cannot find account pos machine group.']);
         }

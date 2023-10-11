@@ -18,13 +18,13 @@ class Category extends Model
     {
         $category_hericy = [];
         $category_ids = [];
-        if ($this->parent_category != null) {
+        if (!empty($this->parent_category)) {
             $parentCategory = Category::where('id', $this->parent_category)->first();
             $category_hericy = json_decode($parentCategory['category_hericy']);
             $category_ids = json_decode($parentCategory['category_ids']);
         }
-        array_push($category_hericy, $this->category);
-        array_push($category_ids, $this->id);
+        $category_hericy[] = $this->name;
+        $category_ids[] = $this->id;
         $category = Category::find($this->id);
         $category->category_hericy = $category_hericy;
         $category->category_ids = $category_ids;
@@ -42,7 +42,7 @@ class Category extends Model
     }
     public function children()
     {
-        return $this->grandchildren()->select('id', 'parent_category', 'category', 'balance', 'description', 'category_ids', 'type')->with('children');
+        return $this->grandchildren()->select('id', 'parent_category', 'name', 'balance', 'description', 'category_ids', 'type')->with('children');
     }
 
     public function grandparent()

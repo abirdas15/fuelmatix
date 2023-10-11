@@ -14,7 +14,7 @@
             <a href="#" @dblclick="openTransaction(node)" @contextmenu="rightClick($event, node)" class="accordion-btn">
                 <span>
                     <img src="images/arrow-svg.svg" alt="" v-if="node.children.length > 0"/>
-                    {{ node.category }}
+                    {{ node.name }}
                 </span>
                 <span> {{ node.description }}</span>
                 <span v-if="node.balance < 0" class="text-danger">({{formatPrice(Math.abs(node.balance))}})</span>

@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Common\AccountCategory;
-use App\Helpers\SessionUser;
 use App\Models\Category;
+use App\Models\Transaction;
 use App\Repository\CategoryRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -21,61 +21,72 @@ class VendorController extends Controller
     {
         $inputData = $request->all();
         $validator = Validator::make($inputData, [
-            'name' => 'required'
+            'name' => 'required|string'
         ]);
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
-        $accountPayable = Category::where('client_company_id', $inputData['session_user']['client_company_id'])->where('category', AccountCategory::ACCOUNT_PAYABLE)->first();
+        $accountPayable = Category::where('client_company_id', $inputData['session_user']['client_company_id'])->where('slug', strtolower(AccountCategory::ACCOUNT_PAYABLE))->first();
         if (!$accountPayable instanceof Category) {
-            return response()->json(['status' => 500, 'error' => 'Cannot find vendor group.']);
+            return response()->json(['status' => 400, 'message' => 'Cannot find [account payable] category.']);
         }
-        $sessionUser = SessionUser::getUser();
         $categoryData = [
-            'category' => $inputData['name'],
-            'parent_category' => $accountPayable->id,
-            'type' => $accountPayable->type,
-            'client_company_id'=> $sessionUser['id']
+            'name' => $inputData['name'],
         ];
-        $newCategory = CategoryRepository::save($categoryData);
-        if ($newCategory instanceof Category) {
-            return response()->json(['status' => 200, 'message' => 'Successfully saved vendor.']);
+        $newCategory = CategoryRepository::saveCategory($categoryData, $accountPayable['id']);
+        if (!$newCategory instanceof Category) {
+            return response()->json(['status' => 400, 'message' => 'Cannot saved [vendor].']);
         }
-        return response()->json(['status' => 500, 'message' => 'Cannot save vendor.']);
+        return response()->json(['status' => 200, 'message' => 'Successfully saved vendor.']);
     }
-    public function list(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function list(Request $request): JsonResponse
     {
         $inputData = $request->all();
-        $limit = isset($inputData['limit']) ? $inputData['limit'] : 10;
-        $keyword = isset($inputData['keyword']) ? $inputData['keyword'] : '';
-        $order_by = isset($inputData['order_by']) ? $inputData['order_by'] : 'id';
-        $order_mode = isset($inputData['order_mode']) ? $inputData['order_mode'] : 'DESC';
-        $bank = Category::where('client_company_id', $inputData['session_user']['client_company_id'])->where('category', AccountCategory::ACCOUNT_PAYABLE)->first();
-        $result = Category::select('id', 'category as name')
+        $limit = $inputData['limit'] ?? 10;
+        $keyword = $inputData['keyword'] ?? '';
+        $order_by = $inputData['order_by'] ?? 'id';
+        $order_mode = $inputData['order_mode'] ?? 'DESC';
+        $accountPayable = Category::where('client_company_id', $inputData['session_user']['client_company_id'])->where('slug', strtolower(AccountCategory::ACCOUNT_PAYABLE))->first();
+        if (!$accountPayable instanceof Category) {
+            return response()->json(['status' => 400, 'message' => 'Cannot find [account payable] category.']);
+        }
+        $result = Category::select('id', 'name')
             ->where('client_company_id', $inputData['session_user']['client_company_id'])
-            ->where('parent_category', $bank->id);
+            ->where('parent_category', $accountPayable['id']);
         if (!empty($keyword)) {
             $result->where(function($q) use ($keyword) {
-                $q->where('category', 'LIKE', '%'.$keyword.'%');
+                $q->where('name', 'LIKE', '%'.$keyword.'%');
             });
         }
         $result = $result->orderBy($order_by, $order_mode)
             ->paginate($limit);
         return response()->json(['status' => 200, 'data' => $result]);
     }
-    public function single(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function single(Request $request): JsonResponse
     {
         $inputData = $request->all();
         $validator = Validator::make($inputData, [
-            'id' => 'required'
+            'id' => 'required|integer'
         ]);
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
-        $result = Category::select('id', 'category as name')->find($inputData['id']);
+        $result = Category::select('id', 'name')->find($inputData['id']);
         return response()->json(['status' => 200, 'data' => $result]);
     }
-    public function update(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function update(Request $request): JsonResponse
     {
         $inputData = $request->all();
         $validator = Validator::make($inputData, [
@@ -85,22 +96,25 @@ class VendorController extends Controller
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
-        $accountPayable = Category::where('client_company_id', $inputData['session_user']['client_company_id'])->where('category', AccountCategory::ACCOUNT_PAYABLE)->first();
-        if ($accountPayable == null) {
-            return response()->json(['status' => 500, 'error' => 'Cannot find vendor group.']);
-        }
         $category = Category::find($inputData['id']);
-        if ($category == null) {
-            return response()->json(['status' => 500, 'error' => 'Cannot find bank.']);
+        if (!$category instanceof Category) {
+            return response()->json(['status' => 400, 'message' => 'Cannot find bank.']);
         }
-        $category->category = $inputData['name'];
-        if ($category->save()) {
-            $category->updateCategory();
-            return response()->json(['status' => 200, 'message' => 'Successfully updated vendor.']);
+        $category->name = $inputData['name'];
+        $categoryData = [
+            'name' => $inputData['name'],
+        ];
+        $updateCategory = CategoryRepository::updateCategory($category, $categoryData);
+        if (!$updateCategory instanceof Category) {
+            return response()->json(['status' => 400, 'message' => 'Cannot updated [vendor].']);
         }
-        return response()->json(['status' => 500, 'errors' => 'Cannot updated vendor.']);
+        return response()->json(['status' => 200, 'message' => 'Successfully updated vendor.']);
     }
-    public function delete(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function delete(Request $request): JsonResponse
     {
         $inputData = $request->all();
         $validator = Validator::make($inputData, [
@@ -108,6 +122,10 @@ class VendorController extends Controller
         ]);
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
+        }
+        $transaction = Transaction::where('account_id', $inputData['id'])->orWhere('linked_id', $inputData['id'])->first();
+        if ($transaction instanceof Transaction) {
+            return response()->json(['status' => 400, 'message' => 'Cannot deleted [vendor].']);
         }
         Category::where('id', $inputData['id'])->delete();
         return response()->json(['status' => 200, 'message' => 'Successfully deleted vendor.']);

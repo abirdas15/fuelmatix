@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Common\AccountCategory;
+use App\Helpers\SessionUser;
 use App\Models\Category;
 use App\Models\Dispenser;
 use App\Models\Product;
@@ -11,13 +12,18 @@ use App\Models\ShiftSale;
 use App\Models\ShiftSaleTransaction;
 use App\Models\ShiftSummary;
 use App\Models\Stock;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class ShiftSaleController extends Controller
 {
-    public function save(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function save(Request $request): JsonResponse
     {
         $inputData = $request->all();
         $validator = Validator::make($inputData, [
@@ -38,85 +44,92 @@ class ShiftSaleController extends Controller
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
+        $sessionUser = SessionUser::getUser();
         if ($inputData['status'] == 'start') {
             $shiftSale = new ShiftSale();
             $shiftSale->date = $inputData['date'];
+            $shiftSale->start_time = date('h:i:s');
             $shiftSale->product_id = $inputData['product_id'];
             $shiftSale->status = 'start';
+            $shiftSale->user_id = $sessionUser['id'];
             $shiftSale->client_company_id = $inputData['session_user']['client_company_id'];
-            $shiftSale->save();
+            if (!$shiftSale->save()) {
+                return response()->json(['status' => 400, 'message' => 'Cannot start shift sale.']);
+            }
             return response()->json(['status' => 200, 'message' => 'Successfully started shift sale.']);
         }
-        ShiftSale::where('client_company_id', $inputData['session_user']['client_company_id'])->where('product_id', $inputData['product_id'])->where('status', 'start')->delete();
-        $category = Category::where('category', AccountCategory::INCOME)->where('client_company_id', $inputData['session_user']['client_company_id'])->first();
+
+        $category = Category::where('slug', strtolower(AccountCategory::INCOME))->where('client_company_id', $inputData['session_user']['client_company_id'])->first();
         $incomeCategory = Category::where('parent_category', $category['id'])
             ->where('module', 'product')
             ->where('module_id', $inputData['product_id'])
             ->where('client_company_id', $inputData['session_user']['client_company_id'])
             ->first();
-        if ($incomeCategory == null) {
+        if (!$incomeCategory instanceof Category) {
             return response()->json(['status' => 500, 'error' => 'Cannot fin account income category.']);
         }
-        $category = Category::where('category', AccountCategory::STOCK_IN_HAND)->where('client_company_id', $inputData['session_user']['client_company_id'])->first();
+        $category = Category::where('slug', )->where('client_company_id', $inputData['session_user']['client_company_id'])->first();
         $stockCategory = Category::where('parent_category', $category['id'])
             ->where('module', 'product')
             ->where('module_id', $inputData['product_id'])
             ->where('client_company_id', $inputData['session_user']['client_company_id'])
             ->first();
-        if ($stockCategory == null) {
+        if (!$stockCategory instanceof Category) {
             return response()->json(['status' => 500, 'error' => 'Cannot fin account stock category.']);
         }
-        $category = Category::where('category', AccountCategory::COST_OF_GOOD_SOLD)->where('client_company_id', $inputData['session_user']['client_company_id'])->first();
+        $category = Category::where('slug', strtolower(AccountCategory::COST_OF_GOOD_SOLD))->where('client_company_id', $inputData['session_user']['client_company_id'])->first();
         $costOfGoodSoldCategory = Category::where('parent_category', $category['id'])
             ->where('module', 'product')
             ->where('module_id', $inputData['product_id'])
             ->where('client_company_id', $inputData['session_user']['client_company_id'])
             ->first();
-        if ($costOfGoodSoldCategory == null) {
+        if (!$costOfGoodSoldCategory instanceof Category) {
             return response()->json(['status' => 500, 'error' => 'Cannot fin account stock of good sold category.']);
         }
      //   $productPrices = ProductPrice::where('client_company_id', $inputData['session_user']['client_company_id'])->where('product_id', $inputData['product_id'])->where('stock_quantity', '>', 0)->get();
-        $shiftSale = new ShiftSale();
-        $shiftSale->date = $inputData['date'];
-        $shiftSale->product_id = $inputData['product_id'];
+        $shiftSale = ShiftSale::where('client_company_id', $inputData['session_user']['client_company_id'])->where('product_id', $inputData['product_id'])->where('status', 'start')->first();
+        if (!$shiftSale instanceof ShiftSale) {
+            return response()->json(['status' => 400, 'message' => 'Cannot find shift sale.']);
+        }
+        $shiftSale->end_time = date('h:i:s');
         $shiftSale->start_reading = $inputData['start_reading'];
         $shiftSale->tank_refill = $inputData['tank_refill'];
         $shiftSale->end_reading = $inputData['end_reading'];
         $shiftSale->consumption = $inputData['consumption'];
         $shiftSale->amount = $inputData['amount'];
         $shiftSale->status = 'end';
-        $shiftSale->user_id = $inputData['session_user']['id'];
-        $shiftSale->client_company_id = $inputData['session_user']['client_company_id'];
-        if ($shiftSale->save()) {
-            $totalNozzleConsumption = 0;
-            $stockData = [
-                'client_company_id' => $inputData['session_user']['client_company_id'],
-                'date' => $inputData['date'],
-                'out_stock' => $inputData['consumption'],
-                'in_stock' => 0,
-                'product_id' => $inputData['product_id'],
-                'opening_stock' => $inputData['start_reading'] + $inputData['tank_refill']
-            ];
-            TransactionController::saveStock($stockData);
+        if (!$shiftSale->save()) {
+            return response()->json(['status' => 500, 'error' => 'Cannot ended shift sale.']);
+        }
+        $totalNozzleConsumption = 0;
+        $stockData = [
+            'client_company_id' => $inputData['session_user']['client_company_id'],
+            'date' => $inputData['date'],
+            'out_stock' => $inputData['consumption'],
+            'in_stock' => 0,
+            'product_id' => $inputData['product_id'],
+            'opening_stock' => $inputData['start_reading'] + $inputData['tank_refill']
+        ];
+        TransactionController::saveStock($stockData);
 
-            foreach ($inputData['dispensers'] as $dispenser) {
-                foreach ($dispenser['nozzle'] as $nozzle) {
-                    $shiftSaleSummary = new ShiftSummary();
-                    $shiftSaleSummary->shift_sale_id = $shiftSale->id;
-                    $shiftSaleSummary->nozzle_id = $nozzle['id'];
-                    $shiftSaleSummary->start_reading = $nozzle['start_reading'];
-                    $shiftSaleSummary->end_reading = $nozzle['end_reading'];
-                    $shiftSaleSummary->consumption = $nozzle['consumption'];
-                    $shiftSaleSummary->amount = $nozzle['amount'];
-                    $shiftSaleSummary->save();
-                }
+        foreach ($inputData['dispensers'] as $dispenser) {
+            foreach ($dispenser['nozzle'] as $nozzle) {
+                $shiftSaleSummary = new ShiftSummary();
+                $shiftSaleSummary->shift_sale_id = $shiftSale->id;
+                $shiftSaleSummary->nozzle_id = $nozzle['id'];
+                $shiftSaleSummary->start_reading = $nozzle['start_reading'];
+                $shiftSaleSummary->end_reading = $nozzle['end_reading'];
+                $shiftSaleSummary->consumption = $nozzle['consumption'];
+                $shiftSaleSummary->amount = $nozzle['amount'];
+                $shiftSaleSummary->save();
             }
-            $buyingPrice = 0;
-            $product = Product::where('id', $inputData['product_id'])->first();
-            $totalNozzleConsumption = $inputData['amount'] / $product['selling_price'];
-            if (!empty($product['buying_price'])) {
-                $buyingPrice = $product['buying_price'] * $totalNozzleConsumption;
-            }
+        }
+        $buyingPrice = 0;
+        $product = Product::where('id', $inputData['product_id'])->first();
+        $totalNozzleConsumption = $inputData['amount'] / $product['selling_price'];
+        if (!empty($product['buying_price'])) {
+            $buyingPrice = $product['buying_price'] * $totalNozzleConsumption;
+        }
 //            foreach ($productPrices as $productPrice) {
 //                if ($productPrice['stock_quantity'] > $totalNozzleConsumption) {
 //                    $productPrice['stock_quantity'] = $productPrice['stock_quantity'] - $totalNozzleConsumption;
@@ -130,37 +143,39 @@ class ShiftSaleController extends Controller
 //                    $productPrice->save();
 //                }
 //            }
-            $transactionData['linked_id'] = $incomeCategory['id'];
-            $shiftSaleTransaction = [];
-            foreach ($inputData['categories'] as $category) {
-                $transactionData['transaction'] = [
-                    ['date' => date('Y-m-d'), 'account_id' => $category['category_id'], 'debit_amount' => 0, 'credit_amount' => $category['amount'], 'module' => 'shift sale', 'module_id' => $shiftSale->id]
-                ];
-                $shiftSaleTransaction[] = [
-                    'shift_sale_id' => $shiftSale->id,
-                    'category_id' => $category['category_id'],
-                    'amount' => $category['amount']
-                ];
-            }
-            TransactionController::saveTransaction($transactionData);
-            $transactionData = [];
-            $transactionData['linked_id'] = $stockCategory['id'];
+        $transactionData['linked_id'] = $incomeCategory['id'];
+        $shiftSaleTransaction = [];
+        foreach ($inputData['categories'] as $category) {
             $transactionData['transaction'] = [
-                ['date' => date('Y-m-d'), 'account_id' => $costOfGoodSoldCategory['id'], 'debit_amount' => 0, 'credit_amount' => $buyingPrice, 'module' => 'shift sale', 'module_id' => $shiftSale->id]
+                ['date' => date('Y-m-d'), 'account_id' => $category['category_id'], 'debit_amount' => 0, 'credit_amount' => $category['amount'], 'module' => 'shift sale', 'module_id' => $shiftSale->id]
             ];
-            TransactionController::saveTransaction($transactionData);
-            ShiftSaleTransaction::insert($shiftSaleTransaction);
-            return response()->json(['status' => 200, 'message' => 'Successfully ended shift sale.']);
+            $shiftSaleTransaction[] = [
+                'shift_sale_id' => $shiftSale->id,
+                'category_id' => $category['category_id'],
+                'amount' => $category['amount']
+            ];
         }
-        return response()->json(['status' => 500, 'error' => 'Cannot ended shift sale.']);
+        TransactionController::saveTransaction($transactionData);
+        $transactionData = [];
+        $transactionData['linked_id'] = $stockCategory['id'];
+        $transactionData['transaction'] = [
+            ['date' => date('Y-m-d'), 'account_id' => $costOfGoodSoldCategory['id'], 'debit_amount' => 0, 'credit_amount' => $buyingPrice, 'module' => 'shift sale', 'module_id' => $shiftSale->id]
+        ];
+        TransactionController::saveTransaction($transactionData);
+        ShiftSaleTransaction::insert($shiftSaleTransaction);
+        return response()->json(['status' => 200, 'message' => 'Successfully ended shift sale.']);
     }
-    public function list(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function list(Request $request): JsonResponse
     {
         $inputData = $request->all();
-        $limit = isset($inputData['limit']) ? $inputData['limit'] : 10;
-        $keyword = isset($inputData['keyword']) ? $inputData['keyword'] : '';
-        $order_by = isset($inputData['order_by']) ? $inputData['order_by'] : 'shift_sale.id';
-        $order_mode = isset($inputData['order_mode']) ? $inputData['order_mode'] : 'DESC';
+        $limit = $inputData['limit'] ?? 10;
+        $keyword = $inputData['keyword'] ?? '';
+        $order_by = $inputData['order_by'] ?? 'shift_sale.id';
+        $order_mode = $inputData['order_mode'] ?? 'DESC';
         $result = ShiftSale::select('shift_sale.*', 'products.name as product_name', 'users.name as user_name')
             ->leftJoin('products', 'products.id', 'shift_sale.product_id')
             ->leftJoin('users', 'users.id','=', 'shift_sale.user_id')
@@ -179,7 +194,11 @@ class ShiftSaleController extends Controller
         }
         return response()->json(['status' => 200, 'data' => $result]);
     }
-    public function single(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function single(Request $request): JsonResponse
     {
         $inputData = $request->all();
         $validator = Validator::make($inputData, [
@@ -210,7 +229,11 @@ class ShiftSaleController extends Controller
         $result['categories'] = ShiftSaleTransaction::select('category_id', 'amount')->where('shift_sale_id', $inputData['id'])->get()->toArray();
         return response()->json(['status' => 200, 'data' => $result]);
     }
-    public function update(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function update(Request $request): JsonResponse
     {
         $inputData = $request->all();
         $validator = Validator::make($inputData, [
@@ -227,8 +250,8 @@ class ShiftSaleController extends Controller
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
         $shiftSale = ShiftSale::find($inputData['id']);
-        if ($shiftSale == null) {
-            return response()->json(['status' => 500, 'error' => 'Cannot find shift sale.']);
+        if (!$shiftSale instanceof ShiftSale) {
+            return response()->json(['status' => 400, 'message' => 'Cannot find shift sale.']);
         }
         $shiftSale->date = $inputData['date'];
         $shiftSale->product_id = $inputData['product_id'];
@@ -255,7 +278,11 @@ class ShiftSaleController extends Controller
         }
         return response()->json(['status' => 500, 'error' => 'Cannot updated shift sale.']);
     }
-    public function delete(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function delete(Request $request): JsonResponse
     {
         $inputData = $request->all();
         $validator = Validator::make($inputData, [
@@ -268,11 +295,15 @@ class ShiftSaleController extends Controller
         ShiftSummary::where('shift_sale_id', $inputData['id'])->delete();
         return response()->json(['status' => 200, 'message' => 'Successfully deleted shift sale.']);
     }
-    public function getCategory(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function getCategory(Request $request): JsonResponse
     {
         $inputData = $request->all();
         $categoryId = Category::select('id')
-            ->whereIn('category', [AccountCategory::CASH_IM_HAND, AccountCategory::ACCOUNT_RECEIVABLE,  AccountCategory::POS_MACHINE])
+            ->whereIn('slug', [strtolower(AccountCategory::CASH_IM_HAND), strtolower(AccountCategory::ACCOUNT_RECEIVABLE),  strtolower(AccountCategory::POS_MACHINE)])
             ->where('client_company_id', $inputData['session_user']['client_company_id'])
             ->pluck('id')
             ->toArray();

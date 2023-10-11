@@ -64,7 +64,7 @@ class ProfitLossController extends Controller
     public static function getCategoryExpense(string $start_date, string $end_date, string $category)
     {
         $sessionUser = SessionUser::getUser();
-        $expenseCategory = Category::select('id')->where('client_company_id', $sessionUser['client_company_id'])->where('category', $category)->first();
+        $expenseCategory = Category::select('id')->where('client_company_id', $sessionUser['client_company_id'])->where('slug', strtolower($category))->first();
         $result = Transaction::select(DB::raw('SUM(credit_amount - debit_amount) as balance'))
             ->whereBetween('date', [$start_date, $end_date])
             ->leftJoin('categories', 'categories.id', '=', 'transactions.account_id')
@@ -92,8 +92,8 @@ class ProfitLossController extends Controller
     public static function getOperatingExpense(string $start_date, string $end_date)
     {
         $sessionUser = SessionUser::getUser();
-        $operationExpenseCategory = Category::select('id')->where('client_company_id', $sessionUser['client_company_id'])->where('category', AccountCategory::OPERATING_EXPENSE)->first();
-        return Transaction::select('categories.category', DB::raw('SUM(credit_amount - debit_amount) as balance'))
+        $operationExpenseCategory = Category::select('id')->where('client_company_id', $sessionUser['client_company_id'])->where('slug', strtolower(AccountCategory::OPERATING_EXPENSE))->first();
+        return Transaction::select('categories.name', DB::raw('SUM(credit_amount - debit_amount) as balance'))
             ->whereBetween('date', [$start_date, $end_date])
             ->leftJoin('categories', 'categories.id', '=', 'transactions.account_id')
             ->whereJsonContains('category_ids', $operationExpenseCategory->id)
@@ -112,7 +112,7 @@ class ProfitLossController extends Controller
             ->whereBetween('date', [$start_date, $end_date])
             ->leftJoin('categories as c1', 'c1.id', '=', 'transactions.account_id')
             ->leftJoin('categories as c2', 'c2.id', '=', 'c1.parent_category')
-            ->where('c2.category', AccountCategory::COST_OF_GOOD_SOLD)
+            ->where('c2.slug', strtolower(AccountCategory::COST_OF_GOOD_SOLD))
             ->groupBy('c1.type')
             ->first();
         if ($result instanceof Transaction) {

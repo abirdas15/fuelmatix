@@ -86,7 +86,7 @@ class DriverController extends Controller
         $order_mode = $inputData['order_mode'] ?? 'DESC';
         $company_id = $inputData['company_id'] ?? '';
         $sessionUser = SessionUser::getUser();
-        $result = Driver::select('driver.id', 'driver.name as driver_name', 'driver.email', 'driver.phone_number', 'categories.category as company_name')
+        $result = Driver::select('driver.id', 'driver.name as driver_name', 'driver.email', 'driver.phone_number', 'categories.name as company_name')
             ->leftJoin('categories', 'categories.id', '=', 'driver.company_id')
             ->where('driver.client_company_id', $sessionUser['client_company_id']);
         if (!empty($keyword)) {

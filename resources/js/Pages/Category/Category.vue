@@ -16,7 +16,7 @@
                 <div class="row">
                     <div class="col-sm-12 form-group">
                         <label >Account Name</label>
-                        <input type="text" class="form-control sm-control bg-white" name="category" v-model="accountParam.category">
+                        <input type="text" class="form-control sm-control bg-white" name="category" v-model="accountParam.name">
                         <div class="invalid-feedback"></div>
                     </div>
                     <div class="col-sm-12 form-group">
@@ -33,7 +33,7 @@
                         <label >Parent Account</label>
                         <select class="form-control sm-control " name="parent_category" v-model=accountParam.parent_category >
                             <option value="">New Top Level Account</option>
-                            <option  v-for="pCat in parentCategory"  :value="pCat.id">{{pCat.category}}</option>
+                            <option  v-for="pCat in parentCategory"  :value="pCat.id">{{pCat.name}}</option>
                         </select>
                         <div class="invalid-feedback"></div>
                     </div>
@@ -48,19 +48,6 @@
                         </select>
                         <div class="invalid-feedback"></div>
                     </div>
-                    <div class="col-sm-12 form-group">
-                        <label>Account Category</label>
-                        <select class="form-control sm-control" name="account_category"  v-model="accountParam.account_category">
-                            <option value="">Select Account Category</option>
-                            <option value="1">Cost of Good Sold</option>
-                            <option value="2">Operating Expense</option>
-                            <option value="3">Interest Expense</option>
-                            <option value="4">Tax</option>
-                            <option value="5">Account Payable</option>
-                            <option value="6">Account Receivable</option>
-                        </select>
-                        <div class="invalid-feedback"></div>
-                    </div>
                 </div>
                 <button type="submit" class="btn btn-primary " v-if="!infoLoading">Save</button>
                 <button type="button" class="btn btn-primary " disabled v-if="infoLoading">Saving...</button>
@@ -72,7 +59,7 @@
                 <div class="row">
                     <div class="col-sm-12 form-group">
                         <label >Account Name</label>
-                        <input type="text" class="form-control sm-control bg-white" name="category" v-model="accountParamEdit.category">
+                        <input type="text" class="form-control sm-control bg-white" name="category" v-model="accountParamEdit.name">
                         <div class="invalid-feedback"></div>
                     </div>
                     <div class="col-sm-12 form-group">
@@ -89,7 +76,7 @@
                         <label >Parent Account</label>
                         <select class="form-control sm-control " name="parent_category" v-model=accountParamEdit.parent_category >
                             <option value="">New Top Level Account</option>
-                            <option  v-for="pCat in parentCategory"  :value="pCat.id">{{pCat.category}}</option>
+                            <option  v-for="pCat in parentCategory"  :value="pCat.id">{{pCat.name}}</option>
                         </select>
                         <div class="invalid-feedback"></div>
                     </div>
@@ -138,7 +125,7 @@ export default {
             categories: [],
             parentCategory: [],
             accountParam: {
-                category: '',
+                name: '',
                 code: '',
                 description: '',
                 parent_category: '',
@@ -147,7 +134,7 @@ export default {
             },
             accountParamEdit: {
                 id: '',
-                category: '',
+                name: '',
                 code: '',
                 description: '',
                 parent_category: '',
@@ -199,7 +186,7 @@ export default {
                     this.getCategory()
                     this.getParentCategory()
                     this.accountParam = {
-                        category: '',
+                        name: '',
                         code: '',
                         description: '',
                         parent_category: '',

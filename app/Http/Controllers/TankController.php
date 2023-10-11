@@ -3,12 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Common\AccountCategory;
+use App\Common\FuelMatixStatus;
 use App\Helpers\SessionUser;
 use App\Models\BstiChart;
 use App\Models\Category;
 use App\Models\Dispenser;
 use App\Models\NozzleReading;
 use App\Models\PayOrder;
+use App\Models\PayOrderData;
 use App\Models\Product;
 use App\Models\ProductPrice;
 use App\Models\Stock;
@@ -405,40 +407,42 @@ class TankController extends Controller
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
 
-        $payOrder = PayOrder::find($inputData['pay_order_id']);
-        if ($payOrder == null) {
-            return response()->json(['status' => 500, 'error' => 'Cannot find pay order.']);
-        }
         $tank = Tank::find($inputData['tank_id']);
-        if ($tank == null) {
-            return response()->json(['status' => 500, 'error' => 'Can not find tank.']);
+        if (!$tank instanceof Tank) {
+            return response()->json(['status' => 400, 'message' => 'Can not find [tank].']);
         }
-        if ($tank['product_id'] == null) {
-            return response()->json(['status' => 500, 'error' => 'Tank has no product. Please assign product.']);
+        if (empty($tank['product_id'])) {
+            return response()->json(['status' => 400, 'message' => 'Tank has no product. Please assign product.']);
         }
-        $category = Category::where('category', AccountCategory::STOCK_IN_HAND)->where('client_company_id', $inputData['session_user']['client_company_id'])->first();
+
+        $payOrder = PayOrderData::where('product_id', $tank['product_id'])->where('pay_order_id', $inputData['pay_order_id'])->where('status', FuelMatixStatus::PENDING)->first();
+        if (!$payOrder instanceof PayOrderData) {
+            return response()->json(['status' => 400, 'message' => 'Cannot find [pay order].']);
+        }
+
+        $category = Category::where('slug', strtolower(AccountCategory::STOCK_IN_HAND))->where('client_company_id', $inputData['session_user']['client_company_id'])->first();
         $stockCategory = Category::where('parent_category', $category['id'])
             ->where('module', 'product')
             ->where('module_id', $tank['product_id'])
             ->where('client_company_id', $inputData['session_user']['client_company_id'])
             ->first();
-        if ($stockCategory == null) {
-            return response()->json(['status' => 500, 'error' => 'Cannot find accounts stock category.']);
+        if (!$stockCategory instanceof Category) {
+            return response()->json(['status' => 400, 'message' => 'Cannot find [stock] category.']);
         }
-        $category = Category::where('category', AccountCategory::COST_OF_GOOD_SOLD)->where('client_company_id', $inputData['session_user']['client_company_id'])->first();
+        $category = Category::where('slug', strtolower(AccountCategory::COST_OF_GOOD_SOLD))->where('client_company_id', $inputData['session_user']['client_company_id'])->first();
         $costOfGoodSoldCategory = Category::where('parent_category', $category['id'])
             ->where('module', 'product')
             ->where('module_id', $tank['product_id'])
             ->where('client_company_id', $inputData['session_user']['client_company_id'])
             ->first();
-        if ($costOfGoodSoldCategory == null) {
-            return response()->json(['status' => 500, 'error' => 'Cannot find accounts cost of good sold category.']);
+        if (!$costOfGoodSoldCategory instanceof Category) {
+            return response()->json(['status' => 400, 'message' => 'Cannot find [cost of good sold] category.']);
         }
-        $lossCategory = Category::where('category', AccountCategory::EVAPORATIVE)
+        $lossCategory = Category::where('slug', strtolower(AccountCategory::EVAPORATIVE))
             ->where('client_company_id', $inputData['session_user']['client_company_id'])
             ->first();
-        if ($lossCategory == null) {
-            return response()->json(['status' => 500, 'error' => 'Cannot find accounts loss category.']);
+        if (!$lossCategory instanceof Category) {
+            return response()->json(['status' => 400, 'message' => 'Cannot find [evaporative loss] category.']);
         }
         $tankRefill = new TankRefill();
         $tankRefill->date = $inputData['date'];
@@ -451,54 +455,55 @@ class TankController extends Controller
         $tankRefill->total_refill_volume = $inputData['total_refill_volume'] ?? 0;
         $tankRefill->net_profit = $inputData['net_profit'] ?? 0;
         $tankRefill->client_company_id = $inputData['session_user']['client_company_id'];
-        if ($tankRefill->save()) {
-            $unitPrice = $payOrder['amount'] / $payOrder['quantity'];
-            $totalRefillAmount = $inputData['total_refill_volume'] * $unitPrice;
-            $transactionData['linked_id'] = $stockCategory['id'];
-            $lossAmount = $payOrder['amount'] - $totalRefillAmount;
-            $transactionData['transaction'] = [
-                ['date' => $inputData['date'], 'account_id' => $costOfGoodSoldCategory['id'], 'debit_amount' => $totalRefillAmount, 'credit_amount' => 0, 'module' => 'tank refill', 'module_id' => $tankRefill->id],
-                ['date' => $inputData['date'], 'account_id' => $lossCategory['id'], 'debit_amount' => $lossAmount > 0 ? abs($lossAmount) : 0, 'credit_amount' => $lossAmount < 0 ? abs($lossAmount) : 0 , 'module' => 'tank refill', 'module_id' => $tankRefill->id],
-            ];
-            TransactionController::saveTransaction($transactionData);
-            $stockData = [
-                'client_company_id' => $inputData['session_user']['client_company_id'],
-                'product_id' => $tank['product_id'],
-                'date' => $inputData['date'],
-                'in_stock' => $inputData['total_refill_volume'],
-                'out_stock' => 0,
-                'opening_stock' => $inputData['start_reading']
-            ];
-            TransactionController::saveStock($stockData);
+        if (!$tankRefill->save()) {
+            return response()->json(['status' => 400, 'message' => 'Cannot saved tank refill.']);
+        }
+        $totalRefillAmount = $inputData['total_refill_volume'] * $payOrder['unit_price'];
+        $transactionData['linked_id'] = $stockCategory['id'];
+        $lossAmount = $payOrder['total'] - $totalRefillAmount;
+        $transactionData['transaction'] = [
+            ['date' => $inputData['date'], 'account_id' => $costOfGoodSoldCategory['id'], 'debit_amount' => $totalRefillAmount, 'credit_amount' => 0, 'module' => 'tank refill', 'module_id' => $tankRefill->id],
+            ['date' => $inputData['date'], 'account_id' => $lossCategory['id'], 'debit_amount' => $lossAmount > 0 ? abs($lossAmount) : 0, 'credit_amount' => $lossAmount < 0 ? abs($lossAmount) : 0 , 'module' => 'tank refill', 'module_id' => $tankRefill->id],
+        ];
+        TransactionController::saveTransaction($transactionData);
+        $stockData = [
+            'client_company_id' => $inputData['session_user']['client_company_id'],
+            'product_id' => $tank['product_id'],
+            'date' => $inputData['date'],
+            'in_stock' => $inputData['total_refill_volume'],
+            'out_stock' => 0,
+            'opening_stock' => $inputData['start_reading']
+        ];
+        TransactionController::saveStock($stockData);
 
-            $productPrice = new ProductPrice();
-            $productPrice->date = $inputData['date'];
-            $productPrice->product_id = $tank['product_id'];
-            $productPrice->quantity = $payOrder['quantity'];
-            $productPrice->stock_quantity = $payOrder['quantity'];
-            $productPrice->price = $payOrder['amount'];
-            $productPrice->unit_price = $payOrder['amount'] / $payOrder['quantity'];
-            $productPrice->module = 'tank refill';
-            $productPrice->module_id = $tankRefill->id;
-            $productPrice->client_company_id = $inputData['session_user']['client_company_id'];
-            $productPrice->save();
-            if (isset($inputData['dispensers'])) {
-                foreach ($inputData['dispensers'] as $dispenser) {
-                    foreach ($dispenser['nozzle'] as $nozzle) {
+        $productPrice = new ProductPrice();
+        $productPrice->date = $inputData['date'];
+        $productPrice->product_id = $tank['product_id'];
+        $productPrice->quantity = $payOrder['quantity'];
+        $productPrice->stock_quantity = $payOrder['quantity'];
+        $productPrice->price = $payOrder['amount'];
+        $productPrice->unit_price = $payOrder['amount'] / $payOrder['quantity'];
+        $productPrice->module = 'tank refill';
+        $productPrice->module_id = $tankRefill->id;
+        $productPrice->client_company_id = $inputData['session_user']['client_company_id'];
+        $productPrice->save();
+        if (isset($inputData['dispensers'])) {
+            foreach ($inputData['dispensers'] as $dispenser) {
+                foreach ($dispenser['nozzle'] as $nozzle) {
 
-                        $tankRefillHistory = new TankRefillHistory();
-                        $tankRefillHistory->tank_refill_id = $tankRefill->id;
-                        $tankRefillHistory->nozzle_id = $nozzle['id'];
-                        $tankRefillHistory->start_reading = $nozzle['start_reading'];
-                        $tankRefillHistory->end_reading = $nozzle['end_reading'];
-                        $tankRefillHistory->sale = $nozzle['sale'];
-                        $tankRefillHistory->save();
-                    }
+                    $tankRefillHistory = new TankRefillHistory();
+                    $tankRefillHistory->tank_refill_id = $tankRefill->id;
+                    $tankRefillHistory->nozzle_id = $nozzle['id'];
+                    $tankRefillHistory->start_reading = $nozzle['start_reading'];
+                    $tankRefillHistory->end_reading = $nozzle['end_reading'];
+                    $tankRefillHistory->sale = $nozzle['sale'];
+                    $tankRefillHistory->save();
                 }
             }
-            return response()->json(['status' => 200, 'message' => 'Successfully saved tank refill.']);
         }
-        return response()->json(['status' => 500, 'error' => 'Cannot saved tank refill.']);
+        $payOrder->status = FuelMatixStatus::COMPLETE;
+        $payOrder->save();
+        return response()->json(['status' => 200, 'message' => 'Successfully saved tank refill.']);
     }
     public function refillList(Request $request)
     {

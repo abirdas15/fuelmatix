@@ -35,7 +35,7 @@ class IncomeStatementController extends Controller
     }
     public static function getExpenses($start_date, $end_date)
     {
-        $result = Transaction::select('categories.category', DB::raw('SUM(credit_amount - debit_amount) as balance'))
+        $result = Transaction::select('categories.name', DB::raw('SUM(credit_amount - debit_amount) as balance'))
             ->whereBetween('date', [$start_date, $end_date])
             ->leftJoin('categories', 'categories.id', '=', 'transactions.account_id')
             ->where('type', '=', 'expenses')
@@ -54,7 +54,7 @@ class IncomeStatementController extends Controller
     }
     public static function getRevenue($start_date, $end_date)
     {
-        $result = Transaction::select('categories.category', DB::raw('SUM(debit_amount - credit_amount) as balance'))
+        $result = Transaction::select('categories.name', DB::raw('SUM(debit_amount - credit_amount) as balance'))
             ->whereBetween('date', [$start_date, $end_date])
             ->leftJoin('categories', 'categories.id', '=', 'transactions.account_id')
             ->where('type', '=', 'income')

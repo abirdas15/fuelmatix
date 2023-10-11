@@ -154,7 +154,7 @@ export default {
                 date: '',
                 tank_id: '',
                 pay_order_id: '',
-                quantity: 0,
+                quantity: '',
                 start_reading: 0,
                 end_reading: 0,
                 dip_sale: 0,
@@ -174,12 +174,13 @@ export default {
     },
     watch: {
         'param.pay_order_id': function () {
-            this.getPayOderSingle()
+            this.getPayOrderQuantity()
             this.getDispenserSingle()
         },
         'param.tank_id': function () {
             this.getDispenserSingle()
             this.getTankReading()
+            this.getPayOrderQuantity()
         },
     },
     methods: {
@@ -225,6 +226,22 @@ export default {
                 }
             });
         },
+
+        getPayOrderQuantity: function () {
+            if (this.param.tank_id == '' && this.param.pay_order_id == '') {
+                return;
+            }
+            ApiService.POST(ApiRoutes.PayOrderQuantity, {tank_id: this.param.tank_id, pay_order_id: this.param.pay_order_id},res => {
+                if (parseInt(res.status) === 200) {
+                    if (res.data != null) {
+                        this.param.quantity = res.data.quantity;
+                        this.param.amount = res.data.total
+                        this.unit_price = res.data.unit_price;
+                    }
+                }
+            });
+        },
+
         getPayOderSingle: function () {
             ApiService.POST(ApiRoutes.PayOrderSingle, {id: this.param.pay_order_id},res => {
                 if (parseInt(res.status) === 200) {

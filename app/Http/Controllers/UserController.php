@@ -7,6 +7,7 @@ use App\Helpers\SessionUser;
 use App\Models\Category;
 use App\Models\Transaction;
 use App\Models\User;
+use App\Repository\CategoryRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -39,23 +40,24 @@ class UserController extends Controller
         $user->address = $requestData['address'] ?? null;
         $user->client_company_id = $sessionUser['client_company_id'];
         $user->cashier_balance = !empty($requestData['cashier_balance']) ? 1 : 0;
-        if ($user->save()) {
-            if (!empty($requestData['cashier_balance'])) {
-                $cashInHandCategory = Category::where('client_company_id', $sessionUser['client_company_id'])->where('category', AccountCategory::CASH_IM_HAND)->first();
-                $category = new Category();
-                $category->category = $requestData['name'];
-                $category->parent_category = $cashInHandCategory->id;
-                $category->type = $cashInHandCategory->type;
-                $category->client_company_id = $sessionUser['client_company_id'];
-                if ($category->save()) {
-                    $category->updateCategory();
-                    $user->category_id = $category->id;
-                    $user->save();
-                    return response()->json(['status' => 200, 'message' => 'Successfully saved user.']);
-                }
+        if (!$user->save()) {
+            return response()->json(['status' => 500, 'message' => 'Cannot saved [user].']);
+        }
+        if (!empty($requestData['cashier_balance'])) {
+            $cashInHandCategory = Category::where('client_company_id', $sessionUser['client_company_id'])->where('slug', strtolower(AccountCategory::CASH_IM_HAND))->first();
+            if (!$cashInHandCategory instanceof Category) {
+                return response()->json(['status' => 400, 'message' => 'Cannot find [cash in hand] category']);
+            }
+            $categoryData = [
+                'name' => $requestData['name'],
+            ];
+            $cashInHandCategory = CategoryRepository::saveCategory($categoryData, $cashInHandCategory['id'], null);
+            if ($cashInHandCategory instanceof Category) {
+                $user->category_id = $cashInHandCategory->id;
+                $user->save();
             }
         }
-        return response()->json(['status' => 500, 'message' => 'Cannot saved user.']);
+        return response()->json(['status' => 200, 'message' => 'Successfully saved user.']);
     }
     /**
      * @param Request $request
@@ -138,33 +140,30 @@ class UserController extends Controller
         $user->address = $requestData['address'] ?? null;
         $user->client_company_id = $sessionUser['client_company_id'];
         $user->cashier_balance = !empty($requestData['cashier_balance']) ? 1 : 0;
-        if ($user->save()) {
-            if (!empty($requestData['cashier_balance']) && empty($user['category_id'])) {
-                $cashInHandCategory = Category::where('client_company_id', $sessionUser['client_company_id'])->where('category', AccountCategory::CASH_IM_HAND)->first();
-                $category = new Category();
-                $category->category = $requestData['name'];
-                $category->parent_category = $cashInHandCategory->id;
-                $category->type = $cashInHandCategory->type;
-                $category->client_company_id = $sessionUser['client_company_id'];
-                if ($category->save()) {
-                    $category->updateCategory();
-                    $user->category_id = $category->id;
-                    $user->save();
-                }
-            } else if (!empty($requestData['cashier_balance']) && !empty($user['category_id'])) {
-                $category = Category::find($user->category_id);
-                if ($category instanceof Category) {
-                    $category->category = $requestData['name'];
-                    if ($category->save()) {
-                        $category->updateCategory();
-                        $user->category_id = $category->id;
-                        $user->save();
-                    }
-                }
-            }
-            return response()->json(['status' => 200, 'message' => 'Successfully updated user.']);
+        if (!$user->save()) {
+            return response()->json(['status' => 400, 'message' => 'Cannot updated [user].']);
         }
-        return response()->json(['status' => 500, 'message' => 'Cannot updated user.']);
+        $categoryData = [
+            'name' => $requestData['name'],
+        ];
+        if (!empty($requestData['cashier_balance']) && empty($user['category_id'])) {
+            $cashInHandCategory = Category::where('client_company_id', $sessionUser['client_company_id'])->where('slug', strtolower(AccountCategory::CASH_IM_HAND))->first();
+            if (!$cashInHandCategory instanceof Category) {
+                return response()->json(['status' => 400, 'message' => 'Cannot find [cash in hand] category']);
+            }
+            $cashInHandCategory = CategoryRepository::saveCategory($categoryData, $cashInHandCategory['id'], null);
+            if ($cashInHandCategory instanceof Category) {
+                $user->category_id = $cashInHandCategory->id;
+                $user->save();
+            }
+        } else if (!empty($requestData['cashier_balance']) && !empty($user['category_id'])) {
+            $category = Category::find($user->category_id);
+            if (!$category instanceof Category) {
+                return response()->json(['status' => 400, 'message' => 'Cannot find [cash in hand] category']);
+            }
+            CategoryRepository::updateCategory($category, $categoryData);
+        }
+        return response()->json(['status' => 200, 'message' => 'Successfully updated user.']);
     }
     /**
      * @param Request $request

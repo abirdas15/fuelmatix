@@ -11,10 +11,11 @@ use App\Models\NozzleReading;
 use App\Models\Product;
 use App\Models\SaleData;
 use App\Models\ShiftSale;
-use App\Models\ShiftSummary;
 use App\Models\Stock;
 use App\Models\Tank;
 use App\Models\TankLog;
+use App\Models\Transaction;
+use App\Repository\CategoryRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -30,14 +31,28 @@ class ProductController extends Controller
     {
         $inputData = $request->all();
         $validator = Validator::make($inputData, [
-            'name' => 'required',
-            'selling_price' => 'required',
-            'type_id' => 'required',
+            'name' => 'required|string',
+            'selling_price' => 'required|numeric',
+            'type_id' => 'required|integer',
             'unit' => 'required',
         ]);
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
+
+        $directIncomeCategory = Category::where('slug', strtolower(AccountCategory::DIRECT_INCOME))->where('client_company_id', $inputData['session_user']['client_company_id'])->first();
+        if (!$directIncomeCategory instanceof Category) {
+            return response()->json(['status' => 400, 'message' => 'Cannot find [income] category.']);
+        }
+        $costOfGoodSoldCategory = Category::where('slug', strtolower(AccountCategory::COST_OF_GOOD_SOLD))->where('client_company_id', $inputData['session_user']['client_company_id'])->first();
+        if (!$costOfGoodSoldCategory instanceof  Category) {
+            return response()->json(['status' => 400, 'message' => 'Cannot find [cost of good sold] category']);
+        }
+        $stockCategory = Category::where('slug', strtolower(AccountCategory::STOCK_IN_HAND))->where('client_company_id', $inputData['session_user']['client_company_id'])->first();
+        if (!$stockCategory instanceof Category) {
+            return response()->json(['status' => 400, 'message' => 'Cannot find [stock in hand] category']);
+        }
+
         $product = new Product();
         $product->name = $inputData['name'];
         $product->selling_price = $inputData['selling_price'];
@@ -47,45 +62,26 @@ class ProductController extends Controller
         $product->unit = $inputData['unit'];
         $product->opening_stock = $inputData['opening_stock'] ?? null;
         $product->client_company_id = $inputData['session_user']['client_company_id'];
-        if ($product->save()) {
-            $incomeCategory = Category::where('category', AccountCategory::INCOME)->where('client_company_id', $inputData['session_user']['client_company_id'])->first();
-            $costOfGoodSoldCategory = Category::where('category', AccountCategory::COST_OF_GOOD_SOLD)->where('client_company_id', $inputData['session_user']['client_company_id'])->first();
-            $stockCategory = Category::where('category', AccountCategory::STOCK_IN_HAND)->where('client_company_id', $inputData['session_user']['client_company_id'])->first();
-            $categoryData = [
-                [
-                    'category' => $inputData['name'],
-                    'parent_category' => $incomeCategory['id'],
-                    'type' => $incomeCategory['type'],
-                    'module' => 'product',
-                    'module_id' => $product->id,
-                    'client_company_id' => $inputData['session_user']['client_company_id']
-                ],
-                [
-                    'category' => $inputData['name'],
-                    'parent_category' => $costOfGoodSoldCategory['id'],
-                    'type' => $costOfGoodSoldCategory['type'],
-                    'module' => 'product',
-                    'module_id' => $product->id,
-                    'client_company_id' => $inputData['session_user']['client_company_id']
-                ],
-                [
-                    'category' => $inputData['name'],
-                    'parent_category' => $stockCategory['id'],
-                    'type' => $stockCategory['type'],
-                    'module' => 'product',
-                    'module_id' => $product->id,
-                    'client_company_id' => $inputData['session_user']['client_company_id']
-                ]
-            ];
-            foreach ($categoryData as $data) {
-                $category = new Category($data);
-                if ($category->save()) {
-                    $category->updateCategory();
-                }
-            }
-            return response()->json(['status' => 200, 'message' => 'Successfully save product.']);
+        if (!$product->save()) {
+            return response()->json(['status' => 400, 'message' => 'Cannot save [product].']);
         }
-        return response()->json(['status' => 500, 'error' => 'Cannot save product.']);
+        $categoryData = [
+            'name' => $inputData['name'],
+            'module_id' => $product->id
+        ];
+        $directIncomeCategory = CategoryRepository::saveCategory($categoryData, $directIncomeCategory['id'], Module::PRODUCT);
+        if (!$directIncomeCategory instanceof Category) {
+            return response()->json(['status' => 400, 'message' => 'Cannot save [income] category.']);
+        }
+        $costOfGoodSoldCategory = CategoryRepository::saveCategory($categoryData, $costOfGoodSoldCategory['id'], Module::PRODUCT);
+        if (!$costOfGoodSoldCategory instanceof Category) {
+            return response()->json(['status' => 400, 'message' => 'Cannot save [cost of good sold] category.']);
+        }
+        $stockCategory = CategoryRepository::saveCategory($categoryData, $stockCategory['id'], Module::PRODUCT);
+        if (!$stockCategory instanceof Category) {
+            return response()->json(['status' => 400, 'message' => 'Cannot save [stock] category.']);
+        }
+        return response()->json(['status' => 200, 'message' => 'Successfully save product.']);
     }
     /**
      * @param Request $request
@@ -156,18 +152,33 @@ class ProductController extends Controller
     {
         $inputData = $request->all();
         $validator = Validator::make($inputData, [
-            'id' => 'required',
-            'name' => 'required',
-            'type_id' => 'required',
-            'buying_price' => 'required',
+            'id' => 'required|integer',
+            'name' => 'required|string',
+            'type_id' => 'required|integer',
+            'buying_price' => 'required|numeric',
+            'selling_price' => 'required|numeric',
             'unit' => 'required',
         ]);
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
+
+        $directIncomeCategory = Category::where('slug', strtolower(AccountCategory::DIRECT_INCOME))->where('client_company_id', $inputData['session_user']['client_company_id'])->first();
+        if (!$directIncomeCategory instanceof Category) {
+            return response()->json(['status' => 400, 'message' => 'Cannot find [income] category.']);
+        }
+        $costOfGoodSoldCategory = Category::where('slug', strtolower(AccountCategory::COST_OF_GOOD_SOLD))->where('client_company_id', $inputData['session_user']['client_company_id'])->first();
+        if (!$costOfGoodSoldCategory instanceof  Category) {
+            return response()->json(['status' => 400, 'message' => 'Cannot find [cost of good sold] category']);
+        }
+        $stockCategory = Category::where('slug', strtolower(AccountCategory::STOCK_IN_HAND))->where('client_company_id', $inputData['session_user']['client_company_id'])->first();
+        if (!$stockCategory instanceof Category) {
+            return response()->json(['status' => 400, 'message' => 'Cannot find [stock in hand] category']);
+        }
+
         $product = Product::find($inputData['id']);
         if (!$product instanceof Product) {
-            return response()->json(['status' => 500, 'error' => 'Cannot find product.']);
+            return response()->json(['status' => 400, 'error' => 'Cannot find [product].']);
         }
         $product->name = $inputData['name'];
         $product->selling_price = $inputData['selling_price'];
@@ -176,63 +187,34 @@ class ProductController extends Controller
         $product->driver_selling_price = $inputData['driver_selling_price'] ?? 0;
         $product->unit = $inputData['unit'];
         $product->opening_stock = $inputData['opening_stock'] ?? null;
-        if ($product->save()) {
-            $incomeCategory = Category::where('category', AccountCategory::INCOME)->where('client_company_id', $inputData['session_user']['client_company_id'])->first();
-            $costOfGoodSoldCategory = Category::where('category', AccountCategory::COST_OF_GOOD_SOLD)->where('client_company_id', $inputData['session_user']['client_company_id'])->first();
-            $stockCategory = Category::where('category', AccountCategory::STOCK_IN_HAND)->where('client_company_id', $inputData['session_user']['client_company_id'])->first();
-
-            $incomeCategoryModel = Category::where('module', Module::PRODUCT)->where('parent_category', $incomeCategory->id)->where('module_id', $inputData['id'])->first();
-            if ($incomeCategoryModel == null) {
-                $incomeCategoryModel = new Category();
-                $incomeCategoryModel->category = $inputData['name'];
-                $incomeCategoryModel->parent_category = $incomeCategory['id'];
-                $incomeCategoryModel->type = $incomeCategory['type'];
-                $incomeCategoryModel->module = Module::PRODUCT;
-                $incomeCategoryModel->module_id = $product->id;
-                $incomeCategoryModel->client_company_id = $inputData['session_user']['client_company_id'];
-            } else {
-                $incomeCategoryModel->category = $inputData['name'];
-            }
-            if ($incomeCategoryModel->save()) {
-                $incomeCategoryModel->updateCategory();
-            }
-
-            $costOfGoodSoldCategoryModel = Category::where('module', Module::PRODUCT)->where('parent_category', $costOfGoodSoldCategory->id)->where('module_id', $inputData['id'])->first();
-            if ($costOfGoodSoldCategoryModel == null) {
-                $costOfGoodSoldCategory = Category::where('category', AccountCategory::COST_OF_GOOD_SOLD)->where('client_company_id', $inputData['session_user']['client_company_id'])->first();
-                $costOfGoodSoldCategoryModel = new Category();
-                $costOfGoodSoldCategoryModel->category = $inputData['name'];
-                $costOfGoodSoldCategoryModel->parent_category = $costOfGoodSoldCategory['id'];
-                $costOfGoodSoldCategoryModel->type = $costOfGoodSoldCategory['type'];
-                $costOfGoodSoldCategoryModel->module = Module::PRODUCT;
-                $costOfGoodSoldCategoryModel->module_id = $product->id;
-                $costOfGoodSoldCategoryModel->client_company_id = $inputData['session_user']['client_company_id'];
-            } else {
-                $costOfGoodSoldCategoryModel->category = $inputData['name'];
-            }
-            if ($costOfGoodSoldCategoryModel->save()) {
-                $costOfGoodSoldCategoryModel->updateCategory();
-            }
-
-            $stockCategoryModel = Category::where('module', Module::PRODUCT)->where('parent_category', $stockCategory->id)->where('module_id', $inputData['id'])->first();
-            if ($stockCategoryModel == null) {
-                $stockCategory = Category::where('category', AccountCategory::STOCK_IN_HAND)->where('client_company_id', $inputData['session_user']['client_company_id'])->first();
-                $stockCategoryModel = new Category();
-                $stockCategoryModel->category = $inputData['name'];
-                $stockCategoryModel->parent_category = $stockCategory['id'];
-                $stockCategoryModel->type = $stockCategory['type'];
-                $stockCategoryModel->module = Module::PRODUCT;
-                $stockCategoryModel->module_id = $product->id;
-                $stockCategoryModel->client_company_id = $inputData['session_user']['client_company_id'];
-            } else {
-                $stockCategoryModel->category = $inputData['name'];
-            }
-            if ($stockCategoryModel->save()) {
-                $stockCategoryModel->updateCategory();
-            }
-            return response()->json(['status' => 200, 'message' => 'Successfully updated product.']);
+        if (!$product->save()) {
+            return response()->json(['status' => 400, 'message' => 'Cannot updated [product].']);
         }
-        return response()->json(['status' => 500, 'error' => 'Cannot updated product.']);
+        $categoryData = [
+            'name' => $inputData['name'],
+            'module_id' => $product->id
+        ];
+        $incomeCategoryModel = Category::where('module', Module::PRODUCT)->where('parent_category', $directIncomeCategory->id)->where('module_id', $inputData['id'])->first();
+        if (!$incomeCategoryModel instanceof Category) {
+            CategoryRepository::saveCategory($categoryData, $directIncomeCategory['id'], Module::PRODUCT);
+        } else {
+            CategoryRepository::updateCategory($incomeCategoryModel, $categoryData);
+        }
+
+        $costOfGoodSoldCategoryModel = Category::where('module', Module::PRODUCT)->where('parent_category', $costOfGoodSoldCategory->id)->where('module_id', $inputData['id'])->first();
+        if (!$costOfGoodSoldCategoryModel instanceof Category) {
+            CategoryRepository::saveCategory($categoryData, $costOfGoodSoldCategory['id'], Module::PRODUCT);
+        } else {
+            CategoryRepository::updateCategory($costOfGoodSoldCategoryModel, $categoryData);
+        }
+
+        $stockCategoryModel = Category::where('module', Module::PRODUCT)->where('parent_category', $stockCategory->id)->where('module_id', $inputData['id'])->first();
+        if (!$stockCategoryModel instanceof Category) {
+            CategoryRepository::saveCategory($categoryData, $stockCategory['id'], Module::PRODUCT);
+        } else {
+            CategoryRepository::updateCategory($stockCategoryModel, $categoryData);
+        }
+        return response()->json(['status' => 200, 'message' => 'Successfully updated product.']);
     }
     /**
      * @param Request $request
@@ -248,10 +230,16 @@ class ProductController extends Controller
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
         $product = Product::find($inputData['id']);
-        if ($product == null) {
-            return response()->json(['status' => 500, 'error' => 'Cannot find product.']);
+        if ($product instanceof Product) {
+            return response()->json(['status' => 400, 'message' => 'Cannot find [product].']);
+        }
+        $categoryId = Category::where('module', Module::PRODUCT)->where('module_id', $inputData['id'])->get()->pluck('id')->toArray();
+        $transaction = Transaction::whereIn('account_id', $categoryId)->orWhereIn('linked_id', $categoryId)->first();
+        if ($transaction instanceof Transaction) {
+            return response()->json(['status' => 400, 'message' => 'Cannot find [product].']);
         }
         Product::where('id', $inputData['id'])->delete();
+        Category::where('module', Module::PRODUCT)->where('module_id', $inputData['id'])->delete();
         return response()->json(['status' => 200, 'message' => 'Successfully delete product.']);
     }
     /**

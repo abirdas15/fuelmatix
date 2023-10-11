@@ -5,7 +5,7 @@
         <div class="container-fluid">
             <div class="d-flex align-items-center justify-content-between mb-3">
                 <router-link :to="{name: 'Accounts'}"><i class="fa-solid fa-left-long fa-3x"></i></router-link>
-                <div class="categoryName">{{singleCategory.category}}</div>
+                <div class="categoryName">{{singleCategory.name}}</div>
                 <button class="btn btn-success" v-if="!loading" type="button" @click="saveTransaction">Save</button>
                 <button class="btn btn-success" v-if="loading" type="button">Saving...</button>
             </div>
@@ -61,7 +61,7 @@
                     </td>
                     <td style="width: 20%">
                         <select name="parent_category" v-model=param.account_id form="transaction_form">
-                            <option v-for="pCat in parentCategory" :value="pCat.id">{{ pCat.category }}</option>
+                            <option v-for="pCat in parentCategory" :value="pCat.id">{{ pCat.name }}</option>
                         </select>
                     </td>
                     <td style="width: 10%">

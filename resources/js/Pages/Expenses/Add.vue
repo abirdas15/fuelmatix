@@ -23,7 +23,7 @@
                                         <label class="form-label">Expense:</label>
                                         <select class="form-control" name="category_id" id="category_id"  v-model="param.category_id">
                                             <option value="">Select Expense</option>
-                                            <option v-for="d in expenseData" :value="d.id">{{d.category}}</option>
+                                            <option v-for="d in expenseData" :value="d.id">{{d.name}}</option>
                                         </select>
                                         <div class="invalid-feedback"></div>
                                     </div>
@@ -41,7 +41,7 @@
                                         <label class="form-label">Payment:</label>
                                         <select class="form-control" name="payment_id" id="payment_id"  v-model="param.payment_id">
                                             <option value="">Select Payment</option>
-                                            <option v-for="d in paymentData" :value="d.id">{{d.category}}</option>
+                                            <option v-for="d in paymentData" :value="d.id">{{d.name}}</option>
                                         </select>
                                         <div class="invalid-feedback"></div>
                                     </div>

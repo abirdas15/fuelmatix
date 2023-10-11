@@ -29,4 +29,11 @@ class AccountCategory
 
     const UN_EARNED_REVENUE = 'Un Earned Revenue';
     const UN_AUTHORIZED_BILL = 'Un Authorized Bill';
+
+    const DIRECT_INCOME = 'Direct Income';
+    const IN_DIRECT_INCOME = 'Indirect Income';
+
+    const DIRECT_EXPENSE = 'Direct Expense';
+    const IN_DIRECT_EXPENSE = 'Indirect Expense';
+    const ADVANCE_PAYABLE = 'Advance Payable';
 }

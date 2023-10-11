@@ -7,16 +7,18 @@ use App\Common\Module;
 use App\Helpers\SessionUser;
 use App\Http\Controllers\TransactionController;
 use App\Models\Category;
+use Illuminate\Http\JsonResponse;
 
 class InvoiceRepository
 {
     /**
      * @param array $data
+     * @return JsonResponse|void
      */
     public static function advancePayment(array $data)
     {
         $sessionUser = SessionUser::getUser();
-        $advancePaymentLiabilities =  Category::where('category', AccountCategory::ADVANCE_PAYABLE)->where('client_company_id', $sessionUser['id'])->first();
+        $advancePaymentLiabilities =  Category::where('slug', strtolower(AccountCategory::ADVANCE_PAYABLE))->where('client_company_id', $sessionUser['id'])->first();
         if (!$advancePaymentLiabilities instanceof Category) {
             return response()->json(['status' => 500, 'message' => 'Cannot find advance payable category.']);
         }

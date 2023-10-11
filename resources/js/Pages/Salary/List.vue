@@ -51,7 +51,13 @@
                                                 <td >{{f.amount}}</td>
                                                 <td >{{f.payment_method}}</td>
                                                 <td>
-                                                    <div v-if="CheckPermission(Section.SALARY + '-' + Action.DELETE)" class="d-flex justify-content-end">
+                                                    <div v-if="CheckPermission(Section.SALARY + '-' + Action.DELETE)" class="d-flex">
+                                                        <a  href="javascript:void(0)" :class="'salary' + f.id" @click="printSalarySheet(f.id)" class="btn btn-primary shadow btn-xs sharp  me-1">
+                                                            <i class="fa fa-print"></i>
+                                                        </a>
+                                                        <a style="display: none" :class="'salary' + f.id" class="btn btn-primary shadow btn-xs sharp  me-1">
+                                                            <i class="fa fa-spinner fa-spin"></i>
+                                                        </a>
                                                         <a  href="javascript:void(0)"  @click="openModalDelete(f)" class="btn btn-danger shadow btn-xs sharp">
                                                             <i class="fa fa-trash"></i>
                                                         </a>
@@ -134,6 +140,18 @@ export default {
         },
     },
     methods: {
+        printSalarySheet: function(id) {
+            $('.salary' + id).toggle();
+            ApiService.DOWNLOAD(ApiRoutes.salaryPrint, {id: id},'',res => {
+                $('.salary' + id).toggle();
+                this.loadingFile = false
+                let blob = new Blob([res], {type: 'pdf'});
+                const link = document.createElement('a');
+                link.href = window.URL.createObjectURL(blob);
+                link.download = 'Daily Log.pdf';
+                link.click();
+            });
+        },
         openModalDelete(data) {
             Swal.fire({
                 title: 'Are you sure you want to delete?',

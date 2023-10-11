@@ -19,7 +19,7 @@
                         <div class="basic-form">
                             <form @submit.prevent="save">
                                 <div class="row">
-                                    <div class="mb-3 form-group col-md-6">
+                                    <div class="mb-3 form-group col-md-4">
                                         <label class="form-label">Bank:</label>
                                         <select class="form-control" name="bank_id" id="bank_id"  v-model="param.bank_id">
                                             <option value="">Select Bank</option>
@@ -27,7 +27,7 @@
                                         </select>
                                         <div class="invalid-feedback"></div>
                                     </div>
-                                    <div class="mb-3 form-group col-md-6">
+                                    <div class="mb-3 form-group col-md-4">
                                         <label class="form-label">Vendor:</label>
                                         <select class="form-control" name="vendor_id" id="vendor_id"  v-model="param.vendor_id">
                                             <option value="">Select Bank</option>
@@ -35,21 +35,65 @@
                                         </select>
                                         <div class="invalid-feedback"></div>
                                     </div>
-                                    <div class="mb-3 form-group col-md-6">
-                                        <label class="form-label">Amount:</label>
-                                        <input type="text" class="form-control" name="amount" v-model="param.amount">
-                                        <div class="invalid-feedback"></div>
-                                    </div>
-                                    <div class="mb-3 form-group col-md-6">
-                                        <label class="form-label">Unit Quantity:</label>
-                                        <input type="text" class="form-control" name="quantity" v-model="param.quantity">
-                                        <div class="invalid-feedback"></div>
-                                    </div>
-                                    <div class="mb-3 form-group col-md-6">
+                                    <div class="mb-3 form-group col-md-4">
                                         <label class="form-label">Pay Order Number:</label>
                                         <input type="text" class="form-control" name="number" v-model="param.number">
                                         <div class="invalid-feedback"></div>
                                     </div>
+                                </div>
+                                <div class="row">
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th style="width: 20%">Product Name</th>
+                                                <th style="width: 20%">Unit Price</th>
+                                                <th style="width: 20%">Quantity</th>
+                                                <th style="width: 20%">Total</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr v-for="(each,index) in param.products">
+                                                <td>
+                                                    <div class="form-group">
+                                                        <select class="form-control" v-model="each.product_id" :name="'products.' + index + '.product_id'" @change="changeProduct($event, index)">
+                                                            <option value="">Choose Product</option>
+                                                            <option v-for="row in products" :value="row.id" v-text="row.name"></option>
+                                                        </select>
+                                                        <div class="invalid-feedback"></div>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="form-group">
+                                                        <input type="text" :name="'products.' + index + '.unit_price'" v-model="each.unit_price" class="form-control" disabled>
+                                                        <div class="invalid-feedback"></div>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="form-group">
+                                                        <input type="text" :name="'products.' + index + '.quantity'" @input="calculatePrice(index)" v-model="each.quantity" class="form-control">
+                                                        <div class="invalid-feedback"></div>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="form-group">
+                                                        <input type="text" :name="'products.' + index + '.total'" v-model="each.total" class="form-control" disabled>
+                                                        <div class="invalid-feedback"></div>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <button @click="addProduct" v-if="index == 0" type="button" class="btn btn-info">+</button>
+                                                    <button @click="removeProduct(index)" v-if="index != 0" type="button" class="btn btn-danger">x</button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                        <tfoot>
+                                            <tr>
+                                                <th colspan="3" class="text-end">Total</th>
+                                                <th>{{ total }}</th>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
                                 </div>
                                 <div class="row" style="text-align: right;">
                                     <div class="col-sm-6"></div>
@@ -78,8 +122,15 @@ export default {
                 bank_id: '',
                 vendor_id: '',
                 number: '',
-                amount: '',
-                quantity: '',
+                products: [
+                    {
+                        product_id: '',
+                        quantity: '',
+                        unit_price: '',
+                        total: '',
+                        expense_category_id: ''
+                    }
+                ]
             },
             listParam: {
                 limit: 5000,
@@ -88,9 +139,58 @@ export default {
             loading: false,
             listDataBank: [],
             listDataVendor: [],
+            products: []
+        }
+    },
+    computed: {
+        total() {
+            let total = 0;
+            this.param.products.map((v) => {
+                if (v.total != '') {
+                    total += parseFloat(v.total);
+                }
+            });
+            return total.toFixed(2);
         }
     },
     methods: {
+        calculatePrice: function(index) {
+            let total = '';
+            if (this.param.products[index].unit_price != '' && this.param.products[index].quantity != '') {
+                total = this.param.products[index].unit_price * this.param.products[index].quantity;
+            }
+            this.param.products[index].total = total;
+        },
+        changeProduct: function(event, index) {
+            let id = event.target.value;
+            let selectedProductIndex;
+            this.products.map((v, i) => {
+                if (v.id == id) {
+                    selectedProductIndex = i;
+                }
+            });
+            this.param.products[index].unit_price = this.products[selectedProductIndex].buying_price;
+            this.param.products[index].expense_category_id = this.products[selectedProductIndex].expense_category_id;
+            this.calculatePrice(index);
+        },
+        removeProduct: function(index) {
+            this.param.products.splice(index, 1);
+        },
+        addProduct: function() {
+            this.param.products.push({
+                product_id: '',
+                unit_price: '',
+                quantity: '',
+                total: ''
+            });
+        },
+        fetchProducts: function () {
+            ApiService.POST(ApiRoutes.ProductList, {limit: 5000, page: 1},res => {
+                if (parseInt(res.status) === 200) {
+                    this.products = res.data.data;
+                }
+            });
+        },
         getBank: function () {
             ApiService.POST(ApiRoutes.BankList, {limit: 5000, page: 1},res => {
                 this.TableLoading = false
@@ -125,6 +225,7 @@ export default {
     created() {
         this.getBank()
         this.getVendor()
+        this.fetchProducts();
     },
     mounted() {
         $('#dashboard_bar').text('Pay Order Add')

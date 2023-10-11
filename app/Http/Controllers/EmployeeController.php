@@ -4,13 +4,19 @@ namespace App\Http\Controllers;
 
 use App\Common\AccountCategory;
 use App\Models\Category;
+use App\Repository\CategoryRepository;
 use App\Repository\EmployeeRepository;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class EmployeeController extends Controller
 {
-    public function save(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function save(Request $request): JsonResponse
     {
         $requestData = $request->all();
         $validator = Validator::make($requestData, [
@@ -22,34 +28,40 @@ class EmployeeController extends Controller
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
-        $salaryExpense = Category::where('client_company_id', $requestData['session_user']['client_company_id'])->where('category', AccountCategory::SALARY_EXPENSE)->first();
-        if ($salaryExpense == null) {
-            return response()->json(['status' => 500, 'error' => 'Cannot find account salary expense group.']);
+        $salaryExpense = Category::where('client_company_id', $requestData['session_user']['client_company_id'])->where('slug', strtolower(AccountCategory::SALARY_EXPENSE))->first();
+        if (!$salaryExpense instanceof Category) {
+            return response()->json(['status' => 400, 'message' => 'Cannot find [salary expense] category.']);
         }
         $others = [
             'position' => $requestData['position'] ?? null,
             'salary' => $requestData['salary'] ?? null,
         ];
-        $category = new Category();
-        $category->category = $requestData['name'];
-        $category->parent_category = $salaryExpense->id;
-        $category->type = $salaryExpense->type;
-        $category->rfid = $requestData['rfid'] ?? null;
-        $category->others = json_encode($others);
-        $category->client_company_id = $requestData['session_user']['client_company_id'];
-        if ($category->save()) {
-            $category->updateCategory();
-            return response()->json(['status' => 200, 'message' => 'Successfully saved employee.']);
+        $categoryData = [
+            'name' => $requestData['name'],
+            'rfid' => $requestData['rfid'] ?? null,
+            'others' => json_encode($others)
+        ];
+        $newCategory = CategoryRepository::saveCategory($categoryData, $salaryExpense['id']);
+        if (!$newCategory instanceof Category) {
+            return response()->json(['status' => 400, 'message' => 'Cannot saved employee.']);
         }
-        return response()->json(['status' => 500, 'errors' => 'Cannot saved employee.']);
+        return response()->json(['status' => 200, 'message' => 'Successfully saved employee.']);
     }
-    public function list(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function list(Request $request): JsonResponse
     {
         $requestData = $request->all();
         $result = EmployeeRepository::list($requestData);
         return response()->json(['status' => 200, 'data' => $result]);
     }
-    public function single(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function single(Request $request): JsonResponse
     {
         $inputData = $request->all();
         $validator = Validator::make($inputData, [
@@ -58,14 +70,18 @@ class EmployeeController extends Controller
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
-        $result = Category::select('id', 'category as name', 'others', 'rfid')->find($inputData['id']);
+        $result = Category::select('id', 'name', 'others', 'rfid')->find($inputData['id']);
         $others = json_decode($result['others']);
         $result['position'] = $others != null ? $others->position : null;
         $result['salary'] = $others != null ? $others->salary : null;
         unset($result['others']);
         return response()->json(['status' => 200, 'data' => $result]);
     }
-    public function update(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function update(Request $request): JsonResponse
     {
         $requestData = $request->all();
         $validator = Validator::make($requestData, [
@@ -84,24 +100,22 @@ class EmployeeController extends Controller
         }
         $category = Category::find($requestData['id']);
         if (!$category instanceof Category) {
-            return response()->json(['status' => 500, 'error' => 'Cannot find employee.']);
-        }
-        $salaryExpense = Category::where('client_company_id', $requestData['session_user']['client_company_id'])->where('category', AccountCategory::SALARY_EXPENSE)->first();
-        if ($salaryExpense == null) {
-            return response()->json(['status' => 500, 'error' => 'Cannot find account salary expense group.']);
+            return response()->json(['status' => 400, 'message' => 'Cannot find [employee].']);
         }
         $others = [
             'position' => $requestData['position'] ?? null,
             'salary' => $requestData['salary'] ?? null,
         ];
-        $category->category = $requestData['name'];
-        $category->parent_category = $salaryExpense->id;
-        $category->rfid = $requestData['rfid'] ?? null;
-        $category->others = json_encode($others);
-        if ($category->save()) {
-            $category->updateCategory();
-            return response()->json(['status' => 200, 'message' => 'Successfully updated employee.']);
+        $categoryData = [
+            'name' => $requestData['name'],
+            'rfid' => $requestData['rfid'] ?? null,
+            'others' => json_encode($others)
+        ];
+        $updateCategory = CategoryRepository::updateCategory($category, $categoryData);
+        if (!$updateCategory instanceof Category) {
+            return response()->json(['status' => 400, 'message' => 'Cannot updated [employee].']);
         }
-        return response()->json(['status' => 500, 'errors' => 'Cannot updated employee.']);
+        $category->updateCategory();
+        return response()->json(['status' => 200, 'message' => 'Successfully updated employee.']);
     }
 }

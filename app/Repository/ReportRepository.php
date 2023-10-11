@@ -77,10 +77,10 @@ class ReportRepository
         $result['asset_balance']['bank'] = self::getAssetBalance($filter['date'], AccountCategory::BANK);
         return $result;
     }
-    public static function getAssetBalance($date, $accountCategoryId)
+    public static function getAssetBalance($date, $accountCategoryName)
     {
         $sessionUser = SessionUser::getUser();
-        $accountCategory = Category::select('id')->where('client_company_id', $sessionUser['client_company_id'])->where('category', $accountCategoryId)->first();
+        $accountCategory = Category::select('id')->where('client_company_id', $sessionUser['client_company_id'])->where('slug', strtolower($accountCategoryName))->first();
         $category = Category::select('id')->where('parent_category', $accountCategory->id)->get()->pluck('id')->toArray();
         $transaction = Transaction::select(DB::raw('SUM(debit_amount - credit_amount) as amount'), 'categories.category as category_name')
             ->where('transactions.client_company_id', $sessionUser['client_company_id'])
@@ -108,7 +108,7 @@ class ReportRepository
     public static function getDuePayments($date)
     {
         $sessionUser = SessionUser::getUser();
-        $accountPayable = Category::select('id')->where('client_company_id', $sessionUser['client_company_id'])->where('category', AccountCategory::ACCOUNT_PAYABLE)->first();
+        $accountPayable = Category::select('id')->where('client_company_id', $sessionUser['client_company_id'])->where('slug', strtolower(AccountCategory::ACCOUNT_PAYABLE))->first();
         $transaction = Transaction::select(DB::raw('SUM(credit_amount) as amount'), 'categories.category as category_name')
             ->where('transactions.client_company_id', $sessionUser['client_company_id'])
             ->leftJoin('categories', 'categories.id', 'transactions.linked_id')
@@ -124,7 +124,7 @@ class ReportRepository
     public static function getCostOfGoodSoldExpense($date)
     {
         $sessionUser = SessionUser::getUser();
-        $costOfGoodSoldCategory = Category::select('id')->where('client_company_id', $sessionUser['client_company_id'])->where('category', AccountCategory::COST_OF_GOOD_SOLD)->first();
+        $costOfGoodSoldCategory = Category::select('id')->where('client_company_id', $sessionUser['client_company_id'])->where('slug', strtolower(AccountCategory::COST_OF_GOOD_SOLD))->first();
         $transaction = Transaction::select(DB::raw('SUM(debit_amount) as amount'), 'categories.category as category_name')
             ->where('transactions.client_company_id', $sessionUser['client_company_id'])
             ->leftJoin('categories', 'categories.id', 'transactions.linked_id')
@@ -139,7 +139,7 @@ class ReportRepository
     public static function getSalaryExpense($date)
     {
         $sessionUser = SessionUser::getUser();
-        $salaryExpense = Category::select('id')->where('client_company_id', $sessionUser['client_company_id'])->where('category', AccountCategory::SALARY_EXPENSE)->first();
+        $salaryExpense = Category::select('id')->where('client_company_id', $sessionUser['client_company_id'])->where('slug', strtolower(AccountCategory::SALARY_EXPENSE))->first();
         $transaction = Transaction::where('transactions.client_company_id', $sessionUser['client_company_id'])
             ->leftJoin('categories', 'categories.id', 'transactions.linked_id')
             ->where('categories.parent_category', $salaryExpense->id)

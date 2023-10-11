@@ -51,7 +51,7 @@ class DashboardController extends Controller
     public static function getInvoiceAmount()
     {
         $sessionUser = SessionUser::getUser();
-        $queryResult = Invoice::select(DB::raw('SUM(invoices.amount - invoices.paid_amount) as amount'), 'categories.category as name')
+        $queryResult = Invoice::select(DB::raw('SUM(invoices.amount - invoices.paid_amount) as amount'), 'categories.name')
             ->leftJoin('categories', 'categories.id', '=', 'invoices.category_id')
             ->where('invoices.client_company_id', $sessionUser['client_company_id'])
             ->having('amount','>', 0)
@@ -72,8 +72,8 @@ class DashboardController extends Controller
     public static function getPayableAmount()
     {
         $sessionUser = SessionUser::getUser();
-        $payableCategory = Category::where('client_company_id', $sessionUser['client_company_id'])->where('category', AccountCategory::ACCOUNT_PAYABLE)->first();
-        $queryResult = Transaction::select('categories.category as name', DB::raw('SUM(debit_amount - credit_amount) as amount'))
+        $payableCategory = Category::where('client_company_id', $sessionUser['client_company_id'])->where('slug', strtolower(AccountCategory::ACCOUNT_PAYABLE))->first();
+        $queryResult = Transaction::select('categories.name', DB::raw('SUM(debit_amount - credit_amount) as amount'))
             ->leftJoin('categories', 'categories.id', '=', 'transactions.account_id')
             ->where('categories.parent_category', $payableCategory->id)
             ->where('transactions.client_company_id', $sessionUser['client_company_id'])

@@ -69,10 +69,10 @@ class BalanceSheetController extends Controller
     public static function getEquity($transactions)
     {
         $sessionUser = SessionUser::getUser();
-        $categories = Category::select('id', 'category', 'balance', 'parent_category', 'description', 'category_ids', 'type')
+        $categories = Category::select('id', 'name', 'balance', 'parent_category', 'description', 'category_ids', 'type')
             ->where('client_company_id', $sessionUser['client_company_id'])
             ->with(['children' => function($q) {
-                $q->select('id', 'category', 'parent_category', 'balance', 'description', 'category_ids', 'type');
+                $q->select('id', 'name', 'parent_category', 'balance', 'description', 'category_ids', 'type');
             }])
             ->where('type', 'equity')
             ->whereNull('parent_category')
@@ -83,10 +83,10 @@ class BalanceSheetController extends Controller
     public static function getAssets($transactions)
     {
         $sessionUser = SessionUser::getUser();
-        $categories = Category::select('id', 'category', 'balance', 'parent_category', 'description', 'category_ids', 'type')
+        $categories = Category::select('id', 'name', 'balance', 'parent_category', 'description', 'category_ids', 'type')
             ->where('client_company_id', $sessionUser['client_company_id'])
             ->with(['children' => function($q) {
-                $q->select('id', 'category', 'parent_category', 'balance', 'description', 'category_ids', 'type');
+                $q->select('id', 'name', 'parent_category', 'balance', 'description', 'category_ids', 'type');
             }])
             ->where('type', 'assets')
             ->whereNull('parent_category')
@@ -97,10 +97,10 @@ class BalanceSheetController extends Controller
     public static function getLiabilities($transactions)
     {
         $sessionUser = SessionUser::getUser();
-        $categories = Category::select('id', 'category', 'balance', 'parent_category', 'description', 'category_ids', 'type')
+        $categories = Category::select('id', 'name', 'balance', 'parent_category', 'description', 'category_ids', 'type')
             ->where('client_company_id', $sessionUser['client_company_id'])
             ->with(['children' => function($q) {
-                $q->select('id', 'category', 'parent_category', 'balance', 'description', 'category_ids', 'type');
+                $q->select('id', 'name', 'parent_category', 'balance', 'description', 'category_ids', 'type');
             }])
             ->where('type', 'liabilities')
             ->whereNull('parent_category')

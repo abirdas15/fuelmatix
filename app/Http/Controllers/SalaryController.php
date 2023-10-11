@@ -4,17 +4,25 @@ namespace App\Http\Controllers;
 
 use App\Common\AccountCategory;
 use App\Common\Module;
+use App\Helpers\Helpers;
 use App\Helpers\SessionUser;
 use App\Models\Category;
+use App\Models\ClientCompany;
 use App\Models\Transaction;
 use App\Repository\EmployeeRepository;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Rmunate\Utilities\SpellNumber;
 
 class SalaryController extends Controller
 {
-    public function searchEmployee(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function searchEmployee(Request $request): JsonResponse
     {
         $requestData = $request->all();
         $validator = Validator::make($requestData, [
@@ -42,7 +50,11 @@ class SalaryController extends Controller
         }
         return response()->json(['status' => 200, 'data' => $employees]);
     }
-    public function save(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function save(Request $request): JsonResponse
     {
         $requestData = $request->all();
         $validator = Validator::make($requestData, [
@@ -57,7 +69,7 @@ class SalaryController extends Controller
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
         $sessionUser = SessionUser::getUser();
-        $date = $requestData['year'].'-'.$requestData['month'].'-01';
+        $date = $requestData['year'].'-'.$requestData['month'].'-01 h:i:s';
         $employeeIds = array_column($requestData['employees'], 'id');
         Transaction::where('client_company_id', $sessionUser['client_company_id'])
             ->where('date', $date)
@@ -77,7 +89,11 @@ class SalaryController extends Controller
         }
         return response()->json(['status' => 200, 'message' => 'Successfully saved salary.']);
     }
-    public function list(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function list(Request $request): JsonResponse
     {
         $requestData = $request->all();
         $sessionUser = SessionUser::getUser();
@@ -89,12 +105,12 @@ class SalaryController extends Controller
         $year = $requestData['year'] ?? '';
         $salaryCategory = Category::select('id')
             ->where('client_company_id', $sessionUser['client_company_id'])
-            ->where('category', AccountCategory::SALARY_EXPENSE)
+            ->where('slug', strtolower(AccountCategory::SALARY_EXPENSE))
             ->first();
         if (!$salaryCategory instanceof Category) {
             return response()->json(['status' => 500, 'errors' => 'Can not find account salary category.']);
         }
-        $result = Transaction::select('transactions.id', 'transactions.debit_amount as amount', 'c.category as name', 'transactions.date', 'c1.category as payment_method')
+        $result = Transaction::select('transactions.id', 'transactions.debit_amount as amount', 'c.name', 'transactions.date', 'c1.name as payment_method')
             ->leftJoin('categories as c', 'c.id', '=', 'transactions.linked_id')
             ->leftJoin('categories as c1', 'c1.id', '=', 'transactions.account_id')
             ->where('c.parent_category', $salaryCategory->id)
@@ -111,8 +127,8 @@ class SalaryController extends Controller
         }
         if (!empty($keyword)) {
             $result->where(function($q) use ($keyword) {
-                $q->where('c.category', 'LIKE', '%'.$keyword.'%');
-                $q->orWhere('c1.category', 'LIKE', '%'.$keyword.'%');
+                $q->where('c.name', 'LIKE', '%'.$keyword.'%');
+                $q->orWhere('c1.name', 'LIKE', '%'.$keyword.'%');
             });
         }
         $result = $result->orderBy($orderBy, $orderMode)
@@ -122,21 +138,56 @@ class SalaryController extends Controller
         }
         return response()->json(['status' => 200, 'data' => $result]);
     }
-    public function getCategory(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function getCategory(Request $request): JsonResponse
     {
         $sessionUser = SessionUser::getUser();
         $cashInHand = Category::select('id')
-            ->where('category', AccountCategory::CASH_IM_HAND)
+            ->where('slug', strtolower(AccountCategory::CASH_IM_HAND))
             ->where('client_company_id', $sessionUser['client_company_id'])
             ->first();
         $bank = Category::select('id')
-            ->where('category', AccountCategory::BANK)
+            ->where('slug', strtolower(AccountCategory::BANK))
             ->where('client_company_id', $sessionUser['client_company_id'])
             ->first();
-        $result = Category::select('id', 'category as name')
+        $result = Category::select('id', 'name')
             ->whereIn('parent_category', [$bank->id, $cashInHand->id])
             ->get()
             ->toArray();
         return response()->json(['status' => 200, 'data' => $result]);
+    }
+
+    /**
+     * @param Request $request
+     * @return JsonResponse|string
+     */
+    public function print(Request $request)
+    {
+        $requestData = $request->all();
+        $validator = Validator::make($requestData, [
+            'id' => 'required|integer'
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['status' => 500, 'errors' => $validator->errors()]);
+        }
+        $sessionUser = SessionUser::getUser();
+        $result = Transaction::select('date', 'debit_amount as amount', 'c1.name as employee_name', 'c1.rfid as employee_id', 'c1.others', 'c2.name as bank_name')
+            ->leftJoin('categories as c1', 'c1.id', '=', 'transactions.linked_id')
+            ->leftJoin('categories as c2', 'c2.id', '=', 'transactions.account_id')
+            ->where('transactions.id', $requestData['id'])
+            ->first();
+        $result['others'] = json_decode($result['others']);
+        $result['amount_in_word'] = Helpers::convertNumberToWord($result['amount']);
+        $company = ClientCompany::find($sessionUser['client_company_id']);
+        $result['company_name'] = $company['name'];
+        $result['address'] = $company['address'];
+        $result['date'] = date('F Y', strtotime($result['date']));
+        $result['pay_date'] = date('d, F Y', strtotime($result['date']));
+        $result['position'] = $result['others']->position ?? '';
+        $pdf = Pdf::loadView('pdf.salary-report', ['data' => $result]);
+        return $pdf->output();
     }
 }

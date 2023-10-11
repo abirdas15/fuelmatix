@@ -41,7 +41,6 @@
                                                 <th class="text-white" @click="sortData('bank_name')" :class="sortClass('bank_name')">Bank</th>
                                                 <th class="text-white" @click="sortData('vendor_name')" :class="sortClass('vendor_name')">Vendor</th>
                                                 <th class="text-white" @click="sortData('amount')" :class="sortClass('amount')">Amount</th>
-                                                <th class="text-white" @click="sortData('quantity')" :class="sortClass('quantity')">Quantity</th>
                                                 <th class="text-white" >Action</th>
                                             </tr>
                                             </thead>
@@ -51,16 +50,15 @@
                                                 <td >{{f.bank_name}}</td>
                                                 <td >{{f.vendor_name}}</td>
                                                 <td >{{f.amount}}</td>
-                                                <td >{{f.quantity}}</td>
                                                 <td>
-                                                    <div class="d-flex justify-content-end">
-                                                        <router-link v-if="CheckPermission(Section.PAY_ORDER + '-' + Action.EDIT)" :to="{name: 'PayOrderEdit', params: { id: f.id }}" class=" btn btn-primary shadow btn-xs sharp me-1">
-                                                            <i class="fas fa-pencil-alt"></i>
-                                                        </router-link>
-                                                        <a v-if="CheckPermission(Section.PAY_ORDER + '-' + Action.DELETE)"  href="javascript:void(0)"  @click="openModalDelete(f)" class="btn btn-danger shadow btn-xs sharp">
-                                                            <i class="fa fa-trash"></i>
-                                                        </a>
-                                                    </div>
+<!--                                                    <div class="d-flex">-->
+<!--                                                        <router-link v-if="CheckPermission(Section.PAY_ORDER + '-' + Action.EDIT)" :to="{name: 'PayOrderEdit', params: { id: f.id }}" class=" btn btn-primary shadow btn-xs sharp me-1">-->
+<!--                                                            <i class="fas fa-pencil-alt"></i>-->
+<!--                                                        </router-link>-->
+<!--                                                        <a v-if="CheckPermission(Section.PAY_ORDER + '-' + Action.DELETE)"  href="javascript:void(0)"  @click="openModalDelete(f)" class="btn btn-danger shadow btn-xs sharp">-->
+<!--                                                            <i class="fa fa-trash"></i>-->
+<!--                                                        </a>-->
+<!--                                                    </div>-->
                                                 </td>
                                             </tr>
                                             </tbody>

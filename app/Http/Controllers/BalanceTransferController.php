@@ -31,7 +31,7 @@ class BalanceTransferController extends Controller
         }
         $sessionUser = SessionUser::getUser();
         $balanceTransfer = new BalanceTransfer();
-        $balanceTransfer->date = Carbon::now('UTC');
+        $balanceTransfer->date = date('Y-m-d');
         $balanceTransfer->from_category_id = $requestData['from_category_id'];
         $balanceTransfer->to_category_id = $requestData['to_category_id'];
         $balanceTransfer->amount = $requestData['amount'];

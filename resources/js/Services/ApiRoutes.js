@@ -116,6 +116,7 @@ const ApiRoutes = {
     PayOrderList: ApiVersion + '/pay/order/list',
     PayOrderSingle: ApiVersion + '/pay/order/single',
     PayOrderLatest: ApiVersion + '/pay/order/latest',
+    PayOrderQuantity: ApiVersion + '/pay/order/quantity',
     //sale
     SaleAdd: ApiVersion + '/sale/save',
     SaleEdit: ApiVersion + '/sale/update',
@@ -148,6 +149,7 @@ const ApiRoutes = {
     salaryDelete: ApiVersion + '/salary/delete',
     salaryList: ApiVersion + '/salary/list',
     salaryGetCategory: ApiVersion + '/salary/getCategory',
+    salaryPrint: ApiVersion + '/salary/print',
     //Company sale
     companySaleAdd: ApiVersion + '/companySale/save',
     companySaleEdit: ApiVersion + '/companySale/update',

@@ -51,7 +51,7 @@
                                                 <td >{{f.position}}</td>
                                                 <td >{{f.salary}}</td>
                                                 <td>
-                                                    <div class="d-flex justify-content-end">
+                                                    <div class="d-flex">
                                                         <router-link v-if="CheckPermission(Section.EMPLOYEE + '-' + Action.EDIT)"  :to="{name: 'employeeEdit', params: { id: f.id }}" class=" btn btn-primary shadow btn-xs sharp me-1">
                                                             <i class="fas fa-pencil-alt"></i>
                                                         </router-link>

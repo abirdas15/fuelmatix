@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="d-flex align-items-center justify-content-between ">
-            <div>{{ node.category }}</div>
+            <div>{{ node.name }}</div>
             <div>
                 <span v-if="node.balance < 0" class="text-danger">({{formatPrice(Math.abs(node.balance))}})</span>
                 <span v-else>{{formatPrice(node.balance)}}</span>

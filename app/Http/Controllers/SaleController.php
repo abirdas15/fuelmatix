@@ -311,12 +311,12 @@ class SaleController extends Controller
     {
         $requestData = $request->all();
         $sessionUser = SessionUser::getUser();
-        $accountReceivable = Category::where('client_company_id', $sessionUser['client_company_id'])->where('category', AccountCategory::ACCOUNT_RECEIVABLE)->first();
+        $accountReceivable = Category::where('client_company_id', $sessionUser['client_company_id'])->where('slug', strtolower( AccountCategory::ACCOUNT_RECEIVABLE))->first();
         $limit = $requestData['limit'] ?? 10;
         $orderBy = $requestData['order_by'] ?? 'transactions.id';
         $orderMode = $requestData['order_mode'] ?? 'DESC';
         $keyword = $requestData['keyword'] ?? '';
-        $result = Transaction::select('transactions.id', 'invoice_item.invoice_id',  DB::raw("SUM(transactions.debit_amount) as amount"), 'transactions.date', 'transactions.description', 'categories.category as name', 'transactions.module', 'transactions.module_id', 'transactions.linked_id as category_id')
+        $result = Transaction::select('transactions.id', 'invoice_item.invoice_id',  DB::raw("SUM(transactions.debit_amount) as amount"), 'transactions.date', 'transactions.description', 'categories.name', 'transactions.module', 'transactions.module_id', 'transactions.linked_id as category_id')
             ->leftJoin('categories', 'categories.id', '=', 'transactions.linked_id')
             ->leftJoin('invoice_item', 'invoice_item.transaction_id', 'transactions.id')
             ->where('categories.parent_category', $accountReceivable->id)
@@ -325,7 +325,7 @@ class SaleController extends Controller
             ->groupBy(DB::raw('invoice_item.invoice_id  , CASE WHEN invoice_item.invoice_id IS NULL THEN transactions.module_id ELSE 0 END'));
         if (!empty($keyword)) {
             $result->where(function($q) use ($keyword) {
-                $q->where('categories.category', 'LIKE', '%'.$keyword.'%');
+                $q->where('categories.name', 'LIKE', '%'.$keyword.'%');
             });
         }
         $result = $result->orderBy($orderBy, $orderMode)

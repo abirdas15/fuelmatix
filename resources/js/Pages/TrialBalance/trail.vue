@@ -21,7 +21,7 @@
                         </thead>
                         <tbody>
                         <tr v-for="data in balance">
-                            <td class="border-0">{{data.category}}</td>
+                            <td class="border-0">{{data.name}}</td>
                             <td class="text-end border-0">{{data.debit_amount}}</td>
                             <td class="text-end border-0">{{data.credit_amount}}</td>
                         </tr>

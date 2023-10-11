@@ -23,23 +23,24 @@ class CategoryRepository
 
     /**
      * @param array $data
-     * @param string $categoryId
+     * @param int $categoryId
      * @param string|null $module
      * @return Category|false
      */
-    public static function saveCategory(array $data, string $categoryId, string $module = null)
+    public static function saveCategory(array $data, int $categoryId, string $module = null)
     {
         $sessionUser = SessionUser::getUser();
         $category = Category::where('id', $categoryId)
             ->where('client_company_id', $sessionUser['client_company_id'])
             ->first();
         $categoryModel = new Category();
-        $categoryModel->category = $data['name'];
+        $categoryModel->name = $data['name'];
         $categoryModel->parent_category = $category['id'];
         $categoryModel->type = $category['type'];
         $categoryModel->module = $module;
         $categoryModel->module_id = $data['module_id'] ?? null;
         $categoryModel->others = $data['others'] ?? null;
+        $categoryModel->rfid = $data['rfid'] ?? null;
         $categoryModel->credit_limit = $data['credit_limit'] ?? null;
         $categoryModel->client_company_id = $sessionUser['client_company_id'];
         if (!$categoryModel->save()) {
@@ -56,7 +57,7 @@ class CategoryRepository
      */
     public static function updateCategory(Category $category, array $data)
     {
-        $category->category = $data['name'];
+        $category->name = $data['name'];
         $category->others = $data['others'] ?? null;
         $category->credit_limit = $data['credit_limit'] ?? null;
         $category->module_id = $data['module_id'] ?? $category['module_id'];

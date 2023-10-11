@@ -34,7 +34,7 @@
                     <br>
                     <strong class="text-success">Operating Expenses</strong>
                     <div class="d-flex align-items-center justify-content-between line" v-for="expense in balance.operating_expenses">
-                        <div>{{ expense.category }}</div>
+                        <div>{{ expense.name }}</div>
                         <div>
                             <span v-if="expense.balance < 0" class="text-danger">({{formatPrice(Math.abs(expense.balance))}})</span>
                             <span v-else>{{formatPrice(expense.balance)}}</span>

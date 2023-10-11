@@ -26,10 +26,10 @@ class CategoryController extends Controller
             ->groupBy('account_id')
             ->get()
             ->toArray();
-        $categories = Category::select('id', 'category', 'balance', 'parent_category', 'description', 'category_ids', 'type')
+        $categories = Category::select('id', 'name', 'balance', 'parent_category', 'description', 'category_ids', 'type')
             ->where('client_company_id', $inputData['session_user']['client_company_id'])
             ->with(['children' => function($q) {
-                $q->select('id', 'category', 'parent_category', 'balance', 'description', 'category_ids', 'type');
+                $q->select('id', 'name', 'parent_category', 'balance', 'description', 'category_ids', 'type');
             }])
             ->whereNull('parent_category')
             ->get()
@@ -89,11 +89,11 @@ class CategoryController extends Controller
             ->toArray();
         foreach ($result as &$data) {
             $category = json_decode($data['category_hericy']);
-            $data['category'] = implode(' --> ', $category);
+            $data['name'] = implode(' --> ', $category);
             unset($data['category_hericy']);
         }
         usort($result, function ($item1, $item2) {
-            return $item1['category'] <=> $item2['category'];
+            return $item1['name'] <=> $item2['name'];
         });
         return response()->json(['status' => 200, 'data' => $result]);
     }
@@ -106,14 +106,14 @@ class CategoryController extends Controller
     {
         $inputData = $request->all();
         $validator = Validator::make($inputData, [
-            'category' => 'required|string',
+            'name' => 'required|string',
             'type' => 'required|string'
         ]);
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
         $category = new Category();
-        $category->category = $inputData['category'];
+        $category->name = $inputData['name'];
         $category->code = $inputData['code'] ?? null;
         $category->parent_category = !empty($inputData['parent_category']) ? $inputData['parent_category'] : null;
         $category->type = $inputData['type'];
@@ -138,7 +138,7 @@ class CategoryController extends Controller
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
-        $result = Category::select('id', 'category', 'code', 'parent_category', 'type', 'description', 'account_category')
+        $result = Category::select('id', 'name', 'code', 'parent_category', 'type', 'description', 'account_category')
             ->where('id', $inputData['id'])
             ->first();
         return response()->json(['status' => 200, 'data' => $result]);
@@ -152,7 +152,7 @@ class CategoryController extends Controller
         $inputData = $request->all();
         $validator = Validator::make($inputData, [
             'id' => 'required|integer',
-            'category' => 'required|string',
+            'name' => 'required|string',
             'type' => 'required|string'
         ]);
         if ($validator->fails()) {
@@ -162,7 +162,7 @@ class CategoryController extends Controller
         if ($category instanceof Category) {
             return response()->json(['status' => 400, 'message' => 'Cannot find [category].']);
         }
-        $category->category = $inputData['category'];
+        $category->name = $inputData['name'];
         $category->code = $inputData['code'] ?? null;
         $category->parent_category = !empty($inputData['parent_category']) ? $inputData['parent_category'] : null;
         $category->type = $inputData['type'];
