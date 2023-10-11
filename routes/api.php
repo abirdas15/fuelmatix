@@ -37,6 +37,7 @@ use App\Http\Controllers\VoucherController;
 use App\Http\Controllers\DriverController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\FuelAdjustmentController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -149,6 +150,7 @@ Route::group(['middleware' => 'AuthReqCheck'], function() {
         Route::post('update', [TankController::class, 'update']);
         Route::post('delete', [TankController::class, 'delete']);
         Route::post('get/nozzle', [TankController::class, 'getNozzle']);
+        Route::post('byProduct', [TankController::class, 'getTankByProduct']);
         Route::group(['prefix' => 'reading'], function() {
             Route::post('save', [TankController::class, 'readingSave']);
             Route::post('list', [TankController::class, 'readingList']);
@@ -287,6 +289,9 @@ Route::group(['middleware' => 'AuthReqCheck'], function() {
     });
     Route::group(['prefix' => 'permission'], function() {
         Route::post('list', [PermissionController::class, 'getAllPermission']);
+    });
+    Route::group(['prefix' => 'fuelAdjustment'], function() {
+        Route::post('save', [FuelAdjustmentController::class, 'save']);
     });
 });
 
