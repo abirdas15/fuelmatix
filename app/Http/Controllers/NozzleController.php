@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Nozzle;
 use App\Models\NozzleReading;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -31,13 +32,18 @@ class NozzleController extends Controller
         }
         return response()->json(['status' => 500, 'error' => 'Cannot save nozzle.']);
     }
-    public function list(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function list(Request $request): JsonResponse
     {
         $inputData = $request->all();
-        $limit = isset($inputData['limit']) ? $inputData['limit'] : 10;
-        $keyword = isset($inputData['keyword']) ? $inputData['keyword'] : '';
-        $order_by = isset($inputData['order_by']) ? $inputData['order_by'] : 'id';
-        $order_mode = isset($inputData['order_mode']) ? $inputData['order_mode'] : 'DESC';
+        $limit = $inputData['limit'] ?? 10;
+        $keyword = $inputData['keyword'] ?? '';
+        $order_by = $inputData['order_by'] ?? 'id';
+        $order_mode = $inputData['order_mode'] ?? 'DESC';
+        $product_id = $request['product_id'] ?? '';
         $result = Nozzle::select('nozzles.id', 'nozzles.name', 'dispensers.dispenser_name')
             ->leftJoin('dispensers', 'dispensers.id', '=', 'nozzles.dispenser_id')
             ->where('nozzles.client_company_id', $inputData['session_user']['client_company_id']);
@@ -45,6 +51,11 @@ class NozzleController extends Controller
             $result->where(function($q) use ($keyword) {
                 $q->where('nozzles.name', 'LIKE', '%'.$keyword.'%');
                 $q->orWhere('dispensers.dispenser_name', 'LIKE', '%'.$keyword.'%');
+            });
+        }
+        if (!empty($product_id)) {
+            $result->where(function($q) use ($product_id) {
+                $q->where('dispensers.product_id', $product_id);
             });
         }
         $result = $result->orderBy($order_by, $order_mode)
