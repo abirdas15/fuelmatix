@@ -292,6 +292,7 @@ Route::group(['middleware' => 'AuthReqCheck'], function() {
     });
     Route::group(['prefix' => 'fuelAdjustment'], function() {
         Route::post('save', [FuelAdjustmentController::class, 'save']);
+        Route::post('list', [FuelAdjustmentController::class, 'list']);
     });
 });
 
