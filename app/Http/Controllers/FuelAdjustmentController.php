@@ -10,6 +10,7 @@ use App\Models\FuelAdjustment;
 use App\Models\FuelAdjustmentData;
 use App\Models\Product;
 use App\Repository\CategoryRepository;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -65,6 +66,9 @@ class FuelAdjustmentController extends Controller
             return response()->json(['status' => 400, 'message' => 'Cannot find [stock] category.'], 422);
         }
         $stockProduct = Category::where('parent_category', $stockCategory['id'])->where('module', Module::PRODUCT)->where('module_id', $product['id'])->first();
+        if (!$stockProduct instanceof Category) {
+            $stockProduct = CategoryRepository::saveCategory($categoryData, $stockCategory['id'], Module::PRODUCT);
+        }
 
         $fuelAdjustmentModel = new FuelAdjustment();
         $fuelAdjustmentModel->product_id = $requestData['product_id'];
@@ -104,5 +108,22 @@ class FuelAdjustmentController extends Controller
         $transactionData['linked_id'] = $categoryId;
         TransactionController::saveTransaction($transactionData);
         return response()->json(['status' => 200, 'message' => 'Successfully save fuel adjustment.']);
+    }
+
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function list(Request $request): JsonResponse
+    {
+        $requestData = $request->all();
+        $limit = $requestData['limit'] ?? 10;
+        $sessionUser = SessionUser::getUser();
+        $result = FuelAdjustment::select('fuel_adjustment.id', 'fuel_adjustment.purpose', 'fuel_adjustment.loss_quantity', 'fuel_adjustment.loss_amount', 'products.name')
+            ->leftJoin('products', 'products.id', '=', 'fuel_adjustment.product_id')
+            ->where('fuel_adjustment.client_company_id', $sessionUser['client_company_id'])
+            ->orderBy('id', 'DESC')
+            ->paginate($limit);
+        return response()->json(['status' => 200, 'data' => $result]);
     }
 }
