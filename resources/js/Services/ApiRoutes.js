@@ -84,6 +84,7 @@ const ApiRoutes = {
     TankList: ApiVersion + '/tank/list',
     TankSingle: ApiVersion + '/tank/single',
     TankGetNozzle: ApiVersion + '/tank/get/nozzle',
+    TankByProduct: ApiVersion + '/tank/byProduct',
     //Tank Reading
     TankReadingAdd: ApiVersion + '/tank/reading/save',
     TankReadingEdit: ApiVersion + '/tank/reading/update',
@@ -208,6 +209,7 @@ const ApiRoutes = {
     RoleDelete: ApiVersion + '/role/delete',
 
     PermissionList: ApiVersion + '/permission/list',
+    FuelAdjustment: ApiVersion + '/fuelAdjustment/save',
 };
 
 export default ApiRoutes;

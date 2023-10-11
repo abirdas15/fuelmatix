@@ -7322,9 +7322,13 @@ __webpack_require__.r(__webpack_exports__);
       param: {
         purpose: '',
         product_id: '',
-        loss: '',
-        nozzle: [],
-        tank: {}
+        loss_quantity: '',
+        nozzles: [],
+        tank: {
+          id: '',
+          name: '',
+          quantity: ''
+        }
       },
       listParam: {
         limit: 5000,
@@ -7341,8 +7345,17 @@ __webpack_require__.r(__webpack_exports__);
     }
   },
   methods: {
-    getName: function getName() {
-      return 'Profit';
+    calculateLoss: function calculateLoss() {
+      var plus = 0;
+      this.param.nozzles.map(function (v) {
+        plus += parseInt(v.quantity);
+      });
+      console.log(this.param.tank.quantity);
+      if (!isNaN(parseInt(plus) - parseInt(this.param.tank.quantity))) {
+        this.param.loss_quantity = parseInt(plus) - parseInt(this.param.tank.quantity);
+      } else {
+        this.param.loss_quantity = plus;
+      }
     },
     getProduct: function getProduct() {
       var _this = this;
@@ -7361,9 +7374,9 @@ __webpack_require__.r(__webpack_exports__);
       }, function (res) {
         if (parseInt(res.status) === 200) {
           res.data.data.map(function (v) {
-            _this2.param.nozzle.push({
+            _this2.param.nozzles.push({
               id: v.id,
-              quantity: '',
+              quantity: 0,
               name: v.name
             });
           });
@@ -7372,15 +7385,13 @@ __webpack_require__.r(__webpack_exports__);
     },
     getTank: function getTank() {
       var _this3 = this;
-      _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].TankList, {
-        limit: 5000,
-        page: 1,
+      _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].TankByProduct, {
         product_id: this.param.product_id
       }, function (res) {
         if (parseInt(res.status) === 200) {
           _this3.param.tank.id = res.data.id;
-          _this3.param.tank.quantity = res.data.quantity;
-          _this3.param.tank.name = res.data.name;
+          _this3.param.tank.quantity = 0;
+          _this3.param.tank.name = res.data.tank_name;
         }
       });
     },
@@ -7388,7 +7399,7 @@ __webpack_require__.r(__webpack_exports__);
       var _this4 = this;
       _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].ClearErrorHandler();
       this.loading = true;
-      _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].BankAdd, this.param, function (res) {
+      _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].FuelAdjustment, this.param, function (res) {
         _this4.loading = false;
         if (parseInt(res.status) === 200) {} else {
           _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].ErrorHandler(res.errors);
@@ -24828,7 +24839,7 @@ var render = function render() {
     staticClass: "form-control",
     attrs: {
       type: "text",
-      name: "name"
+      name: "purpose"
     },
     domProps: {
       value: _vm.param.purpose
@@ -24855,6 +24866,9 @@ var render = function render() {
       expression: "param.product_id"
     }],
     staticClass: "form-control form-select",
+    attrs: {
+      name: "product_id"
+    },
     on: {
       change: function change($event) {
         var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
@@ -24874,8 +24888,8 @@ var render = function render() {
     }, [_vm._v(_vm._s(p.name))]);
   }), 0), _vm._v(" "), _c("div", {
     staticClass: "invalid-feedback"
-  })])]), _vm._v(" "), _vm.param.nozzle.length > 0 ? _c("h5", [_vm._v("Out")]) : _vm._e(), _vm._v(" "), _vm._l(_vm.param.nozzle, function (n) {
-    return _vm.param.nozzle.length > 0 ? _c("div", {
+  })])]), _vm._v(" "), _vm.param.nozzles.length > 0 ? _c("h5", [_vm._v("Out")]) : _vm._e(), _vm._v(" "), _vm._l(_vm.param.nozzles, function (n) {
+    return _vm.param.nozzles.length > 0 ? _c("div", {
       staticClass: "row mb-3"
     }, [_c("label", {
       staticClass: "col-sm-3 col-form-label"
@@ -24890,21 +24904,23 @@ var render = function render() {
       }],
       staticClass: "form-control",
       attrs: {
-        type: "text"
+        type: "number"
       },
       domProps: {
         value: n.quantity
       },
       on: {
-        input: function input($event) {
+        input: [function ($event) {
           if ($event.target.composing) return;
           _vm.$set(n, "quantity", $event.target.value);
-        }
+        }, function ($event) {
+          return _vm.calculateLoss();
+        }]
       }
     }), _vm._v(" "), _c("div", {
       staticClass: "invalid-feedback"
     })])]) : _vm._e();
-  }), _vm._v(" "), _vm.param.tank.id != undefined ? _c("h5", [_vm._v("In")]) : _vm._e(), _vm._v(" "), _vm.param.tank.id != undefined ? _c("div", {
+  }), _vm._v(" "), _vm.param.tank.id != "" ? [_c("h5", [_vm._v("In")]), _vm._v(" "), _c("div", {
     staticClass: "row mb-3"
   }, [_c("label", {
     staticClass: "col-sm-3 col-form-label"
@@ -24919,20 +24935,22 @@ var render = function render() {
     }],
     staticClass: "form-control",
     attrs: {
-      type: "text"
+      type: "number"
     },
     domProps: {
       value: _vm.param.tank.quantity
     },
     on: {
-      input: function input($event) {
+      input: [function ($event) {
         if ($event.target.composing) return;
         _vm.$set(_vm.param.tank, "quantity", $event.target.value);
-      }
+      }, function ($event) {
+        return _vm.calculateLoss();
+      }]
     }
   }), _vm._v(" "), _c("div", {
     staticClass: "invalid-feedback"
-  })])]) : _vm._e(), _vm._v(" "), _c("hr"), _vm._v(" "), _c("div", {
+  })])])] : _vm._e(), _vm._v(" "), _c("hr"), _vm._v(" "), _c("div", {
     staticClass: "row mb-3"
   }, [_c("label", {
     staticClass: "col-sm-3 col-form-label"
@@ -24942,21 +24960,22 @@ var render = function render() {
     directives: [{
       name: "model",
       rawName: "v-model",
-      value: _vm.param.loss,
-      expression: "param.loss"
+      value: _vm.param.loss_quantity,
+      expression: "param.loss_quantity"
     }],
     staticClass: "form-control",
     attrs: {
       type: "text",
+      name: "loss_quantity",
       disabled: ""
     },
     domProps: {
-      value: _vm.param.loss
+      value: _vm.param.loss_quantity
     },
     on: {
       input: function input($event) {
         if ($event.target.composing) return;
-        _vm.$set(_vm.param, "loss", $event.target.value);
+        _vm.$set(_vm.param, "loss_quantity", $event.target.value);
       }
     }
   }), _vm._v(" "), _c("div", {
@@ -24967,7 +24986,7 @@ var render = function render() {
       "text-align": "right"
     }
   }, [_c("div", {
-    staticClass: "mb-3 col-md-6"
+    staticClass: "mb-3 col-md-10"
   }, [!_vm.loading ? _c("button", {
     staticClass: "btn btn-primary",
     attrs: {
@@ -96601,6 +96620,7 @@ var ApiRoutes = {
   TankList: ApiVersion + '/tank/list',
   TankSingle: ApiVersion + '/tank/single',
   TankGetNozzle: ApiVersion + '/tank/get/nozzle',
+  TankByProduct: ApiVersion + '/tank/byProduct',
   //Tank Reading
   TankReadingAdd: ApiVersion + '/tank/reading/save',
   TankReadingEdit: ApiVersion + '/tank/reading/update',
@@ -96720,7 +96740,8 @@ var ApiRoutes = {
   RoleSingle: ApiVersion + '/role/single',
   RoleUpdate: ApiVersion + '/role/update',
   RoleDelete: ApiVersion + '/role/delete',
-  PermissionList: ApiVersion + '/permission/list'
+  PermissionList: ApiVersion + '/permission/list',
+  FuelAdjustment: ApiVersion + '/fuelAdjustment/save'
 };
 /* harmony default export */ __webpack_exports__["default"] = (ApiRoutes);
 
