@@ -89,6 +89,7 @@ import Driver from "../Pages/Driver/Driver.vue";
 import Role from "../Pages/Role/Role.vue";
 import createRole from "../Pages/Role/Create.vue";
 import roleEdit from "../Pages/Role/Edit.vue";
+import fuelAdjustment from "../Pages/FuelAdjustment/Adjustment.vue";
 
 const ROOT_URL = "";
 const router = new VueRouter({
@@ -493,6 +494,9 @@ const router = new VueRouter({
                     path: ROOT_URL + "/role/edit/:id", name: "roleEdit", component: roleEdit,  beforeEnter: (to, from, next) => {
                         CheckPermission(to, from, next, Section.ROLE + '-' + Action.EDIT)
                     },
+                },
+                {
+                    path: ROOT_URL + "/fuel/adjustment", name: "fuelAdjustment", component: fuelAdjustment,
                 },
             ],
         },

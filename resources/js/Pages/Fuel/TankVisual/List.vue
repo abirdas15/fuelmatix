@@ -221,7 +221,7 @@ export default {
             right: 0;
             background-color: #a6a6a6;
             height: 3px;
-            z-index: 99;
+            z-index: 2;
             &.r-1{
                 width: 30px;
             }
