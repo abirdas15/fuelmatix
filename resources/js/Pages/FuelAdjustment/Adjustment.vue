@@ -18,53 +18,61 @@
                         <div class="basic-form">
                             <form @submit.prevent="save">
                                 <div class="row">
-                                    <div class="row mb-3">
-                                        <label class="col-sm-3 col-form-label">Purpose</label>
-                                        <div class="col-sm-7 form-group">
+                                    <div class="col-sm-6">
+                                        <div class="form-group mb-3">
+                                            <label class="">Purpose</label>
                                             <input type="text" class="form-control" name="purpose" v-model="param.purpose">
                                             <div class="invalid-feedback"></div>
                                         </div>
 
                                     </div>
-
-                                    <div class="row mb-3">
-                                        <label  class="col-sm-3 col-form-label">Product</label>
-                                        <div class="col-sm-7 form-group">
+                                    <div class="col-sm-6">
+                                        <div class="row form-group mb-3">
+                                            <label >Product</label>
                                             <select class="form-control form-select" name="product_id" v-model="param.product_id">
                                                 <option v-for="p in products" :value="p.id">{{p.name}}</option>
                                             </select>
                                             <div class="invalid-feedback"></div>
                                         </div>
                                     </div>
-                                    <h5 v-if="param.nozzles.length > 0">Out</h5>
-                                    <div v-if="param.nozzles.length > 0" class="row mb-3" v-for="n in param.nozzles">
-                                        <label  class="col-sm-3 col-form-label">{{n.name}}</label>
-                                        <div class="col-sm-7 form-group">
-                                            <input type="number" class="form-control" v-model="n.quantity" @input="calculateLoss()">
-                                            <div class="invalid-feedback"></div>
-                                        </div>
-                                    </div>
-                                    <template v-if="param.tank.id != ''">
-                                        <h5>In</h5>
-                                        <div class="row mb-3">
-                                            <label  class="col-sm-3 col-form-label">{{param.tank.name}}</label>
-                                            <div class="col-sm-7 form-group">
-                                                <input type="number" class="form-control" v-model="param.tank.quantity"  @input="calculateLoss()">
-                                                <div class="invalid-feedback"></div>
+                                    <div class="row justify-content-between">
+                                        <div class="col-sm-6 box-mula" style="width:49%" v-if="param.nozzles.length > 0">
+                                            <div class="" >
+                                                <h5 class="putkir-futa">Out</h5>
+                                                <div class="row mb-3" v-for="n in param.nozzles">
+                                                    <label  class="col-sm-3 col-form-label">{{n.name}}</label>
+                                                    <div class="col-sm-7 form-group">
+                                                        <input type="number" class="form-control" v-model="n.quantity" @input="calculateLoss()">
+                                                        <div class="invalid-feedback"></div>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
-                                    </template>
+                                        <div class="col-sm-6 box-mula" style="width:49%" v-if="param.tank.id != ''">
+                                            <div class="" >
+                                                <h5 class="putkir-futa">In</h5>
+                                                <div class="row mb-3">
+                                                    <label  class="col-sm-3 col-form-label">{{param.tank.name}}</label>
+                                                    <div class="col-sm-7 form-group">
+                                                        <input type="number" class="form-control" v-model="param.tank.quantity"  @input="calculateLoss()">
+                                                        <div class="invalid-feedback"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                     <hr>
                                     <div class="row mb-3">
                                         <label  class="col-sm-3 col-form-label">Loss</label>
-                                        <div class="col-sm-7 form-group">
+                                        <div class="col-sm-9 form-group">
                                             <input type="text" class="form-control" name="loss_quantity" disabled v-model="param.loss_quantity">
                                             <div class="invalid-feedback"></div>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="row" style="text-align: right;">
-                                    <div class="mb-3 col-md-10">
+                                    <div class="mb-3 col-md-12">
                                         <button type="submit" class="btn btn-primary" v-if="!loading">Submit</button>
                                         <button type="button" class="btn btn-primary" v-if="loading">Submitting...</button>
                                         <router-link :to="{name: 'Bank'}" type="button" class="btn btn-primary">Cancel</router-link>
@@ -155,7 +163,9 @@ export default {
             ApiService.POST(ApiRoutes.FuelAdjustment, this.param,res => {
                 this.loading = false
                 if (parseInt(res.status) === 200) {
-
+                    this.$router.push({
+                        name: 'adjustment'
+                    })
                 } else {
                     ApiService.ErrorHandler(res.errors);
                 }
@@ -172,5 +182,16 @@ export default {
 </script>
 
 <style scoped>
-
+.box-mula{
+    padding: 10px 30px;
+    box-shadow: 0 0 15px 0 #CBC9C8;
+    border-radius: 12px;
+    margin-bottom: 30px;
+    margin-top: 10px;
+}
+.putkir-futa{
+    border-bottom: 1px solid #c1c1c1;
+    margin: 10px 0px 15px 0px;
+    padding-bottom: 11px;
+}
 </style>

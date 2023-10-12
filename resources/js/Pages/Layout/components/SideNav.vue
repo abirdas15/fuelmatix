@@ -79,7 +79,7 @@
                         <li v-if="CheckPermission(Section.SYSTEM_SETTING + '-' + Action.VIEW)"><router-link :to="{name: 'system'}">System setting</router-link></li>
                         <li v-if="CheckPermission(Section.VOUCHER + '-' + Action.VIEW)"><router-link :to="{name: 'voucher'}">Voucher</router-link></li>
                         <li v-if="CheckPermission(Section.DRIVER + '-' + Action.VIEW)"><router-link :to="{name: 'driver'}">Driver</router-link></li>
-                        <li><router-link :to="{name: 'fuelAdjustment'}">Fuel Adjustment</router-link></li>
+                        <li><router-link :to="{name: 'adjustment'}">Fuel Adjustment</router-link></li>
                     </ul>
                 </li>
                 <li><a class="has-arrow " href="javascript:void(0)" aria-expanded="false">

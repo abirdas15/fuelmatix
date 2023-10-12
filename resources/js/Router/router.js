@@ -90,6 +90,7 @@ import Role from "../Pages/Role/Role.vue";
 import createRole from "../Pages/Role/Create.vue";
 import roleEdit from "../Pages/Role/Edit.vue";
 import fuelAdjustment from "../Pages/FuelAdjustment/Adjustment.vue";
+import fuelAdjustmentList from "../Pages/FuelAdjustment/List.vue";
 
 const ROOT_URL = "";
 const router = new VueRouter({
@@ -496,8 +497,11 @@ const router = new VueRouter({
                     },
                 },
                 {
-                    path: ROOT_URL + "/fuel/adjustment", name: "fuelAdjustment", component: fuelAdjustment,
+                    path: ROOT_URL + "/fuel/adjustment/add", name: "fuelAdjustment", component: fuelAdjustment,
                 },
+                {
+                    path: ROOT_URL + "/fuel/adjustment/list", name: "adjustment", component: fuelAdjustmentList,
+                }
             ],
         },
     ],

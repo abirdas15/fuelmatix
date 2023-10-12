@@ -209,7 +209,9 @@ const ApiRoutes = {
     RoleDelete: ApiVersion + '/role/delete',
 
     PermissionList: ApiVersion + '/permission/list',
+    //Adjustment
     FuelAdjustment: ApiVersion + '/fuelAdjustment/save',
+    FuelAdjustmentList: ApiVersion + '/fuelAdjustment/list',
 };
 
 export default ApiRoutes;
