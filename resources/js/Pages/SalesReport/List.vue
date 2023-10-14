@@ -17,21 +17,22 @@
                             <div class="row align-items-end">
                                 <div class="col-xl-3 mb-3">
                                     <div class="example">
-                                        <p class="mb-1">Select Product </p>
-                                        <select class="me-sm-2 form-control wide" id="inlineFormCustomSelect" v-model="Param.type_id">
-                                            <option value="">Select Type</option>
-                                            <option v-for="t of productType" :value="t.id">{{t.name}}</option>
-                                        </select>
+                                        <p class="mb-1">Select Date Range </p>
+                                        <input type="text" class="date form-control bg-white">
                                     </div>
                                 </div>
                                 <div class="col-xl-3 mb-3">
                                     <div class="example">
-                                        <p class="mb-1">Select Date Range </p>
-                                        <input type="text" class="date form-control m-auto w-15" placeholder="Date">
+                                        <p class="mb-1">Select Product </p>
+                                        <select class="me-sm-2 form-control wide" id="inlineFormCustomSelect" v-model="Param.type_id">
+                                            <option value="">Select Type</option>
+                                            <option v-for="t of products" :value="t.id">{{t.name}}</option>
+                                        </select>
                                     </div>
                                 </div>
+
                                 <div class="col-xl-3 mb-3">
-                                    <button type="button" class="btn btn-rounded btn-white border" @click="list"><span
+                                    <button type="button" class="btn btn-rounded btn-white border" @click="getSalesReport"><span
                                         class="btn-icon-start text-info"><i class="fa fa-filter color-white"></i>
 											</span>Filter</button>
 
@@ -42,7 +43,7 @@
                                     <div class="dataTables_wrapper no-footer">
                                         <div class="dataTables_length">
                                             <label class="d-flex align-items-center">Show
-                                                <select class="mx-2"  v-model="Param.limit" @change="list">
+                                                <select class="mx-2"  v-model="Param.limit" @change="getSalesReport">
                                                     <option value="10">10</option>
                                                     <option value="25">25</option>
                                                     <option value="50">50</option>
@@ -60,32 +61,15 @@
                                             <thead>
                                             <tr class="text-white" style="background-color: #4886EE;color:#ffffff">
                                                 <th class="text-white" @click="sortData('name')" :class="sortClass('name')">Date</th>
-                                                <th class="text-white" @click="sortData('name')" :class="sortClass('name')">Product Name</th>
-                                                <th class="text-white" @click="sortData('name')" :class="sortClass('purpose')">Purpose</th>
-                                                <th class="text-white" @click="sortData('name')" :class="sortClass('loss_amount')">Loss Amount</th>
-                                                <th class="text-white" @click="sortData('name')" :class="sortClass('loss_quantity')">Loss Quantity</th>
-                                                <th class="text-white" @click="sortData('name')" :class="sortClass('loss_quantity')">User Name</th>
-                                                <th class="text-white" >Action</th>
+                                                <th class="text-white" @click="sortData('product_name')" :class="sortClass('product_name')">Product Name</th>
+                                                <th class="text-white" @click="sortData('quantity')" :class="sortClass('quantity')">Quantity</th>
                                             </tr>
                                             </thead>
                                             <tbody v-if="listData.length > 0 && TableLoading == false">
                                             <tr v-for="f in listData">
                                                 <td >{{f.date}}</td>
-                                                <td >{{f.name}}</td>
-                                                <td >{{f.purpose}}</td>
-                                                <td >{{f.loss_amount}}</td>
-                                                <td >{{f.loss_quantity}}</td>
-                                                <td >{{f.user_name}}</td>
-                                                <td>
-                                                    <div class="d-flex">
-                                                        <router-link v-if="CheckPermission(Section.FUEL_ADJUSTMENT + '-' + Action.EDIT)" :to="{name: 'fuelAdjustmentEdit', params: { id: f.id }}" class=" btn btn-primary shadow btn-xs sharp me-1">
-                                                            <i class="fas fa-pencil-alt"></i>
-                                                        </router-link>
-                                                        <a v-if="CheckPermission(Section.FUEL_ADJUSTMENT + '-' + Action.DELETE)" href="javascript:void(0)"  @click="openModalDelete(f.id)" class="btn btn-danger shadow btn-xs sharp">
-                                                            <i class="fa fa-trash"></i>
-                                                        </a>
-                                                    </div>
-                                                </td>
+                                                <td >{{f.product_name}}</td>
+                                                <td >{{f.quantity}}</td>
                                             </tr>
                                             </tbody>
                                             <tbody v-if="listData.length == 0 && TableLoading == false">
@@ -99,13 +83,7 @@
                                             </tr>
                                             </tbody>
                                         </table>
-                                        <div class="dataTables_info" id="example3_info" role="status" aria-live="polite" v-if="paginateData != null">Showing
-                                            {{paginateData.from}} to {{ paginateData.to }} of {{ paginateData.total }} entries
-                                        </div>
 
-                                        <div class="dataTables_paginate paging_simple_numbers" id="example3_paginate">
-                                            <Pagination :data="paginateData" :onChange="list"></Pagination>
-                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -153,7 +131,7 @@ export default {
         },
     },
     created() {
-        this.list();
+        this.getProduct();
     },
     computed: {
         Action() {
@@ -174,19 +152,12 @@ export default {
                 }
             })
         },
-        getSalesReport: function (page) {
-            if (page == undefined) {
-                page = {
-                    page: 1
-                };
-            }
-            this.Param.page = page.page;
+        getSalesReport: function () {
             this.TableLoading = true
-            ApiService.POST(ApiRoutes.FuelAdjustmentList, this.Param,res => {
+            ApiService.POST(ApiRoutes.SalesReport, this.Param,res => {
                 this.TableLoading = false
                 if (parseInt(res.status) === 200) {
-                    this.paginateData = res.data;
-                    this.listData = res.data.data;
+                    this.listData = res.data;
                 } else {
                     ApiService.ErrorHandler(res.error);
                 }
@@ -207,7 +178,6 @@ export default {
         sortData: function (sort_name) {
             this.Param.order_by = sort_name;
             this.Param.order_mode = this.Param.order_mode == 'DESC' ? 'ASC' : 'DESC'
-            this.list();
         },
 
     },
@@ -221,9 +191,8 @@ export default {
                 onChange: (date, dateStr) => {
                     let dateArr = dateStr.split('to')
                     if (dateArr.length == 2) {
-                        this.param.start_date = dateArr[0]
-                        this.param.end_date = dateArr[1]
-                        this.getSalesReport()
+                        this.Param.start_date = dateArr[0]
+                        this.Param.end_date = dateArr[1]
                     }
                 }
             })

@@ -138,7 +138,7 @@
                             <router-link :to="{name: 'LedgerSheet'}" >Un authorize Bill
                             </router-link>
                         </li>
-                        <li v-if="CheckPermission(Section.UNAUTHORIZED_BILL + '-' + Action.VIEW)">
+                        <li v-if="CheckPermission(Section.SALES_REPORT + '-' + Action.VIEW)">
                             <router-link :to="{name: 'salesReport'}" >Sales Report
                             </router-link>
                         </li>
