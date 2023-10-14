@@ -50,7 +50,7 @@ class VoucherController extends Controller
         $requestData = $request->all();
         $limit = $requestData['limit'] ?? 10;
         $sessionUser = SessionUser::getUser();
-        $result = Voucher::select('voucher.id', 'voucher.voucher_number', 'voucher.validity', 'voucher.status', 'categories.category as company_name')
+        $result = Voucher::select('voucher.id', 'voucher.voucher_number', 'voucher.validity', 'voucher.status', 'categories.name as company_name')
             ->leftJoin('categories', 'categories.id', '=', 'voucher.company_id')
             ->where('voucher.client_company_id', $sessionUser['client_company_id'])
             ->paginate($limit);

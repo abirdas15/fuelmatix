@@ -1,18 +1,17 @@
-<template>
+0<template>
     <div class="content-body">
         <div class="container-fluid">
             <div class="row page-titles">
                 <ol class="breadcrumb align-items-center ">
                     <li class="breadcrumb-item active"><router-link :to="{name: 'Dashboard'}">Home</router-link></li>
-                    <li class="breadcrumb-item"><a href="javascript:void(0)">Fuel Adjustment List</a></li>
-                    <li style="margin-left: auto;" v-if="CheckPermission(Section.FUEL_ADJUSTMENT + '-' + Action.CREATE)"><router-link :to="{name: 'fuelAdjustment'}"><i class="fa-solid fa-plus"></i> Fuel Adjustment</router-link></li>
+                    <li class="breadcrumb-item"><a href="javascript:void(0)">Unauthorized Bill</a></li>
                 </ol>
             </div>
             <div class="row">
                 <div class="col-12">
                     <div class="card">
                         <div class="card-header bg-secondary">
-                            <h4 class="card-title">Fuel Adjustment List</h4>
+                            <h4 class="card-title">Unauthorized Bill</h4>
                         </div>
                         <div class="card-body">
                             <div class="row mt-4">
@@ -37,30 +36,25 @@
                                         <table class="display  dataTable no-footer" style="min-width: 845px">
                                             <thead>
                                             <tr class="text-white" style="background-color: #4886EE;color:#ffffff">
-                                                <th class="text-white" @click="sortData('name')" :class="sortClass('name')">Date</th>
-                                                <th class="text-white" @click="sortData('name')" :class="sortClass('name')">Product Name</th>
-                                                <th class="text-white" @click="sortData('name')" :class="sortClass('purpose')">Purpose</th>
-                                                <th class="text-white" @click="sortData('name')" :class="sortClass('loss_amount')">Loss Amount</th>
-                                                <th class="text-white" @click="sortData('name')" :class="sortClass('loss_quantity')">Loss Quantity</th>
-                                                <th class="text-white" @click="sortData('name')" :class="sortClass('loss_quantity')">User Name</th>
+                                                <th class="text-white">Date</th>
+                                                <th class="text-white">Company Name</th>
+                                                <th class="text-white">Driver Name</th>
+                                                <th class="text-white">Amount</th>
+                                                <th class="text-white">User Name</th>
                                                 <th class="text-white" >Action</th>
                                             </tr>
                                             </thead>
                                             <tbody v-if="listData.length > 0 && TableLoading == false">
                                             <tr v-for="f in listData">
-                                                <td >{{f.date}}</td>
-                                                <td >{{f.name}}</td>
-                                                <td >{{f.purpose}}</td>
-                                                <td >{{f.loss_amount}}</td>
-                                                <td >{{f.loss_quantity}}</td>
+                                                <td >{{f.created_at}}</td>
+                                                <td >{{f.company_name}}</td>
+                                                <td >{{f.driver_name}}</td>
+                                                <td >{{f.amount}}</td>
                                                 <td >{{f.user_name}}</td>
                                                 <td>
-                                                    <div class="d-flex">
-                                                        <router-link v-if="CheckPermission(Section.FUEL_ADJUSTMENT + '-' + Action.EDIT)" :to="{name: 'fuelAdjustmentEdit', params: { id: f.id }}" class=" btn btn-primary shadow btn-xs sharp me-1">
-                                                            <i class="fas fa-pencil-alt"></i>
-                                                        </router-link>
-                                                        <a v-if="CheckPermission(Section.FUEL_ADJUSTMENT + '-' + Action.DELETE)" href="javascript:void(0)"  @click="openModalDelete(f.id)" class="btn btn-danger shadow btn-xs sharp">
-                                                            <i class="fa fa-trash"></i>
+                                                    <div v-if="CheckPermission(Section.UNAUTHORIZED_BILL + '-' + Action.CREATE)" class="d-flex">
+                                                        <a  href="javascript:void(0)" @click="openModal(f)"  class="btn btn-primary shadow btn-xs sharp">
+                                                            <i class="fa-solid fa-money-bill-transfer"></i>
                                                         </a>
                                                     </div>
                                                 </td>
@@ -92,6 +86,23 @@
                 </div>
             </div>
         </div>
+        <div class="popup-wrapper-modal transferModal d-none">
+            <form @submit.prevent="saveTransfer" class="popup-box" style="max-width: 800px">
+                <button type="button" class=" btn  closeBtn"><i class="fas fa-times"></i></button>
+                <div class="row align-items-center">
+                    <div class="col-sm-12">
+                        <div class="input-wrapper form-group mb-3">
+                            <label for="voucher_number">Voucher Number</label>
+                            <input type="text" class="w-100 form-control bg-white" name="voucher_number" id="voucher_number"
+                                   v-model="transferParam.voucher_number" placeholder="Voucher Number">
+                            <small class="invalid-feedback"></small>
+                        </div>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary " v-if="!Loading">Submit</button>
+                <button type="button" class="btn btn-primary " disabled v-if="Loading">Submitting...</button>
+            </form>
+        </div>
     </div>
 </template>
 
@@ -99,7 +110,7 @@
 import Swal from 'sweetalert2/dist/sweetalert2.js'
 import ApiService from "../../Services/ApiService";
 import ApiRoutes from "../../Services/ApiRoutes";
-import Pagination from "../../Helpers/Pagination";
+import Pagination from "../../Helpers/Pagination.vue";
 import Section from "../../Helpers/Section";
 import Action from "../../Helpers/Action";
 export default {
@@ -119,6 +130,11 @@ export default {
             Loading: false,
             TableLoading: false,
             listData: [],
+            transferParam: {
+                id: '',
+                driver_id: '',
+                voucher_number: ''
+            }
         };
     },
     watch: {
@@ -141,20 +157,23 @@ export default {
         },
     },
     methods: {
-        openModalDelete(id) {
-            Swal.fire({
-                title: 'Are you sure you want to delete?',
-                text: "You won't be able to revert this!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, delete it!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    this.Delete(id)
+        saveTransfer: function() {
+            this.Loading = true;
+            ApiService.POST(ApiRoutes.UnauthorizedBillTransfer, this.transferParam,res => {
+                this.Loading = false;
+                if (parseInt(res.status) === 200) {
+                    $('.transferModal').addClass('d-none');
+                    this.$toast.success(res.message);
+                    this.list();
+                } else {
+                    ApiService.ErrorHandler(res.errors);
                 }
-            })
+            });
+        },
+        openModal: function(data) {
+            this.transferParam.id = data.id;
+            this.transferParam.driver_id = data.driver_id;
+            $('.transferModal').removeClass('d-none');
         },
         list: function (page) {
             if (page == undefined) {
@@ -164,7 +183,7 @@ export default {
             }
             this.Param.page = page.page;
             this.TableLoading = true
-            ApiService.POST(ApiRoutes.FuelAdjustmentList, this.Param,res => {
+            ApiService.POST(ApiRoutes.UnauthorizedBill, this.Param,res => {
                 this.TableLoading = false
                 if (parseInt(res.status) === 200) {
                     this.paginateData = res.data;
@@ -174,37 +193,9 @@ export default {
                 }
             });
         },
-        Delete: function (id) {
-            ApiService.POST(ApiRoutes.FuelAdjustmentDelete, {id: id },res => {
-                if (parseInt(res.status) === 200) {
-                    this.$toast.success(res.message);
-                    this.list()
-                } else {
-                    ApiService.ErrorHandler(res.error);
-                }
-            });
-        },
-
-        sortClass: function (order_by) {
-            let cls;
-            if (this.Param.order_by == order_by && this.Param.order_mode == 'DESC') {
-                cls = 'sorting_desc'
-            } else if (this.Param.order_by == order_by && this.Param.order_mode == 'ASC') {
-                cls = 'sorting_asc'
-            } else {
-                cls = 'sorting'
-            }
-            return cls;
-        },
-        sortData: function (sort_name) {
-            this.Param.order_by = sort_name;
-            this.Param.order_mode = this.Param.order_mode == 'DESC' ? 'ASC' : 'DESC'
-            this.list();
-        },
-
     },
     mounted() {
-        $('#dashboard_bar').text('Bank List')
+        $('#dashboard_bar').text('Unauthorized Bill')
     }
 }
 </script>

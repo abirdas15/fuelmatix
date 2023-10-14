@@ -19,6 +19,7 @@
                         <li v-if="CheckPermission(Section.POS + '-' + Action.VIEW)"><router-link :to="{name: 'Pos'}" >POS</router-link></li>
                         <li v-if="CheckPermission(Section.POS_HISTORY + '-' + Action.VIEW)"><router-link :to="{name: 'PosList'}" >POS History</router-link></li>
                         <li v-if="CheckPermission(Section.COMPANY_SALE + '-' + Action.VIEW)"><router-link :to="{name: 'CompanySale'}">Company Sale </router-link></li>
+                        <li v-if="CheckPermission(Section.COMPANY_SALE + '-' + Action.VIEW)"><router-link :to="{name: 'unauthorizedBill'}">Unauthorized Bill </router-link></li>
                     </ul>
                 </li>
                 <li><a class="has-arrow " href="javascript:void(0)" aria-expanded="false">
@@ -79,7 +80,7 @@
                         <li v-if="CheckPermission(Section.SYSTEM_SETTING + '-' + Action.VIEW)"><router-link :to="{name: 'system'}">System setting</router-link></li>
                         <li v-if="CheckPermission(Section.VOUCHER + '-' + Action.VIEW)"><router-link :to="{name: 'voucher'}">Voucher</router-link></li>
                         <li v-if="CheckPermission(Section.DRIVER + '-' + Action.VIEW)"><router-link :to="{name: 'driver'}">Driver</router-link></li>
-                        <li><router-link :to="{name: 'adjustment'}">Fuel Adjustment</router-link></li>
+                        <li  v-if="CheckPermission(Section.FUEL_ADJUSTMENT + '-' + Action.VIEW)"><router-link :to="{name: 'adjustment'}">Fuel Adjustment</router-link></li>
                     </ul>
                 </li>
                 <li><a class="has-arrow " href="javascript:void(0)" aria-expanded="false">
@@ -133,7 +134,7 @@
                             <router-link :to="{name: 'TrailBalance'}" >Trial Balance
                             </router-link>
                         </li>
-                        <li v-if="CheckPermission(Section.LEDGER + '-' + Action.VIEW)">
+                        <li v-if="CheckPermission(Section.UNAUTHORIZED_BILL + '-' + Action.VIEW)">
                             <router-link :to="{name: 'LedgerSheet'}" >Ledger Sheet
                             </router-link>
                         </li>

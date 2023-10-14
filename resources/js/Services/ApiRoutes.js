@@ -124,6 +124,8 @@ const ApiRoutes = {
     SaleSingle: ApiVersion + '/sale/single',
     SaleDelete: ApiVersion + '/sale/delete',
     SaleList: ApiVersion + '/sale/list',
+    UnauthorizedBill: ApiVersion + '/sale/unauthorizedBill',
+    UnauthorizedBillTransfer: ApiVersion + '/sale/unauthorizedBill/transfer',
     //Credit Company
     CreditCompanyAdd: ApiVersion + '/creditCompany/save',
     CreditCompanyEdit: ApiVersion + '/creditCompany/update',
@@ -212,6 +214,9 @@ const ApiRoutes = {
     //Adjustment
     FuelAdjustment: ApiVersion + '/fuelAdjustment/save',
     FuelAdjustmentList: ApiVersion + '/fuelAdjustment/list',
+    FuelAdjustmentSingle: ApiVersion + '/fuelAdjustment/single',
+    FuelAdjustmentUpdate: ApiVersion + '/fuelAdjustment/update',
+    FuelAdjustmentDelete: ApiVersion + '/fuelAdjustment/delete',
 };
 
 export default ApiRoutes;

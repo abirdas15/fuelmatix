@@ -42,6 +42,8 @@ class Section
     const ROLE = 'Role';
     const POS_MACHINE = 'Pos-Machine';
     const INVOICE = 'Invoice';
+    const FUEL_ADJUSTMENT = 'Fue-Adjustment';
+    const UNAUTHORIZED_BILL = 'Unauthorized-Bill';
 
     /**
      * @return array
@@ -87,6 +89,8 @@ class Section
             'ROLE' => self::ROLE,
             'POS_MACHINE' => self::POS_MACHINE,
             'INVOICE' => self::INVOICE,
+            'FUEL_ADJUSTMENT' => self::FUEL_ADJUSTMENT,
+            'UNAUTHORIZED_BILL' => self::UNAUTHORIZED_BILL,
         ];
     }
 }

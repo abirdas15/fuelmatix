@@ -307,7 +307,7 @@ class ShiftSaleController extends Controller
             ->where('client_company_id', $inputData['session_user']['client_company_id'])
             ->pluck('id')
             ->toArray();
-        $result = Category::select('id', 'category as name')
+        $result = Category::select('id', 'name')
             ->whereIn('parent_category', $categoryId)
             ->orderBy('parent_category', 'ASC')
             ->get()

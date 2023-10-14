@@ -6,6 +6,7 @@ use App\Helpers\SessionUser;
 use App\Models\Category;
 use App\Models\Stock;
 use App\Models\Transaction;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -46,6 +47,8 @@ class TransactionController extends Controller
             $newTransaction->module = $transaction['module'] ?? 'accounting';
             $newTransaction->module_id = $transaction['module_id'] ?? null;
             $newTransaction->client_company_id = $sessionUser['client_company_id'];
+            $newTransaction->user_id = $sessionUser['id'];
+            $newTransaction->created_at = $transaction['date'].' '.date('H:i:s');
             if ($newTransaction->save()) {
                 $id = $newTransaction->id;
                 $newTransaction = new Transaction();
@@ -59,6 +62,8 @@ class TransactionController extends Controller
                 $newTransaction->module = $transaction['module'] ?? 'accounting';
                 $newTransaction->module_id = $transaction['module_id'] ?? null;
                 $newTransaction->client_company_id = $sessionUser['client_company_id'];
+                $newTransaction->user_id = $sessionUser['id'];
+                $newTransaction->created_at = $transaction['date'].' '.date('H:i:s');
                 $newTransaction->parent_id = $id;
                 $newTransaction->save();
                 $previous = Transaction::find($id);

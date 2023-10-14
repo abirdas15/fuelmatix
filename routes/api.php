@@ -196,6 +196,8 @@ Route::group(['middleware' => 'AuthReqCheck'], function() {
         Route::post('single', [SaleController::class, 'single']);
         Route::post('update', [SaleController::class, 'update']);
         Route::post('delete', [SaleController::class, 'delete']);
+        Route::post('unauthorizedBill', [SaleController::class, 'unauthorizedBill']);
+        Route::post('unauthorizedBill/transfer', [SaleController::class, 'unauthorizedBillTransfer']);
     });
     Route::group(['prefix' => 'creditCompany'], function() {
         Route::post('save', [CreditCompanyController::class, 'save']);
@@ -293,6 +295,9 @@ Route::group(['middleware' => 'AuthReqCheck'], function() {
     Route::group(['prefix' => 'fuelAdjustment'], function() {
         Route::post('save', [FuelAdjustmentController::class, 'save']);
         Route::post('list', [FuelAdjustmentController::class, 'list']);
+        Route::post('single', [FuelAdjustmentController::class, 'single']);
+        Route::post('update', [FuelAdjustmentController::class, 'update']);
+        Route::post('delete', [FuelAdjustmentController::class, 'delete']);
     });
 });
 

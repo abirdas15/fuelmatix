@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Common\AccountCategory;
+use App\Common\FuelMatixDateTimeFormat;
+use App\Common\FuelMatixStatus;
 use App\Common\Module;
 use App\Common\PaymentMethod;
 use App\Helpers\Helpers;
@@ -44,6 +46,7 @@ class SaleController extends Controller
         $voucher = null;
         $driverLiabilityId = null;
         $total_amount = array_sum(array_column($requestData['products'], 'subtotal'));
+        $payment_category_id = $requestData['company_id'] ?? '';
         if ($requestData['payment_method'] == PaymentMethod::COMPANY) {
             $company = Category::find($requestData['company_id']);
             if (!$company instanceof Category) {
@@ -53,7 +56,7 @@ class SaleController extends Controller
             if (!$driver instanceof Driver) {
                 return response()->json(['status' => 400, 'message' => 'Cannot find [driver].']);
             }
-            if (empty($requestData['advance_sale'])) {
+            if (empty($requestData['advance_sale']) && !empty($requestData['voucher_number'])) {
                 $voucher = Voucher::where('company_id', $requestData['company_id'])
                     ->where('status', 'pending')
                     ->where('validity', '>=', date('Y-m-d'))
@@ -62,6 +65,9 @@ class SaleController extends Controller
                 if (!$voucher instanceof Voucher) {
                     return response()->json(['status' => 500, 'errors' => ['voucher_number' => ['The voucher number is not valid.']]]);
                 }
+            }
+            if (empty($requestData['voucher_number'])) {
+                $payment_category_id = $driver['un_authorized_bill_id'];
             }
             if (!empty($requestData['advance_pay']) || !empty($requestData['advance_sale'])) {
                 $driverLiability = Category::find($driver['driver_liability_id']);
@@ -97,19 +103,20 @@ class SaleController extends Controller
                 $driverId = $driverExpense['id'];
             }
         }
-        $sessionUser = SessionUser::getUser();
-        if (!$sessionUser instanceof User) {
-            return response()->json(['status' => 500, 'message' => 'Cannot find session [user].']);
+        if (!empty($requestData['voucher_number'])) {
+            $sessionUser = SessionUser::getUser();
+            if (!$sessionUser instanceof User) {
+                return response()->json(['status' => 500, 'message' => 'Cannot find session [user].']);
+            }
+            $category = Category::where('id', $sessionUser['category_id'])->first();
+            if (!$category instanceof Category) {
+                return response()->json(['status' => 500, 'message' => 'You are not a cashier user.']);
+            }
+            if ($requestData['payment_method'] == PaymentMethod::CASH) {
+                $payment_category_id = $category['id'];
+            }
+            $cash_in_hand_category_id = $category['id'];
         }
-        $payment_category_id = $requestData['company_id'] ?? '';
-        $category = Category::where('id', $sessionUser['category_id'])->first();
-        if (!$category instanceof Category) {
-            return response()->json(['status' => 500, 'message' => 'You are not a cashier user.']);
-        }
-        if ($requestData['payment_method'] == PaymentMethod::CASH) {
-            $payment_category_id = $category['id'];
-        }
-        $cash_in_hand_category_id = $category['id'];
         $sale = new Sale();
         $sale->date = Carbon::now('UTC');
         $sale->invoice_number = Sale::getInvoiceNumber();
@@ -335,5 +342,82 @@ class SaleController extends Controller
             $data['date'] = date('d/m/Y', strtotime($data['date']));
         }
         return response()->json(['status' => 200, 'data' => $result]);
+    }
+
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function unauthorizedBill(Request $request): JsonResponse
+    {
+        $sessionUser = SessionUser::getUser();
+        $limit = $request['limit'] ?? 10;
+        $keyword = $request['keyword'] ?? '';
+        $driverId = Driver::select('un_authorized_bill_id')
+            ->where('client_company_id', $sessionUser['client_company_id'])
+            ->get()
+            ->pluck('un_authorized_bill_id')
+            ->toArray();
+        $result = Transaction::select('transactions.id','transactions.created_at', 'transactions.linked_id as driver_id', 'transactions.debit_amount as amount', 'c1.name as driver_name', 'c2.name as company_name', 'users.name as user_name')
+            ->leftJoin('categories as c1', 'c1.id', '=', 'transactions.linked_id')
+            ->leftJoin('categories as c2', 'c2.id', '=', 'c1.parent_category')
+            ->leftJoin('users', 'users.id', '=', 'transactions.user_id')
+            ->whereIn('transactions.linked_id', $driverId)
+            ->where('transactions.client_company_id', $sessionUser['client_company_id']);
+        if (!empty($keyword)) {
+            $result->where(function($q) use ($keyword) {
+                $q->where('c1.name', 'LIKE', '%'.$keyword.'%');
+                $q->orWhere('c2.name', 'LIKE', '%'.$keyword.'%');
+                $q->orWhere('users.name', 'LIKE', '%'.$keyword.'%');
+                $q->orWhere('transactions.amount', 'LIKE', '%'.$keyword.'%');
+            });
+        }
+        $result = $result->orderBy('id', 'DESC')
+            ->paginate($limit);
+        foreach ($result as &$data) {
+            $data['created_at'] = Helpers::formatDate($data['created_at'], FuelMatixDateTimeFormat::STANDARD_DATE_TIME);
+            $data['amount'] = number_format($data['amount'], 2);
+        }
+        return response()->json(['status' => 200, 'data' => $result]);
+    }
+
+    /**
+     * @param Request $request
+     * @return JsonResponse|void
+     */
+    public function unauthorizedBillTransfer(Request $request)
+    {
+        $requestData = $request->all();
+        $validator = Validator::make($requestData, [
+            'id' => 'required',
+            'voucher_number' => 'required',
+            'driver_id' => 'required'
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['status' => 500, 'errors' => $validator->errors()]);
+        }
+        $driver = Category::where('id', $requestData['driver_id'])->first();
+        if (!$driver instanceof Category) {
+            return response()->json(['status' => 400, 'message' => 'Cannot find [driver].']);
+        }
+        $voucher = Voucher::where('voucher_number', $requestData['voucher_number'])
+            ->where('company_id', $driver['module_id'])
+            ->where('status', FuelMatixStatus::PENDING)
+            ->first();
+        if (!$voucher instanceof Voucher) {
+            return response()->json(['status' => 500, 'errors' => ['voucher_number' => ['The voucher number is not valid.']]]);
+        }
+        $transaction = Transaction::find($requestData['id']);
+        if (!$transaction instanceof Transaction) {
+            return response()->json(['status' => 400, 'message' => 'Cannot find [transaction].']);
+        }
+        $transaction->linked_id = $driver['module_id'];
+        $transaction->save();
+        $transaction = Transaction::where('id', $transaction['parent_id'])->first();
+        $transaction->account_id = $driver['module_id'];
+        $transaction->save();
+        $voucher->status = FuelMatixStatus::COMPLETE;
+        $voucher->save();
+        return response()->json(['status' => 200, 'message' => 'Successfully saved.']);
     }
 }

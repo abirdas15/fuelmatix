@@ -91,6 +91,8 @@ import createRole from "../Pages/Role/Create.vue";
 import roleEdit from "../Pages/Role/Edit.vue";
 import fuelAdjustment from "../Pages/FuelAdjustment/Adjustment.vue";
 import fuelAdjustmentList from "../Pages/FuelAdjustment/List.vue";
+import fuelAdjustmentEdit from "../Pages/FuelAdjustment/Edit.vue";
+import UnauthorizedBill from "../Pages/UnauthorizedBill/UnauthorizedBill.vue";
 
 const ROOT_URL = "";
 const router = new VueRouter({
@@ -497,10 +499,19 @@ const router = new VueRouter({
                     },
                 },
                 {
-                    path: ROOT_URL + "/fuel/adjustment/add", name: "fuelAdjustment", component: fuelAdjustment,
+                    path: ROOT_URL + "/fuel/adjustment/add", name: "fuelAdjustment", component: fuelAdjustment,  beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.FUEL_ADJUSTMENT + '-' + Action.CREATE)
+                    },
                 },
                 {
-                    path: ROOT_URL + "/fuel/adjustment/list", name: "adjustment", component: fuelAdjustmentList,
+                    path: ROOT_URL + "/fuel/adjustment/list", name: "adjustment", component: fuelAdjustmentList,  beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.FUEL_ADJUSTMENT + '-' + Action.VIEW)
+                    },
+                },
+                {
+                    path: ROOT_URL + "/unauthorizedBill", name: "unauthorizedBill", component: UnauthorizedBill,  beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.UNAUTHORIZED_BILL + '-' + Action.EDIT)
+                    },
                 }
             ],
         },

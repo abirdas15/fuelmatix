@@ -37,6 +37,8 @@ const Section= {
     ROLE : 'Role',
     POS_MACHINE: 'Pos-Machine',
     INVOICE: 'Invoice',
+    FUEL_ADJUSTMENT: 'Fue-Adjustment',
+    UNAUTHORIZED_BILL: 'Unauthorized-Bill',
 }
 export default Section;
 

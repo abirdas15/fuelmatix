@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Common\AccountCategory;
+use App\Common\FuelMatixCategoryType;
 use App\Common\Module;
 use App\Models\Category;
 use App\Models\ClientCompany;
@@ -79,7 +80,7 @@ class FuelMatixCategory extends Command
         $this->info('Category: '. AccountCategory::ASSETS);
         $assetCategory = $this->saveCategory([
             'name' => AccountCategory::ASSETS,
-            'type' => 'assets',
+            'type' => FuelMatixCategoryType::ASSET,
             'client_company_id' => $clientCompany->id,
         ]);
         if (!$assetCategory instanceof Category) {
@@ -91,7 +92,7 @@ class FuelMatixCategory extends Command
         $currentAssetCategory = $this->saveCategory([
             'name' => AccountCategory::CURRENT_ASSETS,
             'parent_category' => $assetCategory['id'],
-            'type' => 'assets',
+            'type' => FuelMatixCategoryType::ASSET,
             'default' => 1,
             'client_company_id' => $clientCompany->id,
         ]);
@@ -104,7 +105,7 @@ class FuelMatixCategory extends Command
         $accountReceivableCategory = $this->saveCategory([
             'name' => AccountCategory::ACCOUNT_RECEIVABLE,
             'parent_category' => $currentAssetCategory['id'],
-            'type' => 'assets',
+            'type' => FuelMatixCategoryType::ASSET,
             'default' => 1,
             'client_company_id' => $clientCompany->id,
         ]);
@@ -117,7 +118,7 @@ class FuelMatixCategory extends Command
         $cashInHandCategory = $this->saveCategory([
             'name' => AccountCategory::CASH_IM_HAND,
             'parent_category' => $currentAssetCategory['id'],
-            'type' => 'assets',
+            'type' => FuelMatixCategoryType::ASSET,
             'client_company_id' => $clientCompany->id,
         ]);
         if (!$cashInHandCategory instanceof Category) {
@@ -130,7 +131,7 @@ class FuelMatixCategory extends Command
         $stockInHandCategory = $this->saveCategory([
             'name' => AccountCategory::STOCK_IN_HAND,
             'parent_category' => $currentAssetCategory['id'],
-            'type' => 'assets',
+            'type' => FuelMatixCategoryType::ASSET,
             'default' => 1,
             'client_company_id' => $clientCompany->id,
         ]);
@@ -144,7 +145,7 @@ class FuelMatixCategory extends Command
         $bankCategory = $this->saveCategory([
             'name' => AccountCategory::BANK,
             'parent_category' => $currentAssetCategory['id'],
-            'type' => 'assets',
+            'type' => FuelMatixCategoryType::ASSET,
             'default' => 1,
             'client_company_id' => $clientCompany->id,
         ]);
@@ -157,7 +158,7 @@ class FuelMatixCategory extends Command
         $posMachineCategory = $this->saveCategory([
             'name' => AccountCategory::POS_MACHINE,
             'parent_category' => $currentAssetCategory['id'],
-            'type' => 'assets',
+            'type' => FuelMatixCategoryType::ASSET,
             'client_company_id' => $clientCompany->id,
         ]);
         if (!$posMachineCategory instanceof Category) {
@@ -165,11 +166,24 @@ class FuelMatixCategory extends Command
         }
         $this->info('Successfully Save '. AccountCategory::POS_MACHINE);
 
+
+        $this->info('Category: '. AccountCategory::UN_AUTHORIZED_BILL);
+        $unAuthorizedBillCategory = $this->saveCategory([
+            'name' => AccountCategory::UN_AUTHORIZED_BILL,
+            'parent_category' => $currentAssetCategory['id'],
+            'type' => FuelMatixCategoryType::ASSET,
+            'client_company_id' => $clientCompany->id,
+        ]);
+        if (!$unAuthorizedBillCategory instanceof Category) {
+            $this->warn('Cannot save category ['.AccountCategory::UN_AUTHORIZED_BILL.']...');
+        }
+        $this->info('Successfully Save '. AccountCategory::UN_AUTHORIZED_BILL);
+
         $this->info('Category: '. AccountCategory::CASH);
         $cashCategory = $this->saveCategory([
             'name' => AccountCategory::CASH,
             'parent_category' => $cashInHandCategory['id'],
-            'type' => 'assets',
+            'type' => FuelMatixCategoryType::ASSET,
             'default' => 1,
             'client_company_id' => $clientCompany->id,
         ]);
@@ -182,7 +196,7 @@ class FuelMatixCategory extends Command
         $liabilityCategory = $this->saveCategory([
             'name' => AccountCategory::LIABILITIES,
             'parent_category' => null,
-            'type' => 'liabilities',
+            'type' => FuelMatixCategoryType::LIABILITIES,
             'default' => 1,
             'client_company_id' => $clientCompany->id,
         ]);
@@ -196,7 +210,7 @@ class FuelMatixCategory extends Command
         $currentLiabilityCategory = $this->saveCategory([
             'name' => AccountCategory::CURRENT_LIABILITIES,
             'parent_category' => $liabilityCategory['id'],
-            'type' => 'liabilities',
+            'type' => FuelMatixCategoryType::LIABILITIES,
             'client_company_id' => $clientCompany->id,
         ]);
         if (!$currentLiabilityCategory instanceof Category) {
@@ -208,7 +222,7 @@ class FuelMatixCategory extends Command
         $accountPayableCategory = $this->saveCategory([
             'name' => AccountCategory::ACCOUNT_PAYABLE,
             'parent_category' => $currentLiabilityCategory['id'],
-            'type' => 'liabilities',
+            'type' => FuelMatixCategoryType::LIABILITIES,
             'client_company_id' => $clientCompany->id,
         ]);
         if (!$accountPayableCategory instanceof Category) {
@@ -221,7 +235,7 @@ class FuelMatixCategory extends Command
         $unEarnRevenueCategory = $this->saveCategory([
             'name' => AccountCategory::UN_EARNED_REVENUE,
             'parent_category' => $liabilityCategory['id'],
-            'type' => 'liabilities',
+            'type' => FuelMatixCategoryType::LIABILITIES,
             'client_company_id' => $clientCompany->id,
         ]);
         if (!$unEarnRevenueCategory instanceof Category) {
@@ -229,24 +243,13 @@ class FuelMatixCategory extends Command
         }
         $this->info('Successfully Save '. AccountCategory::UN_EARNED_REVENUE);
 
-        $this->info('Category: '. AccountCategory::UN_AUTHORIZED_BILL);
-        $unAuthorizedBillCategory = $this->saveCategory([
-            'name' => AccountCategory::UN_AUTHORIZED_BILL,
-            'parent_category' => $liabilityCategory['id'],
-            'type' => 'liabilities',
-            'client_company_id' => $clientCompany->id,
-        ]);
-        if (!$unAuthorizedBillCategory instanceof Category) {
-            $this->warn('Cannot save category ['.AccountCategory::UN_AUTHORIZED_BILL.']...');
-        }
-        $this->info('Successfully Save '. AccountCategory::UN_AUTHORIZED_BILL);
 
 
         $this->info('Category: '. AccountCategory::EQUITY);
         $equityCategory = $this->saveCategory([
             'name' => AccountCategory::EQUITY,
             'parent_category' => null,
-            'type' => 'equity',
+            'type' => FuelMatixCategoryType::EQUITY,
             'client_company_id' => $clientCompany->id,
         ]);
         if (!$equityCategory instanceof Category) {
@@ -259,7 +262,7 @@ class FuelMatixCategory extends Command
         $incomeCategory = $this->saveCategory([
             'name' => AccountCategory::INCOME,
             'parent_category' => null,
-            'type' => 'income',
+            'type' => FuelMatixCategoryType::INCOME,
             'client_company_id' => $clientCompany->id,
         ]);
         if (!$incomeCategory instanceof Category) {
@@ -271,7 +274,7 @@ class FuelMatixCategory extends Command
         $directIncomeCategory = $this->saveCategory([
             'name' => AccountCategory::DIRECT_INCOME,
             'parent_category' => $incomeCategory['id'],
-            'type' => 'income',
+            'type' => FuelMatixCategoryType::INCOME,
             'client_company_id' => $clientCompany->id,
         ]);
         if (!$directIncomeCategory instanceof Category) {
@@ -284,7 +287,7 @@ class FuelMatixCategory extends Command
         $indirectIncomeCategory = $this->saveCategory([
             'name' => AccountCategory::IN_DIRECT_INCOME,
             'parent_category' => $incomeCategory['id'],
-            'type' => 'income',
+            'type' => FuelMatixCategoryType::INCOME,
             'client_company_id' => $clientCompany->id,
         ]);
         if (!$indirectIncomeCategory instanceof Category) {
@@ -297,7 +300,7 @@ class FuelMatixCategory extends Command
         $expenseCategory = $this->saveCategory([
             'name' => AccountCategory::EXPENSES,
             'parent_category' => null,
-            'type' => 'expenses',
+            'type' => FuelMatixCategoryType::EXPENSE,
             'client_company_id' => $clientCompany->id,
         ]);
         if (!$expenseCategory instanceof Category) {
@@ -310,7 +313,7 @@ class FuelMatixCategory extends Command
         $costOfGoodSoldCategory = $this->saveCategory([
             'name' => AccountCategory::COST_OF_GOOD_SOLD,
             'parent_category' => $expenseCategory['id'],
-            'type' => 'expenses',
+            'type' => FuelMatixCategoryType::EXPENSE,
             'client_company_id' => $clientCompany->id,
         ]);
         if (!$costOfGoodSoldCategory instanceof Category) {
@@ -323,7 +326,7 @@ class FuelMatixCategory extends Command
         $directExpenseCategory = $this->saveCategory([
             'name' => AccountCategory::DIRECT_EXPENSE,
             'parent_category' => $expenseCategory['id'],
-            'type' => 'expenses',
+            'type' => FuelMatixCategoryType::EXPENSE,
             'client_company_id' => $clientCompany->id,
         ]);
         if (!$directExpenseCategory instanceof Category) {
@@ -335,7 +338,7 @@ class FuelMatixCategory extends Command
         $indirectExpenseCategory = $this->saveCategory([
             'name' => AccountCategory::IN_DIRECT_EXPENSE,
             'parent_category' => $expenseCategory['id'],
-            'type' => 'expenses',
+            'type' => FuelMatixCategoryType::EXPENSE,
             'client_company_id' => $clientCompany->id,
         ]);
         if (!$indirectExpenseCategory instanceof Category) {
@@ -348,7 +351,7 @@ class FuelMatixCategory extends Command
         $salaryExpenseCategory = $this->saveCategory([
             'name' => AccountCategory::SALARY_EXPENSE,
             'parent_category' => $directExpenseCategory['id'],
-            'type' => 'expenses',
+            'type' => FuelMatixCategoryType::EXPENSE,
             'client_company_id' => $clientCompany->id,
         ]);
         if (!$salaryExpenseCategory instanceof Category) {
@@ -361,7 +364,7 @@ class FuelMatixCategory extends Command
         $operatingExpenseCategory = $this->saveCategory([
             'name' => AccountCategory::OPERATING_EXPENSE,
             'parent_category' => $expenseCategory['id'],
-            'type' => 'expenses',
+            'type' => FuelMatixCategoryType::EXPENSE,
             'client_company_id' => $clientCompany->id,
         ]);
         if (!$operatingExpenseCategory instanceof Category) {
@@ -374,7 +377,7 @@ class FuelMatixCategory extends Command
         $interestExpenseCategory = $this->saveCategory([
             'name' => AccountCategory::INTEREST_EXPENSE,
             'parent_category' => $expenseCategory['id'],
-            'type' => 'expenses',
+            'type' => FuelMatixCategoryType::EXPENSE,
             'client_company_id' => $clientCompany->id,
         ]);
         if (!$interestExpenseCategory instanceof Category) {
@@ -387,7 +390,7 @@ class FuelMatixCategory extends Command
         $taxExpenseCategory = $this->saveCategory([
             'name' => AccountCategory::TAX,
             'parent_category' => $expenseCategory['id'],
-            'type' => 'expenses',
+            'type' => FuelMatixCategoryType::EXPENSE,
             'client_company_id' => $clientCompany->id,
         ]);
         if (!$taxExpenseCategory instanceof Category) {
@@ -399,7 +402,7 @@ class FuelMatixCategory extends Command
         $evaporativeExpenseCategory = $this->saveCategory([
             'name' => AccountCategory::EVAPORATIVE,
             'parent_category' => $expenseCategory['id'],
-            'type' => 'expenses',
+            'type' => FuelMatixCategoryType::EXPENSE,
             'client_company_id' => $clientCompany->id,
         ]);
         if (!$evaporativeExpenseCategory instanceof Category) {
@@ -412,7 +415,7 @@ class FuelMatixCategory extends Command
         $driverSaleExpenseCategory = $this->saveCategory([
             'name' => AccountCategory::DRIVER_SALE,
             'parent_category' => $expenseCategory['id'],
-            'type' => 'expenses',
+            'type' => FuelMatixCategoryType::EXPENSE,
             'client_company_id' => $clientCompany->id,
         ]);
         if (!$driverSaleExpenseCategory instanceof Category) {
@@ -424,7 +427,7 @@ class FuelMatixCategory extends Command
         $driverSaleExpenseCategory = $this->saveCategory([
             'name' => AccountCategory::DRIVER_SALE,
             'parent_category' => $expenseCategory['id'],
-            'type' => 'expenses',
+            'type' => FuelMatixCategoryType::EXPENSE,
             'client_company_id' => $clientCompany->id,
         ]);
         if (!$driverSaleExpenseCategory instanceof Category) {

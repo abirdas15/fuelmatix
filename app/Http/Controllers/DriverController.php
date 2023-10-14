@@ -51,12 +51,21 @@ class DriverController extends Controller
             return response()->json(['status' => 500, 'error' => 'Cannot find driver sale category.']);
         }
 
+        $unAuthorizedBillCategory = Category::where('module', Module::UN_AUTHORIZED_BILL)->where('module_id', $requestData['company_id'])->where('client_company_id', $sessionUser['client_company_id'])->first();
+        if (!$unAuthorizedBillCategory instanceof Category) {
+            return response()->json(['status' => 500, 'error' => 'Cannot find [un authorized bill] category.']);
+        }
+
         $driverSaleDriver = CategoryRepository::saveCategory($data, $driverSaleCategory['id'], Module::DRIVER_SALE_DRIVER);
         if (!$driverSaleDriver instanceof Category) {
             return response()->json(['status' => 500, 'message' => 'Cannot save [driver]']);
         }
         $unEarnRevenueDriver = CategoryRepository::saveCategory($data, $unEarnRevenueCategory['id'], Module::UN_EARNED_REVENUE_DRIVER);
         if (!$unEarnRevenueDriver instanceof Category) {
+            return response()->json(['status' => 500, 'message' => 'Cannot save [driver]']);
+        }
+        $unAuthorizedBillDriver = CategoryRepository::saveCategory($data, $unAuthorizedBillCategory['id'], Module::UN_AUTHORIZED_BILL);
+        if (!$unAuthorizedBillDriver instanceof Category) {
             return response()->json(['status' => 500, 'message' => 'Cannot save [driver]']);
         }
         $driverData = [
@@ -66,6 +75,7 @@ class DriverController extends Controller
             'phone_number' => $requestData['phone_number'],
             'driver_expense_id' => $driverSaleDriver['id'],
             'driver_liability_id' => $unEarnRevenueDriver['id'],
+            'un_authorized_bill_id' => $unAuthorizedBillDriver['id'],
         ];
         $newDriver = DriverRepository::save($driverData, $sessionUser);
         if (!$newDriver instanceof Driver) {
@@ -154,6 +164,10 @@ class DriverController extends Controller
         if (!$liabilityCategory instanceof Category) {
             return response()->json(['status' => 500, 'errors' => 'Cannot find [driver un revenue category]']);
         }
+        $unAuthorizedCategory = Category::find($driver['un_authorized_bill_id']);
+        if (!$unAuthorizedCategory instanceof Category) {
+            return response()->json(['status' => 500, 'errors' => 'Cannot find [driver un authorized bill] category']);
+        }
         $driver->name = $requestData['name'];
         $driver->company_id = $requestData['company_id'];
         $driver->phone_number = $requestData['phone_number'];
@@ -170,6 +184,10 @@ class DriverController extends Controller
             return response()->json(['status' => 500, 'error' => 'Cannot update driver.']);
         }
         $updateCategory = CategoryRepository::updateCategory($liabilityCategory,  $data);
+        if (!$updateCategory instanceof Category) {
+            return response()->json(['status' => 500, 'error' => 'Cannot update driver.']);
+        }
+        $updateCategory = CategoryRepository::updateCategory($unAuthorizedCategory,  $data);
         if (!$updateCategory instanceof Category) {
             return response()->json(['status' => 500, 'error' => 'Cannot update driver.']);
         }

@@ -34,7 +34,8 @@
 
                                     <div id="progress-content-section" v-if="listDispenser">
                                         <div class="section-content discovery active">
-                                            <div class="card">
+                                            <template v-if="oilStock">
+                                                <div class="card">
                                                 <div class="card-header">
                                                     <h5 class="card-title">
                                                         {{ listDispenser.product_name }}</h5>
@@ -76,6 +77,7 @@
                                                     </div>
                                                 </div>
                                             </div>
+                                            </template>
                                             <div class="card" v-if="listDispenser.dispensers.length > 0"
                                                  v-for="(d, dIndex) in listDispenser.dispensers">
                                                 <div class="card-header">
@@ -234,6 +236,18 @@ export default {
             allAmountCategory: null,
             categories: [],
             totalPaid: 0,
+            oilStock: false,
+        }
+    },
+    watch: {
+        'productIndex': function() {
+            if (this.listData.length > 0) {
+                if (this.listData[this.productIndex].product_type == 'Octane' || this.listData[this.productIndex].product_type == 'Diesel' || this.listData[this.productIndex].product_type == 'Petrol' || this.listData[this.productIndex].product_type == 'LPG') {
+                    this.oilStock = true;
+                } else {
+                    this.oilStock = false;
+                }
+            }
         }
     },
     methods: {

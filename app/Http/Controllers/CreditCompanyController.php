@@ -71,6 +71,15 @@ class CreditCompanyController extends Controller
         if (!$unEarnedRevenueCategory instanceof Category) {
             return response()->json(['status' => 400, 'message' => 'Cannot saved [un earned revenue] category.']);
         }
+
+        $category = Category::where('slug', strtolower(AccountCategory::UN_AUTHORIZED_BILL))->where('client_company_id', $sessionUser['client_company_id'])->first();
+        if (!$category instanceof Category) {
+            return response()->json(['status' => 400, 'message' => 'Cannot find [un earned revenue] category.']);
+        }
+        $unAuthorizedBillCategory = CategoryRepository::saveCategory($data, $category['id'], Module::UN_AUTHORIZED_BILL);
+        if (!$unAuthorizedBillCategory instanceof Category) {
+            return response()->json(['status' => 400, 'message' => 'Cannot saved [un authorized bill] category.']);
+        }
         return response()->json(['status' => 200, 'message' => 'Successfully saved credit company.']);
     }
     /**

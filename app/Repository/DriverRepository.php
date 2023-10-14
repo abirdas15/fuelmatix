@@ -24,6 +24,7 @@ class DriverRepository
         $driverModel->phone_number = $data['phone_number'];
         $driverModel->driver_expense_id = $data['driver_expense_id'];
         $driverModel->driver_liability_id = $data['driver_liability_id'];
+        $driverModel->un_authorized_bill_id = $data['un_authorized_bill_id'];
         $driverModel->client_company_id = $sessionUser['client_company_id'];
         if (!$driverModel->save()) {
             return false;

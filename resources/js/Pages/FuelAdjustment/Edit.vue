@@ -16,7 +16,7 @@
                     </div>
                     <div class="card-body">
                         <div class="basic-form">
-                            <form @submit.prevent="save">
+                            <form @submit.prevent="update">
                                 <div class="row">
                                     <div class="col-sm-6">
                                         <div class="form-group mb-3">
@@ -29,7 +29,7 @@
                                     <div class="col-sm-6">
                                         <div class="row form-group mb-3">
                                             <label >Product</label>
-                                            <select class="form-control form-select" name="product_id" v-model="param.product_id">
+                                            <select class="form-control form-select" name="product_id" v-model="param.product_id" @change="getNozzle(); getNozzle();">
                                                 <option v-for="p in products" :value="p.id">{{p.name}}</option>
                                             </select>
                                             <div class="invalid-feedback"></div>
@@ -95,17 +95,7 @@ import ApiRoutes from "../../Services/ApiRoutes";
 export default {
     data() {
         return {
-            param: {
-                purpose: '',
-                product_id: '',
-                loss_quantity: '',
-                nozzles: [],
-                tank: {
-                    id: '',
-                    name: '',
-                    quantity: '',
-                }
-            },
+            param: {},
             listParam: {
                 limit: 5000,
                 page: 1,
@@ -115,12 +105,19 @@ export default {
         }
     },
     watch: {
-        'param.product_id': function () {
-            this.getNozzle()
-            this.getTank()
-        }
+        // 'param.product_id': function () {
+        //     this.getNozzle()
+        //     this.getTank()
+        // }
     },
     methods: {
+        fetchSingle: function() {
+            ApiService.POST(ApiRoutes.FuelAdjustmentSingle, {id: this.$route.params.id}, (res) => {
+                if (parseFloat(res.status) === 200) {
+                    this.param = res.data;
+                }
+            });
+        },
         calculateLoss: function () {
             let plus = 0
             this.param.nozzles.map(v => {
@@ -140,6 +137,7 @@ export default {
             })
         },
         getNozzle: function () {
+            this.param.nozzles = [];
             ApiService.POST(ApiRoutes.NozzleList, { limit: 5000, page: 1, product_id: this.param.product_id}, res => {
                 if (parseInt(res.status) === 200) {
                     res.data.data.map(v => {
@@ -158,10 +156,10 @@ export default {
                 }
             })
         },
-        save: function () {
+        update: function () {
             ApiService.ClearErrorHandler();
             this.loading = true
-            ApiService.POST(ApiRoutes.FuelAdjustment, this.param,res => {
+            ApiService.POST(ApiRoutes.FuelAdjustmentUpdate, this.param,res => {
                 this.loading = false
                 if (parseInt(res.status) === 200) {
                     this.$router.push({
@@ -175,6 +173,7 @@ export default {
     },
     created() {
         this.getProduct()
+        this.fetchSingle();
     },
     mounted() {
         $('#dashboard_bar').text('Fuel Adjustment')
