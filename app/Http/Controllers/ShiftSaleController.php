@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Common\AccountCategory;
+use App\Common\Module;
 use App\Helpers\SessionUser;
 use App\Models\Category;
 use App\Models\Dispenser;
@@ -59,16 +60,16 @@ class ShiftSaleController extends Controller
             return response()->json(['status' => 200, 'message' => 'Successfully started shift sale.']);
         }
 
-        $category = Category::where('slug', strtolower(AccountCategory::INCOME))->where('client_company_id', $inputData['session_user']['client_company_id'])->first();
+        $category = Category::where('slug', strtolower(AccountCategory::DIRECT_INCOME))->where('client_company_id', $inputData['session_user']['client_company_id'])->first();
         $incomeCategory = Category::where('parent_category', $category['id'])
-            ->where('module', 'product')
+            ->where('module', Module::PRODUCT)
             ->where('module_id', $inputData['product_id'])
             ->where('client_company_id', $inputData['session_user']['client_company_id'])
             ->first();
         if (!$incomeCategory instanceof Category) {
             return response()->json(['status' => 500, 'error' => 'Cannot fin account income category.']);
         }
-        $category = Category::where('slug', )->where('client_company_id', $inputData['session_user']['client_company_id'])->first();
+        $category = Category::where('slug', strtolower(AccountCategory::STOCK_IN_HAND))->where('client_company_id', $inputData['session_user']['client_company_id'])->first();
         $stockCategory = Category::where('parent_category', $category['id'])
             ->where('module', 'product')
             ->where('module_id', $inputData['product_id'])
