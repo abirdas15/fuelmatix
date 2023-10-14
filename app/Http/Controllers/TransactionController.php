@@ -43,7 +43,6 @@ class TransactionController extends Controller
             $newTransaction->credit_amount = $transaction['credit_amount'] ?? 0;
             $newTransaction->file = $transaction['file'] ?? null;
             $newTransaction->linked_id = $inputData['linked_id'];
-            $newTransaction->added_by = Auth::user()->id;
             $newTransaction->module = $transaction['module'] ?? 'accounting';
             $newTransaction->module_id = $transaction['module_id'] ?? null;
             $newTransaction->client_company_id = $sessionUser['client_company_id'];
@@ -58,7 +57,6 @@ class TransactionController extends Controller
                 $newTransaction->debit_amount = $transaction['credit_amount'] ?? 0;
                 $newTransaction->credit_amount = $transaction['debit_amount'] ?? 0;
                 $newTransaction->linked_id = $transaction['account_id'];
-                $newTransaction->added_by = Auth::user()->id;
                 $newTransaction->module = $transaction['module'] ?? 'accounting';
                 $newTransaction->module_id = $transaction['module_id'] ?? null;
                 $newTransaction->client_company_id = $sessionUser['client_company_id'];

@@ -35220,9 +35220,7 @@ var render = function render() {
       "min-width": "845px"
     }
   }, [_vm._m(2), _vm._v(" "), _vm.listData.length > 0 && _vm.TableLoading == false ? _c("tbody", _vm._l(_vm.listData, function (f) {
-    return _c("tr", [_c("td", [_vm._v(_vm._s(f.created_at))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(f.company_name))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(f.driver_name))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(f.amount))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(f.user_name))]), _vm._v(" "), _c("td", [_vm.CheckPermission(_vm.Section.UNAUTHORIZED_BILL + "-" + _vm.Action.CREATE) ? _c("div", {
-      staticClass: "d-flex"
-    }, [_c("a", {
+    return _c("tr", [_c("td", [_vm._v(_vm._s(f.created_at))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(f.company_name))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(f.driver_name))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(f.amount))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(f.user_name))]), _vm._v(" "), _c("td", [_c("a", {
       staticClass: "btn btn-primary shadow btn-xs sharp",
       attrs: {
         href: "javascript:void(0)"
@@ -35234,7 +35232,7 @@ var render = function render() {
       }
     }, [_c("i", {
       staticClass: "fa-solid fa-money-bill-transfer"
-    })])]) : _vm._e()])]);
+    })])])]);
   }), 0) : _vm._e(), _vm._v(" "), _vm.listData.length == 0 && _vm.TableLoading == false ? _c("tbody", [_vm._m(3)]) : _vm._e(), _vm._v(" "), _vm.TableLoading == true ? _c("tbody", [_vm._m(4)]) : _vm._e()]), _vm._v(" "), _vm.paginateData != null ? _c("div", {
     staticClass: "dataTables_info",
     attrs: {

@@ -52,11 +52,9 @@
                                                 <td >{{f.amount}}</td>
                                                 <td >{{f.user_name}}</td>
                                                 <td>
-                                                    <div v-if="CheckPermission(Section.UNAUTHORIZED_BILL + '-' + Action.CREATE)" class="d-flex">
-                                                        <a  href="javascript:void(0)" @click="openModal(f)"  class="btn btn-primary shadow btn-xs sharp">
-                                                            <i class="fa-solid fa-money-bill-transfer"></i>
-                                                        </a>
-                                                    </div>
+                                                    <a  href="javascript:void(0)" @click="openModal(f)"  class="btn btn-primary shadow btn-xs sharp">
+                                                        <i class="fa-solid fa-money-bill-transfer"></i>
+                                                    </a>
                                                 </td>
                                             </tr>
                                             </tbody>
