@@ -217,6 +217,9 @@ const ApiRoutes = {
     FuelAdjustmentSingle: ApiVersion + '/fuelAdjustment/single',
     FuelAdjustmentUpdate: ApiVersion + '/fuelAdjustment/update',
     FuelAdjustmentDelete: ApiVersion + '/fuelAdjustment/delete',
+
+    //sales report
+    SalesReport: ApiVersion + '/report/sales'
 };
 
 export default ApiRoutes;
