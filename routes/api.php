@@ -250,6 +250,7 @@ Route::group(['middleware' => 'AuthReqCheck'], function() {
             Route::post('/', [ReportController::class, 'dailyLog']);
             Route::post('export/pdf', [ReportController::class, 'dailyLogExportPdf']);
         });
+        Route::post('sales', [ReportController::class, 'salesReport']);
     });
     Route::group(['prefix' => 'user'], function() {
         Route::post('save', [UserController::class, 'save']);

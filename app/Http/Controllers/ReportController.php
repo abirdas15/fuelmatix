@@ -2,9 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Common\FuelMatixDateTimeFormat;
+use App\Common\FuelMatixStatus;
+use App\Helpers\Helpers;
+use App\Helpers\SessionUser;
+use App\Models\ShiftSale;
 use App\Repository\ReportRepository;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class ReportController extends Controller
@@ -40,5 +47,40 @@ class ReportController extends Controller
         $result = ReportRepository::dailyLog($filter);
         $pdf = Pdf::loadView('pdf.daily-log', ['data' => $result]);
         return $pdf->output();
+    }
+
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function salesReport(Request $request): JsonResponse
+    {
+        $requestData = $request->all();
+        $validator = Validator::make($requestData, [
+            'start_date' => 'required',
+            'end_date' => 'required'
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['status' => 500, 'errors' => $validator->errors()]);
+        }
+        $productId = $requestData['product_id'] ?? '';
+        $sessionUser = SessionUser::getUser();
+        $result = ShiftSale::select('shift_sale.date', DB::raw('SUM(shift_sale.consumption) as quantity'), 'products.name as product_name')
+            ->leftJoin('products', 'products.id', '=', 'shift_sale.product_id')
+            ->whereBetween('date', [$requestData['start_date'], $requestData['end_date']])
+            ->where('shift_sale.client_company_id', $sessionUser['client_company_id'])
+            ->where('status', FuelMatixStatus::END);
+        if (!empty($productId)) {
+            $result->where(function($q) use ($productId){
+                $q->where('shift_sale.product_id', $productId);
+            });
+        }
+        $result = $result->groupBy('date')
+            ->get()
+            ->toArray();
+        foreach ($result as &$data) {
+            $data['date'] = Helpers::formatDate($data['date'], FuelMatixDateTimeFormat::STANDARD_DATE);
+        }
+        return response()->json(['status' => 200, 'data' => $result]);
     }
 }
