@@ -512,6 +512,11 @@ const router = new VueRouter({
                     path: ROOT_URL + "/unauthorizedBill", name: "unauthorizedBill", component: UnauthorizedBill,  beforeEnter: (to, from, next) => {
                         CheckPermission(to, from, next, Section.UNAUTHORIZED_BILL + '-' + Action.EDIT)
                     },
+                },
+                {
+                    path: ROOT_URL + "/sales/report", name: "salesReport", component: UnauthorizedBill,  beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.UNAUTHORIZED_BILL + '-' + Action.EDIT)
+                    },
                 }
             ],
         },

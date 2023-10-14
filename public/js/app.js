@@ -28679,7 +28679,13 @@ var render = function render() {
         name: "LedgerSheet"
       }
     }
-  }, [_vm._v("Ledger Sheet\n                        ")])], 1) : _vm._e()])]), _vm._v(" "), _vm.CheckPermission(_vm.Section.ROLE + "-" + _vm.Action.VIEW) ? _c("li", [_c("router-link", {
+  }, [_vm._v("Un authorize Bill\n                        ")])], 1) : _vm._e(), _vm._v(" "), _vm.CheckPermission(_vm.Section.UNAUTHORIZED_BILL + "-" + _vm.Action.VIEW) ? _c("li", [_c("router-link", {
+    attrs: {
+      to: {
+        name: "salesReport"
+      }
+    }
+  }, [_vm._v("Sales Report\n                        ")])], 1) : _vm._e()])]), _vm._v(" "), _vm.CheckPermission(_vm.Section.ROLE + "-" + _vm.Action.VIEW) ? _c("li", [_c("router-link", {
     attrs: {
       to: {
         name: "role"
@@ -38273,7 +38279,7 @@ exports = module.exports = __webpack_require__(/*! ../../../../node_modules/css-
 
 
 // module
-exports.push([module.i, "\n.box-mula[data-v-0d4183dd]{\n    padding: 10px 30px;\n    box-shadow: 0 0 15px 0 #CBC9C8;\n    border-radius: 12px;\n    margin-bottom: 30px;\n    margin-top: 10px;\n}\n.putkir-futa[data-v-0d4183dd]{\n    border-bottom: 1px solid #c1c1c1;\n    margin: 10px 0px 15px 0px;\n    padding-bottom: 11px;\n}\n", ""]);
+exports.push([module.i, "\n.box-mula[data-v-0d4183dd]{\r\n    padding: 10px 30px;\r\n    box-shadow: 0 0 15px 0 #CBC9C8;\r\n    border-radius: 12px;\r\n    margin-bottom: 30px;\r\n    margin-top: 10px;\n}\n.putkir-futa[data-v-0d4183dd]{\r\n    border-bottom: 1px solid #c1c1c1;\r\n    margin: 10px 0px 15px 0px;\r\n    padding-bottom: 11px;\n}\r\n", ""]);
 
 // exports
 
@@ -98107,6 +98113,13 @@ var router = new vue_router__WEBPACK_IMPORTED_MODULE_1__["default"]({
       beforeEnter: function beforeEnter(to, from, next) {
         CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_92__["default"].UNAUTHORIZED_BILL + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_93__["default"].EDIT);
       }
+    }, {
+      path: ROOT_URL + "/sales/report",
+      name: "salesReport",
+      component: _Pages_UnauthorizedBill_UnauthorizedBill_vue__WEBPACK_IMPORTED_MODULE_91__["default"],
+      beforeEnter: function beforeEnter(to, from, next) {
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_92__["default"].UNAUTHORIZED_BILL + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_93__["default"].EDIT);
+      }
     }]
   }]
 });
@@ -98702,7 +98715,7 @@ var app = new vue__WEBPACK_IMPORTED_MODULE_1___default.a({
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! D:\xampp7.4\htdocs\fuelmatix\resources\js\app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! D:\xampp\htdocs\projects\fuelmatix\resources\js\app.js */"./resources/js/app.js");
 
 
 /***/ })
