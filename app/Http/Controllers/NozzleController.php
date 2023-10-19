@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Common\FuelMatixDateTimeFormat;
+use App\Helpers\Helpers;
 use App\Models\Nozzle;
 use App\Models\NozzleReading;
 use Illuminate\Http\JsonResponse;
@@ -10,7 +12,11 @@ use Illuminate\Support\Facades\Validator;
 
 class NozzleController extends Controller
 {
-    public function save(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function save(Request $request): JsonResponse
     {
         $inputData = $request->all();
         $validator = Validator::make($inputData, [
@@ -28,9 +34,9 @@ class NozzleController extends Controller
         $nozzle->opening_stock = $inputData['opening_stock'] ?? null;
         $nozzle->client_company_id = $inputData['session_user']['client_company_id'];
         if ($nozzle->save()) {
-            return response()->json(['status' => 200, 'message' => 'Successfully save nozzle.']);
+            return response()->json(['status' => 200, 'message' => 'Successfully saved nozzle.']);
         }
-        return response()->json(['status' => 500, 'error' => 'Cannot save nozzle.']);
+        return response()->json(['status' => 400, 'message' => 'Cannot saved [nozzle].']);
     }
     /**
      * @param Request $request
@@ -62,7 +68,11 @@ class NozzleController extends Controller
             ->paginate($limit);
         return response()->json(['status' => 200, 'data' => $result]);
     }
-    public function single(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function single(Request $request): JsonResponse
     {
         $inputData = $request->all();
         $validator = Validator::make($inputData, [
@@ -74,7 +84,11 @@ class NozzleController extends Controller
         $result = Nozzle::find($inputData['id']);
         return response()->json(['status' => 200, 'data' => $result]);
     }
-    public function update(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function update(Request $request): JsonResponse
     {
         $inputData = $request->all();
         $validator = Validator::make($inputData, [
@@ -88,18 +102,22 @@ class NozzleController extends Controller
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
         $nozzle = Nozzle::find($inputData['id']);
-        if ($nozzle == null) {
-            return response()->json(['status' => 500, 'error' => 'Cannot find nozzle.']);
+        if (!$nozzle instanceof Nozzle) {
+            return response()->json(['status' => 400, 'message' => 'Cannot find [nozzle].']);
         }
         $nozzle->name = $inputData['name'];
         $nozzle->dispenser_id = $inputData['dispenser_id'];
         $nozzle->opening_stock = $inputData['opening_stock'] ?? null;
         if ($nozzle->save()) {
-            return response()->json(['status' => 200, 'message' => 'Successfully update nozzle.']);
+            return response()->json(['status' => 200, 'message' => 'Successfully updated nozzle.']);
         }
-        return response()->json(['status' => 500, 'error' => 'Cannot update nozzle.']);
+        return response()->json(['status' => 400, 'message' => 'Cannot updated nozzle.']);
     }
-    public function delete(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function delete(Request $request): JsonResponse
     {
         $inputData = $request->all();
         $validator = Validator::make($inputData, [
@@ -109,13 +127,17 @@ class NozzleController extends Controller
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
         $nozzle = Nozzle::find($inputData['id']);
-        if ($nozzle == null) {
-            return response()->json(['status' => 500, 'error' => 'Cannot find nozzle.']);
+        if (!$nozzle instanceof Nozzle) {
+            return response()->json(['status' => 400, 'message' => 'Cannot find [nozzle].']);
         }
         Nozzle::where('id', $inputData['id'])->delete();
-        return response()->json(['status' => 200, 'message' => 'Successfully delete nozzle.']);
+        return response()->json(['status' => 200, 'message' => 'Successfully delete [nozzle].']);
     }
-    public function readingSave(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function readingSave(Request $request): JsonResponse
     {
         $inputData = $request->all();
         $validator = Validator::make($inputData, [
@@ -130,7 +152,7 @@ class NozzleController extends Controller
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
         $reading = new NozzleReading();
-        $reading->date = $inputData['date'];
+        $reading->date = $inputData['date'].' '.date('H:i:s');
         $reading->nozzle_id = $inputData['nozzle_id'];
         $reading->reading = $inputData['reading'];
         $reading->type = $inputData['type'];
@@ -140,13 +162,17 @@ class NozzleController extends Controller
         }
         return response()->json(['status' => 500, 'error' => 'Cannot save reading.']);
     }
-    public function readingList(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function readingList(Request $request): JsonResponse
     {
         $inputData = $request->all();
-        $limit = isset($inputData['limit']) ? $inputData['limit'] : 10;
-        $keyword = isset($inputData['keyword']) ? $inputData['keyword'] : '';
-        $order_by = isset($inputData['order_by']) ? $inputData['order_by'] : 'id';
-        $order_mode = isset($inputData['order_mode']) ? $inputData['order_mode'] : 'DESC';
+        $limit = $inputData['limit'] ?? 10;
+        $keyword = $inputData['keyword'] ?? '';
+        $order_by = $inputData['order_by'] ?? 'id';
+        $order_mode = $inputData['order_mode'] ?? 'DESC';
         $result = NozzleReading::select('nozzle_readings.id', 'nozzle_readings.date', 'nozzle_readings.reading', 'nozzles.name')
             ->leftJoin('nozzles', 'nozzles.id', '=', 'nozzle_readings.nozzle_id')
             ->where('nozzle_readings.client_company_id', $inputData['session_user']['client_company_id']);
@@ -156,12 +182,12 @@ class NozzleController extends Controller
                 $q->orWhere('nozzle_readings.reading', 'LIKE', '%'.$keyword.'%');
             });
         }
-        if (isset($inputData['start_date']) && !empty($inputData['start_date']) && isset($inputData['end_date']) && !empty($inputData['end_date'])) {
+        if (!empty($inputData['start_date']) && !empty($inputData['end_date'])) {
             $result->where(function($q) use ($inputData) {
                 $q->whereBetween('date', [$inputData['start_date'], $inputData['end_date']]);
             });
         }
-        if (isset($inputData['nozzle_id']) && !empty($inputData['nozzle_id'])) {
+        if (!empty($inputData['nozzle_id'])) {
             $result->where(function($q) use ($inputData) {
                 $q->where('nozzle_id', $inputData['nozzle_id']);
             });
@@ -169,11 +195,15 @@ class NozzleController extends Controller
         $result = $result->orderBy($order_by, $order_mode)
             ->paginate($limit);
         foreach ($result as &$data) {
-            $data['date'] = date('d/m/Y', strtotime($data['date']));
+            $data['date'] = Helpers::formatDate($data['date'], FuelMatixDateTimeFormat::STANDARD_DATE_TIME);
         }
         return response()->json(['status' => 200, 'data' => $result]);
     }
-    public function readingSingle(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function readingSingle(Request $request): JsonResponse
     {
         $inputData = $request->all();
         $validator = Validator::make($inputData, [
@@ -185,7 +215,11 @@ class NozzleController extends Controller
         $result = NozzleReading::find($inputData['id']);
         return response()->json(['status' => 200, 'data' => $result]);
     }
-    public function readingUpdate(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function readingUpdate(Request $request): JsonResponse
     {
         $inputData = $request->all();
         $validator = Validator::make($inputData, [
@@ -201,19 +235,23 @@ class NozzleController extends Controller
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
         $reading = NozzleReading::find($inputData['id']);
-        if ($reading == null) {
-            return response()->json(['status' => 500, 'error' => 'Cannot find reading..']);
+        if (!$reading  instanceof NozzleReading) {
+            return response()->json(['status' => 400, 'message' => 'Cannot find reading..']);
         }
         $reading->date = $inputData['date'];
         $reading->nozzle_id = $inputData['nozzle_id'];
         $reading->reading = $inputData['reading'];
         $reading->type = $inputData['type'];
         if ($reading->save()) {
-            return response()->json(['status' => 200, 'message' => 'Successfully udpate reading.']);
+            return response()->json(['status' => 200, 'message' => 'Successfully updated reading.']);
         }
-        return response()->json(['status' => 500, 'error' => 'Cannot update reading.']);
+        return response()->json(['status' => 400, 'message' => 'Cannot update reading.']);
     }
-    public function readingDelete(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function readingDelete(Request $request): JsonResponse
     {
         $inputData = $request->all();
         $validator = Validator::make($inputData, [
@@ -223,10 +261,10 @@ class NozzleController extends Controller
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
         $reading = NozzleReading::find($inputData['id']);
-        if ($reading == null) {
-            return response()->json(['status' => 500, 'error' => 'Cannot find reading..']);
+        if (!$reading instanceof NozzleReading) {
+            return response()->json(['status' => 400, 'message' => 'Cannot find reading..']);
         }
         NozzleReading::where('id', $inputData['id'])->delete();
-        return response()->json(['status' => 200, 'message' => 'Successfully delete reading.']);
+        return response()->json(['status' => 200, 'message' => 'Successfully deleted reading.']);
     }
 }

@@ -515,7 +515,9 @@ const router = new VueRouter({
                     },
                 },
                 {
-                    path: ROOT_URL + "/sales/report", name: "salesReport", component: salesReport
+                    path: ROOT_URL + "/sales/report", name: "salesReport", component: salesReport,  beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.SALES_REPORT + '-' + Action.EDIT)
+                    },
                 }
             ],
         },

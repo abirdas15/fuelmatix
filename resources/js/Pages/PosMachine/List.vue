@@ -49,11 +49,11 @@
                                                 <td >{{f.tds}}</td>
                                                 <td >{{f.bank_name}}</td>
                                                 <td>
-                                                    <div class="d-flex justify-content-end">
+                                                    <div class="d-flex">
                                                         <router-link v-if="CheckPermission(Section.POS_MACHINE + '-' + Action.EDIT)" :to="{name: 'posMachineEdit', params: { id: f.id }}" class=" btn btn-primary shadow btn-xs sharp me-1">
                                                             <i class="fas fa-pencil-alt"></i>
                                                         </router-link>
-                                                        <a v-if="CheckPermission(Section.POS_MACHINE + '-' + Action.DELETE)" href="javascript:void(0)"  @click="openModalDelete(f)" class="btn btn-danger shadow btn-xs sharp">
+                                                        <a v-if="CheckPermission(Section.POS_MACHINE + '-' + Action.DELETE)" href="javascript:void(0)"  @click="openModalDelete(f.id)" class="btn btn-danger shadow btn-xs sharp">
                                                             <i class="fa fa-trash"></i>
                                                         </a>
                                                     </div>
@@ -135,7 +135,7 @@ export default {
         },
     },
     methods: {
-        openModalDelete(data) {
+        openModalDelete(id) {
             Swal.fire({
                 title: 'Are you sure you want to delete?',
                 text: "You won't be able to revert this!",
@@ -146,7 +146,7 @@ export default {
                 confirmButtonText: 'Yes, delete it!'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    this.Delete(data)
+                    this.Delete(id)
                 }
             })
         },
@@ -168,8 +168,8 @@ export default {
                 }
             });
         },
-        Delete: function (data) {
-            ApiService.POST(ApiRoutes.posMachineDelete, {id: data.id },res => {
+        Delete: function (id) {
+            ApiService.POST(ApiRoutes.posMachineDelete, {id: id },res => {
                 if (parseInt(res.status) === 200) {
                     this.$toast.success(res.message);
                     this.list()

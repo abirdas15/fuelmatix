@@ -104,7 +104,7 @@ export default {
         }
     },
     mounted() {
-        $('#dashboard_bar').text('Dashboard')
+        $('#dashboard_bar').text('Daily Sale')
     },
     methods: {
         calculateTop: function (tank) {

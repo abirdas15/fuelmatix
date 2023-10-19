@@ -37,7 +37,7 @@ class InvoiceController extends Controller
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
-        $transaction = Transaction::select('id','module', 'module_id', 'linked_id as category_id', 'debit_amount as amount')
+        $transaction = Transaction::select('id','module', 'module_id', 'description', 'linked_id as category_id', 'debit_amount as amount')
             ->whereIn('id', $requestData['ids'])
             ->get()
             ->toArray();
@@ -56,6 +56,7 @@ class InvoiceController extends Controller
                         ->toArray();
                     foreach ($posSale as &$sale) {
                         $sale['transaction_id'] = $row['id'];
+                        $sale['description'] = $row['description'] ?? null;
                         $invoiceItem[] = $sale;
                     }
                 } else if ($row['module'] == Module::SHIFT_SALE) {
@@ -85,6 +86,7 @@ class InvoiceController extends Controller
                     $invoiceItemObj = new InvoiceItem();
                     $invoiceItemObj->invoice_id = $invoice->id;
                     $invoiceItemObj->transaction_id = $item['transaction_id'];
+                    $invoiceItemObj->car_number = $item['description'] ?? null;
                     $invoiceItemObj->product_id = $item['product_id'];
                     $invoiceItemObj->quantity = $item['quantity'];
                     $invoiceItemObj->price = $item['price'];
@@ -175,11 +177,16 @@ class InvoiceController extends Controller
         Transaction::where('module', Module::INVOICE)->where('module_id', $requestData['id'])->delete();
         return response()->json(['status' => 200, 'message' => 'Successfully deleted invoice.']);
     }
-    public function single(Request $request)
+
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function single(Request $request): JsonResponse
     {
         $requestData = $request->all();
         $validator = Validator::make($requestData, [
-            'id' => 'required'
+            'id' => 'required|integer'
         ]);
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
@@ -193,7 +200,7 @@ class InvoiceController extends Controller
         if (!empty($sessionUser['client_company_id'])) {
             $company = ClientCompany::find($sessionUser['client_company_id']);
         }
-        $category = Category::select('others', 'category as name')->find($invoice['category_id']);
+        $category = Category::select('others', 'name')->find($invoice['category_id']);
         $others = json_decode($category['others']);
         $category['email'] = $others->email ?? '';
         $category['phone'] = $others->phone ?? '';
@@ -201,7 +208,7 @@ class InvoiceController extends Controller
         $invoice['customer_company'] = $category;
         $invoice['company'] = $company;
         $invoice['amount'] = number_format($invoice['amount'], 2);
-        $invoiceItem = InvoiceItem::select('invoice_item.id', 'invoice_item.quantity', 'invoice_item.price', 'invoice_item.subtotal', 'products.name as product_name')
+        $invoiceItem = InvoiceItem::select('invoice_item.id', 'invoice_item.car_number', 'invoice_item.quantity', 'invoice_item.price', 'invoice_item.subtotal', 'products.name as product_name')
             ->leftJoin('products', 'products.id', 'invoice_item.product_id')
             ->where('invoice_item.invoice_id', $requestData['id'])
             ->get()
@@ -232,7 +239,7 @@ class InvoiceController extends Controller
         if (!empty($sessionUser['client_company_id'])) {
             $company = ClientCompany::find($sessionUser['client_company_id']);
         }
-        $category = Category::select('others', 'category as name')->find($invoice['category_id']);
+        $category = Category::select('others', 'name')->find($invoice['category_id']);
         $others = json_decode($category['others']);
         $category['email'] = $others->email ?? '';
         $category['phone'] = $others->phone ?? '';
@@ -240,7 +247,7 @@ class InvoiceController extends Controller
         $invoice['customer_company'] = $category;
         $invoice['company'] = $company;
         $invoice['amount'] = number_format($invoice['amount'], 2);
-        $invoiceItem = InvoiceItem::select('invoice_item.id', 'invoice_item.quantity', 'invoice_item.price', 'invoice_item.subtotal', 'products.name as product_name')
+        $invoiceItem = InvoiceItem::select('invoice_item.id', 'invoice_item.car_number', 'invoice_item.quantity', 'invoice_item.price', 'invoice_item.subtotal', 'products.name as product_name')
             ->leftJoin('products', 'products.id', 'invoice_item.product_id')
             ->where('invoice_item.invoice_id', $requestData['id'])
             ->get()

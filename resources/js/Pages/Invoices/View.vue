@@ -70,6 +70,7 @@
                                             <thead>
                                             <tr>
                                                 <th style="background-color: rgba(134,183,255,0.9)">Product</th>
+                                                <th style="background-color: rgba(134,183,255,0.9)">Car Number</th>
                                                 <th style="background-color: rgba(134,183,255,0.9)" class="text-center">Quantity</th>
                                                 <th style="background-color: rgba(134,183,255,0.9)" class="text-end">Unit Price</th>
                                                 <th style="background-color: rgba(134,183,255,0.9)" class="text-end">Subtotal</th>
@@ -78,12 +79,13 @@
                                             <tbody>
                                             <tr v-for="item in param?.invoice_item">
                                                 <td>{{item.product_name}}</td>
+                                                <td>{{item.car_number}}</td>
                                                 <td class="text-center">{{item.quantity}}</td>
                                                 <td class="text-end">{{item.price}}</td>
                                                 <td class="text-end">{{item.subtotal}}</td>
                                             </tr>
                                             <tr>
-                                                <th colspan="3" class="text-end"><strong>Total</strong></th>
+                                                <th colspan="4" class="text-end"><strong>Total</strong></th>
                                                 <th class="text-end">{{param.amount}}</th>
                                             </tr>
                                             </tbody>

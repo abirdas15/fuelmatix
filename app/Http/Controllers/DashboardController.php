@@ -8,12 +8,17 @@ use App\Models\Category;
 use App\Models\Invoice;
 use App\Models\ShiftSale;
 use App\Models\Transaction;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
-    public function get(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function get(Request $request): JsonResponse
     {
         $result = [
             'sale' => self::getShiftSale(),
@@ -22,7 +27,11 @@ class DashboardController extends Controller
         ];
         return response()->json(['status' => 200, 'data' => $result]);
     }
-    public static function getShiftSale()
+
+    /**
+     * @return array[]
+     */
+    public static function getShiftSale(): array
     {
         $sessionUser = SessionUser::getUser();
         $startDate = date('Y-01-01');
@@ -37,7 +46,7 @@ class DashboardController extends Controller
         $month = [];
         $amount = [];
         $quantity = [];
-        for($i = 1; $i <= 12; $i++) {
+        for($i = 1; $i <= date('m'); $i++) {
             $month[] = date('F', strtotime(date('Y-'.$i.'-01')));
             $amount[] = isset($shiftSale[$i]) ? $shiftSale[$i]['amount'] : 0;
             $quantity[] = isset($shiftSale[$i]) ? $shiftSale[$i]['quantity'] : 0;

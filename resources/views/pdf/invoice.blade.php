@@ -74,6 +74,7 @@
         <thead>
         <tr>
             <th>Product</th>
+            <th>Car Number</th>
             <th style="text-align: center">Quantity</th>
             <th style="text-align: right">Unit Price</th>
             <th style="text-align: right">Subtotal</th>
@@ -83,6 +84,7 @@
         @foreach($data['invoice_item'] as $item)
             <tr>
                 <td>{{ $item['product_name'] }}</td>
+                <td>{{ $item['car_number'] }}</td>
                 <td style="text-align: center">{{ $item['quantity'] }}</td>
                 <td style="text-align: right">{{ $item['price'] }}</td>
                 <td style="text-align: right">{{ $item['subtotal'] }}</td>
@@ -91,7 +93,7 @@
         </tbody>
         <tfoot>
         <tr>
-            <th colspan="3" style="text-align: right">Total</th>
+            <th colspan="4" style="text-align: right">Total</th>
             <th style="text-align: right">{{ $data['amount'] }}</th>
         </tr>
         </tfoot>

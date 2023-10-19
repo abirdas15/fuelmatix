@@ -43,8 +43,9 @@
                                                 <th>
                                                     <input type="checkbox" class="form-check-input" @change="selectAll($event)">
                                                 </th>
-                                                <th class="text-white" @click="sortData('date')" :class="sortClass('date')">Date</th>
+                                                <th class="text-white" @click="sortData('created_at')" :class="sortClass('created_at')">Date</th>
                                                 <th class="text-white" @click="sortData('name')" :class="sortClass('name')">Company</th>
+                                                <th class="text-white" @click="sortData('description')" :class="sortClass('description')">Car Number</th>
                                                 <th class="text-white" @click="sortData('amount')" :class="sortClass('amount')">Amount</th>
                                                 <th class="text-white" style="width: 375px">Action</th>
                                             </tr>
@@ -54,8 +55,9 @@
                                                 <td>
                                                     <input v-if="!f.invoice_id" type="checkbox" :checked="isExist(f.id)" class="form-check-input" @change="selectIds($event, f.id)">
                                                 </td>
-                                                <td >{{f.date}}</td>
+                                                <td >{{f.created_at}}</td>
                                                 <td><a href="javascript:void(0);">{{f.name}}</a></td>
+                                                <td><a href="javascript:void(0);">{{f.description}}</a></td>
                                                 <td><a href="javascript:void(0);">{{f?.amount}}</a></td>
                                                 <td>
                                                     <template v-if="f.module == 'shift sale' && CheckPermission(Section.COMPANY_SALE + '-' + Action.CREATE)">

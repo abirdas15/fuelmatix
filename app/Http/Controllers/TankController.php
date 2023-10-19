@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Common\AccountCategory;
+use App\Common\FuelMatixDateTimeFormat;
 use App\Common\FuelMatixStatus;
+use App\Helpers\Helpers;
 use App\Helpers\SessionUser;
 use App\Models\BstiChart;
 use App\Models\Category;
@@ -216,7 +218,7 @@ class TankController extends Controller
             ->first();
         $reading = new TankLog();
         $reading->tank_id = $inputData['tank_id'];
-        $reading->date = $inputData['date'];
+        $reading->date = $inputData['date'].' '.date('H:i:s');
         $reading->height = $inputData['height'];
         $reading->water_height = $inputData['water_height'] ?? null;
         $reading->type = $inputData['type'];
@@ -225,7 +227,7 @@ class TankController extends Controller
         if ($reading->save()) {
             return response()->json(['status' => 200, 'message' => 'Successfully saved tank reading.']);
         }
-        return response()->json(['status' => 500, 'error' => 'Cannot saved tank reading.']);
+        return response()->json(['status' => 400, 'message' => 'Cannot saved tank reading.']);
     }
     /**
      * @param Request $request
@@ -252,7 +254,7 @@ class TankController extends Controller
         $result = $result->orderBy($order_by, $order_mode)
             ->paginate($limit);
         foreach ($result as $data) {
-            $data['date'] = date('d/m/Y', strtotime($data['date']));
+            $data['date'] = Helpers::formatDate($data['date'], FuelMatixDateTimeFormat::STANDARD_DATE_TIME);
         }
         return response()->json(['status' => 200, 'data' => $result]);
     }
@@ -289,21 +291,21 @@ class TankController extends Controller
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
         $reading = TankLog::find($inputData['id']);
-        if ($reading == null) {
-            return response()->json(['status' => 500, 'error' => 'Cannot find tank reading.']);
+        if (!$reading instanceof TankLog) {
+            return response()->json(['status' => 400, 'message' => 'Cannot find [tank reading].']);
         }
         $bstiChart = BstiChart::where('tank_id', $inputData['tank_id'])
             ->where('height', '=', floor($inputData['height']))
             ->first();
         $reading->tank_id = $inputData['tank_id'];
-        $reading->date = $inputData['date'];
+        $reading->date = $inputData['date'].' '.date('H:i:s');
         $reading->height = $inputData['height'];
         $reading->water_height = $inputData['water_height'] ?? null;
         $reading->volume = $bstiChart != null ? $bstiChart->volume : 0;
         if ($reading->save()) {
             return response()->json(['status' => 200, 'message' => 'Successfully updated tank reading.']);
         }
-        return response()->json(['status' => 500, 'error' => 'Cannot updated tank reading.']);
+        return response()->json(['status' => 400, 'message' => 'Cannot updated [tank reading].']);
     }
     /**
      * @param Request $request

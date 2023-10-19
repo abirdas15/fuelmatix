@@ -50,6 +50,12 @@
                                         <label>Advance Amount: <strong>{{ parseFloat(driver_amount).toFixed(2) }}</strong></label>
                                     </div>
                                 </div>
+                                <div class="col-sm-6" v-if="company_id">
+                                    <div class="user-search form-group">
+                                        <input type="text" class="form-control" placeholder="Car Number" name="car_number" v-model="car_number">
+                                        <span class="invalid-feedback d-block"></span>
+                                    </div>
+                                </div>
                             </div>
                             <div class="default-cart">
                                 <div class="t-section">
@@ -533,7 +539,8 @@ export default {
             drivers: [],
             advance_amount: '',
             advance_sale: false,
-            driver_amount: 0.00
+            driver_amount: 0.00,
+            car_number: '',
         }
     },
     computed: {
@@ -632,6 +639,7 @@ export default {
             let param = {
                 payment_method: this.payment_method,
                 products: this.sale,
+                car_number: this.car_number
             }
             if (type == 'company') {
                 param.driver_tip = this.driver_tip
