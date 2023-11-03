@@ -260,6 +260,27 @@ class ProductController extends Controller
         if (!$product instanceof Product) {
             return response()->json(['status' => 500, 'error' => 'Cannot find product.']);
         }
+        $end_reading = 0;
+        $start_reading = 0;
+        $tank = Tank::where('product_id', $inputData['product_id'])->select('id')->where('client_company_id', $sessionUser['client_company_id'])->first();
+        if ($tank instanceof Tank) {
+            $tankReading = TankLog::select('tank_log.volume')
+                ->where('type', 'shift sell')
+                ->where('tank_id', $tank->id)
+                ->where('client_company_id', $sessionUser['client_company_id'])
+                ->orderBy('tank_log.id', 'DESC')
+                ->limit(2)
+                ->get()
+                ->toArray();
+            if (!empty($tankReading)) {
+                if (count($tankReading) == 1) {
+                    $start_reading = $tankReading[0]['volume'];
+                } else {
+                    $start_reading = $tankReading[1]['volume'] ?? 0;
+                    $end_reading = $tankReading[0]['volume'] ?? 0;
+                }
+            }
+        }
         $stock = Stock::select('*')
             ->where('client_company_id', $sessionUser['client_company_id'])
             ->where('date', date('Y-m-d'))
@@ -267,8 +288,6 @@ class ProductController extends Controller
             ->orderBy('id', 'DESC')
             ->first();
         $tank_refill = 0;
-        $end_reading = 0;
-        $start_reading = $product->opening_stock ?? 0;
         if ($stock instanceof Stock) {
             if ($stock['in_stock'] > 0) {
                 $start_reading = $stock['opening_stock'];
@@ -286,18 +305,7 @@ class ProductController extends Controller
                 $start_reading = $previousStock->closing_stock;
             }
         }
-        $tank = Tank::where('product_id', $inputData['product_id'])->select('id')->where('client_company_id', $sessionUser['client_company_id'])->first();
-        if ($tank instanceof Tank) {
-            $tankReading = TankLog::select('tank_log.volume')
-                ->where('type', 'shift sell')
-                ->where('tank_id', $tank->id)
-                ->where('client_company_id', $sessionUser['client_company_id'])
-                ->orderBy('tank_log.id', 'DESC')
-                ->first();
-            if ($tankReading instanceof TankLog) {
-                $end_reading = $tankReading['volume'];
-            }
-        }
+
         $consumption = $start_reading + $tank_refill - $end_reading;
         $amount = $consumption * $product['selling_price'];
         $result = [
@@ -321,8 +329,8 @@ class ProductController extends Controller
         foreach ($dispensers as &$dispenser) {
             foreach ($dispenser['nozzle'] as &$nozzle) {
                 $reading = NozzleReading::select('*')->where('client_company_id', $sessionUser['client_company_id'])->where('nozzle_id', $nozzle['id'])->orderBy('id', 'DESC')->where('type', 'shift sell')->limit(2)->get()->toArray();
-                $nozzle['end_reading'] = isset($reading[0]) ? $reading[0]['reading'] : 0;
-                $nozzle['start_reading'] = isset($reading[1]) ? $reading[1]['reading'] : 0;
+                $nozzle['start_reading'] = isset($reading[0]) ? $reading[0]['reading'] : 0;
+                $nozzle['end_reading'] = isset($reading[1]) ? $reading[1]['reading'] : 0;
                 $nozzle['consumption'] =  $nozzle['end_reading']  - $nozzle['start_reading'];
                 $nozzle['amount'] = $nozzle['consumption'] * $product['selling_price'];
             }

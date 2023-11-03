@@ -59,7 +59,7 @@
                                     <div class="mb-3 col-md-6">
                                         <button type="submit" class="btn btn-primary" v-if="!loading">Submit</button>
                                         <button type="button" class="btn btn-primary" v-if="loading">Submitting...</button>
-                                        <router-link :to="{name: 'TankReading'}" type="button" class="btn btn-primary">Cancel</router-link>
+                                        <router-link :to="{name: 'TankReading'}" type="button" class="btn btn-danger">Cancel</router-link>
                                     </div>
                                 </div>
                             </form>

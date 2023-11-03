@@ -52,14 +52,15 @@
                                         <label class="form-label">Unit:</label>
                                         <select class="form-control wide" name="unit" v-model="param.unit">
                                             <option value="1">Liter</option>
+                                            <option value="2">M3</option>
                                         </select>
                                         <div class="invalid-feedback"></div>
                                     </div>
-                                    <div class="mb-3 form-group col-md-6">
-                                        <label class="form-label">Opening Stock:</label>
-                                        <input type="number" class="form-control" name="opening_stock" v-model="param.opening_stock">
-                                        <div class="invalid-feedback"></div>
-                                    </div>
+<!--                                    <div class="mb-3 form-group col-md-6">-->
+<!--                                        <label class="form-label">Opening Stock:</label>-->
+<!--                                        <input type="number" class="form-control" name="opening_stock" v-model="param.opening_stock">-->
+<!--                                        <div class="invalid-feedback"></div>-->
+<!--                                    </div>-->
                                 </div>
                                 <div class="row" style="text-align: right;">
                                     <div class="mb-3 col-md-6">
@@ -68,7 +69,7 @@
                                     <div class="mb-3 col-md-6">
                                         <button type="submit" class="btn btn-primary" v-if="!loading">Submit</button>
                                         <button type="button" class="btn btn-primary" v-if="loading">Submitting...</button>
-                                        <router-link :to="{name: 'Product'}" type="button" class="btn btn-primary">Cancel</router-link>
+                                        <router-link :to="{name: 'Product'}" type="button" class="btn btn-danger">Cancel</router-link>
                                     </div>
                                 </div>
                             </form>

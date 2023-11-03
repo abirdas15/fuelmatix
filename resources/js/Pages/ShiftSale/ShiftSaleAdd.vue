@@ -206,7 +206,7 @@
                                         <button type="submit" class="btn btn-primary" v-if="!loading && listDispenser?.status == 'start'">Start</button>
                                         <button type="submit" class="btn btn-primary" v-if="!loading && listDispenser?.status == 'end'">End</button>
                                         <button type="button" class="btn btn-primary" v-if="loading">Submitting...</button>
-                                        <router-link :to="{name: 'ShiftSaleList'}" type="button" class="btn btn-primary">Cancel</router-link>
+                                        <router-link :to="{name: 'ShiftSaleList'}" type="button" class="btn btn-danger">Cancel</router-link>
                                     </div>
                                 </div>
                             </div>
@@ -239,8 +239,8 @@ export default {
             oilStock: false,
         }
     },
-    watch: {
-        'productIndex': function() {
+    methods: {
+        updateOilStock: function() {
             if (this.listData.length > 0) {
                 if (this.listData[this.productIndex].product_type == 'Octane' || this.listData[this.productIndex].product_type == 'Diesel' || this.listData[this.productIndex].product_type == 'Petrol' || this.listData[this.productIndex].product_type == 'LPG') {
                     this.oilStock = true;
@@ -248,9 +248,7 @@ export default {
                     this.oilStock = false;
                 }
             }
-        }
-    },
-    methods: {
+        },
         totalPosSale: function () {
             let total = 0
             this.listDispenser.pos_sale.map((v) => {
@@ -341,6 +339,7 @@ export default {
                 if (parseInt(res.status) === 200) {
                     this.listDispenser = res.data;
                     this.getCategory()
+                    this.updateOilStock();
                 }
                 this.getTotalSale()
             });

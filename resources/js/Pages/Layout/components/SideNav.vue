@@ -83,14 +83,6 @@
                         <li  v-if="CheckPermission(Section.FUEL_ADJUSTMENT + '-' + Action.VIEW)"><router-link :to="{name: 'adjustment'}">Fuel Adjustment</router-link></li>
                     </ul>
                 </li>
-                <li><a class="has-arrow " href="javascript:void(0)" aria-expanded="false">
-                    <i class="fa-solid fa-user-gear"></i>
-                    <span class="nav-text">Settings</span>
-                </a>
-                    <ul aria-expanded="false" class="bichi">
-                        <li v-if="CheckPermission(Section.CREDIT_COMPANY + '-' + Action.VIEW)"><router-link :to="{name: 'system'}">Company</router-link></li>
-                    </ul>
-                </li>
                 <li>
                     <router-link :to="{name: 'Accounts'}"  aria-expanded="false">
                         <i class="fas fa-dollar-sign"></i>

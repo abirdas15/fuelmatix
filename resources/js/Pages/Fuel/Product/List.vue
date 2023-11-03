@@ -70,7 +70,7 @@
                                                 <td><a href="javascript:void(0);">{{f?.buying_price}}</a></td>
                                                 <td><a href="javascript:void(0);">{{f.selling_price}}</a></td>
                                                 <td><a href="javascript:void(0);">{{f.driver_selling_price}}</a></td>
-                                                <td><a href="javascript:void(0);">{{f?.unit}}</a></td>
+                                                <td><a href="javascript:void(0);">{{f?.unit == 1 ? "Liter": "M3"}}</a></td>
                                                 <td>
                                                     <div class="d-flex justify-content-end">
                                                         <router-link v-if="CheckPermission(Section.PRODUCT + '-' + Action.EDIT)" :to="{name: 'ProductEdit', params: { id: f.id }}" class=" btn btn-primary shadow btn-xs sharp me-1">
