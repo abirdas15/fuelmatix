@@ -20,6 +20,8 @@ use App\Models\Tank;
 use App\Models\TankLog;
 use App\Models\TankRefill;
 use App\Models\TankRefillHistory;
+use App\Repository\NozzleRepository;
+use App\Repository\TankRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -220,21 +222,19 @@ class TankController extends Controller
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
-        $bstiChart = BstiChart::where('tank_id', $inputData['tank_id'])
-            ->where('height', '=', floor($inputData['height']))
-            ->first();
-        $reading = new TankLog();
-        $reading->tank_id = $inputData['tank_id'];
-        $reading->date = $inputData['date'].' '.date('H:i:s');
-        $reading->height = $inputData['height'];
-        $reading->water_height = $inputData['water_height'] ?? null;
-        $reading->type = $inputData['type'];
-        $reading->volume = $bstiChart != null ? $bstiChart->volume : 0;
-        $reading->client_company_id = $inputData['session_user']['client_company_id'];
-        if ($reading->save()) {
-            return response()->json(['status' => 200, 'message' => 'Successfully saved tank reading.']);
+        $data = [
+            'tank_id' => $inputData['tank_id'],
+            'date' => $inputData['date'],
+            'height' => $inputData['height'],
+            'water_height' => $inputData['water_height'],
+            'type' => $inputData['type'],
+            'volume' => $inputData['volume'],
+        ];
+        $tankReading = TankRepository::readingSave($data);
+        if (!$tankReading instanceof TankLog) {
+            return response()->json($tankReading);
         }
-        return response()->json(['status' => 400, 'message' => 'Cannot saved tank reading.']);
+        return response()->json(['status' => 200, 'message' => 'Successfully saved tank reading.']);
     }
     /**
      * @param Request $request
@@ -467,6 +467,13 @@ class TankController extends Controller
         if (!$tankRefill->save()) {
             return response()->json(['status' => 400, 'message' => 'Cannot saved tank refill.']);
         }
+        $tankLogData = [
+            'tank_id' => $inputData['tank_id'],
+            'date' => date('Y-m-d'),
+            'height' =>  $inputData['end_reading'] ?? 0,
+            'type' => 'tank refill',
+        ];
+        TankRepository::readingSave($tankLogData);
         $totalRefillAmount = $inputData['total_refill_volume'] * $payOrder['unit_price'];
         $transactionData['linked_id'] = $stockCategory['id'];
         $lossAmount = $payOrder['total'] - $totalRefillAmount;
@@ -507,6 +514,13 @@ class TankController extends Controller
                     $tankRefillHistory->end_reading = $nozzle['end_reading'];
                     $tankRefillHistory->sale = $nozzle['sale'];
                     $tankRefillHistory->save();
+                    $readingData = [
+                        'date' => date('Y-m-d'),
+                        'nozzle_id' => $nozzle['id'],
+                        'reading' => $nozzle['end_reading'],
+                        'type' => 'tank refill',
+                    ];
+                    NozzleRepository::readingSave($readingData);
                 }
             }
         }

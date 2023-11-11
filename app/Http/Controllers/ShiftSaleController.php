@@ -13,6 +13,9 @@ use App\Models\ShiftSale;
 use App\Models\ShiftSaleTransaction;
 use App\Models\ShiftSummary;
 use App\Models\Stock;
+use App\Models\Tank;
+use App\Repository\NozzleRepository;
+use App\Repository\TankRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -60,6 +63,10 @@ class ShiftSaleController extends Controller
             return response()->json(['status' => 200, 'message' => 'Successfully started shift sale.']);
         }
 
+        $tank = Tank::where('product_id', $inputData['product_id'])->first();
+        if (!$tank instanceof Tank) {
+            return response()->json(['status' => 400, 'message' => 'Cannot find tank.']);
+        }
         $category = Category::where('slug', strtolower(AccountCategory::DIRECT_INCOME))->where('client_company_id', $inputData['session_user']['client_company_id'])->first();
         $incomeCategory = Category::where('parent_category', $category['id'])
             ->where('module', Module::PRODUCT)
@@ -103,6 +110,13 @@ class ShiftSaleController extends Controller
         if (!$shiftSale->save()) {
             return response()->json(['status' => 500, 'error' => 'Cannot ended shift sale.']);
         }
+        $tankLogData = [
+            'tank_id' => $tank['id'],
+            'date' => date('Y-m-d'),
+            'height' => $inputData['end_reading'],
+            'type' => 'shift sell',
+        ];
+        TankRepository::readingSave($tankLogData);
         $totalNozzleConsumption = 0;
         $stockData = [
             'client_company_id' => $inputData['session_user']['client_company_id'],
@@ -125,6 +139,13 @@ class ShiftSaleController extends Controller
                 $shiftSaleSummary->consumption = $nozzle['consumption'];
                 $shiftSaleSummary->amount = $nozzle['amount'];
                 $shiftSaleSummary->save();
+                $readingData = [
+                    'date' => date('Y-m-d'),
+                    'nozzle_id' => $nozzle['id'],
+                    'reading' => $nozzle['end_reading'],
+                    'type' => 'shift sell',
+                ];
+                NozzleRepository::readingSave($readingData);
             }
         }
         $buyingPrice = 0;

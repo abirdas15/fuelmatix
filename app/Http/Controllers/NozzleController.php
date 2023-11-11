@@ -6,6 +6,7 @@ use App\Common\FuelMatixDateTimeFormat;
 use App\Helpers\Helpers;
 use App\Models\Nozzle;
 use App\Models\NozzleReading;
+use App\Repository\NozzleRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -151,16 +152,17 @@ class NozzleController extends Controller
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
-        $reading = new NozzleReading();
-        $reading->date = $inputData['date'].' '.date('H:i:s');
-        $reading->nozzle_id = $inputData['nozzle_id'];
-        $reading->reading = $inputData['reading'];
-        $reading->type = $inputData['type'];
-        $reading->client_company_id = $inputData['session_user']['client_company_id'];
-        if ($reading->save()) {
-            return response()->json(['status' => 200, 'message' => 'Successfully save reading.']);
+        $readingData = [
+            'date' => $inputData['date'],
+            'nozzle_id' => $inputData['nozzle_id'],
+            'reading' => $inputData['reading'],
+            'type' => $inputData['type'],
+        ];
+        $reading = NozzleRepository::readingSave($readingData);
+        if (!$reading instanceof NozzleReading) {
+            return response()->json($reading);
         }
-        return response()->json(['status' => 500, 'error' => 'Cannot save reading.']);
+        return response()->json(['status' => 200, 'message' => 'Successfully save reading.']);
     }
     /**
      * @param Request $request
