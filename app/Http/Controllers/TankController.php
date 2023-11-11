@@ -50,6 +50,7 @@ class TankController extends Controller
         $tank->tank_name = $inputData['tank_name'];
         $tank->capacity = $inputData['capacity'];
         $tank->height = $inputData['height'];
+        $tank->opening_stock = $inputData['opening_stock'] ?? 0;
         $tank->client_company_id = $sessionUser['client_company_id'];
         if (!$tank->save()) {
             return response()->json(['status' => 400, 'message' => 'Cannot saved tank.']);
@@ -86,7 +87,7 @@ class TankController extends Controller
         $order_by = $inputData['order_by'] ?? 'id';
         $order_mode = $inputData['order_mode'] ?? 'DESC';
         $sessionUser = SessionUser::getUser();
-        $result = Tank::select('tank.id' ,'tank.tank_name', 'tank.height', 'tank.capacity', 'products.name as product_name', 'product_types.name as product_type_name')
+        $result = Tank::select('tank.id' ,'tank.tank_name', 'tank.height', 'tank.capacity', 'products.name as product_name', 'product_types.name as product_type_name', 'tank.opening_stock')
             ->leftJoin('products', 'products.id', 'tank.product_id')
             ->leftJoin('product_types', 'product_types.id', 'products.type_id')
             ->where('tank.client_company_id', $inputData['session_user']['client_company_id'])
@@ -162,6 +163,7 @@ class TankController extends Controller
         $tank->tank_name = $inputData['tank_name'];
         $tank->capacity = $inputData['capacity'];
         $tank->height = $inputData['height'];
+        $tank->opening_stock = $inputData['opening_stock'] ?? 0;
         if (!$tank->save()) {
             return response()->json(['status' => 400, 'message' => 'Cannot updated [tank].']);
         }
