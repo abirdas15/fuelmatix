@@ -135,7 +135,7 @@ class TankController extends Controller
     public function single(Request $request): JsonResponse
     {
         $inputData = $request->all();
-        $result = Tank::select('id', 'tank_name', 'height', 'capacity', 'product_id')->find($inputData['id']);
+        $result = Tank::select('id', 'tank_name', 'height', 'capacity', 'product_id', 'opening_stock')->find($inputData['id']);
         return response()->json(['status' => 200, 'data' => $result]);
     }
     /**

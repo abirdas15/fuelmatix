@@ -6123,6 +6123,7 @@ __webpack_require__.r(__webpack_exports__);
       formData.append('capacity', this.param.capacity);
       formData.append('height', this.param.height);
       formData.append('product_id', this.param.product_id);
+      formData.append('opening_stock', this.param.opening_stock);
       formData.append('file', this.param.file);
       this.loading = true;
       _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].TankAdd, formData, function (res) {
@@ -22439,7 +22440,7 @@ var render = function render() {
     }],
     staticClass: "form-control",
     attrs: {
-      type: "text",
+      type: "number",
       name: "capacity"
     },
     domProps: {
@@ -22466,7 +22467,7 @@ var render = function render() {
     }],
     staticClass: "form-control",
     attrs: {
-      type: "text",
+      type: "number",
       name: "height"
     },
     domProps: {
@@ -22493,7 +22494,7 @@ var render = function render() {
     }],
     staticClass: "form-control",
     attrs: {
-      type: "text",
+      type: "number",
       name: "height"
     },
     domProps: {
@@ -22710,7 +22711,7 @@ var render = function render() {
     }],
     staticClass: "form-control",
     attrs: {
-      type: "text",
+      type: "number",
       name: "capacity"
     },
     domProps: {
@@ -22737,7 +22738,7 @@ var render = function render() {
     }],
     staticClass: "form-control",
     attrs: {
-      type: "text",
+      type: "number",
       name: "height"
     },
     domProps: {
@@ -22764,7 +22765,7 @@ var render = function render() {
     }],
     staticClass: "form-control",
     attrs: {
-      type: "text",
+      type: "number",
       name: "height"
     },
     domProps: {
@@ -23011,6 +23012,14 @@ var render = function render() {
       }
     }
   }, [_vm._v("Height")]), _vm._v(" "), _c("th", {
+    staticClass: "text-white",
+    "class": _vm.sortClass("height"),
+    on: {
+      click: function click($event) {
+        return _vm.sortData("opening_stock");
+      }
+    }
+  }, [_vm._v("Opening Stock")]), _vm._v(" "), _c("th", {
     staticClass: "text-white"
   }, [_vm._v("Action")])])]), _vm._v(" "), _vm.listData.length > 0 && _vm.TableLoading == false ? _c("tbody", _vm._l(_vm.listData, function (f) {
     return _c("tr", [_c("td", [_vm._v(_vm._s(f.tank_name))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(f.product_name))]), _vm._v(" "), _c("td", [_c("a", {
@@ -23021,7 +23030,11 @@ var render = function render() {
       attrs: {
         href: "javascript:void(0);"
       }
-    }, [_vm._v(_vm._s(f === null || f === void 0 ? void 0 : f.height))])]), _vm._v(" "), _c("td", [_c("div", {
+    }, [_vm._v(_vm._s(f === null || f === void 0 ? void 0 : f.height))])]), _vm._v(" "), _c("td", [_c("a", {
+      attrs: {
+        href: "javascript:void(0);"
+      }
+    }, [_vm._v(_vm._s(f === null || f === void 0 ? void 0 : f.opening_stock))])]), _vm._v(" "), _c("td", [_c("div", {
       staticClass: "d-flex justify-content-end"
     }, [_vm.CheckPermission(_vm.Section.TANK + "-" + _vm.Action.EDIT) ? _c("router-link", {
       staticClass: "btn btn-primary shadow btn-xs sharp me-1",

@@ -34,17 +34,17 @@
                                     </div>
                                     <div class="mb-3 form-group col-md-6">
                                         <label class="form-label">Tank capacity:</label>
-                                        <input type="text" class="form-control" name="capacity" v-model="param.capacity">
+                                        <input type="number" class="form-control" name="capacity" v-model="param.capacity">
                                         <div class="invalid-feedback"></div>
                                     </div>
                                     <div class="mb-3 form-group col-md-6">
                                         <label class="form-label">Opening Stock:</label>
-                                        <input type="text" class="form-control" name="height" v-model="param.opening_stock">
+                                        <input type="number" class="form-control" name="height" v-model="param.opening_stock">
                                         <div class="invalid-feedback"></div>
                                     </div>
                                     <div class="mb-3 form-group col-md-6">
                                         <label class="form-label">Height:</label>
-                                        <input type="text" class="form-control" name="height" v-model="param.height">
+                                        <input type="number" class="form-control" name="height" v-model="param.height">
                                         <div class="invalid-feedback"></div>
                                     </div>
                                     <div class="mb-3 form-group col-md-6">
@@ -113,6 +113,7 @@ export default {
             formData.append('capacity', this.param.capacity)
             formData.append('height', this.param.height)
             formData.append('product_id', this.param.product_id)
+            formData.append('opening_stock', this.param.opening_stock)
             formData.append('file', this.param.file)
             this.loading = true
             ApiService.POST(ApiRoutes.TankAdd, formData,res => {

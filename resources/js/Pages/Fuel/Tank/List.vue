@@ -41,6 +41,7 @@
                                                 <th class="text-white" @click="sortData('product_name')" :class="sortClass('product_name')">Tank Product</th>
                                                 <th class="text-white" @click="sortData('capacity')" :class="sortClass('capacity')">Capacity</th>
                                                 <th class="text-white" @click="sortData('height')" :class="sortClass('height')">Height</th>
+                                                <th class="text-white" @click="sortData('opening_stock')" :class="sortClass('height')">Opening Stock</th>
                                                 <th class="text-white" >Action</th>
                                             </tr>
                                             </thead>
@@ -50,6 +51,7 @@
                                                 <td >{{f.product_name}}</td>
                                                 <td><a href="javascript:void(0);">{{f.capacity}}</a></td>
                                                 <td><a href="javascript:void(0);">{{f?.height}}</a></td>
+                                                <td><a href="javascript:void(0);">{{f?.opening_stock}}</a></td>
                                                 <td>
                                                     <div class="d-flex justify-content-end">
                                                         <router-link v-if="CheckPermission(Section.TANK + '-' + Action.EDIT)" :to="{name: 'TankEdit', params: { id: f.id }}" class=" btn btn-primary shadow btn-xs sharp me-1">
