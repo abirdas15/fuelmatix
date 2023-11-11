@@ -22,7 +22,7 @@
                                         <label class="form-label">From:</label>
                                         <select name="from_category_id" class="form-control form-select" v-model="param.from_category_id">
                                             <template v-for="c in categories">
-                                                <option v-if="c.id != param.to_category_id" :value="c.id">{{c.category}}</option>
+                                                <option v-if="c.id != param.to_category_id" :value="c.id">{{c.name}}</option>
                                             </template>
                                         </select>
                                         <div class="invalid-feedback"></div>
@@ -31,7 +31,7 @@
                                         <label class="form-label">To:</label>
                                         <select name="from_category_id" class="form-control form-select" v-model="param.to_category_id">
                                             <template v-for="c in categories">
-                                                <option v-if="c.id != param.from_category_id" :value="c.id">{{c.category}}</option>
+                                                <option v-if="c.id != param.from_category_id" :value="c.id">{{c.name}}</option>
                                             </template>
                                         </select>
 

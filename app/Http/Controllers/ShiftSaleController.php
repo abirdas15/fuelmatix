@@ -96,6 +96,7 @@ class ShiftSaleController extends Controller
         $shiftSale->start_reading = $inputData['start_reading'];
         $shiftSale->tank_refill = $inputData['tank_refill'];
         $shiftSale->end_reading = $inputData['end_reading'];
+        $shiftSale->adjustment = $inputData['adjustment'];
         $shiftSale->consumption = $inputData['consumption'];
         $shiftSale->amount = $inputData['amount'];
         $shiftSale->status = 'end';
@@ -120,6 +121,7 @@ class ShiftSaleController extends Controller
                 $shiftSaleSummary->nozzle_id = $nozzle['id'];
                 $shiftSaleSummary->start_reading = $nozzle['start_reading'];
                 $shiftSaleSummary->end_reading = $nozzle['end_reading'];
+                $shiftSaleSummary->adjustment = $nozzle['adjustment'];
                 $shiftSaleSummary->consumption = $nozzle['consumption'];
                 $shiftSaleSummary->amount = $nozzle['amount'];
                 $shiftSaleSummary->save();

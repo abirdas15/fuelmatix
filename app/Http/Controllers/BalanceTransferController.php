@@ -51,7 +51,7 @@ class BalanceTransferController extends Controller
         $sessionUser = SessionUser::getUser();
         $requestData = $request->all();
         $limit = $requestData['limit'] ?? 10;
-        $result = BalanceTransfer::select('balance_transfer.id', 'balance_transfer.date', 'balance_transfer.amount', 'balance_transfer.status', 'c1.category as from_category_name', 'c2.category as to_category_name')
+        $result = BalanceTransfer::select('balance_transfer.id', 'balance_transfer.date', 'balance_transfer.amount', 'balance_transfer.status', 'c1.name as from_category_name', 'c2.name as to_category_name')
             ->leftJoin('categories as c1', 'c1.id', '=', 'balance_transfer.from_category_id')
             ->leftJoin('categories as c2', 'c2.id', '=', 'balance_transfer.to_category_id')
             ->where('balance_transfer.client_company_id', $sessionUser['client_company_id']);

@@ -61,14 +61,14 @@ class ExpenseController extends Controller
         $keyword = $inputData['keyword'] ?? '';
         $sessionUser = SessionUser::getUser();
 
-        $result = Expense::select('expense.id', 'expense.date', 'expense.amount',  'c.category as expense', 'c1.category as payment', 'expense.status')
+        $result = Expense::select('expense.id', 'expense.date', 'expense.amount',  'c.name as expense', 'c1.name as payment', 'expense.status')
             ->leftJoin('categories as c', 'c.id', 'expense.category_id')
             ->leftJoin('categories as c1', 'c1.id', 'expense.payment_id')
             ->where('expense.client_company_id', $sessionUser['client_company_id']);
         if (!empty($keyword)) {
             $result->where(function($q) use ($keyword) {
-                $q->where('c.category', 'LIKE', '%'.$keyword.'%');
-                $q->orWhere('c1.category', 'LIKE', '%'.$keyword.'%');
+                $q->where('c.name', 'LIKE', '%'.$keyword.'%');
+                $q->orWhere('c1.name', 'LIKE', '%'.$keyword.'%');
             });
         }
         $result = $result->orderBy('status', 'DESC')

@@ -11,6 +11,7 @@ use App\Models\Category;
 use App\Models\FuelAdjustment;
 use App\Models\FuelAdjustmentData;
 use App\Models\Product;
+use App\Models\ShiftSale;
 use App\Models\Transaction;
 use App\Repository\CategoryRepository;
 use Carbon\Carbon;
@@ -38,11 +39,16 @@ class FuelAdjustmentController extends Controller
         if (!$product instanceof Product) {
             return response()->json(['status' => 400, 'message' => 'Cannot find [product]']);
         }
+        $sessionUser = SessionUser::getUser();
+        $shiftSale = ShiftSale::where('client_company_id', $sessionUser['client_company_id'])->where('product_id', $requestData['product_id'])->where('status', 'start')->first();
+        if (!$shiftSale instanceof ShiftSale) {
+            return response()->json(['status' => 400, 'message' => 'Please start shift sale first.']);
+        }
+
         $categoryData = [
             'name' => $product['name'],
             'module_id' => $product->id
         ];
-        $sessionUser = SessionUser::getUser();
         $categoryId = null;
         if ($requestData['loss_quantity'] > 0) {
             $indirectExpenseCategory = Category::where('slug', strtolower(AccountCategory::IN_DIRECT_EXPENSE))->where('client_company_id', $sessionUser['client_company_id'])->first();
@@ -80,6 +86,7 @@ class FuelAdjustmentController extends Controller
         $fuelAdjustmentModel->purpose = $requestData['purpose'];
         $fuelAdjustmentModel->loss_quantity = $requestData['loss_quantity'];
         $fuelAdjustmentModel->loss_amount = $requestData['loss_quantity'] * $product['buying_price'];
+        $fuelAdjustmentModel->shift_sale_id = $shiftSale['id'];
         $fuelAdjustmentModel->client_company_id = $sessionUser['client_company_id'];
         $fuelAdjustmentModel->user_id = $sessionUser['id'];
         if (!$fuelAdjustmentModel->save()) {

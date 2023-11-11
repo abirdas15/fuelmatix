@@ -7,10 +7,13 @@ use App\Common\Module;
 use App\Helpers\SessionUser;
 use App\Models\Category;
 use App\Models\Dispenser;
+use App\Models\FuelAdjustment;
+use App\Models\FuelAdjustmentData;
 use App\Models\NozzleReading;
 use App\Models\Product;
 use App\Models\SaleData;
 use App\Models\ShiftSale;
+use App\Models\ShiftSummary;
 use App\Models\Stock;
 use App\Models\Tank;
 use App\Models\TankLog;
@@ -260,27 +263,18 @@ class ProductController extends Controller
         if (!$product instanceof Product) {
             return response()->json(['status' => 500, 'error' => 'Cannot find product.']);
         }
-        $end_reading = 0;
-        $start_reading = 0;
-        $tank = Tank::where('product_id', $inputData['product_id'])->select('id')->where('client_company_id', $sessionUser['client_company_id'])->first();
-        if ($tank instanceof Tank) {
-            $tankReading = TankLog::select('tank_log.volume')
-                ->where('type', 'shift sell')
-                ->where('tank_id', $tank->id)
-                ->where('client_company_id', $sessionUser['client_company_id'])
-                ->orderBy('tank_log.id', 'DESC')
-                ->limit(2)
-                ->get()
-                ->toArray();
-            if (!empty($tankReading)) {
-                if (count($tankReading) == 1) {
-                    $start_reading = $tankReading[0]['volume'];
-                } else {
-                    $start_reading = $tankReading[1]['volume'] ?? 0;
-                    $end_reading = $tankReading[0]['volume'] ?? 0;
-                }
-            }
+        $tank = Tank::where('product_id', $product['id'])->first();
+        if (!$tank instanceof Tank) {
+            return response()->json(['status' => 500, 'error' => 'Cannot find tank.']);
         }
+        $shiftSale = ShiftSale::select('id', 'end_reading')->where('client_company_id', $sessionUser['client_company_id'])->where('status', 'end')->where('product_id', $request['product_id'])->orderBy('id', 'DESC')->first();
+        $start_reading = $product['opening_stock'] ?? 0;
+        $shiftSaleId = 0;
+        if ($shiftSale instanceof ShiftSale) {
+            $start_reading = $shiftSale['end_reading'];
+            $shiftSaleId = $shiftSale['id'];
+        }
+        $end_reading = 0;
         $stock = Stock::select('*')
             ->where('client_company_id', $sessionUser['client_company_id'])
             ->where('date', date('Y-m-d'))
@@ -289,30 +283,31 @@ class ProductController extends Controller
             ->first();
         $tank_refill = 0;
         if ($stock instanceof Stock) {
-            if ($stock['in_stock'] > 0) {
-                $start_reading = $stock['opening_stock'];
-            } else {
-                $start_reading = $stock['closing_stock'];
-            }
             $tank_refill = $stock['in_stock'];
-        } else {
-            $previousStock = Stock::select('*')
-                ->where('client_company_id', $sessionUser['client_company_id'])
-                ->where('module', 'product')->where('module_id', $inputData['product_id'])
-                ->orderBy('id', 'DESC')
-                ->first();
-            if ($previousStock instanceof Stock) {
-                $start_reading = $previousStock->closing_stock;
+        }
+        $shiftSale = ShiftSale::select('id', 'end_reading')->where('client_company_id', $sessionUser['client_company_id'])->where('status', 'start')->where('product_id', $request['product_id'])->orderBy('id', 'DESC')->first();
+        $fuelAdjustment = FuelAdjustment::select('id', 'loss_quantity')->where('shift_sale_id', $shiftSale['id'] ?? 0)->first();
+        $adjustment = 0;
+        $nozzleAdjustment = [];
+        if ($fuelAdjustment instanceof FuelAdjustment) {
+            $fuelAdjustmentData = FuelAdjustmentData::where('fuel_adjustment_id', $fuelAdjustment['id'])->get()->toArray();
+            foreach ($fuelAdjustmentData as $adjustmentData) {
+                if ($adjustmentData['tank_id'] == $tank['id']) {
+                    $adjustment = $adjustmentData['quantity'];
+                }
+                if (!empty($adjustmentData['nozzle_id'])) {
+                    $nozzleAdjustment[$adjustmentData['nozzle_id']] = $adjustmentData;
+                }
             }
         }
-
-        $consumption = $start_reading + $tank_refill - $end_reading;
+        $consumption = $start_reading + $tank_refill - $adjustment - $end_reading;
         $amount = $consumption * $product['selling_price'];
         $result = [
             'date' => date('Y-m-d'),
             'product_id' => $inputData['product_id'],
             'start_reading' => $start_reading,
             'tank_refill' => $tank_refill,
+            'adjustment' => $adjustment,
             'end_reading' => $end_reading,
             'consumption' => $consumption,
             'amount' => $amount,
@@ -322,16 +317,17 @@ class ProductController extends Controller
             ->where('product_id', $inputData['product_id'])
             ->where('client_company_id', $sessionUser['client_company_id'])
             ->with(['nozzle' => function($q) {
-                $q->select('nozzles.id', 'nozzles.dispenser_id', 'nozzles.name');
+                $q->select('nozzles.id', 'nozzles.dispenser_id', 'nozzles.name', 'nozzles.opening_stock');
             }])
             ->get()
             ->toArray();
+        $shiftSaleData = ShiftSummary::select('nozzle_id', 'end_reading')->where('shift_sale_id', $shiftSaleId)->get()->keyBy('nozzle_id')->toArray();
         foreach ($dispensers as &$dispenser) {
             foreach ($dispenser['nozzle'] as &$nozzle) {
-                $reading = NozzleReading::select('*')->where('client_company_id', $sessionUser['client_company_id'])->where('nozzle_id', $nozzle['id'])->orderBy('id', 'DESC')->where('type', 'shift sell')->limit(2)->get()->toArray();
-                $nozzle['start_reading'] = isset($reading[0]) ? $reading[0]['reading'] : 0;
-                $nozzle['end_reading'] = isset($reading[1]) ? $reading[1]['reading'] : 0;
-                $nozzle['consumption'] =  $nozzle['end_reading']  - $nozzle['start_reading'];
+                $nozzle['start_reading'] = isset($shiftSaleData[$nozzle['id']]) ? $shiftSaleData[$nozzle['id']]['end_reading'] : $nozzle['opening_stock'];
+                $nozzle['end_reading'] = 0;
+                $nozzle['adjustment'] = isset($nozzleAdjustment[$nozzle['id']]) ? $nozzleAdjustment[$nozzle['id']]['quantity'] : 0;
+                $nozzle['consumption'] =  $nozzle['end_reading']  - $nozzle['start_reading'] -  $nozzle['adjustment'];
                 $nozzle['amount'] = $nozzle['consumption'] * $product['selling_price'];
             }
         }

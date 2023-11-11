@@ -42,7 +42,7 @@
                                                 </div>
                                                 <div class="card-body">
                                                     <div class="row align-items-center text-start">
-                                                        <div class="col-md-4">
+                                                        <div class="col-md-2">
                                                             <label class="form-label">
                                                                 <p class="m-0">OIL Stock </p>
                                                             </label>
@@ -65,6 +65,14 @@
                                                                 type="text" class="form-control text-end"  @click="enableInput('frReading')"
                                                                 v-model="listDispenser.end_reading"
                                                                 @input="calculateAmount">
+                                                            <input class="form-control" value="0" v-if="listDispenser.status == 'start'" disabled>
+                                                        </div>
+                                                        <div class="mb-3 col-md-2">
+                                                            <label>Adjustment </label>
+                                                            <input id="frReading" @blur="disableInput('frReading')" v-if="listDispenser.status == 'end'"
+                                                                   type="text" class="form-control text-end" disabled
+                                                                   v-model="listDispenser.adjustment"
+                                                                   @input="calculateAmount">
                                                             <input class="form-control" value="0" v-if="listDispenser.status == 'start'" disabled>
                                                         </div>
 
@@ -90,17 +98,25 @@
                                                                 <p class="m-0">{{ n.name }}</p>
                                                             </label>
                                                         </div>
-                                                        <div class="mb-3 col-md-3">
+                                                        <div class="mb-3 col-md-2">
                                                             <label>Previous Reading </label>
                                                             <input type="text" class="form-control" disabled
                                                                    v-model="n.start_reading">
                                                         </div>
-                                                        <div class="mb-3 col-md-3">
+                                                        <div class="mb-3 col-md-2">
                                                             <label>Final Reading </label>
                                                             <input type="text" class="form-control text-end" @blur="disableInput('frReading'+nIndex+dIndex)"
                                                                    v-if="listDispenser.status == 'end'"
                                                                    v-model="n.end_reading" @click="enableInput('frReading'+nIndex+dIndex)"
                                                                    @input="calculateAmountNozzle(dIndex, nIndex) ">
+                                                            <input class="form-control" value="0" v-if="listDispenser.status == 'start'" disabled>
+                                                        </div>
+                                                        <div class="mb-3 col-md-2">
+                                                            <label>Adjustment </label>
+                                                            <input type="text" class="form-control text-end" @blur="disableInput('frReading'+nIndex+dIndex)"
+                                                                   v-if="listDispenser.status == 'end'"
+                                                                   v-model="n.adjustment"
+                                                                   @input="calculateAmountNozzle(dIndex, nIndex) " disabled>
                                                             <input class="form-control" value="0" v-if="listDispenser.status == 'start'" disabled>
                                                         </div>
 
@@ -170,7 +186,7 @@
                                                                 <option v-for="c in allAmountCategory" :value="c.id">{{c.name}}</option>
                                                             </select>
                                                             <div class="form-group">
-                                                                <input class="form-control me-3 text-end"  style="max-width: 210px" type="number" v-model="category.amount" :id="'categories.'+index+'.amount'"
+                                                                <input class="form-control me-3 text-end"  style="max-width: 210px" type="number" step="any" v-model="category.amount" :id="'categories.'+index+'.amount'"
                                                                        @input="calculateValue(category.amount)"
                                                                        :name="'categories.'+index+'.amount'">
                                                                 <div class="invalid-feedback"></div>
