@@ -268,7 +268,7 @@ class ProductController extends Controller
             return response()->json(['status' => 500, 'error' => 'Cannot find tank.']);
         }
         $shiftSale = ShiftSale::select('id', 'end_reading')->where('client_company_id', $sessionUser['client_company_id'])->where('status', 'end')->where('product_id', $request['product_id'])->orderBy('id', 'DESC')->first();
-        $start_reading = $product['opening_stock'] ?? 0;
+        $start_reading = $tank['opening_stock'] ?? 0;
         $shiftSaleId = 0;
         if ($shiftSale instanceof ShiftSale) {
             $start_reading = $shiftSale['end_reading'];
@@ -300,7 +300,7 @@ class ProductController extends Controller
                 }
             }
         }
-        $consumption = $start_reading + $tank_refill - $adjustment - $end_reading;
+        $consumption = $start_reading + $tank_refill + $adjustment - $end_reading;
         $amount = $consumption * $product['selling_price'];
         $result = [
             'date' => date('Y-m-d'),
