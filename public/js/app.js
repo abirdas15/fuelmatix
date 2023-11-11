@@ -10606,7 +10606,8 @@ __webpack_require__.r(__webpack_exports__);
       allAmountCategory: null,
       categories: [],
       totalPaid: 0,
-      oilStock: false
+      oilStock: false,
+      mismatchAllow: null
     };
   },
   methods: {
@@ -10667,7 +10668,7 @@ __webpack_require__.r(__webpack_exports__);
     },
     calculateAmount: function calculateAmount() {
       if (this.isNumeric(this.listDispenser.end_reading)) {
-        this.listDispenser.consumption = parseFloat(this.listDispenser.start_reading) - parseFloat(this.listDispenser.end_reading);
+        this.listDispenser.consumption = parseFloat(this.listDispenser.start_reading) - parseFloat(this.listDispenser.end_reading) + parseFloat(this.listDispenser.adjustment);
         this.listDispenser.amount = parseFloat(this.listDispenser.consumption) * parseFloat(this.listDispenser.selling_price);
       } else {
         this.listDispenser.consumption = 0;
@@ -10676,7 +10677,7 @@ __webpack_require__.r(__webpack_exports__);
     },
     calculateAmountNozzle: function calculateAmountNozzle(dIndex, nIndex) {
       if (this.isNumeric(this.listDispenser.dispensers[dIndex].nozzle[nIndex].end_reading)) {
-        this.listDispenser.dispensers[dIndex].nozzle[nIndex].consumption = parseFloat(this.listDispenser.dispensers[dIndex].nozzle[nIndex].end_reading) - parseFloat(this.listDispenser.dispensers[dIndex].nozzle[nIndex].start_reading);
+        this.listDispenser.dispensers[dIndex].nozzle[nIndex].consumption = parseFloat(this.listDispenser.dispensers[dIndex].nozzle[nIndex].end_reading) - parseFloat(this.listDispenser.dispensers[dIndex].nozzle[nIndex].start_reading) - parseFloat(this.listDispenser.dispensers[dIndex].nozzle[nIndex].adjustment);
         this.listDispenser.dispensers[dIndex].nozzle[nIndex].amount = parseFloat(this.listDispenser.dispensers[dIndex].nozzle[nIndex].consumption) * parseFloat(this.listDispenser.selling_price);
       } else {
         this.listDispenser.dispensers[dIndex].nozzle[nIndex].consumption = 0;
@@ -10726,6 +10727,9 @@ __webpack_require__.r(__webpack_exports__);
         _this5.getTotalSale();
       });
     },
+    totalShiftParcent: function totalShiftParcent(totalNozzleConsumption) {
+      return totalNozzleConsumption / this.listDispenser.consumption * 100;
+    },
     save: function save() {
       var _this6 = this;
       _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].ClearErrorHandler();
@@ -10737,16 +10741,25 @@ __webpack_require__.r(__webpack_exports__);
         this.listDispenser.categories.map(function (v) {
           totalCategoryAmount += parseFloat(v.amount);
         });
-        if (this.totalAmount - this.totalPosSale() != totalCategoryAmount) {
-          this.loading = false;
-          this.$toast.error('Please match the total amount and category list');
-          return;
-        }
+        // if ((this.totalAmount - this.totalPosSale()) != totalCategoryAmount) {
+        //     this.loading = false
+        //     this.$toast.error('Please match the total amount and category list')
+        //     return
+        // }
+
         this.listDispenser.dispensers.map(function (dispenser) {
           dispenser.nozzle.map(function (nozzle) {
             totalConsumption += parseFloat(nozzle.consumption);
           });
         });
+        // check if mismatch allow
+        if (this.mismatchAllow != null) {
+          if (this.totalShiftParcent(totalConsumption) > this.mismatchAllow) {
+            this.loading = false;
+            this.$toast.error('The mismatch is grater than allowed consumption');
+            return;
+          }
+        }
         this.listDispenser.amount = totalCategoryAmount;
         this.listDispenser.consumption = totalConsumption;
       }
@@ -10767,10 +10780,23 @@ __webpack_require__.r(__webpack_exports__);
           _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].ErrorHandler(res.errors);
         }
       });
+    },
+    getSingleMitchMatch: function getSingleMitchMatch() {
+      var _this7 = this;
+      _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].companySingle, this.param, function (res) {
+        if (parseInt(res.status) === 200) {
+          if (res.data.sale_mismatch_allow != null) {
+            _this7.mismatchAllow = res.data.sale_mismatch_allow;
+          }
+        } else {
+          _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].ErrorHandler(res.errors);
+        }
+      });
     }
   },
   created: function created() {
     this.getProduct();
+    this.getSingleMitchMatch();
   },
   mounted: function mounted() {
     if (this.$route.query.product_id != undefined) {
@@ -33885,7 +33911,7 @@ var render = function render() {
     staticClass: "card-header"
   }, [_c("h5", {
     staticClass: "card-title"
-  }, [_vm._v("\n                                                    " + _vm._s(_vm.listDispenser.product_name))])]), _vm._v(" "), _c("div", {
+  }, [_vm._v("\n                                                        " + _vm._s(_vm.listDispenser.product_name))])]), _vm._v(" "), _c("div", {
     staticClass: "card-body"
   }, [_c("div", {
     staticClass: "row align-items-center text-start"
@@ -33913,7 +33939,7 @@ var render = function render() {
         _vm.$set(_vm.listDispenser, "start_reading", $event.target.value);
       }
     }
-  })]), _vm._v(" "), _c("div", {
+  })]), _vm._v(" "), _vm.listDispenser.status == "end" ? _c("div", {
     staticClass: "mb-3 col-md-2"
   }, [_c("label", [_vm._v("Tank Refill ")]), _vm._v(" "), _c("input", {
     directives: [{
@@ -33936,9 +33962,9 @@ var render = function render() {
         _vm.$set(_vm.listDispenser, "tank_refill", $event.target.value);
       }
     }
-  })]), _vm._v(" "), _c("div", {
+  })]) : _vm._e(), _vm._v(" "), _vm.listDispenser.status == "end" ? _c("div", {
     staticClass: "mb-3 col-md-2"
-  }, [_c("label", [_vm._v("Final Reading ")]), _vm._v(" "), _vm.listDispenser.status == "end" ? _c("input", {
+  }, [_c("label", [_vm._v("Final Reading ")]), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -33965,13 +33991,7 @@ var render = function render() {
         _vm.$set(_vm.listDispenser, "end_reading", $event.target.value);
       }, _vm.calculateAmount]
     }
-  }) : _vm._e(), _vm._v(" "), _vm.listDispenser.status == "start" ? _c("input", {
-    staticClass: "form-control",
-    attrs: {
-      value: "0",
-      disabled: ""
-    }
-  }) : _vm._e()]), _vm._v(" "), _c("div", {
+  })]) : _vm._e(), _vm._v(" "), _vm.listDispenser.status == "end" ? _c("div", {
     staticClass: "mb-3 col-md-2"
   }, [_c("label", [_vm._v("Adjustment ")]), _vm._v(" "), _vm.listDispenser.status == "end" ? _c("input", {
     directives: [{
@@ -33998,13 +34018,7 @@ var render = function render() {
         _vm.$set(_vm.listDispenser, "adjustment", $event.target.value);
       }, _vm.calculateAmount]
     }
-  }) : _vm._e(), _vm._v(" "), _vm.listDispenser.status == "start" ? _c("input", {
-    staticClass: "form-control",
-    attrs: {
-      value: "0",
-      disabled: ""
-    }
-  }) : _vm._e()]), _vm._v(" "), _c("div", {
+  }) : _vm._e()]) : _vm._e(), _vm._v(" "), _vm.listDispenser.status == "end" ? _c("div", {
     staticClass: "mb-3 col-md-2"
   }, [_c("label", [_vm._v("Consumption ")]), _vm._v(" "), _vm.listDispenser.status == "end" ? _c("input", {
     directives: [{
@@ -34028,13 +34042,7 @@ var render = function render() {
         _vm.$set(_vm.listDispenser, "consumption", $event.target.value);
       }
     }
-  }) : _vm._e(), _vm._v(" "), _vm.listDispenser.status == "start" ? _c("input", {
-    staticClass: "form-control",
-    attrs: {
-      value: "0",
-      disabled: ""
-    }
-  }) : _vm._e()])])])])] : _vm._e(), _vm._v(" "), _vm._l(_vm.listDispenser.dispensers, function (d, dIndex) {
+  }) : _vm._e()]) : _vm._e()])])])] : _vm._e(), _vm._v(" "), _vm._l(_vm.listDispenser.dispensers, function (d, dIndex) {
     return _vm.listDispenser.dispensers.length > 0 ? _c("div", {
       staticClass: "card"
     }, [_c("div", {
@@ -34075,7 +34083,7 @@ var render = function render() {
             _vm.$set(n, "start_reading", $event.target.value);
           }
         }
-      })]), _vm._v(" "), _c("div", {
+      })]), _vm._v(" "), _vm.listDispenser.status == "end" ? _c("div", {
         staticClass: "mb-3 col-md-2"
       }, [_c("label", [_vm._v("Final Reading ")]), _vm._v(" "), _vm.listDispenser.status == "end" ? _c("input", {
         directives: [{
@@ -34105,13 +34113,7 @@ var render = function render() {
             return _vm.calculateAmountNozzle(dIndex, nIndex);
           }]
         }
-      }) : _vm._e(), _vm._v(" "), _vm.listDispenser.status == "start" ? _c("input", {
-        staticClass: "form-control",
-        attrs: {
-          value: "0",
-          disabled: ""
-        }
-      }) : _vm._e()]), _vm._v(" "), _c("div", {
+      }) : _vm._e()]) : _vm._e(), _vm._v(" "), _vm.listDispenser.status == "end" ? _c("div", {
         staticClass: "mb-3 col-md-2"
       }, [_c("label", [_vm._v("Adjustment ")]), _vm._v(" "), _vm.listDispenser.status == "end" ? _c("input", {
         directives: [{
@@ -34139,15 +34141,9 @@ var render = function render() {
             return _vm.calculateAmountNozzle(dIndex, nIndex);
           }]
         }
-      }) : _vm._e(), _vm._v(" "), _vm.listDispenser.status == "start" ? _c("input", {
-        staticClass: "form-control",
-        attrs: {
-          value: "0",
-          disabled: ""
-        }
-      }) : _vm._e()]), _vm._v(" "), _c("div", {
+      }) : _vm._e()]) : _vm._e(), _vm._v(" "), _vm.listDispenser.status == "end" ? _c("div", {
         staticClass: "mb-3 col-md-2"
-      }, [_c("label", [_vm._v("Consumption ")]), _vm._v(" "), _vm.listDispenser.status == "end" ? _c("input", {
+      }, [_c("label", [_vm._v("Consumption ")]), _vm._v(" "), _c("input", {
         directives: [{
           name: "model",
           rawName: "v-model",
@@ -34168,13 +34164,7 @@ var render = function render() {
             _vm.$set(n, "consumption", $event.target.value);
           }
         }
-      }) : _vm._e(), _vm._v(" "), _vm.listDispenser.status == "start" ? _c("input", {
-        staticClass: "form-control",
-        attrs: {
-          value: "0",
-          disabled: ""
-        }
-      }) : _vm._e()])]);
+      })]) : _vm._e()]);
     }), 0) : _vm._e()]) : _vm._e();
   }), _vm._v(" "), _vm.listDispenser.status != "start" ? [_c("div", {
     staticClass: "row"

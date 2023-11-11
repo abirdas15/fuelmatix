@@ -54,33 +54,33 @@
                                                                    type="text" class="form-control"
                                                                    v-model="listDispenser.start_reading">
                                                         </div>
-                                                        <div class="mb-3 col-md-2">
+                                                        <div class="mb-3 col-md-2" v-if="listDispenser.status == 'end'">
                                                             <label>Tank Refill </label>
                                                             <input type="text" class="form-control"  disabled
                                                                 v-model="listDispenser.tank_refill">
                                                         </div>
-                                                        <div class="mb-3 col-md-2">
+                                                        <div class="mb-3 col-md-2" v-if="listDispenser.status == 'end'">
                                                             <label>Final Reading </label>
-                                                            <input id="frReading" @blur="disableInput('frReading')" v-if="listDispenser.status == 'end'"
+                                                            <input id="frReading" @blur="disableInput('frReading')"
                                                                 type="text" class="form-control text-end"  @click="enableInput('frReading')"
                                                                 v-model="listDispenser.end_reading"
                                                                 @input="calculateAmount">
-                                                            <input class="form-control" value="0" v-if="listDispenser.status == 'start'" disabled>
+<!--                                                            <input class="form-control" value="0" v-if="listDispenser.status == 'start'" disabled>-->
                                                         </div>
-                                                        <div class="mb-3 col-md-2">
+                                                        <div class="mb-3 col-md-2" v-if="listDispenser.status == 'end'">
                                                             <label>Adjustment </label>
                                                             <input id="frReading" @blur="disableInput('frReading')" v-if="listDispenser.status == 'end'"
                                                                    type="text" class="form-control text-end" disabled
                                                                    v-model="listDispenser.adjustment"
                                                                    @input="calculateAmount">
-                                                            <input class="form-control" value="0" v-if="listDispenser.status == 'start'" disabled>
+<!--                                                            <input class="form-control" value="0" v-if="listDispenser.status == 'start'" disabled>-->
                                                         </div>
 
-                                                        <div class="mb-3 col-md-2">
+                                                        <div class="mb-3 col-md-2" v-if="listDispenser.status == 'end'">
                                                             <label>Consumption </label>
                                                             <input type="text" class="form-control" id="consumption" disabled  v-if="listDispenser.status == 'end'"
                                                                    v-model="listDispenser.consumption">
-                                                            <input class="form-control" value="0" v-if="listDispenser.status == 'start'" disabled>
+<!--                                                            <input class="form-control" value="0" v-if="listDispenser.status == 'start'" disabled>-->
                                                         </div>
                                                     </div>
                                                 </div>
@@ -103,29 +103,29 @@
                                                             <input type="text" class="form-control" disabled
                                                                    v-model="n.start_reading">
                                                         </div>
-                                                        <div class="mb-3 col-md-2">
+                                                        <div class="mb-3 col-md-2"  v-if="listDispenser.status == 'end'">
                                                             <label>Final Reading </label>
                                                             <input type="text" class="form-control text-end" @blur="disableInput('frReading'+nIndex+dIndex)"
                                                                    v-if="listDispenser.status == 'end'"
                                                                    v-model="n.end_reading" @click="enableInput('frReading'+nIndex+dIndex)"
                                                                    @input="calculateAmountNozzle(dIndex, nIndex) ">
-                                                            <input class="form-control" value="0" v-if="listDispenser.status == 'start'" disabled>
+<!--                                                            <input class="form-control" value="0" v-if="listDispenser.status == 'start'" disabled>-->
                                                         </div>
-                                                        <div class="mb-3 col-md-2">
+                                                        <div class="mb-3 col-md-2" v-if="listDispenser.status == 'end'">
                                                             <label>Adjustment </label>
                                                             <input type="text" class="form-control text-end" @blur="disableInput('frReading'+nIndex+dIndex)"
                                                                    v-if="listDispenser.status == 'end'"
                                                                    v-model="n.adjustment"
                                                                    @input="calculateAmountNozzle(dIndex, nIndex) " disabled>
-                                                            <input class="form-control" value="0" v-if="listDispenser.status == 'start'" disabled>
+<!--                                                            <input class="form-control" value="0" v-if="listDispenser.status == 'start'" disabled>-->
                                                         </div>
 
 
-                                                        <div class="mb-3 col-md-2">
+                                                        <div class="mb-3 col-md-2"  v-if="listDispenser.status == 'end'">
                                                             <label>Consumption </label>
-                                                            <input type="text" disabled class="form-control"   v-if="listDispenser.status == 'end'"
+                                                            <input type="text" disabled class="form-control"
                                                                    v-model="n.consumption">
-                                                            <input class="form-control" value="0" v-if="listDispenser.status == 'start'" disabled>
+<!--                                                            <input class="form-control" value="0" v-if="listDispenser.status == 'start'" disabled>-->
                                                         </div>
                                                     </div>
                                                 </div>
@@ -253,6 +253,7 @@ export default {
             categories: [],
             totalPaid: 0,
             oilStock: false,
+            mismatchAllow: null,
         }
     },
     methods: {
@@ -310,7 +311,7 @@ export default {
         },
         calculateAmount: function () {
             if (this.isNumeric(this.listDispenser.end_reading)) {
-                this.listDispenser.consumption = parseFloat(this.listDispenser.start_reading) - parseFloat(this.listDispenser.end_reading)
+                this.listDispenser.consumption = parseFloat(this.listDispenser.start_reading) - parseFloat(this.listDispenser.end_reading) + parseFloat(this.listDispenser.adjustment)
                 this.listDispenser.amount = parseFloat(this.listDispenser.consumption ) * parseFloat(this.listDispenser.selling_price)
             } else {
                 this.listDispenser.consumption = 0
@@ -319,7 +320,7 @@ export default {
         },
         calculateAmountNozzle: function (dIndex, nIndex) {
             if (this.isNumeric(this.listDispenser.dispensers[dIndex].nozzle[nIndex].end_reading)) {
-                this.listDispenser.dispensers[dIndex].nozzle[nIndex].consumption = parseFloat(this.listDispenser.dispensers[dIndex].nozzle[nIndex].end_reading) - parseFloat(this.listDispenser.dispensers[dIndex].nozzle[nIndex].start_reading)
+                this.listDispenser.dispensers[dIndex].nozzle[nIndex].consumption = parseFloat(this.listDispenser.dispensers[dIndex].nozzle[nIndex].end_reading) - parseFloat(this.listDispenser.dispensers[dIndex].nozzle[nIndex].start_reading)  - parseFloat(this.listDispenser.dispensers[dIndex].nozzle[nIndex].adjustment)
                 this.listDispenser.dispensers[dIndex].nozzle[nIndex].amount = parseFloat(this.listDispenser.dispensers[dIndex].nozzle[nIndex].consumption) * parseFloat(this.listDispenser.selling_price)
             } else {
                 this.listDispenser.dispensers[dIndex].nozzle[nIndex].consumption = 0
@@ -360,6 +361,9 @@ export default {
                 this.getTotalSale()
             });
         },
+        totalShiftParcent: function (totalNozzleConsumption) {
+           return (totalNozzleConsumption / this.listDispenser.consumption) * 100
+        },
         save: function () {
             ApiService.ClearErrorHandler();
             this.loading = true
@@ -370,18 +374,28 @@ export default {
                 this.listDispenser.categories.map(v => {
                     totalCategoryAmount += parseFloat(v.amount)
                 })
-                if ((this.totalAmount - this.totalPosSale()) != totalCategoryAmount) {
-                    this.loading = false
-                    this.$toast.error('Please match the total amount and category list')
-                    return
-                }
+                // if ((this.totalAmount - this.totalPosSale()) != totalCategoryAmount) {
+                //     this.loading = false
+                //     this.$toast.error('Please match the total amount and category list')
+                //     return
+                // }
+
                 this.listDispenser.dispensers.map(dispenser => {
                     dispenser.nozzle.map(nozzle => {
                         totalConsumption += parseFloat(nozzle.consumption)
                     })
                 })
+                // check if mismatch allow
+                if (this.mismatchAllow != null) {
+                    if (this.totalShiftParcent(totalConsumption) > this.mismatchAllow) {
+                        this.loading = false
+                        this.$toast.error('The mismatch is grater than allowed consumption')
+                        return
+                    }
+                }
                 this.listDispenser.amount = totalCategoryAmount;
                 this.listDispenser.consumption = totalConsumption;
+
             }
             ApiService.POST(ApiRoutes.ShiftSaleAdd, this.listDispenser, res => {
                 this.loading = false
@@ -401,9 +415,21 @@ export default {
                 }
             });
         },
+        getSingleMitchMatch: function () {
+            ApiService.POST(ApiRoutes.companySingle, this.param,res => {
+                if (parseInt(res.status) === 200) {
+                    if (res.data.sale_mismatch_allow != null) {
+                        this.mismatchAllow = res.data.sale_mismatch_allow
+                    }
+                } else {
+                    ApiService.ErrorHandler(res.errors);
+                }
+            });
+        },
     },
     created() {
         this.getProduct()
+        this.getSingleMitchMatch()
     },
     mounted() {
         if (this.$route.query.product_id != undefined) {
