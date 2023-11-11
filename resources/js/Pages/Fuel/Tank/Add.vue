@@ -38,6 +38,11 @@
                                         <div class="invalid-feedback"></div>
                                     </div>
                                     <div class="mb-3 form-group col-md-6">
+                                        <label class="form-label">Opening Stock:</label>
+                                        <input type="text" class="form-control" name="height" v-model="param.opening_stock">
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                    <div class="mb-3 form-group col-md-6">
                                         <label class="form-label">Height:</label>
                                         <input type="text" class="form-control" name="height" v-model="param.height">
                                         <div class="invalid-feedback"></div>
@@ -79,6 +84,7 @@ export default {
                 capacity: '',
                 product_id: '',
                 height: '',
+                opening_stock: '',
                 file: '',
             },
             listData: [],

@@ -6090,6 +6090,7 @@ __webpack_require__.r(__webpack_exports__);
         capacity: '',
         product_id: '',
         height: '',
+        opening_stock: '',
         file: ''
       },
       listData: [],
@@ -6201,6 +6202,7 @@ __webpack_require__.r(__webpack_exports__);
       formData.append('capacity', this.param.capacity);
       formData.append('height', this.param.height);
       formData.append('product_id', this.param.product_id);
+      formData.append('opening_stock', this.param.opening_stock);
       formData.append('file', this.param.file);
       _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].TankEdit, formData, function (res) {
         _this3.loading = false;
@@ -22455,6 +22457,33 @@ var render = function render() {
     staticClass: "mb-3 form-group col-md-6"
   }, [_c("label", {
     staticClass: "form-label"
+  }, [_vm._v("Opening Stock:")]), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.param.opening_stock,
+      expression: "param.opening_stock"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      name: "height"
+    },
+    domProps: {
+      value: _vm.param.opening_stock
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.param, "opening_stock", $event.target.value);
+      }
+    }
+  }), _vm._v(" "), _c("div", {
+    staticClass: "invalid-feedback"
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 form-group col-md-6"
+  }, [_c("label", {
+    staticClass: "form-label"
   }, [_vm._v("Height:")]), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
@@ -22691,6 +22720,33 @@ var render = function render() {
       input: function input($event) {
         if ($event.target.composing) return;
         _vm.$set(_vm.param, "capacity", $event.target.value);
+      }
+    }
+  }), _vm._v(" "), _c("div", {
+    staticClass: "invalid-feedback"
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 form-group col-md-6"
+  }, [_c("label", {
+    staticClass: "form-label"
+  }, [_vm._v("Opening Stock:")]), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.param.opening_stock,
+      expression: "param.opening_stock"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      name: "height"
+    },
+    domProps: {
+      value: _vm.param.opening_stock
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.param, "opening_stock", $event.target.value);
       }
     }
   }), _vm._v(" "), _c("div", {
@@ -38706,7 +38762,7 @@ exports = module.exports = __webpack_require__(/*! ../../../../node_modules/css-
 
 
 // module
-exports.push([module.i, "\n.box-mula[data-v-0d4183dd]{\n    padding: 10px 30px;\n    box-shadow: 0 0 15px 0 #CBC9C8;\n    border-radius: 12px;\n    margin-bottom: 30px;\n    margin-top: 10px;\n}\n.putkir-futa[data-v-0d4183dd]{\n    border-bottom: 1px solid #c1c1c1;\n    margin: 10px 0px 15px 0px;\n    padding-bottom: 11px;\n}\n", ""]);
+exports.push([module.i, "\n.box-mula[data-v-0d4183dd]{\r\n    padding: 10px 30px;\r\n    box-shadow: 0 0 15px 0 #CBC9C8;\r\n    border-radius: 12px;\r\n    margin-bottom: 30px;\r\n    margin-top: 10px;\n}\n.putkir-futa[data-v-0d4183dd]{\r\n    border-bottom: 1px solid #c1c1c1;\r\n    margin: 10px 0px 15px 0px;\r\n    padding-bottom: 11px;\n}\r\n", ""]);
 
 // exports
 
@@ -99216,7 +99272,7 @@ var app = new vue__WEBPACK_IMPORTED_MODULE_1___default.a({
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! D:\xampp7.4\htdocs\fuelmatix\resources\js\app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! D:\xampp\htdocs\projects\fuelmatix\resources\js\app.js */"./resources/js/app.js");
 
 
 /***/ })
