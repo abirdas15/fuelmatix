@@ -662,4 +662,31 @@ class TankController extends Controller
         }
         return response()->json(['status' => 200, 'data' => $tank]);
     }
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function getVolume(Request $request): JsonResponse
+    {
+        $requestData = $request->all();
+        $validator = Validator::make($requestData, [
+            'height' => 'required'
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['status' => 500, 'errors' => $validator->errors()]);
+        }
+        $tank_id = $requestData['tank_id'];
+        if (!empty($requestData['product_id'])) {
+            $tank = Tank::where('product_id', $requestData['product_id'])->first();
+            if ($tank instanceof Tank) {
+                $tank_id = $tank['id'];
+            }
+        }
+        $bstiChart = BstiChart::select('volume')->where('tank_id', $tank_id) ->where('height', '=', floor($requestData['height']))
+            ->first();
+        return response()->json([
+            'status' => 200,
+            'data' => $bstiChart['volume'] ?? 0
+        ]);
+    }
 }
