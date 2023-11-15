@@ -670,7 +670,6 @@ class TankController extends Controller
     {
         $requestData = $request->all();
         $validator = Validator::make($requestData, [
-            'tank_id' => 'required',
             'height' => 'required'
         ]);
         if ($validator->fails()) {
