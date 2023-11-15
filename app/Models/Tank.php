@@ -14,4 +14,13 @@ class Tank extends Model
     {
         return $this->hasOne(TankLog::class, 'tank_id', 'id');
     }
+    protected $appends = [
+        'volume'
+    ];
+    public function getVolumeAttribute()
+    {
+        $bstiChart = BstiChart::select('volume')->where('tank_id', $this->id) ->where('height', '=', floor($this->height))
+            ->first();
+        return $bstiChart['volume'] ?? 0;
+    }
 }

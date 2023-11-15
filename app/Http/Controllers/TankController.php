@@ -7,6 +7,7 @@ use App\Common\FuelMatixDateTimeFormat;
 use App\Common\FuelMatixStatus;
 use App\Helpers\Helpers;
 use App\Helpers\SessionUser;
+use App\Imports\BstiChartImport;
 use App\Models\BstiChart;
 use App\Models\Category;
 use App\Models\Dispenser;
@@ -27,6 +28,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use Maatwebsite\Excel\Facades\Excel;
 
 class TankController extends Controller
 {
@@ -41,7 +43,8 @@ class TankController extends Controller
             'product_id' => 'required',
             'tank_name' => 'required',
             'capacity' => 'required',
-            'height' => 'required'
+            'height' => 'required',
+            'file' => 'required|file'
         ]);
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
@@ -58,22 +61,7 @@ class TankController extends Controller
             return response()->json(['status' => 400, 'message' => 'Cannot saved tank.']);
         }
         if ($request->file('file')) {
-            $file = $request->file('file');
-            $spreadsheet = IOFactory::load($file->getRealPath());
-            $sheet = $spreadsheet->getActiveSheet();
-            $row_limit = $sheet->getHighestDataRow();
-            $row_range = range(2, $row_limit);
-            $bstiChartData = [];
-            foreach ($row_range as $row) {
-                $bstiChartData[] = [
-                    'height' => $sheet->getCell('A' . $row)->getValue(),
-                    'volume' => $sheet->getCell('B' . $row)->getValue(),
-                    'tank_id' => $tank->id,
-                ];
-            }
-            if (count($bstiChartData) > 0) {
-                BstiChart::insert($bstiChartData);
-            }
+            Excel::import(new BstiChartImport($tank['id']), $request->file('file'));
         }
         return response()->json(['status' => 200, 'message' => 'Successfully saved tank.']);
     }
@@ -170,22 +158,9 @@ class TankController extends Controller
             return response()->json(['status' => 400, 'message' => 'Cannot updated [tank].']);
         }
         if ($request->file('file')) {
-            BstiChart::where('tank_id', $inputData['id'])->delete();
-            $file = $request->file('file');
-            $spreadsheet = IOFactory::load($file->getRealPath());
-            $sheet = $spreadsheet->getActiveSheet();
-            $row_limit = $sheet->getHighestDataRow();
-            $row_range = range(2, $row_limit);
-            $bstiChartData = [];
-            foreach ($row_range as $row) {
-                $bstiChartData[] = [
-                    'height' => $sheet->getCell('A' . $row)->getValue(),
-                    'volume' => $sheet->getCell('B' . $row)->getValue(),
-                    'tank_id' => $tank->id,
-                ];
-            }
-            if (count($bstiChartData) > 0) {
-                BstiChart::insert($bstiChartData);
+            if ($request->file('file')) {
+                BstiChart::where('tank_id', $inputData['id'])->delete();
+                Excel::import(new BstiChartImport($tank['id']), $request->file('file'));
             }
         }
         return response()->json(['status' => 200, 'message' => 'Successfully updated tank.']);
