@@ -19,18 +19,46 @@
                                 <div class="col-sm-4 mb-5" v-for="(f, i) in listData">
                                     <div class="taank">
                                         <div class="tank-height">
-                                            <div class="height">{{ f.height != null ? f.height : 'N/A' }} (Tank Height)</div>
+                                            <div class="height">{{ f.height != null ? f.height : 'N/A' }} mm</div>
                                         </div>
                                         <div class="water-tank">
+                                            <div class="range r-1 position-0"></div>
+                                            <div class="range r-3 position-1"></div>
+                                            <div class="range r-2 position-2"></div>
+                                            <div class="range r-3 position-3"></div>
+                                            <div class="range r-1 position-4"></div>
+                                            <div class="range r-3 position-5"></div>
+                                            <div class="range r-2 position-6"></div>
+                                            <div class="range r-3 position-7"></div>
+                                            <div class="range r-1 position-8"></div>
+                                            <div class="range r-3 position-9"></div>
+                                            <div class="range r-2 position-10"></div>
+                                            <div class="range r-3 position-11"></div>
+                                            <div class="range r-1 position-12"></div>
+                                            <div class="range r-3 position-13"></div>
+                                            <div class="range r-2 position-14"></div>
+                                            <div class="range r-3 position-15"></div>
+                                            <div class="range r-1 position-16"></div>
+                                            <div class="range r-3 position-17"></div>
+                                            <div class="range r-2 position-18"></div>
+                                            <div class="range r-3 position-19"></div>
+                                            <div class="range r-1 position-20"></div>
+                                            <div class="range r-3 position-21"></div>
+                                            <div class="range r-2 position-22"></div>
+                                            <div class="range r-3 position-23"></div>
+                                            <div class="range r-1 position-24"></div>
                                             <div class="tank-capacity">
-                                                <div class="capacity">{{f.capacity != null ? f.capacity : 'N/A'}} (Fuel Capacity)</div>
+                                                <div class="capacity">{{f.capacity != null ? f.capacity : 'N/A'}} Liter</div>
                                             </div>
                                             <div class="fuel-height">
                                                 <svg width="100%" height="100%" version="1.1" xmlns="http://www.w3.org/2000/svg" class="wave"><defs></defs><path :id="'fuel'+i" d=""/></svg>
                                                 <svg style="position: absolute; left: 0" width="100%" height="100%" version="1.1" xmlns="http://www.w3.org/2000/svg" class="wave"><defs></defs><path :id="'water'+i"d=""/></svg>
                                             </div>
                                             <div class="fuel-vol" :style="{top: calculateTop(f)}">
-                                                <div class="vol fw-bold">{{f.last_reading.volume != null ? f.last_reading.volume : 'N/A'}} mm</div>
+                                                <div class="vol fw-bold">{{f.last_reading?.volume != null ? f.last_reading?.volume : 'N/A'}} Liter</div>
+                                            </div>
+                                            <div class="fuel-vol-right" :style="{top: calculateTop(f)}">
+                                                <div class="vol fw-bold">{{f.last_reading?.height != null ? f.last_reading?.height : 'N/A'}} mm</div>
                                             </div>
                                         </div>
 
@@ -194,12 +222,14 @@ export default {
 <style lang="scss" scoped>
 .taank{
     position: relative;
+    width: 350px;
+    margin: auto;
     .tank-height{
         position: absolute;
-        left: -2rem;
+        left: -49px;
         text-align: right;
         top: 0;
-        width: 180px;
+        width: 130px;
         .height{
             color: #369D6F;
         }
@@ -208,7 +238,7 @@ export default {
     .water-tank{
         margin: auto;
         height: 250px;
-        width: 200px;
+        width: 160px;
         border-radius : 0;
         border-width: 3px;
         border-top: 0;
@@ -242,9 +272,9 @@ export default {
         }
         .tank-capacity{
             position: absolute;
-            left: -11.5rem;
-            text-align: right;
-            top: 1.7rem;
+            right: -190px;
+            text-align: left;
+            top: 0rem;
             width: 180px;
             .capacity{
                 color: red;
@@ -259,11 +289,20 @@ export default {
         }
         .fuel-vol{
             position: absolute;
-            right: -9rem;
+            right: -145px;
             text-align: left;
             width: 137px;
             .vol{
                 color: #424242;
+            }
+        }
+        .fuel-vol-right{
+            position: absolute;
+            left: -136px;
+            text-align: right;
+            width: 130px;
+            .vol{
+                color: #1a77e1;
             }
         }
         .fuel-height{

@@ -62,17 +62,17 @@
                                                 <div class="mb-3 form-group col-md-3"></div>
                                                 <div class="mb-3 form-group col-md-3">
                                                     <label class="form-label">Reading before refill:</label>
-                                                    <input type="text" disabled class="form-control " name="start_reading" v-model="param.start_reading">
+                                                    <input type="text" class="form-control " disabled name="start_reading" v-model="param.start_reading">
                                                     <div class="invalid-feedback"></div>
                                                 </div>
                                                 <div class="mb-3 form-group col-md-3">
                                                     <label class="form-label">Reading after refill:</label>
-                                                    <input type="text" disabled class="form-control " name="end_reading" v-model="param.end_reading">
+                                                    <input type="text" class="form-control " name="end_reading" v-model="param.end_reading">
                                                     <div class="invalid-feedback"></div>
                                                 </div>
                                                 <div class="mb-3 form-group col-md-3">
                                                     <label class="form-label">Tank Volume:</label>
-                                                    <input type="text" disabled class="form-control " name="dip_sale" v-model="param.dip_sale">
+                                                    <input type="text" class="form-control " disabled name="dip_sale" v-model="param.dip_sale">
                                                     <div class="invalid-feedback"></div>
                                                 </div>
                                             </div>
@@ -92,13 +92,13 @@
                                                 </div>
                                                 <div class="mb-3 col-md-3">
                                                     <label>Previous Reading </label>
-                                                    <input type="text" class="form-control" disabled
-                                                             :id="'prReading'+nIndex+dIndex"
+                                                    <input type="text" class="form-control"
+                                                             :id="'prReading'+nIndex+dIndex" disabled
                                                            v-model="n.start_reading">
                                                 </div>
                                                 <div class="mb-3 col-md-3">
                                                     <label>End reading </label>
-                                                    <input type="text" class="form-control" disabled
+                                                    <input type="text" class="form-control"
                                                              :id="'trReading'+nIndex+dIndex"
                                                            v-model="n.end_reading">
                                                 </div>

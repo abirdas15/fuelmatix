@@ -16262,7 +16262,7 @@ var render = function render() {
   }, [_vm._v("Tanks")]), _vm._v(" "), _c("div", {
     staticClass: "row mt-4"
   }, _vm._l(_vm.listData, function (f, i) {
-    var _f$last_reading, _f$last_reading2;
+    var _f$last_reading, _f$last_reading2, _f$last_reading3, _f$last_reading4;
     return _c("div", {
       staticClass: "col-sm-4 mb-5"
     }, [_c("div", {
@@ -16271,7 +16271,7 @@ var render = function render() {
       staticClass: "tank-height"
     }, [_c("div", {
       staticClass: "height"
-    }, [_vm._v(_vm._s(f.height != null ? f.height : "N/A") + " (Tank Height)")])]), _vm._v(" "), _c("div", {
+    }, [_vm._v(_vm._s(f.height != null ? f.height : "N/A") + " mm")])]), _vm._v(" "), _c("div", {
       staticClass: "water-tank"
     }, [_c("div", {
       staticClass: "range r-1 position-0"
@@ -16327,7 +16327,7 @@ var render = function render() {
       staticClass: "tank-capacity"
     }, [_c("div", {
       staticClass: "capacity"
-    }, [_vm._v(_vm._s(f.capacity != null ? f.capacity : "N/A") + " (Fuel Capacity)")])]), _vm._v(" "), _c("div", {
+    }, [_vm._v(_vm._s(f.capacity != null ? f.capacity : "N/A") + " Liter")])]), _vm._v(" "), _c("div", {
       staticClass: "fuel-height"
     }, [_c("svg", {
       staticClass: "wave",
@@ -16366,7 +16366,14 @@ var render = function render() {
       }
     }, [_c("div", {
       staticClass: "vol fw-bold"
-    }, [_vm._v(_vm._s(((_f$last_reading = f.last_reading) === null || _f$last_reading === void 0 ? void 0 : _f$last_reading.volume) != null ? (_f$last_reading2 = f.last_reading) === null || _f$last_reading2 === void 0 ? void 0 : _f$last_reading2.volume : "N/A") + " mm")])])]), _vm._v(" "), _c("div", {
+    }, [_vm._v(_vm._s(((_f$last_reading = f.last_reading) === null || _f$last_reading === void 0 ? void 0 : _f$last_reading.volume) != null ? (_f$last_reading2 = f.last_reading) === null || _f$last_reading2 === void 0 ? void 0 : _f$last_reading2.volume : "N/A") + " Liter")])]), _vm._v(" "), _c("div", {
+      staticClass: "fuel-vol-right",
+      style: {
+        top: _vm.calculateTop(f)
+      }
+    }, [_c("div", {
+      staticClass: "vol fw-bold"
+    }, [_vm._v(_vm._s(((_f$last_reading3 = f.last_reading) === null || _f$last_reading3 === void 0 ? void 0 : _f$last_reading3.height) != null ? (_f$last_reading4 = f.last_reading) === null || _f$last_reading4 === void 0 ? void 0 : _f$last_reading4.height : "N/A") + " mm")])])]), _vm._v(" "), _c("div", {
       staticClass: "text-center mt-1 fw-bold"
     }, [_vm._v("\n                                " + _vm._s(f.tank_name) + "\n                            ")]), _vm._v(" "), _c("div", {
       staticClass: "text-center"
@@ -24168,7 +24175,6 @@ var render = function render() {
     staticClass: "form-control",
     attrs: {
       type: "text",
-      disabled: "",
       name: "end_reading"
     },
     domProps: {
@@ -24240,8 +24246,8 @@ var render = function render() {
         staticClass: "form-control",
         attrs: {
           type: "text",
-          disabled: "",
-          id: "prReading" + nIndex + dIndex
+          id: "prReading" + nIndex + dIndex,
+          disabled: ""
         },
         domProps: {
           value: n.start_reading
@@ -24264,7 +24270,6 @@ var render = function render() {
         staticClass: "form-control",
         attrs: {
           type: "text",
-          disabled: "",
           id: "trReading" + nIndex + dIndex
         },
         domProps: {
@@ -25258,6 +25263,7 @@ var render = function render() {
   }, [_c("div", {
     staticClass: "row mt-4"
   }, _vm._l(_vm.listData, function (f, i) {
+    var _f$last_reading, _f$last_reading2, _f$last_reading3, _f$last_reading4;
     return _c("div", {
       staticClass: "col-sm-4 mb-5"
     }, [_c("div", {
@@ -25266,13 +25272,63 @@ var render = function render() {
       staticClass: "tank-height"
     }, [_c("div", {
       staticClass: "height"
-    }, [_vm._v(_vm._s(f.height != null ? f.height : "N/A") + " (Tank Height)")])]), _vm._v(" "), _c("div", {
+    }, [_vm._v(_vm._s(f.height != null ? f.height : "N/A") + " mm")])]), _vm._v(" "), _c("div", {
       staticClass: "water-tank"
     }, [_c("div", {
+      staticClass: "range r-1 position-0"
+    }), _vm._v(" "), _c("div", {
+      staticClass: "range r-3 position-1"
+    }), _vm._v(" "), _c("div", {
+      staticClass: "range r-2 position-2"
+    }), _vm._v(" "), _c("div", {
+      staticClass: "range r-3 position-3"
+    }), _vm._v(" "), _c("div", {
+      staticClass: "range r-1 position-4"
+    }), _vm._v(" "), _c("div", {
+      staticClass: "range r-3 position-5"
+    }), _vm._v(" "), _c("div", {
+      staticClass: "range r-2 position-6"
+    }), _vm._v(" "), _c("div", {
+      staticClass: "range r-3 position-7"
+    }), _vm._v(" "), _c("div", {
+      staticClass: "range r-1 position-8"
+    }), _vm._v(" "), _c("div", {
+      staticClass: "range r-3 position-9"
+    }), _vm._v(" "), _c("div", {
+      staticClass: "range r-2 position-10"
+    }), _vm._v(" "), _c("div", {
+      staticClass: "range r-3 position-11"
+    }), _vm._v(" "), _c("div", {
+      staticClass: "range r-1 position-12"
+    }), _vm._v(" "), _c("div", {
+      staticClass: "range r-3 position-13"
+    }), _vm._v(" "), _c("div", {
+      staticClass: "range r-2 position-14"
+    }), _vm._v(" "), _c("div", {
+      staticClass: "range r-3 position-15"
+    }), _vm._v(" "), _c("div", {
+      staticClass: "range r-1 position-16"
+    }), _vm._v(" "), _c("div", {
+      staticClass: "range r-3 position-17"
+    }), _vm._v(" "), _c("div", {
+      staticClass: "range r-2 position-18"
+    }), _vm._v(" "), _c("div", {
+      staticClass: "range r-3 position-19"
+    }), _vm._v(" "), _c("div", {
+      staticClass: "range r-1 position-20"
+    }), _vm._v(" "), _c("div", {
+      staticClass: "range r-3 position-21"
+    }), _vm._v(" "), _c("div", {
+      staticClass: "range r-2 position-22"
+    }), _vm._v(" "), _c("div", {
+      staticClass: "range r-3 position-23"
+    }), _vm._v(" "), _c("div", {
+      staticClass: "range r-1 position-24"
+    }), _vm._v(" "), _c("div", {
       staticClass: "tank-capacity"
     }, [_c("div", {
       staticClass: "capacity"
-    }, [_vm._v(_vm._s(f.capacity != null ? f.capacity : "N/A") + " (Fuel Capacity)")])]), _vm._v(" "), _c("div", {
+    }, [_vm._v(_vm._s(f.capacity != null ? f.capacity : "N/A") + " Liter")])]), _vm._v(" "), _c("div", {
       staticClass: "fuel-height"
     }, [_c("svg", {
       staticClass: "wave",
@@ -25311,7 +25367,14 @@ var render = function render() {
       }
     }, [_c("div", {
       staticClass: "vol fw-bold"
-    }, [_vm._v(_vm._s(f.last_reading.volume != null ? f.last_reading.volume : "N/A") + " mm")])])]), _vm._v(" "), _c("div", {
+    }, [_vm._v(_vm._s(((_f$last_reading = f.last_reading) === null || _f$last_reading === void 0 ? void 0 : _f$last_reading.volume) != null ? (_f$last_reading2 = f.last_reading) === null || _f$last_reading2 === void 0 ? void 0 : _f$last_reading2.volume : "N/A") + " Liter")])]), _vm._v(" "), _c("div", {
+      staticClass: "fuel-vol-right",
+      style: {
+        top: _vm.calculateTop(f)
+      }
+    }, [_c("div", {
+      staticClass: "vol fw-bold"
+    }, [_vm._v(_vm._s(((_f$last_reading3 = f.last_reading) === null || _f$last_reading3 === void 0 ? void 0 : _f$last_reading3.height) != null ? (_f$last_reading4 = f.last_reading) === null || _f$last_reading4 === void 0 ? void 0 : _f$last_reading4.height : "N/A") + " mm")])])]), _vm._v(" "), _c("div", {
       staticClass: "text-center mt-1 fw-bold"
     }, [_vm._v("\n                                        " + _vm._s(f.tank_name) + "\n                                    ")]), _vm._v(" "), _c("div", {
       staticClass: "text-center"
@@ -27106,395 +27169,6 @@ var render = function render() {
   var _vm = this,
     _c = _vm._self._c;
   return _c("div", [_vm._m(0), _vm._v(" "), _c("div", {
-    staticClass: "chatbox"
-  }, [_c("div", {
-    staticClass: "chatbox-close"
-  }), _vm._v(" "), _c("div", {
-    staticClass: "custom-tab-1"
-  }, [_vm._m(1), _vm._v(" "), _c("div", {
-    staticClass: "tab-content"
-  }, [_c("div", {
-    staticClass: "tab-pane fade active show",
-    attrs: {
-      id: "chat",
-      role: "tabpanel"
-    }
-  }, [_c("div", {
-    staticClass: "card mb-sm-3 mb-md-0 contacts_card dlab-chat-user-box"
-  }, [_c("div", {
-    staticClass: "card-header chat-list-header text-center"
-  }, [_c("a", {
-    attrs: {
-      href: "javascript:void(0);"
-    }
-  }, [_c("svg", {
-    attrs: {
-      xmlns: "http://www.w3.org/2000/svg",
-      "xmlns:xlink": "http://www.w3.org/1999/xlink",
-      width: "18px",
-      height: "18px",
-      viewBox: "0 0 24 24",
-      version: "1.1"
-    }
-  }, [_c("g", {
-    attrs: {
-      stroke: "none",
-      "stroke-width": "1",
-      fill: "none",
-      "fill-rule": "evenodd"
-    }
-  }, [_c("rect", {
-    attrs: {
-      fill: "#000000",
-      x: "4",
-      y: "11",
-      width: "16",
-      height: "2",
-      rx: "1"
-    }
-  }), _vm._v(" "), _c("rect", {
-    attrs: {
-      fill: "#000000",
-      opacity: "0.3",
-      transform: "translate(12.000000, 12.000000) rotate(-270.000000) translate(-12.000000, -12.000000) ",
-      x: "4",
-      y: "11",
-      width: "16",
-      height: "2",
-      rx: "1"
-    }
-  })])])]), _vm._v(" "), _vm._m(2), _vm._v(" "), _c("a", {
-    attrs: {
-      href: "javascript:void(0);"
-    }
-  }, [_c("svg", {
-    attrs: {
-      xmlns: "http://www.w3.org/2000/svg",
-      "xmlns:xlink": "http://www.w3.org/1999/xlink",
-      width: "18px",
-      height: "18px",
-      viewBox: "0 0 24 24",
-      version: "1.1"
-    }
-  }, [_c("g", {
-    attrs: {
-      stroke: "none",
-      "stroke-width": "1",
-      fill: "none",
-      "fill-rule": "evenodd"
-    }
-  }, [_c("rect", {
-    attrs: {
-      x: "0",
-      y: "0",
-      width: "24",
-      height: "24"
-    }
-  }), _vm._v(" "), _c("circle", {
-    attrs: {
-      fill: "#000000",
-      cx: "5",
-      cy: "12",
-      r: "2"
-    }
-  }), _vm._v(" "), _c("circle", {
-    attrs: {
-      fill: "#000000",
-      cx: "12",
-      cy: "12",
-      r: "2"
-    }
-  }), _vm._v(" "), _c("circle", {
-    attrs: {
-      fill: "#000000",
-      cx: "19",
-      cy: "12",
-      r: "2"
-    }
-  })])]), _vm._v("\n                                >")])]), _vm._v(" "), _vm._m(3)]), _vm._v(" "), _c("div", {
-    staticClass: "card chat dlab-chat-history-box d-none"
-  }, [_c("div", {
-    staticClass: "card-header chat-list-header text-center"
-  }, [_c("a", {
-    staticClass: "dlab-chat-history-back",
-    attrs: {
-      href: "javascript:void(0);"
-    }
-  }, [_c("svg", {
-    attrs: {
-      xmlns: "http://www.w3.org/2000/svg",
-      "xmlns:xlink": "http://www.w3.org/1999/xlink",
-      width: "18px",
-      height: "18px",
-      viewBox: "0 0 24 24",
-      version: "1.1"
-    }
-  }, [_c("g", {
-    attrs: {
-      stroke: "none",
-      "stroke-width": "1",
-      fill: "none",
-      "fill-rule": "evenodd"
-    }
-  }, [_c("polygon", {
-    attrs: {
-      points: "0 0 24 0 24 24 0 24"
-    }
-  }), _vm._v(" "), _c("rect", {
-    attrs: {
-      fill: "#000000",
-      opacity: "0.3",
-      transform: "translate(15.000000, 12.000000) scale(-1, 1) rotate(-90.000000) translate(-15.000000, -12.000000) ",
-      x: "14",
-      y: "7",
-      width: "2",
-      height: "10",
-      rx: "1"
-    }
-  }), _vm._v(" "), _c("path", {
-    attrs: {
-      d: "M3.7071045,15.7071045 C3.3165802,16.0976288 2.68341522,16.0976288 2.29289093,15.7071045 C1.90236664,15.3165802 1.90236664,14.6834152 2.29289093,14.2928909 L8.29289093,8.29289093 C8.67146987,7.914312 9.28105631,7.90106637 9.67572234,8.26284357 L15.6757223,13.7628436 C16.0828413,14.136036 16.1103443,14.7686034 15.7371519,15.1757223 C15.3639594,15.5828413 14.7313921,15.6103443 14.3242731,15.2371519 L9.03007346,10.3841355 L3.7071045,15.7071045 Z",
-      fill: "#000000",
-      "fill-rule": "nonzero",
-      transform: "translate(9.000001, 11.999997) scale(-1, -1) rotate(90.000000) translate(-9.000001, -11.999997) "
-    }
-  })])])]), _vm._v(" "), _vm._m(4), _vm._v(" "), _c("div", {
-    staticClass: "dropdown"
-  }, [_c("a", {
-    attrs: {
-      href: "javascript:void(0);",
-      "data-bs-toggle": "dropdown",
-      "aria-expanded": "false"
-    }
-  }, [_c("svg", {
-    attrs: {
-      xmlns: "http://www.w3.org/2000/svg",
-      "xmlns:xlink": "http://www.w3.org/1999/xlink",
-      width: "18px",
-      height: "18px",
-      viewBox: "0 0 24 24",
-      version: "1.1"
-    }
-  }, [_c("g", {
-    attrs: {
-      stroke: "none",
-      "stroke-width": "1",
-      fill: "none",
-      "fill-rule": "evenodd"
-    }
-  }, [_c("rect", {
-    attrs: {
-      x: "0",
-      y: "0",
-      width: "24",
-      height: "24"
-    }
-  }), _vm._v(" "), _c("circle", {
-    attrs: {
-      fill: "#000000",
-      cx: "5",
-      cy: "12",
-      r: "2"
-    }
-  }), _vm._v(" "), _c("circle", {
-    attrs: {
-      fill: "#000000",
-      cx: "12",
-      cy: "12",
-      r: "2"
-    }
-  }), _vm._v(" "), _c("circle", {
-    attrs: {
-      fill: "#000000",
-      cx: "19",
-      cy: "12",
-      r: "2"
-    }
-  })])]), _vm._v(" >")]), _vm._v(" "), _vm._m(5)])]), _vm._v(" "), _vm._m(6), _vm._v(" "), _vm._m(7)])]), _vm._v(" "), _c("div", {
-    staticClass: "tab-pane fade",
-    attrs: {
-      id: "alerts",
-      role: "tabpanel"
-    }
-  }, [_c("div", {
-    staticClass: "card mb-sm-3 mb-md-0 contacts_card"
-  }, [_c("div", {
-    staticClass: "card-header chat-list-header text-center"
-  }, [_c("a", {
-    attrs: {
-      href: "javascript:void(0);"
-    }
-  }, [_c("svg", {
-    attrs: {
-      xmlns: "http://www.w3.org/2000/svg"
-    }
-  }, [_c("g", {
-    attrs: {
-      stroke: "none",
-      "stroke-width": "1",
-      fill: "none",
-      "fill-rule": "evenodd"
-    }
-  }, [_c("rect", {
-    attrs: {
-      x: "0",
-      y: "0",
-      width: "24",
-      height: "24"
-    }
-  }), _vm._v(" "), _c("circle", {
-    attrs: {
-      fill: "#000000",
-      cx: "5",
-      cy: "12",
-      r: "2"
-    }
-  }), _vm._v(" "), _c("circle", {
-    attrs: {
-      fill: "#000000",
-      cx: "12",
-      cy: "12",
-      r: "2"
-    }
-  }), _vm._v(" "), _c("circle", {
-    attrs: {
-      fill: "#000000",
-      cx: "19",
-      cy: "12",
-      r: "2"
-    }
-  })])])]), _vm._v(" "), _vm._m(8), _vm._v(" "), _c("a", {
-    attrs: {
-      href: "javascript:void(0);"
-    }
-  }, [_c("svg", {
-    attrs: {
-      xmlns: "http://www.w3.org/2000/svg",
-      "xmlns:xlink": "http://www.w3.org/1999/xlink",
-      width: "18px",
-      height: "18px",
-      viewBox: "0 0 24 24",
-      version: "1.1"
-    }
-  }, [_c("g", {
-    attrs: {
-      stroke: "none",
-      "stroke-width": "1",
-      fill: "none",
-      "fill-rule": "evenodd"
-    }
-  }, [_c("rect", {
-    attrs: {
-      x: "0",
-      y: "0",
-      width: "24",
-      height: "24"
-    }
-  }), _vm._v(" "), _c("path", {
-    attrs: {
-      d: "M14.2928932,16.7071068 C13.9023689,16.3165825 13.9023689,15.6834175 14.2928932,15.2928932 C14.6834175,14.9023689 15.3165825,14.9023689 15.7071068,15.2928932 L19.7071068,19.2928932 C20.0976311,19.6834175 20.0976311,20.3165825 19.7071068,20.7071068 C19.3165825,21.0976311 18.6834175,21.0976311 18.2928932,20.7071068 L14.2928932,16.7071068 Z",
-      fill: "#000000",
-      "fill-rule": "nonzero",
-      opacity: "0.3"
-    }
-  }), _vm._v(" "), _c("path", {
-    attrs: {
-      d: "M11,16 C13.7614237,16 16,13.7614237 16,11 C16,8.23857625 13.7614237,6 11,6 C8.23857625,6 6,8.23857625 6,11 C6,13.7614237 8.23857625,16 11,16 Z M11,18 C7.13400675,18 4,14.8659932 4,11 C4,7.13400675 7.13400675,4 11,4 C14.8659932,4 18,7.13400675 18,11 C18,14.8659932 14.8659932,18 11,18 Z",
-      fill: "#000000",
-      "fill-rule": "nonzero"
-    }
-  })])])])]), _vm._v(" "), _vm._m(9), _vm._v(" "), _c("div", {
-    staticClass: "card-footer"
-  })])]), _vm._v(" "), _c("div", {
-    staticClass: "tab-pane fade",
-    attrs: {
-      id: "notes"
-    }
-  }, [_c("div", {
-    staticClass: "card mb-sm-3 mb-md-0 note_card"
-  }, [_c("div", {
-    staticClass: "card-header chat-list-header text-center"
-  }, [_c("a", {
-    attrs: {
-      href: "javascript:void(0);"
-    }
-  }, [_c("svg", {
-    attrs: {
-      xmlns: "http://www.w3.org/2000/svg",
-      "xmlns:xlink": "http://www.w3.org/1999/xlink",
-      width: "18px",
-      height: "18px",
-      viewBox: "0 0 24 24",
-      version: "1.1"
-    }
-  }, [_c("g", {
-    attrs: {
-      stroke: "none",
-      "stroke-width": "1",
-      fill: "none",
-      "fill-rule": "evenodd"
-    }
-  }, [_c("rect", {
-    attrs: {
-      fill: "#000000",
-      x: "4",
-      y: "11",
-      width: "16",
-      height: "2",
-      rx: "1"
-    }
-  }), _vm._v(" "), _c("rect", {
-    attrs: {
-      fill: "#000000",
-      opacity: "0.3",
-      transform: "translate(12.000000, 12.000000) rotate(-270.000000) translate(-12.000000, -12.000000) ",
-      x: "4",
-      y: "11",
-      width: "16",
-      height: "2",
-      rx: "1"
-    }
-  })])])]), _vm._v(" "), _vm._m(10), _vm._v(" "), _c("a", {
-    attrs: {
-      href: "javascript:void(0);"
-    }
-  }, [_c("svg", {
-    attrs: {
-      xmlns: "http://www.w3.org/2000/svg",
-      "xmlns:xlink": "http://www.w3.org/1999/xlink",
-      width: "18px",
-      height: "18px",
-      viewBox: "0 0 24 24",
-      version: "1.1"
-    }
-  }, [_c("g", {
-    attrs: {
-      stroke: "none",
-      "stroke-width": "1",
-      fill: "none",
-      "fill-rule": "evenodd"
-    }
-  }, [_c("rect", {
-    attrs: {
-      x: "0",
-      y: "0",
-      width: "24",
-      height: "24"
-    }
-  }), _vm._v(" "), _c("path", {
-    attrs: {
-      d: "M14.2928932,16.7071068 C13.9023689,16.3165825 13.9023689,15.6834175 14.2928932,15.2928932 C14.6834175,14.9023689 15.3165825,14.9023689 15.7071068,15.2928932 L19.7071068,19.2928932 C20.0976311,19.6834175 20.0976311,20.3165825 19.7071068,20.7071068 C19.3165825,21.0976311 18.6834175,21.0976311 18.2928932,20.7071068 L14.2928932,16.7071068 Z",
-      fill: "#000000",
-      "fill-rule": "nonzero",
-      opacity: "0.3"
-    }
-  }), _vm._v(" "), _c("path", {
-    attrs: {
-      d: "M11,16 C13.7614237,16 16,13.7614237 16,11 C16,8.23857625 13.7614237,6 11,6 C8.23857625,6 6,8.23857625 6,11 C6,13.7614237 8.23857625,16 11,16 Z M11,18 C7.13400675,18 4,14.8659932 4,11 C4,7.13400675 7.13400675,4 11,4 C14.8659932,4 18,7.13400675 18,11 C18,14.8659932 14.8659932,18 11,18 Z",
-      fill: "#000000",
-      "fill-rule": "nonzero"
-    }
-  })])])])]), _vm._v(" "), _vm._m(11)])])])])]), _vm._v(" "), _c("div", {
     staticClass: "header border-bottom"
   }, [_c("div", {
     staticClass: "header-content"
@@ -27502,67 +27176,11 @@ var render = function render() {
     staticClass: "navbar navbar-expand"
   }, [_c("div", {
     staticClass: "collapse navbar-collapse justify-content-between"
-  }, [_vm._m(12), _vm._v(" "), _c("ul", {
+  }, [_vm._m(1), _vm._v(" "), _c("ul", {
     staticClass: "navbar-nav header-right"
-  }, [_vm._m(13), _vm._v(" "), _c("li", {
-    staticClass: "nav-item dropdown notification_dropdown"
-  }, [_c("a", {
-    staticClass: "nav-link",
-    attrs: {
-      href: "javascript:void(0);",
-      role: "button",
-      "data-bs-toggle": "dropdown"
-    }
-  }, [_c("svg", {
-    attrs: {
-      width: "28",
-      height: "28",
-      viewBox: "0 0 28 28",
-      fill: "none",
-      xmlns: "http://www.w3.org/2000/svg"
-    }
-  }, [_c("path", {
-    attrs: {
-      d: "M23.3333 19.8333H23.1187C23.2568 19.4597 23.3295 19.065 23.3333 18.6666V12.8333C23.3294 10.7663 22.6402 8.75902 21.3735 7.12565C20.1068 5.49228 18.3343 4.32508 16.3333 3.80679V3.49996C16.3333 2.88112 16.0875 2.28763 15.6499 1.85004C15.2123 1.41246 14.6188 1.16663 14 1.16663C13.3812 1.16663 12.7877 1.41246 12.3501 1.85004C11.9125 2.28763 11.6667 2.88112 11.6667 3.49996V3.80679C9.66574 4.32508 7.89317 5.49228 6.6265 7.12565C5.35983 8.75902 4.67058 10.7663 4.66667 12.8333V18.6666C4.67053 19.065 4.74316 19.4597 4.88133 19.8333H4.66667C4.35725 19.8333 4.0605 19.9562 3.84171 20.175C3.62292 20.3938 3.5 20.6905 3.5 21C3.5 21.3094 3.62292 21.6061 3.84171 21.8249C4.0605 22.0437 4.35725 22.1666 4.66667 22.1666H23.3333C23.6428 22.1666 23.9395 22.0437 24.1583 21.8249C24.3771 21.6061 24.5 21.3094 24.5 21C24.5 20.6905 24.3771 20.3938 24.1583 20.175C23.9395 19.9562 23.6428 19.8333 23.3333 19.8333Z",
-      fill: "#717579"
-    }
-  }), _vm._v(" "), _c("path", {
-    attrs: {
-      d: "M9.9819 24.5C10.3863 25.2088 10.971 25.7981 11.6766 26.2079C12.3823 26.6178 13.1838 26.8337 13.9999 26.8337C14.816 26.8337 15.6175 26.6178 16.3232 26.2079C17.0288 25.7981 17.6135 25.2088 18.0179 24.5H9.9819Z",
-      fill: "#717579"
-    }
-  })]), _vm._v(" "), _c("span", {
-    staticClass: "badge light text-white bg-warning rounded-circle"
-  }, [_vm._v("12")])]), _vm._v(" "), _vm._m(14)]), _vm._v(" "), _c("li", {
-    staticClass: "nav-item dropdown notification_dropdown"
-  }, [_c("a", {
-    staticClass: "nav-link bell-link",
-    attrs: {
-      href: "javascript:void(0);"
-    }
-  }, [_c("svg", {
-    attrs: {
-      width: "28",
-      height: "28",
-      viewBox: "0 0 28 28",
-      fill: "none",
-      xmlns: "http://www.w3.org/2000/svg"
-    }
-  }, [_c("path", {
-    attrs: {
-      d: "M27.076 6.24662C26.962 5.48439 26.5787 4.78822 25.9955 4.28434C25.4123 3.78045 24.6679 3.50219 23.8971 3.5H4.10289C3.33217 3.50219 2.58775 3.78045 2.00456 4.28434C1.42137 4.78822 1.03803 5.48439 0.924011 6.24662L14 14.7079L27.076 6.24662Z",
-      fill: "#717579"
-    }
-  }), _vm._v(" "), _c("path", {
-    attrs: {
-      d: "M14.4751 16.485C14.3336 16.5765 14.1686 16.6252 14 16.6252C13.8314 16.6252 13.6664 16.5765 13.5249 16.485L0.875 8.30025V21.2721C0.875926 22.1279 1.2163 22.9484 1.82145 23.5536C2.42659 24.1587 3.24707 24.4991 4.10288 24.5H23.8971C24.7529 24.4991 25.5734 24.1587 26.1786 23.5536C26.7837 22.9484 27.1241 22.1279 27.125 21.2721V8.29938L14.4751 16.485Z",
-      fill: "#717579"
-    }
-  })]), _vm._v(" "), _c("span", {
-    staticClass: "badge light text-white bg-danger rounded-circle"
-  }, [_vm._v("76")])])]), _vm._v(" "), _c("li", {
+  }, [_c("li", {
     staticClass: "nav-item dropdown header-profile"
-  }, [_vm._m(15), _vm._v(" "), _c("div", {
+  }, [_vm._m(2), _vm._v(" "), _c("div", {
     staticClass: "dropdown-menu dropdown-menu-end"
   }, [_c("a", {
     staticClass: "dropdown-item ai-icon",
@@ -27694,708 +27312,6 @@ var staticRenderFns = [function () {
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
-  return _c("ul", {
-    staticClass: "nav nav-tabs"
-  }, [_c("li", {
-    staticClass: "nav-item"
-  }, [_c("a", {
-    staticClass: "nav-link",
-    attrs: {
-      "data-bs-toggle": "tab",
-      href: "#alerts"
-    }
-  }, [_vm._v("Alerts")])]), _vm._v(" "), _c("li", {
-    staticClass: "nav-item"
-  }, [_c("a", {
-    staticClass: "nav-link active",
-    attrs: {
-      "data-bs-toggle": "tab",
-      href: "#chat"
-    }
-  }, [_vm._v("Chat")])])]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("div", [_c("h6", {
-    staticClass: "mb-1"
-  }, [_vm._v("Chat List")]), _vm._v(" "), _c("p", {
-    staticClass: "mb-0"
-  }, [_vm._v("Show All")])]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("div", {
-    staticClass: "card-body contacts_body p-0 dlab-scroll",
-    attrs: {
-      id: "DLAB_W_Contacts_Body"
-    }
-  }, [_c("ul", {
-    staticClass: "contacts"
-  }, [_c("li", {
-    staticClass: "name-first-letter"
-  }, [_vm._v("A")]), _vm._v(" "), _c("li", {
-    staticClass: "active dlab-chat-user"
-  }, [_c("div", {
-    staticClass: "d-flex bd-highlight"
-  }, [_c("div", {
-    staticClass: "img_cont"
-  }, [_c("img", {
-    staticClass: "rounded-circle user_img",
-    attrs: {
-      src: "images/avatar/1.jpg",
-      alt: ""
-    }
-  }), _vm._v(" "), _c("span", {
-    staticClass: "online_icon"
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "user_info"
-  }, [_c("span", [_vm._v("Archie Parker")]), _vm._v(" "), _c("p", [_vm._v("Kalid is online")])])])]), _vm._v(" "), _c("li", {
-    staticClass: "dlab-chat-user"
-  }, [_c("div", {
-    staticClass: "d-flex bd-highlight"
-  }, [_c("div", {
-    staticClass: "img_cont"
-  }, [_c("img", {
-    staticClass: "rounded-circle user_img",
-    attrs: {
-      src: "images/avatar/2.jpg",
-      alt: ""
-    }
-  }), _vm._v(" "), _c("span", {
-    staticClass: "online_icon offline"
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "user_info"
-  }, [_c("span", [_vm._v("Alfie Mason")]), _vm._v(" "), _c("p", [_vm._v("Taherah left 7 mins ago")])])])]), _vm._v(" "), _c("li", {
-    staticClass: "dlab-chat-user"
-  }, [_c("div", {
-    staticClass: "d-flex bd-highlight"
-  }, [_c("div", {
-    staticClass: "img_cont"
-  }, [_c("img", {
-    staticClass: "rounded-circle user_img",
-    attrs: {
-      src: "images/avatar/3.jpg",
-      alt: ""
-    }
-  }), _vm._v(" "), _c("span", {
-    staticClass: "online_icon"
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "user_info"
-  }, [_c("span", [_vm._v("AharlieKane")]), _vm._v(" "), _c("p", [_vm._v("Sami is online")])])])]), _vm._v(" "), _c("li", {
-    staticClass: "dlab-chat-user"
-  }, [_c("div", {
-    staticClass: "d-flex bd-highlight"
-  }, [_c("div", {
-    staticClass: "img_cont"
-  }, [_c("img", {
-    staticClass: "rounded-circle user_img",
-    attrs: {
-      src: "images/avatar/4.jpg",
-      alt: ""
-    }
-  }), _vm._v(" "), _c("span", {
-    staticClass: "online_icon offline"
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "user_info"
-  }, [_c("span", [_vm._v("Athan Jacoby")]), _vm._v(" "), _c("p", [_vm._v("Nargis left 30 mins ago")])])])]), _vm._v(" "), _c("li", {
-    staticClass: "name-first-letter"
-  }, [_vm._v("B")]), _vm._v(" "), _c("li", {
-    staticClass: "dlab-chat-user"
-  }, [_c("div", {
-    staticClass: "d-flex bd-highlight"
-  }, [_c("div", {
-    staticClass: "img_cont"
-  }, [_c("img", {
-    staticClass: "rounded-circle user_img",
-    attrs: {
-      src: "images/avatar/5.jpg",
-      alt: ""
-    }
-  }), _vm._v(" "), _c("span", {
-    staticClass: "online_icon offline"
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "user_info"
-  }, [_c("span", [_vm._v("Bashid Samim")]), _vm._v(" "), _c("p", [_vm._v("Rashid left 50 mins ago")])])])]), _vm._v(" "), _c("li", {
-    staticClass: "dlab-chat-user"
-  }, [_c("div", {
-    staticClass: "d-flex bd-highlight"
-  }, [_c("div", {
-    staticClass: "img_cont"
-  }, [_c("img", {
-    staticClass: "rounded-circle user_img",
-    attrs: {
-      src: "images/avatar/1.jpg",
-      alt: ""
-    }
-  }), _vm._v(" "), _c("span", {
-    staticClass: "online_icon"
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "user_info"
-  }, [_c("span", [_vm._v("Breddie Ronan")]), _vm._v(" "), _c("p", [_vm._v("Kalid is online")])])])]), _vm._v(" "), _c("li", {
-    staticClass: "dlab-chat-user"
-  }, [_c("div", {
-    staticClass: "d-flex bd-highlight"
-  }, [_c("div", {
-    staticClass: "img_cont"
-  }, [_c("img", {
-    staticClass: "rounded-circle user_img",
-    attrs: {
-      src: "images/avatar/2.jpg",
-      alt: ""
-    }
-  }), _vm._v(" "), _c("span", {
-    staticClass: "online_icon offline"
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "user_info"
-  }, [_c("span", [_vm._v("Ceorge Carson")]), _vm._v(" "), _c("p", [_vm._v("Taherah left 7 mins ago")])])])]), _vm._v(" "), _c("li", {
-    staticClass: "name-first-letter"
-  }, [_vm._v("D")]), _vm._v(" "), _c("li", {
-    staticClass: "dlab-chat-user"
-  }, [_c("div", {
-    staticClass: "d-flex bd-highlight"
-  }, [_c("div", {
-    staticClass: "img_cont"
-  }, [_c("img", {
-    staticClass: "rounded-circle user_img",
-    attrs: {
-      src: "images/avatar/3.jpg",
-      alt: ""
-    }
-  }), _vm._v(" "), _c("span", {
-    staticClass: "online_icon"
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "user_info"
-  }, [_c("span", [_vm._v("Darry Parker")]), _vm._v(" "), _c("p", [_vm._v("Sami is online")])])])]), _vm._v(" "), _c("li", {
-    staticClass: "dlab-chat-user"
-  }, [_c("div", {
-    staticClass: "d-flex bd-highlight"
-  }, [_c("div", {
-    staticClass: "img_cont"
-  }, [_c("img", {
-    staticClass: "rounded-circle user_img",
-    attrs: {
-      src: "images/avatar/4.jpg",
-      alt: ""
-    }
-  }), _vm._v(" "), _c("span", {
-    staticClass: "online_icon offline"
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "user_info"
-  }, [_c("span", [_vm._v("Denry Hunter")]), _vm._v(" "), _c("p", [_vm._v("Nargis left 30 mins ago")])])])]), _vm._v(" "), _c("li", {
-    staticClass: "name-first-letter"
-  }, [_vm._v("J")]), _vm._v(" "), _c("li", {
-    staticClass: "dlab-chat-user"
-  }, [_c("div", {
-    staticClass: "d-flex bd-highlight"
-  }, [_c("div", {
-    staticClass: "img_cont"
-  }, [_c("img", {
-    staticClass: "rounded-circle user_img",
-    attrs: {
-      src: "images/avatar/5.jpg",
-      alt: ""
-    }
-  }), _vm._v(" "), _c("span", {
-    staticClass: "online_icon offline"
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "user_info"
-  }, [_c("span", [_vm._v("Jack Ronan")]), _vm._v(" "), _c("p", [_vm._v("Rashid left 50 mins ago")])])])]), _vm._v(" "), _c("li", {
-    staticClass: "dlab-chat-user"
-  }, [_c("div", {
-    staticClass: "d-flex bd-highlight"
-  }, [_c("div", {
-    staticClass: "img_cont"
-  }, [_c("img", {
-    staticClass: "rounded-circle user_img",
-    attrs: {
-      src: "images/avatar/1.jpg",
-      alt: ""
-    }
-  }), _vm._v(" "), _c("span", {
-    staticClass: "online_icon"
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "user_info"
-  }, [_c("span", [_vm._v("Jacob Tucker")]), _vm._v(" "), _c("p", [_vm._v("Kalid is online")])])])]), _vm._v(" "), _c("li", {
-    staticClass: "dlab-chat-user"
-  }, [_c("div", {
-    staticClass: "d-flex bd-highlight"
-  }, [_c("div", {
-    staticClass: "img_cont"
-  }, [_c("img", {
-    staticClass: "rounded-circle user_img",
-    attrs: {
-      src: "images/avatar/2.jpg",
-      alt: ""
-    }
-  }), _vm._v(" "), _c("span", {
-    staticClass: "online_icon offline"
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "user_info"
-  }, [_c("span", [_vm._v("James Logan")]), _vm._v(" "), _c("p", [_vm._v("Taherah left 7 mins ago")])])])]), _vm._v(" "), _c("li", {
-    staticClass: "dlab-chat-user"
-  }, [_c("div", {
-    staticClass: "d-flex bd-highlight"
-  }, [_c("div", {
-    staticClass: "img_cont"
-  }, [_c("img", {
-    staticClass: "rounded-circle user_img",
-    attrs: {
-      src: "images/avatar/3.jpg",
-      alt: ""
-    }
-  }), _vm._v(" "), _c("span", {
-    staticClass: "online_icon"
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "user_info"
-  }, [_c("span", [_vm._v("Joshua Weston")]), _vm._v(" "), _c("p", [_vm._v("Sami is online")])])])]), _vm._v(" "), _c("li", {
-    staticClass: "name-first-letter"
-  }, [_vm._v("O")]), _vm._v(" "), _c("li", {
-    staticClass: "dlab-chat-user"
-  }, [_c("div", {
-    staticClass: "d-flex bd-highlight"
-  }, [_c("div", {
-    staticClass: "img_cont"
-  }, [_c("img", {
-    staticClass: "rounded-circle user_img",
-    attrs: {
-      src: "images/avatar/4.jpg",
-      alt: ""
-    }
-  }), _vm._v(" "), _c("span", {
-    staticClass: "online_icon offline"
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "user_info"
-  }, [_c("span", [_vm._v("Oliver Acker")]), _vm._v(" "), _c("p", [_vm._v("Nargis left 30 mins ago")])])])]), _vm._v(" "), _c("li", {
-    staticClass: "dlab-chat-user"
-  }, [_c("div", {
-    staticClass: "d-flex bd-highlight"
-  }, [_c("div", {
-    staticClass: "img_cont"
-  }, [_c("img", {
-    staticClass: "rounded-circle user_img",
-    attrs: {
-      src: "images/avatar/5.jpg",
-      alt: ""
-    }
-  }), _vm._v(" "), _c("span", {
-    staticClass: "online_icon offline"
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "user_info"
-  }, [_c("span", [_vm._v("Oscar Weston")]), _vm._v(" "), _c("p", [_vm._v("Rashid left 50 mins ago")])])])])])]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("div", [_c("h6", {
-    staticClass: "mb-1"
-  }, [_vm._v("Chat with Khelesh")]), _vm._v(" "), _c("p", {
-    staticClass: "mb-0 text-success"
-  }, [_vm._v("Online")])]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("ul", {
-    staticClass: "dropdown-menu dropdown-menu-end"
-  }, [_c("li", {
-    staticClass: "dropdown-item"
-  }, [_c("i", {
-    staticClass: "fa fa-user-circle text-primary me-2"
-  }), _vm._v(" View\n                                        profile\n                                    ")]), _vm._v(" "), _c("li", {
-    staticClass: "dropdown-item"
-  }, [_c("i", {
-    staticClass: "fa fa-users text-primary me-2"
-  }), _vm._v(" Add to\n                                        btn-close friends\n                                    ")]), _vm._v(" "), _c("li", {
-    staticClass: "dropdown-item"
-  }, [_c("i", {
-    staticClass: "fa fa-plus text-primary me-2"
-  }), _vm._v(" Add to\n                                        group\n                                    ")]), _vm._v(" "), _c("li", {
-    staticClass: "dropdown-item"
-  }, [_c("i", {
-    staticClass: "fa fa-ban text-primary me-2"
-  }), _vm._v(" Block\n                                    ")])]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("div", {
-    staticClass: "card-body msg_card_body dlab-scroll",
-    attrs: {
-      id: "DLAB_W_Contacts_Body3"
-    }
-  }, [_c("div", {
-    staticClass: "d-flex justify-content-start mb-4"
-  }, [_c("div", {
-    staticClass: "img_cont_msg"
-  }, [_c("img", {
-    staticClass: "rounded-circle user_img_msg",
-    attrs: {
-      src: "images/avatar/1.jpg",
-      alt: ""
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "msg_cotainer"
-  }, [_vm._v("\n                                    Hi, how are you samim?\n                                    "), _c("span", {
-    staticClass: "msg_time"
-  }, [_vm._v("8:40 AM, Today")])])]), _vm._v(" "), _c("div", {
-    staticClass: "d-flex justify-content-end mb-4"
-  }, [_c("div", {
-    staticClass: "msg_cotainer_send"
-  }, [_vm._v("\n                                    Hi Khalid i am good tnx how about you?\n                                    "), _c("span", {
-    staticClass: "msg_time_send"
-  }, [_vm._v("8:55 AM, Today")])]), _vm._v(" "), _c("div", {
-    staticClass: "img_cont_msg"
-  }, [_c("img", {
-    staticClass: "rounded-circle user_img_msg",
-    attrs: {
-      src: "images/avatar/2.jpg",
-      alt: ""
-    }
-  })])]), _vm._v(" "), _c("div", {
-    staticClass: "d-flex justify-content-start mb-4"
-  }, [_c("div", {
-    staticClass: "img_cont_msg"
-  }, [_c("img", {
-    staticClass: "rounded-circle user_img_msg",
-    attrs: {
-      src: "images/avatar/1.jpg",
-      alt: ""
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "msg_cotainer"
-  }, [_vm._v("\n                                    I am good too, thank you for your chat template\n                                    "), _c("span", {
-    staticClass: "msg_time"
-  }, [_vm._v("9:00 AM, Today")])])]), _vm._v(" "), _c("div", {
-    staticClass: "d-flex justify-content-end mb-4"
-  }, [_c("div", {
-    staticClass: "msg_cotainer_send"
-  }, [_vm._v("\n                                    You are welcome\n                                    "), _c("span", {
-    staticClass: "msg_time_send"
-  }, [_vm._v("9:05 AM, Today")])]), _vm._v(" "), _c("div", {
-    staticClass: "img_cont_msg"
-  }, [_c("img", {
-    staticClass: "rounded-circle user_img_msg",
-    attrs: {
-      src: "images/avatar/2.jpg",
-      alt: ""
-    }
-  })])]), _vm._v(" "), _c("div", {
-    staticClass: "d-flex justify-content-start mb-4"
-  }, [_c("div", {
-    staticClass: "img_cont_msg"
-  }, [_c("img", {
-    staticClass: "rounded-circle user_img_msg",
-    attrs: {
-      src: "images/avatar/1.jpg",
-      alt: ""
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "msg_cotainer"
-  }, [_vm._v("\n                                    I am looking for your next templates\n                                    "), _c("span", {
-    staticClass: "msg_time"
-  }, [_vm._v("9:07 AM, Today")])])]), _vm._v(" "), _c("div", {
-    staticClass: "d-flex justify-content-end mb-4"
-  }, [_c("div", {
-    staticClass: "msg_cotainer_send"
-  }, [_vm._v("\n                                    Ok, thank you have a good day\n                                    "), _c("span", {
-    staticClass: "msg_time_send"
-  }, [_vm._v("9:10 AM, Today")])]), _vm._v(" "), _c("div", {
-    staticClass: "img_cont_msg"
-  }, [_c("img", {
-    staticClass: "rounded-circle user_img_msg",
-    attrs: {
-      src: "images/avatar/2.jpg",
-      alt: ""
-    }
-  })])]), _vm._v(" "), _c("div", {
-    staticClass: "d-flex justify-content-start mb-4"
-  }, [_c("div", {
-    staticClass: "img_cont_msg"
-  }, [_c("img", {
-    staticClass: "rounded-circle user_img_msg",
-    attrs: {
-      src: "images/avatar/1.jpg",
-      alt: ""
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "msg_cotainer"
-  }, [_vm._v("\n                                    Bye, see you\n                                    "), _c("span", {
-    staticClass: "msg_time"
-  }, [_vm._v("9:12 AM, Today")])])]), _vm._v(" "), _c("div", {
-    staticClass: "d-flex justify-content-start mb-4"
-  }, [_c("div", {
-    staticClass: "img_cont_msg"
-  }, [_c("img", {
-    staticClass: "rounded-circle user_img_msg",
-    attrs: {
-      src: "images/avatar/1.jpg",
-      alt: ""
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "msg_cotainer"
-  }, [_vm._v("\n                                    Hi, how are you samim?\n                                    "), _c("span", {
-    staticClass: "msg_time"
-  }, [_vm._v("8:40 AM, Today")])])]), _vm._v(" "), _c("div", {
-    staticClass: "d-flex justify-content-end mb-4"
-  }, [_c("div", {
-    staticClass: "msg_cotainer_send"
-  }, [_vm._v("\n                                    Hi Khalid i am good tnx how about you?\n                                    "), _c("span", {
-    staticClass: "msg_time_send"
-  }, [_vm._v("8:55 AM, Today")])]), _vm._v(" "), _c("div", {
-    staticClass: "img_cont_msg"
-  }, [_c("img", {
-    staticClass: "rounded-circle user_img_msg",
-    attrs: {
-      src: "images/avatar/2.jpg",
-      alt: ""
-    }
-  })])]), _vm._v(" "), _c("div", {
-    staticClass: "d-flex justify-content-start mb-4"
-  }, [_c("div", {
-    staticClass: "img_cont_msg"
-  }, [_c("img", {
-    staticClass: "rounded-circle user_img_msg",
-    attrs: {
-      src: "images/avatar/1.jpg",
-      alt: ""
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "msg_cotainer"
-  }, [_vm._v("\n                                    I am good too, thank you for your chat template\n                                    "), _c("span", {
-    staticClass: "msg_time"
-  }, [_vm._v("9:00 AM, Today")])])]), _vm._v(" "), _c("div", {
-    staticClass: "d-flex justify-content-end mb-4"
-  }, [_c("div", {
-    staticClass: "msg_cotainer_send"
-  }, [_vm._v("\n                                    You are welcome\n                                    "), _c("span", {
-    staticClass: "msg_time_send"
-  }, [_vm._v("9:05 AM, Today")])]), _vm._v(" "), _c("div", {
-    staticClass: "img_cont_msg"
-  }, [_c("img", {
-    staticClass: "rounded-circle user_img_msg",
-    attrs: {
-      src: "images/avatar/2.jpg",
-      alt: ""
-    }
-  })])]), _vm._v(" "), _c("div", {
-    staticClass: "d-flex justify-content-start mb-4"
-  }, [_c("div", {
-    staticClass: "img_cont_msg"
-  }, [_c("img", {
-    staticClass: "rounded-circle user_img_msg",
-    attrs: {
-      src: "images/avatar/1.jpg",
-      alt: ""
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "msg_cotainer"
-  }, [_vm._v("\n                                    I am looking for your next templates\n                                    "), _c("span", {
-    staticClass: "msg_time"
-  }, [_vm._v("9:07 AM, Today")])])]), _vm._v(" "), _c("div", {
-    staticClass: "d-flex justify-content-end mb-4"
-  }, [_c("div", {
-    staticClass: "msg_cotainer_send"
-  }, [_vm._v("\n                                    Ok, thank you have a good day\n                                    "), _c("span", {
-    staticClass: "msg_time_send"
-  }, [_vm._v("9:10 AM, Today")])]), _vm._v(" "), _c("div", {
-    staticClass: "img_cont_msg"
-  }, [_c("img", {
-    staticClass: "rounded-circle user_img_msg",
-    attrs: {
-      src: "images/avatar/2.jpg",
-      alt: ""
-    }
-  })])]), _vm._v(" "), _c("div", {
-    staticClass: "d-flex justify-content-start mb-4"
-  }, [_c("div", {
-    staticClass: "img_cont_msg"
-  }, [_c("img", {
-    staticClass: "rounded-circle user_img_msg",
-    attrs: {
-      src: "images/avatar/1.jpg",
-      alt: ""
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "msg_cotainer"
-  }, [_vm._v("\n                                    Bye, see you\n                                    "), _c("span", {
-    staticClass: "msg_time"
-  }, [_vm._v("9:12 AM, Today")])])])]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("div", {
-    staticClass: "card-footer type_msg"
-  }, [_c("div", {
-    staticClass: "input-group"
-  }, [_c("textarea", {
-    staticClass: "form-control",
-    attrs: {
-      placeholder: "Type your message..."
-    }
-  }), _vm._v(" "), _c("div", {
-    staticClass: "input-group-append"
-  }, [_c("button", {
-    staticClass: "btn btn-primary",
-    attrs: {
-      type: "button"
-    }
-  }, [_c("i", {
-    staticClass: "fa fa-location-arrow"
-  })])])])]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("div", [_c("h6", {
-    staticClass: "mb-1"
-  }, [_vm._v("Notications")]), _vm._v(" "), _c("p", {
-    staticClass: "mb-0"
-  }, [_vm._v("Show All")])]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("div", {
-    staticClass: "card-body contacts_body p-0 dlab-scroll",
-    attrs: {
-      id: "DLAB_W_Contacts_Body1"
-    }
-  }, [_c("ul", {
-    staticClass: "contacts"
-  }, [_c("li", {
-    staticClass: "name-first-letter"
-  }, [_vm._v("SEVER STATUS")]), _vm._v(" "), _c("li", {
-    staticClass: "active"
-  }, [_c("div", {
-    staticClass: "d-flex bd-highlight"
-  }, [_c("div", {
-    staticClass: "img_cont primary"
-  }, [_vm._v("KK")]), _vm._v(" "), _c("div", {
-    staticClass: "user_info"
-  }, [_c("span", [_vm._v("David Nester Birthday")]), _vm._v(" "), _c("p", {
-    staticClass: "text-primary"
-  }, [_vm._v("Today")])])])]), _vm._v(" "), _c("li", {
-    staticClass: "name-first-letter"
-  }, [_vm._v("SOCIAL")]), _vm._v(" "), _c("li", [_c("div", {
-    staticClass: "d-flex bd-highlight"
-  }, [_c("div", {
-    staticClass: "img_cont success"
-  }, [_vm._v("RU")]), _vm._v(" "), _c("div", {
-    staticClass: "user_info"
-  }, [_c("span", [_vm._v("Perfection Simplified")]), _vm._v(" "), _c("p", [_vm._v("Jame Smith commented on your status")])])])]), _vm._v(" "), _c("li", {
-    staticClass: "name-first-letter"
-  }, [_vm._v("SEVER STATUS")]), _vm._v(" "), _c("li", [_c("div", {
-    staticClass: "d-flex bd-highlight"
-  }, [_c("div", {
-    staticClass: "img_cont primary"
-  }, [_vm._v("AU")]), _vm._v(" "), _c("div", {
-    staticClass: "user_info"
-  }, [_c("span", [_vm._v("AharlieKane")]), _vm._v(" "), _c("p", [_vm._v("Sami is online")])])])]), _vm._v(" "), _c("li", [_c("div", {
-    staticClass: "d-flex bd-highlight"
-  }, [_c("div", {
-    staticClass: "img_cont info"
-  }, [_vm._v("MO")]), _vm._v(" "), _c("div", {
-    staticClass: "user_info"
-  }, [_c("span", [_vm._v("Athan Jacoby")]), _vm._v(" "), _c("p", [_vm._v("Nargis left 30 mins ago")])])])])])]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("div", [_c("h6", {
-    staticClass: "mb-1"
-  }, [_vm._v("Notes")]), _vm._v(" "), _c("p", {
-    staticClass: "mb-0"
-  }, [_vm._v("Add New Nots")])]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("div", {
-    staticClass: "card-body contacts_body p-0 dlab-scroll",
-    attrs: {
-      id: "DLAB_W_Contacts_Body2"
-    }
-  }, [_c("ul", {
-    staticClass: "contacts"
-  }, [_c("li", {
-    staticClass: "active"
-  }, [_c("div", {
-    staticClass: "d-flex bd-highlight"
-  }, [_c("div", {
-    staticClass: "user_info"
-  }, [_c("span", [_vm._v("New order placed..")]), _vm._v(" "), _c("p", [_vm._v("10 Aug 2020")])]), _vm._v(" "), _c("div", {
-    staticClass: "ms-auto"
-  }, [_c("a", {
-    staticClass: "btn btn-primary btn-xs sharp me-1",
-    attrs: {
-      href: "javascript:void(0);"
-    }
-  }, [_c("i", {
-    staticClass: "fas fa-pencil-alt"
-  })]), _vm._v(" "), _c("a", {
-    staticClass: "btn btn-danger btn-xs sharp",
-    attrs: {
-      href: "javascript:void(0);"
-    }
-  }, [_c("i", {
-    staticClass: "fa fa-trash"
-  })])])])]), _vm._v(" "), _c("li", [_c("div", {
-    staticClass: "d-flex bd-highlight"
-  }, [_c("div", {
-    staticClass: "user_info"
-  }, [_c("span", [_vm._v("Youtube, a video-sharing website..")]), _vm._v(" "), _c("p", [_vm._v("10 Aug 2020")])]), _vm._v(" "), _c("div", {
-    staticClass: "ms-auto"
-  }, [_c("a", {
-    staticClass: "btn btn-primary btn-xs sharp me-1",
-    attrs: {
-      href: "javascript:void(0);"
-    }
-  }, [_c("i", {
-    staticClass: "fas fa-pencil-alt"
-  })]), _vm._v(" "), _c("a", {
-    staticClass: "btn btn-danger btn-xs sharp",
-    attrs: {
-      href: "javascript:void(0);"
-    }
-  }, [_c("i", {
-    staticClass: "fa fa-trash"
-  })])])])]), _vm._v(" "), _c("li", [_c("div", {
-    staticClass: "d-flex bd-highlight"
-  }, [_c("div", {
-    staticClass: "user_info"
-  }, [_c("span", [_vm._v("john just buy your product..")]), _vm._v(" "), _c("p", [_vm._v("10 Aug 2020")])]), _vm._v(" "), _c("div", {
-    staticClass: "ms-auto"
-  }, [_c("a", {
-    staticClass: "btn btn-primary btn-xs sharp me-1",
-    attrs: {
-      href: "javascript:void(0);"
-    }
-  }, [_c("i", {
-    staticClass: "fas fa-pencil-alt"
-  })]), _vm._v(" "), _c("a", {
-    staticClass: "btn btn-danger btn-xs sharp",
-    attrs: {
-      href: "javascript:void(0);"
-    }
-  }, [_c("i", {
-    staticClass: "fa fa-trash"
-  })])])])]), _vm._v(" "), _c("li", [_c("div", {
-    staticClass: "d-flex bd-highlight"
-  }, [_c("div", {
-    staticClass: "user_info"
-  }, [_c("span", [_vm._v("Athan Jacoby")]), _vm._v(" "), _c("p", [_vm._v("10 Aug 2020")])]), _vm._v(" "), _c("div", {
-    staticClass: "ms-auto"
-  }, [_c("a", {
-    staticClass: "btn btn-primary btn-xs sharp me-1",
-    attrs: {
-      href: "javascript:void(0);"
-    }
-  }, [_c("i", {
-    staticClass: "fas fa-pencil-alt"
-  })]), _vm._v(" "), _c("a", {
-    staticClass: "btn btn-danger btn-xs sharp",
-    attrs: {
-      href: "javascript:void(0);"
-    }
-  }, [_c("i", {
-    staticClass: "fa fa-trash"
-  })])])])])])]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
   return _c("div", {
     staticClass: "header-left"
   }, [_c("div", {
@@ -28404,127 +27320,6 @@ var staticRenderFns = [function () {
       id: "dashboard_bar"
     }
   }, [_vm._v("Dashboard")])]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("li", {
-    staticClass: "nav-item d-flex align-items-center"
-  }, [_c("div", {
-    staticClass: "input-group search-area"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      placeholder: "Search here..."
-    }
-  }), _vm._v(" "), _c("span", {
-    staticClass: "input-group-text"
-  }, [_c("a", {
-    attrs: {
-      href: "javascript:void(0)"
-    }
-  }, [_c("i", {
-    staticClass: "flaticon-381-search-2"
-  })])])])]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("div", {
-    staticClass: "dropdown-menu dropdown-menu-end"
-  }, [_c("div", {
-    staticClass: "widget-media dlab-scroll p-3",
-    staticStyle: {
-      height: "380px"
-    },
-    attrs: {
-      id: "DZ_W_Notification1"
-    }
-  }, [_c("ul", {
-    staticClass: "timeline"
-  }, [_c("li", [_c("div", {
-    staticClass: "timeline-panel"
-  }, [_c("div", {
-    staticClass: "media me-2"
-  }, [_c("img", {
-    attrs: {
-      alt: "image",
-      width: "50",
-      src: "images/avatar/1.png"
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "media-body"
-  }, [_c("h6", {
-    staticClass: "mb-1"
-  }, [_vm._v("Dr sultads Send you Photo")]), _vm._v(" "), _c("small", {
-    staticClass: "d-block"
-  }, [_vm._v("29 July 2020 - 02:26 PM")])])])]), _vm._v(" "), _c("li", [_c("div", {
-    staticClass: "timeline-panel"
-  }, [_c("div", {
-    staticClass: "media me-2 media-info"
-  }, [_vm._v("KG")]), _vm._v(" "), _c("div", {
-    staticClass: "media-body"
-  }, [_c("h6", {
-    staticClass: "mb-1"
-  }, [_vm._v("Resport created successfully")]), _vm._v(" "), _c("small", {
-    staticClass: "d-block"
-  }, [_vm._v("29 July 2020 - 02:26 PM")])])])]), _vm._v(" "), _c("li", [_c("div", {
-    staticClass: "timeline-panel"
-  }, [_c("div", {
-    staticClass: "media me-2 media-success"
-  }, [_c("i", {
-    staticClass: "fa fa-home"
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "media-body"
-  }, [_c("h6", {
-    staticClass: "mb-1"
-  }, [_vm._v("Reminder : Treatment Time!")]), _vm._v(" "), _c("small", {
-    staticClass: "d-block"
-  }, [_vm._v("29 July 2020 - 02:26 PM")])])])]), _vm._v(" "), _c("li", [_c("div", {
-    staticClass: "timeline-panel"
-  }, [_c("div", {
-    staticClass: "media me-2"
-  }, [_c("img", {
-    attrs: {
-      alt: "image",
-      width: "50",
-      src: "images/avatar/1.jpg"
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "media-body"
-  }, [_c("h6", {
-    staticClass: "mb-1"
-  }, [_vm._v("Dr sultads Send you Photo")]), _vm._v(" "), _c("small", {
-    staticClass: "d-block"
-  }, [_vm._v("29 July 2020 - 02:26 PM")])])])]), _vm._v(" "), _c("li", [_c("div", {
-    staticClass: "timeline-panel"
-  }, [_c("div", {
-    staticClass: "media me-2 media-danger"
-  }, [_vm._v("KG")]), _vm._v(" "), _c("div", {
-    staticClass: "media-body"
-  }, [_c("h6", {
-    staticClass: "mb-1"
-  }, [_vm._v("Resport created successfully")]), _vm._v(" "), _c("small", {
-    staticClass: "d-block"
-  }, [_vm._v("29 July 2020 - 02:26 PM")])])])]), _vm._v(" "), _c("li", [_c("div", {
-    staticClass: "timeline-panel"
-  }, [_c("div", {
-    staticClass: "media me-2 media-primary"
-  }, [_c("i", {
-    staticClass: "fa fa-home"
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "media-body"
-  }, [_c("h6", {
-    staticClass: "mb-1"
-  }, [_vm._v("Reminder : Treatment Time!")]), _vm._v(" "), _c("small", {
-    staticClass: "d-block"
-  }, [_vm._v("29 July 2020 - 02:26 PM")])])])])])]), _vm._v(" "), _c("a", {
-    staticClass: "all-notification",
-    attrs: {
-      href: "javascript:void(0);"
-    }
-  }, [_vm._v("See all notifications "), _c("i", {
-    staticClass: "ti-arrow-end"
-  })])]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
@@ -38442,7 +37237,7 @@ exports = module.exports = __webpack_require__(/*! ../../../../node_modules/css-
 
 
 // module
-exports.push([module.i, ".taank[data-v-f46ab3c0] {\n  position: relative;\n}\n.taank .tank-height[data-v-f46ab3c0] {\n  position: absolute;\n  left: -2rem;\n  text-align: right;\n  top: 0;\n  width: 180px;\n}\n.taank .tank-height .height[data-v-f46ab3c0] {\n  color: #369D6F;\n}\n.taank .water-tank[data-v-f46ab3c0] {\n  margin: auto;\n  height: 250px;\n  width: 200px;\n  border-radius: 0;\n  border-width: 3px;\n  border-top: 0;\n  border-color: #a6a6a6;\n  border-style: solid;\n  position: relative;\n  overflow: visible;\n}\n.taank .water-tank .range[data-v-f46ab3c0] {\n  position: absolute;\n  right: 0;\n  background-color: #a6a6a6;\n  height: 3px;\n  z-index: 2;\n}\n.taank .water-tank .range.r-1[data-v-f46ab3c0] {\n  width: 30px;\n}\n.taank .water-tank .range.r-2[data-v-f46ab3c0] {\n  width: 20px;\n}\n.taank .water-tank .range.r-3[data-v-f46ab3c0] {\n  width: 10px;\n}\n.taank .water-tank .range.r-4[data-v-f46ab3c0] {\n  width: 5px;\n}\n.taank .water-tank .position-0[data-v-f46ab3c0] {\n  top: 0px;\n}\n.taank .water-tank .position-1[data-v-f46ab3c0] {\n  top: 10px;\n}\n.taank .water-tank .position-2[data-v-f46ab3c0] {\n  top: 20px;\n}\n.taank .water-tank .position-3[data-v-f46ab3c0] {\n  top: 30px;\n}\n.taank .water-tank .position-4[data-v-f46ab3c0] {\n  top: 40px;\n}\n.taank .water-tank .position-5[data-v-f46ab3c0] {\n  top: 50px;\n}\n.taank .water-tank .position-6[data-v-f46ab3c0] {\n  top: 60px;\n}\n.taank .water-tank .position-7[data-v-f46ab3c0] {\n  top: 70px;\n}\n.taank .water-tank .position-8[data-v-f46ab3c0] {\n  top: 80px;\n}\n.taank .water-tank .position-9[data-v-f46ab3c0] {\n  top: 90px;\n}\n.taank .water-tank .position-10[data-v-f46ab3c0] {\n  top: 100px;\n}\n.taank .water-tank .position-11[data-v-f46ab3c0] {\n  top: 110px;\n}\n.taank .water-tank .position-12[data-v-f46ab3c0] {\n  top: 120px;\n}\n.taank .water-tank .position-13[data-v-f46ab3c0] {\n  top: 130px;\n}\n.taank .water-tank .position-14[data-v-f46ab3c0] {\n  top: 140px;\n}\n.taank .water-tank .position-15[data-v-f46ab3c0] {\n  top: 150px;\n}\n.taank .water-tank .position-16[data-v-f46ab3c0] {\n  top: 160px;\n}\n.taank .water-tank .position-17[data-v-f46ab3c0] {\n  top: 170px;\n}\n.taank .water-tank .position-18[data-v-f46ab3c0] {\n  top: 180px;\n}\n.taank .water-tank .position-19[data-v-f46ab3c0] {\n  top: 190px;\n}\n.taank .water-tank .position-20[data-v-f46ab3c0] {\n  top: 200px;\n}\n.taank .water-tank .position-21[data-v-f46ab3c0] {\n  top: 210px;\n}\n.taank .water-tank .position-22[data-v-f46ab3c0] {\n  top: 220px;\n}\n.taank .water-tank .position-23[data-v-f46ab3c0] {\n  top: 230px;\n}\n.taank .water-tank .position-24[data-v-f46ab3c0] {\n  top: 240px;\n}\n.taank .water-tank .position-25[data-v-f46ab3c0] {\n  top: 250px;\n}\n.taank .water-tank .position-26[data-v-f46ab3c0] {\n  top: 260px;\n}\n.taank .water-tank .position-27[data-v-f46ab3c0] {\n  top: 270px;\n}\n.taank .water-tank .position-28[data-v-f46ab3c0] {\n  top: 280px;\n}\n.taank .water-tank .position-29[data-v-f46ab3c0] {\n  top: 290px;\n}\n.taank .water-tank .position-30[data-v-f46ab3c0] {\n  top: 300px;\n}\n.taank .water-tank .tank-capacity[data-v-f46ab3c0] {\n  position: absolute;\n  left: -11.5rem;\n  text-align: right;\n  top: 1.7rem;\n  width: 180px;\n}\n.taank .water-tank .tank-capacity .capacity[data-v-f46ab3c0] {\n  color: red;\n}\n.taank .water-tank .tank-capacity .tank-attr[data-v-f46ab3c0] {\n  color: red;\n  font-weight: bold;\n  position: absolute;\n  right: -7rem;\n  top: 0.8rem;\n}\n.taank .water-tank .fuel-vol[data-v-f46ab3c0] {\n  position: absolute;\n  right: -9rem;\n  text-align: left;\n  width: 137px;\n}\n.taank .water-tank .fuel-vol .vol[data-v-f46ab3c0] {\n  color: #424242;\n}\n.taank .water-tank .fuel-height[data-v-f46ab3c0] {\n  height: 200px;\n  position: absolute;\n  bottom: 0;\n  left: 0;\n  right: 0;\n  text-align: center;\n}\n.taank .tank-bar[data-v-f46ab3c0] {\n  height: 250px;\n  width: 2px;\n  background-color: #a6a6a6;\n}", ""]);
+exports.push([module.i, ".taank[data-v-f46ab3c0] {\n  position: relative;\n  width: 350px;\n  margin: auto;\n}\n.taank .tank-height[data-v-f46ab3c0] {\n  position: absolute;\n  left: -49px;\n  text-align: right;\n  top: 0;\n  width: 130px;\n}\n.taank .tank-height .height[data-v-f46ab3c0] {\n  color: #369D6F;\n}\n.taank .water-tank[data-v-f46ab3c0] {\n  margin: auto;\n  height: 250px;\n  width: 160px;\n  border-radius: 0;\n  border-width: 3px;\n  border-top: 0;\n  border-color: #a6a6a6;\n  border-style: solid;\n  position: relative;\n  overflow: visible;\n}\n.taank .water-tank .range[data-v-f46ab3c0] {\n  position: absolute;\n  right: 0;\n  background-color: #a6a6a6;\n  height: 3px;\n  z-index: 2;\n}\n.taank .water-tank .range.r-1[data-v-f46ab3c0] {\n  width: 30px;\n}\n.taank .water-tank .range.r-2[data-v-f46ab3c0] {\n  width: 20px;\n}\n.taank .water-tank .range.r-3[data-v-f46ab3c0] {\n  width: 10px;\n}\n.taank .water-tank .range.r-4[data-v-f46ab3c0] {\n  width: 5px;\n}\n.taank .water-tank .position-0[data-v-f46ab3c0] {\n  top: 0px;\n}\n.taank .water-tank .position-1[data-v-f46ab3c0] {\n  top: 10px;\n}\n.taank .water-tank .position-2[data-v-f46ab3c0] {\n  top: 20px;\n}\n.taank .water-tank .position-3[data-v-f46ab3c0] {\n  top: 30px;\n}\n.taank .water-tank .position-4[data-v-f46ab3c0] {\n  top: 40px;\n}\n.taank .water-tank .position-5[data-v-f46ab3c0] {\n  top: 50px;\n}\n.taank .water-tank .position-6[data-v-f46ab3c0] {\n  top: 60px;\n}\n.taank .water-tank .position-7[data-v-f46ab3c0] {\n  top: 70px;\n}\n.taank .water-tank .position-8[data-v-f46ab3c0] {\n  top: 80px;\n}\n.taank .water-tank .position-9[data-v-f46ab3c0] {\n  top: 90px;\n}\n.taank .water-tank .position-10[data-v-f46ab3c0] {\n  top: 100px;\n}\n.taank .water-tank .position-11[data-v-f46ab3c0] {\n  top: 110px;\n}\n.taank .water-tank .position-12[data-v-f46ab3c0] {\n  top: 120px;\n}\n.taank .water-tank .position-13[data-v-f46ab3c0] {\n  top: 130px;\n}\n.taank .water-tank .position-14[data-v-f46ab3c0] {\n  top: 140px;\n}\n.taank .water-tank .position-15[data-v-f46ab3c0] {\n  top: 150px;\n}\n.taank .water-tank .position-16[data-v-f46ab3c0] {\n  top: 160px;\n}\n.taank .water-tank .position-17[data-v-f46ab3c0] {\n  top: 170px;\n}\n.taank .water-tank .position-18[data-v-f46ab3c0] {\n  top: 180px;\n}\n.taank .water-tank .position-19[data-v-f46ab3c0] {\n  top: 190px;\n}\n.taank .water-tank .position-20[data-v-f46ab3c0] {\n  top: 200px;\n}\n.taank .water-tank .position-21[data-v-f46ab3c0] {\n  top: 210px;\n}\n.taank .water-tank .position-22[data-v-f46ab3c0] {\n  top: 220px;\n}\n.taank .water-tank .position-23[data-v-f46ab3c0] {\n  top: 230px;\n}\n.taank .water-tank .position-24[data-v-f46ab3c0] {\n  top: 240px;\n}\n.taank .water-tank .position-25[data-v-f46ab3c0] {\n  top: 250px;\n}\n.taank .water-tank .position-26[data-v-f46ab3c0] {\n  top: 260px;\n}\n.taank .water-tank .position-27[data-v-f46ab3c0] {\n  top: 270px;\n}\n.taank .water-tank .position-28[data-v-f46ab3c0] {\n  top: 280px;\n}\n.taank .water-tank .position-29[data-v-f46ab3c0] {\n  top: 290px;\n}\n.taank .water-tank .position-30[data-v-f46ab3c0] {\n  top: 300px;\n}\n.taank .water-tank .tank-capacity[data-v-f46ab3c0] {\n  position: absolute;\n  right: -190px;\n  text-align: left;\n  top: 0rem;\n  width: 180px;\n}\n.taank .water-tank .tank-capacity .capacity[data-v-f46ab3c0] {\n  color: red;\n}\n.taank .water-tank .tank-capacity .tank-attr[data-v-f46ab3c0] {\n  color: red;\n  font-weight: bold;\n  position: absolute;\n  right: -7rem;\n  top: 0.8rem;\n}\n.taank .water-tank .fuel-vol[data-v-f46ab3c0] {\n  position: absolute;\n  right: -145px;\n  text-align: left;\n  width: 137px;\n}\n.taank .water-tank .fuel-vol .vol[data-v-f46ab3c0] {\n  color: #424242;\n}\n.taank .water-tank .fuel-vol-right[data-v-f46ab3c0] {\n  position: absolute;\n  left: -136px;\n  text-align: right;\n  width: 130px;\n}\n.taank .water-tank .fuel-vol-right .vol[data-v-f46ab3c0] {\n  color: #1a77e1;\n}\n.taank .water-tank .fuel-height[data-v-f46ab3c0] {\n  height: 200px;\n  position: absolute;\n  bottom: 0;\n  left: 0;\n  right: 0;\n  text-align: center;\n}\n.taank .tank-bar[data-v-f46ab3c0] {\n  height: 250px;\n  width: 2px;\n  background-color: #a6a6a6;\n}", ""]);
 
 // exports
 
@@ -38461,7 +37256,7 @@ exports = module.exports = __webpack_require__(/*! ../../../../../node_modules/c
 
 
 // module
-exports.push([module.i, ".taank[data-v-2df8ec93] {\n  position: relative;\n}\n.taank .tank-height[data-v-2df8ec93] {\n  position: absolute;\n  left: -2rem;\n  text-align: right;\n  top: 0;\n  width: 180px;\n}\n.taank .tank-height .height[data-v-2df8ec93] {\n  color: #369D6F;\n}\n.taank .water-tank[data-v-2df8ec93] {\n  margin: auto;\n  height: 250px;\n  width: 200px;\n  border-radius: 0;\n  border-width: 3px;\n  border-top: 0;\n  border-color: #a6a6a6;\n  border-style: solid;\n  position: relative;\n  overflow: visible;\n}\n.taank .water-tank .range[data-v-2df8ec93] {\n  position: absolute;\n  right: 0;\n  background-color: #a6a6a6;\n  height: 3px;\n  z-index: 2;\n}\n.taank .water-tank .range.r-1[data-v-2df8ec93] {\n  width: 30px;\n}\n.taank .water-tank .range.r-2[data-v-2df8ec93] {\n  width: 20px;\n}\n.taank .water-tank .range.r-3[data-v-2df8ec93] {\n  width: 10px;\n}\n.taank .water-tank .range.r-4[data-v-2df8ec93] {\n  width: 5px;\n}\n.taank .water-tank .position-0[data-v-2df8ec93] {\n  top: 0px;\n}\n.taank .water-tank .position-1[data-v-2df8ec93] {\n  top: 10px;\n}\n.taank .water-tank .position-2[data-v-2df8ec93] {\n  top: 20px;\n}\n.taank .water-tank .position-3[data-v-2df8ec93] {\n  top: 30px;\n}\n.taank .water-tank .position-4[data-v-2df8ec93] {\n  top: 40px;\n}\n.taank .water-tank .position-5[data-v-2df8ec93] {\n  top: 50px;\n}\n.taank .water-tank .position-6[data-v-2df8ec93] {\n  top: 60px;\n}\n.taank .water-tank .position-7[data-v-2df8ec93] {\n  top: 70px;\n}\n.taank .water-tank .position-8[data-v-2df8ec93] {\n  top: 80px;\n}\n.taank .water-tank .position-9[data-v-2df8ec93] {\n  top: 90px;\n}\n.taank .water-tank .position-10[data-v-2df8ec93] {\n  top: 100px;\n}\n.taank .water-tank .position-11[data-v-2df8ec93] {\n  top: 110px;\n}\n.taank .water-tank .position-12[data-v-2df8ec93] {\n  top: 120px;\n}\n.taank .water-tank .position-13[data-v-2df8ec93] {\n  top: 130px;\n}\n.taank .water-tank .position-14[data-v-2df8ec93] {\n  top: 140px;\n}\n.taank .water-tank .position-15[data-v-2df8ec93] {\n  top: 150px;\n}\n.taank .water-tank .position-16[data-v-2df8ec93] {\n  top: 160px;\n}\n.taank .water-tank .position-17[data-v-2df8ec93] {\n  top: 170px;\n}\n.taank .water-tank .position-18[data-v-2df8ec93] {\n  top: 180px;\n}\n.taank .water-tank .position-19[data-v-2df8ec93] {\n  top: 190px;\n}\n.taank .water-tank .position-20[data-v-2df8ec93] {\n  top: 200px;\n}\n.taank .water-tank .position-21[data-v-2df8ec93] {\n  top: 210px;\n}\n.taank .water-tank .position-22[data-v-2df8ec93] {\n  top: 220px;\n}\n.taank .water-tank .position-23[data-v-2df8ec93] {\n  top: 230px;\n}\n.taank .water-tank .position-24[data-v-2df8ec93] {\n  top: 240px;\n}\n.taank .water-tank .position-25[data-v-2df8ec93] {\n  top: 250px;\n}\n.taank .water-tank .position-26[data-v-2df8ec93] {\n  top: 260px;\n}\n.taank .water-tank .position-27[data-v-2df8ec93] {\n  top: 270px;\n}\n.taank .water-tank .position-28[data-v-2df8ec93] {\n  top: 280px;\n}\n.taank .water-tank .position-29[data-v-2df8ec93] {\n  top: 290px;\n}\n.taank .water-tank .position-30[data-v-2df8ec93] {\n  top: 300px;\n}\n.taank .water-tank .tank-capacity[data-v-2df8ec93] {\n  position: absolute;\n  left: -11.5rem;\n  text-align: right;\n  top: 1.7rem;\n  width: 180px;\n}\n.taank .water-tank .tank-capacity .capacity[data-v-2df8ec93] {\n  color: red;\n}\n.taank .water-tank .tank-capacity .tank-attr[data-v-2df8ec93] {\n  color: red;\n  font-weight: bold;\n  position: absolute;\n  right: -7rem;\n  top: 0.8rem;\n}\n.taank .water-tank .fuel-vol[data-v-2df8ec93] {\n  position: absolute;\n  right: -9rem;\n  text-align: left;\n  width: 137px;\n}\n.taank .water-tank .fuel-vol .vol[data-v-2df8ec93] {\n  color: #424242;\n}\n.taank .water-tank .fuel-height[data-v-2df8ec93] {\n  height: 200px;\n  position: absolute;\n  bottom: 0;\n  left: 0;\n  right: 0;\n  text-align: center;\n}\n.taank .tank-bar[data-v-2df8ec93] {\n  height: 250px;\n  width: 2px;\n  background-color: #a6a6a6;\n}", ""]);
+exports.push([module.i, ".taank[data-v-2df8ec93] {\n  position: relative;\n  width: 350px;\n  margin: auto;\n}\n.taank .tank-height[data-v-2df8ec93] {\n  position: absolute;\n  left: -49px;\n  text-align: right;\n  top: 0;\n  width: 130px;\n}\n.taank .tank-height .height[data-v-2df8ec93] {\n  color: #369D6F;\n}\n.taank .water-tank[data-v-2df8ec93] {\n  margin: auto;\n  height: 250px;\n  width: 160px;\n  border-radius: 0;\n  border-width: 3px;\n  border-top: 0;\n  border-color: #a6a6a6;\n  border-style: solid;\n  position: relative;\n  overflow: visible;\n}\n.taank .water-tank .range[data-v-2df8ec93] {\n  position: absolute;\n  right: 0;\n  background-color: #a6a6a6;\n  height: 3px;\n  z-index: 2;\n}\n.taank .water-tank .range.r-1[data-v-2df8ec93] {\n  width: 30px;\n}\n.taank .water-tank .range.r-2[data-v-2df8ec93] {\n  width: 20px;\n}\n.taank .water-tank .range.r-3[data-v-2df8ec93] {\n  width: 10px;\n}\n.taank .water-tank .range.r-4[data-v-2df8ec93] {\n  width: 5px;\n}\n.taank .water-tank .position-0[data-v-2df8ec93] {\n  top: 0px;\n}\n.taank .water-tank .position-1[data-v-2df8ec93] {\n  top: 10px;\n}\n.taank .water-tank .position-2[data-v-2df8ec93] {\n  top: 20px;\n}\n.taank .water-tank .position-3[data-v-2df8ec93] {\n  top: 30px;\n}\n.taank .water-tank .position-4[data-v-2df8ec93] {\n  top: 40px;\n}\n.taank .water-tank .position-5[data-v-2df8ec93] {\n  top: 50px;\n}\n.taank .water-tank .position-6[data-v-2df8ec93] {\n  top: 60px;\n}\n.taank .water-tank .position-7[data-v-2df8ec93] {\n  top: 70px;\n}\n.taank .water-tank .position-8[data-v-2df8ec93] {\n  top: 80px;\n}\n.taank .water-tank .position-9[data-v-2df8ec93] {\n  top: 90px;\n}\n.taank .water-tank .position-10[data-v-2df8ec93] {\n  top: 100px;\n}\n.taank .water-tank .position-11[data-v-2df8ec93] {\n  top: 110px;\n}\n.taank .water-tank .position-12[data-v-2df8ec93] {\n  top: 120px;\n}\n.taank .water-tank .position-13[data-v-2df8ec93] {\n  top: 130px;\n}\n.taank .water-tank .position-14[data-v-2df8ec93] {\n  top: 140px;\n}\n.taank .water-tank .position-15[data-v-2df8ec93] {\n  top: 150px;\n}\n.taank .water-tank .position-16[data-v-2df8ec93] {\n  top: 160px;\n}\n.taank .water-tank .position-17[data-v-2df8ec93] {\n  top: 170px;\n}\n.taank .water-tank .position-18[data-v-2df8ec93] {\n  top: 180px;\n}\n.taank .water-tank .position-19[data-v-2df8ec93] {\n  top: 190px;\n}\n.taank .water-tank .position-20[data-v-2df8ec93] {\n  top: 200px;\n}\n.taank .water-tank .position-21[data-v-2df8ec93] {\n  top: 210px;\n}\n.taank .water-tank .position-22[data-v-2df8ec93] {\n  top: 220px;\n}\n.taank .water-tank .position-23[data-v-2df8ec93] {\n  top: 230px;\n}\n.taank .water-tank .position-24[data-v-2df8ec93] {\n  top: 240px;\n}\n.taank .water-tank .position-25[data-v-2df8ec93] {\n  top: 250px;\n}\n.taank .water-tank .position-26[data-v-2df8ec93] {\n  top: 260px;\n}\n.taank .water-tank .position-27[data-v-2df8ec93] {\n  top: 270px;\n}\n.taank .water-tank .position-28[data-v-2df8ec93] {\n  top: 280px;\n}\n.taank .water-tank .position-29[data-v-2df8ec93] {\n  top: 290px;\n}\n.taank .water-tank .position-30[data-v-2df8ec93] {\n  top: 300px;\n}\n.taank .water-tank .tank-capacity[data-v-2df8ec93] {\n  position: absolute;\n  right: -190px;\n  text-align: left;\n  top: 0rem;\n  width: 180px;\n}\n.taank .water-tank .tank-capacity .capacity[data-v-2df8ec93] {\n  color: red;\n}\n.taank .water-tank .tank-capacity .tank-attr[data-v-2df8ec93] {\n  color: red;\n  font-weight: bold;\n  position: absolute;\n  right: -7rem;\n  top: 0.8rem;\n}\n.taank .water-tank .fuel-vol[data-v-2df8ec93] {\n  position: absolute;\n  right: -145px;\n  text-align: left;\n  width: 137px;\n}\n.taank .water-tank .fuel-vol .vol[data-v-2df8ec93] {\n  color: #424242;\n}\n.taank .water-tank .fuel-vol-right[data-v-2df8ec93] {\n  position: absolute;\n  left: -136px;\n  text-align: right;\n  width: 130px;\n}\n.taank .water-tank .fuel-vol-right .vol[data-v-2df8ec93] {\n  color: #1a77e1;\n}\n.taank .water-tank .fuel-height[data-v-2df8ec93] {\n  height: 200px;\n  position: absolute;\n  bottom: 0;\n  left: 0;\n  right: 0;\n  text-align: center;\n}\n.taank .tank-bar[data-v-2df8ec93] {\n  height: 250px;\n  width: 2px;\n  background-color: #a6a6a6;\n}", ""]);
 
 // exports
 
@@ -38765,7 +37560,7 @@ exports = module.exports = __webpack_require__(/*! ../../../../node_modules/css-
 
 
 // module
-exports.push([module.i, "\n.box-mula[data-v-0d4183dd]{\n    padding: 10px 30px;\n    box-shadow: 0 0 15px 0 #CBC9C8;\n    border-radius: 12px;\n    margin-bottom: 30px;\n    margin-top: 10px;\n}\n.putkir-futa[data-v-0d4183dd]{\n    border-bottom: 1px solid #c1c1c1;\n    margin: 10px 0px 15px 0px;\n    padding-bottom: 11px;\n}\n", ""]);
+exports.push([module.i, "\n.box-mula[data-v-0d4183dd]{\r\n    padding: 10px 30px;\r\n    box-shadow: 0 0 15px 0 #CBC9C8;\r\n    border-radius: 12px;\r\n    margin-bottom: 30px;\r\n    margin-top: 10px;\n}\n.putkir-futa[data-v-0d4183dd]{\r\n    border-bottom: 1px solid #c1c1c1;\r\n    margin: 10px 0px 15px 0px;\r\n    padding-bottom: 11px;\n}\r\n", ""]);
 
 // exports
 
@@ -99275,7 +98070,7 @@ var app = new vue__WEBPACK_IMPORTED_MODULE_1___default.a({
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! D:\xampp7.4\htdocs\fuelmatix\resources\js\app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! D:\xampp\htdocs\projects\fuelmatix\resources\js\app.js */"./resources/js/app.js");
 
 
 /***/ })
