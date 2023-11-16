@@ -83,4 +83,23 @@ class Helpers
         }
         return '';
     }
+
+    /**
+     * @param array $data
+     * @param int $value
+     * @param string $matchField
+     * @param string $findField
+     * @return int|mixed
+     */
+    public static function filterBstiChart(array $data, int $value, string $matchField, string $findField)
+    {
+        if ($value == 0) {
+            return 0;
+        }
+        $dataArray = [];
+        foreach ($data as $row) {
+            $dataArray[$row[$findField]] = $row;
+        }
+        return $dataArray[$value] ? $dataArray[$value][$matchField] : 0;
+    }
 }

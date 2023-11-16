@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Common\AccountCategory;
 use App\Common\Module;
+use App\Helpers\Helpers;
 use App\Helpers\SessionUser;
+use App\Models\BstiChart;
 use App\Models\Category;
 use App\Models\Dispenser;
 use App\Models\FuelAdjustment;
@@ -17,6 +19,7 @@ use App\Models\ShiftSummary;
 use App\Models\Stock;
 use App\Models\Tank;
 use App\Models\TankLog;
+use App\Models\TankRefill;
 use App\Models\Transaction;
 use App\Repository\CategoryRepository;
 use Illuminate\Http\JsonResponse;
@@ -275,16 +278,7 @@ class ProductController extends Controller
             $shiftSaleId = $shiftSale['id'];
         }
         $end_reading = 0;
-        $stock = Stock::select('*')
-            ->where('client_company_id', $sessionUser['client_company_id'])
-            ->where('date', date('Y-m-d'))
-            ->where('module', 'product')->where('module_id', $inputData['product_id'])
-            ->orderBy('id', 'DESC')
-            ->first();
         $tank_refill = 0;
-        if ($stock instanceof Stock) {
-            $tank_refill = $stock['in_stock'];
-        }
         $shiftSale = ShiftSale::select('id', 'end_reading')->where('client_company_id', $sessionUser['client_company_id'])->where('status', 'start')->where('product_id', $request['product_id'])->orderBy('id', 'DESC')->first();
         $fuelAdjustment = FuelAdjustment::select('id', 'loss_quantity')->where('shift_sale_id', $shiftSale['id'] ?? 0)->first();
         $adjustment = 0;
@@ -300,16 +294,33 @@ class ProductController extends Controller
                 }
             }
         }
+        $tankRefill = TankRefill::where('shift_sale_id', $shiftSale['id'] ?? 0)->first();
+        if ($tankRefill instanceof TankRefill) {
+            $tank_refill = $tankRefill['total_refill_volume'];
+        }
         $consumption = $start_reading + $tank_refill + $adjustment - $end_reading;
         $amount = $consumption * $product['selling_price'];
+
+        $bstiChart = BstiChart::select('height', 'volume')->where('tank_id', $tank['id'])->get()->toArray();
+        $start_reading_mm = Helpers::filterBstiChart($bstiChart, floor($start_reading), 'height', 'volume');
+        $tank_refill_mm = Helpers::filterBstiChart($bstiChart, floor($tank_refill), 'height', 'volume');
+        $adjustment_mm = Helpers::filterBstiChart($bstiChart, floor($adjustment), 'height', 'volume');
+        $end_reading_mm = Helpers::filterBstiChart($bstiChart, floor($end_reading), 'height', 'volume');
+        $consumption_mm = $start_reading_mm + $tank_refill_mm +  $adjustment_mm - $end_reading_mm;
+
         $result = [
             'date' => date('Y-m-d'),
             'product_id' => $inputData['product_id'],
             'start_reading' => $start_reading,
+            'start_reading_mm' => $start_reading_mm,
             'tank_refill' => $tank_refill,
+            'tank_refill_mm' => $tank_refill_mm,
             'adjustment' => $adjustment,
+            'adjustment_mm' => $adjustment,
             'end_reading' => $end_reading,
+            'end_reading_mm' => $end_reading,
             'consumption' => $consumption,
+            'consumption_mm' => $consumption_mm,
             'amount' => $amount,
             'selling_price' => $product->selling_price
         ];

@@ -16,6 +16,7 @@ use App\Models\PayOrder;
 use App\Models\PayOrderData;
 use App\Models\Product;
 use App\Models\ProductPrice;
+use App\Models\ShiftSale;
 use App\Models\Stock;
 use App\Models\Tank;
 use App\Models\TankLog;
@@ -397,12 +398,17 @@ class TankController extends Controller
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
 
+        $sessionUser = SessionUser::getUser();
         $tank = Tank::find($inputData['tank_id']);
         if (!$tank instanceof Tank) {
             return response()->json(['status' => 400, 'message' => 'Can not find [tank].']);
         }
         if (empty($tank['product_id'])) {
             return response()->json(['status' => 400, 'message' => 'Tank has no product. Please assign product.']);
+        }
+        $shiftSale = ShiftSale::where('client_company_id', $sessionUser['client_company_id'])->where('product_id', $tank['product_id'])->where('status', 'start')->first();
+        if (!$shiftSale instanceof ShiftSale) {
+            return response()->json(['status' => 400, 'message' => 'Please start shift sale first.']);
         }
 
         $payOrder = PayOrderData::where('product_id', $tank['product_id'])->where('pay_order_id', $inputData['pay_order_id'])->where('status', FuelMatixStatus::PENDING)->first();
@@ -444,6 +450,7 @@ class TankController extends Controller
         $tankRefill->dip_sale = $inputData['dip_sale'] ?? 0;
         $tankRefill->total_refill_volume = $inputData['total_refill_volume'] ?? 0;
         $tankRefill->net_profit = $inputData['net_profit'] ?? 0;
+        $tankRefill->shift_sale_id = $shiftSale['id'];
         $tankRefill->client_company_id = $inputData['session_user']['client_company_id'];
         if (!$tankRefill->save()) {
             return response()->json(['status' => 400, 'message' => 'Cannot saved tank refill.']);
@@ -463,15 +470,6 @@ class TankController extends Controller
             ['date' => $inputData['date'], 'account_id' => $lossCategory['id'], 'debit_amount' => $lossAmount > 0 ? abs($lossAmount) : 0, 'credit_amount' => $lossAmount < 0 ? abs($lossAmount) : 0 , 'module' => 'tank refill', 'module_id' => $tankRefill->id],
         ];
         TransactionController::saveTransaction($transactionData);
-        $stockData = [
-            'client_company_id' => $inputData['session_user']['client_company_id'],
-            'product_id' => $tank['product_id'],
-            'date' => $inputData['date'],
-            'in_stock' => $inputData['total_refill_volume'],
-            'out_stock' => 0,
-            'opening_stock' => $inputData['start_reading']
-        ];
-        TransactionController::saveStock($stockData);
 
         $productPrice = new ProductPrice();
         $productPrice->date = $inputData['date'];
@@ -687,6 +685,27 @@ class TankController extends Controller
         return response()->json([
             'status' => 200,
             'data' => $bstiChart['volume'] ?? 0
+        ]);
+    }
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function getBstiChart(Request $request): JsonResponse
+    {
+        $tank_id = $request['tank_id'] ?? 0;
+        if (!empty($requestData['product_id'])) {
+            $tank = Tank::where('product_id', $request['product_id'] ?? 0)->first();
+            if ($tank instanceof Tank) {
+                $tank_id = $tank['id'];
+            }
+        }
+        $bstiChart = BstiChart::select('volume', 'height')->where('tank_id', $tank_id)
+            ->get()
+            ->toArray();
+        return response()->json([
+            'status' => 200,
+            'data' => $bstiChart
         ]);
     }
 }
