@@ -28362,7 +28362,7 @@ var render = function render() {
         name: "Invoices"
       }
     }
-  }, [_vm._v("Invoices ")])], 1) : _vm._e(), _vm._v(" "), _vm.CheckPermission(_vm.Section.BILL + "-" + _vm.Action.VIEW) ? _c("li", [_c("router-link", {
+  }, [_vm._v("Invoices ")])], 1) : _vm._e(), _vm._v(" "), _vm.CheckPermission(_vm.Section.COMPANY_BILL + "-" + _vm.Action.VIEW) ? _c("li", [_c("router-link", {
     attrs: {
       to: {
         name: "CompanyBills"
@@ -91077,7 +91077,8 @@ var Section = {
   INVOICE: 'Invoice',
   FUEL_ADJUSTMENT: 'Fue-Adjustment',
   UNAUTHORIZED_BILL: 'Unauthorized-Bill',
-  SALES_REPORT: 'Sales-Report'
+  SALES_REPORT: 'Sales-Report',
+  COMPANY_BILL: 'Company-Bill'
 };
 /* harmony default export */ __webpack_exports__["default"] = (Section);
 
@@ -98853,7 +98854,7 @@ var router = new vue_router__WEBPACK_IMPORTED_MODULE_1__["default"]({
       name: "CompanyBills",
       component: _Pages_CompanyBills_List_vue__WEBPACK_IMPORTED_MODULE_93__["default"],
       beforeEnter: function beforeEnter(to, from, next) {
-        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].SALES_REPORT + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].EDIT);
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].COMPANY_BILL + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].VIEW);
       }
     }]
   }]

@@ -522,7 +522,7 @@ const router = new VueRouter({
                 },
                 {
                     path: ROOT_URL + "/company/bills", name: "CompanyBills", component: companyBills,  beforeEnter: (to, from, next) => {
-                        CheckPermission(to, from, next, Section.SALES_REPORT + '-' + Action.EDIT)
+                        CheckPermission(to, from, next, Section.COMPANY_BILL + '-' + Action.VIEW)
                     },
                 }
             ],

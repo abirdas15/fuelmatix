@@ -40,6 +40,7 @@ const Section= {
     FUEL_ADJUSTMENT: 'Fue-Adjustment',
     UNAUTHORIZED_BILL: 'Unauthorized-Bill',
     SALES_REPORT: 'Sales-Report',
+    COMPANY_BILL: 'Company-Bill'
 }
 export default Section;
 

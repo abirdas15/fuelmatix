@@ -45,6 +45,7 @@ class Section
     const FUEL_ADJUSTMENT = 'Fue-Adjustment';
     const UNAUTHORIZED_BILL = 'Unauthorized-Bill';
     const SALES_REPORT = 'Sales-Report';
+    const COMPANY_BILL = 'Company-Bill';
 
     /**
      * @return array
@@ -93,6 +94,7 @@ class Section
             'FUEL_ADJUSTMENT' => self::FUEL_ADJUSTMENT,
             'UNAUTHORIZED_BILL' => self::UNAUTHORIZED_BILL,
             'SALES_REPORT' => self::SALES_REPORT,
+            'COMPANY_BILL' => self::COMPANY_BILL,
         ];
     }
 }
