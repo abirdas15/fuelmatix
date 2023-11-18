@@ -336,6 +336,8 @@ export default {
                     this.totalAmount += nozzle.amount
                 })
             })
+            this.totalSale < 0 ? this.totalSale = 0 : this.totalSale;
+            this.totalAmount < 0 ? this.totalAmount = 0 : this.totalAmount;
         },
         disableInput: function (id) {
             $('#'+id).prop('readonly', true);
@@ -396,7 +398,7 @@ export default {
             });
         },
         totalShiftParcent: function (totalNozzleConsumption) {
-           return (totalNozzleConsumption / this.listDispenser.consumption) * 100
+           return ((totalNozzleConsumption - this.listDispenser.consumption) /this.listDispenser.consumption) * 100
         },
         save: function () {
             ApiService.ClearErrorHandler();

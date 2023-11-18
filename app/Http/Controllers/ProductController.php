@@ -340,6 +340,7 @@ class ProductController extends Controller
                 $nozzle['adjustment'] = isset($nozzleAdjustment[$nozzle['id']]) ? $nozzleAdjustment[$nozzle['id']]['quantity'] : 0;
                 $nozzle['consumption'] =  $nozzle['end_reading']  - $nozzle['start_reading'] -  $nozzle['adjustment'];
                 $nozzle['amount'] = $nozzle['consumption'] * $product['selling_price'];
+                $nozzle['consumption'] = $nozzle['consumption'] > 0 ? $nozzle['consumption'] : 0;
             }
         }
         $result['dispensers'] = $dispensers;

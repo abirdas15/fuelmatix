@@ -10673,6 +10673,8 @@ __webpack_require__.r(__webpack_exports__);
           _this3.totalAmount += nozzle.amount;
         });
       });
+      this.totalSale < 0 ? this.totalSale = 0 : this.totalSale;
+      this.totalAmount < 0 ? this.totalAmount = 0 : this.totalAmount;
     },
     disableInput: function disableInput(id) {
       $('#' + id).prop('readonly', true);
@@ -10743,7 +10745,7 @@ __webpack_require__.r(__webpack_exports__);
       });
     },
     totalShiftParcent: function totalShiftParcent(totalNozzleConsumption) {
-      return totalNozzleConsumption / this.listDispenser.consumption * 100;
+      return (totalNozzleConsumption - this.listDispenser.consumption) / this.listDispenser.consumption * 100;
     },
     save: function save() {
       var _this7 = this;
