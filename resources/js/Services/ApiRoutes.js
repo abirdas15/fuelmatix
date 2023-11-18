@@ -85,6 +85,7 @@ const ApiRoutes = {
     TankSingle: ApiVersion + '/tank/single',
     TankGetNozzle: ApiVersion + '/tank/get/nozzle',
     TankByProduct: ApiVersion + '/tank/byProduct',
+    TankBstiChart: ApiVersion + '/tank/getBstiChart',
     //Tank Reading
     TankReadingAdd: ApiVersion + '/tank/reading/save',
     TankReadingEdit: ApiVersion + '/tank/reading/update',

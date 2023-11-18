@@ -88,6 +88,16 @@ Vue.use(VueToast, { position: "top-right" });
                     {id: 12, name: 'December'},
                 ]
             },
+            filterBstiChart: function(data, value, matchField, findField) {
+                let returnValue = 0;
+                value = Math.floor(value);
+                data.map((v) => {
+                    if (v[matchField] == value) {
+                        returnValue =  v[findField];
+                    }
+                });
+                return parseFloat(returnValue);
+            }
         },
         mounted() {
             $('.closeBtn').click(() => {

@@ -691,11 +691,11 @@ class TankController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-    public function getBstiChart(Request $request): JsonResponse
+    public function getBstiChart(Request $request)
     {
         $tank_id = $request['tank_id'] ?? 0;
-        if (!empty($requestData['product_id'])) {
-            $tank = Tank::where('product_id', $request['product_id'] ?? 0)->first();
+        if (!empty($request['product_id'])) {
+            $tank = Tank::where('product_id', $request['product_id'])->first();
             if ($tank instanceof Tank) {
                 $tank_id = $tank['id'];
             }

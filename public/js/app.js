@@ -10607,10 +10607,30 @@ __webpack_require__.r(__webpack_exports__);
       categories: [],
       totalPaid: 0,
       oilStock: false,
-      mismatchAllow: null
+      mismatchAllow: null,
+      bstiChart: []
     };
   },
+  watch: {
+    'listDispenser.end_reading_mm': function listDispenserEnd_reading_mm() {
+      this.listDispenser.end_reading = this.filterBstiChart(this.bstiChart, this.listDispenser.end_reading_mm, 'height', 'volume');
+    },
+    'listDispenser.end_reading': function listDispenserEnd_reading() {
+      this.calculateAmount();
+    }
+  },
   methods: {
+    getBstiChart: function getBstiChart() {
+      var _this = this;
+      _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].TankBstiChart, {
+        product_id: this.product_id
+      }, function (res) {
+        _this.TableLoading = false;
+        if (parseInt(res.status) === 200) {
+          _this.bstiChart = res.data;
+        }
+      });
+    },
     updateOilStock: function updateOilStock() {
       if (this.listData.length > 0) {
         if (this.listData[this.productIndex].product_type == 'Octane' || this.listData[this.productIndex].product_type == 'Diesel' || this.listData[this.productIndex].product_type == 'Petrol' || this.listData[this.productIndex].product_type == 'LPG') {
@@ -10628,10 +10648,10 @@ __webpack_require__.r(__webpack_exports__);
       return total;
     },
     calculateValue: function calculateValue(amount) {
-      var _this = this;
+      var _this2 = this;
       this.totalPaid = 0;
       this.categories.map(function (v) {
-        _this.totalPaid += parseFloat(v.amount);
+        _this2.totalPaid += parseFloat(v.amount);
       });
     },
     removeCategory: function removeCategory(index) {
@@ -10644,13 +10664,13 @@ __webpack_require__.r(__webpack_exports__);
       });
     },
     getTotalSale: function getTotalSale() {
-      var _this2 = this;
+      var _this3 = this;
       this.totalSale = 0;
       this.totalAmount = 0;
       this.listDispenser.dispensers.map(function (dispenser) {
         dispenser.nozzle.map(function (nozzle) {
-          _this2.totalSale += nozzle.consumption;
-          _this2.totalAmount += nozzle.amount;
+          _this3.totalSale += nozzle.consumption;
+          _this3.totalAmount += nozzle.amount;
         });
       });
     },
@@ -10667,13 +10687,8 @@ __webpack_require__.r(__webpack_exports__);
       return eachProgress * this.productIndex;
     },
     calculateAmount: function calculateAmount() {
-      if (this.isNumeric(this.listDispenser.end_reading)) {
-        this.listDispenser.consumption = parseFloat(this.listDispenser.start_reading) - parseFloat(this.listDispenser.end_reading) + parseFloat(this.listDispenser.adjustment);
-        this.listDispenser.amount = parseFloat(this.listDispenser.consumption) * parseFloat(this.listDispenser.selling_price);
-      } else {
-        this.listDispenser.consumption = 0;
-        this.listDispenser.amount = 0;
-      }
+      this.listDispenser.consumption = parseFloat(this.listDispenser.start_reading) - parseFloat(this.listDispenser.end_reading) + parseFloat(this.listDispenser.adjustment);
+      this.listDispenser.amount = parseFloat(this.listDispenser.consumption) * parseFloat(this.listDispenser.selling_price);
     },
     calculateAmountNozzle: function calculateAmountNozzle(dIndex, nIndex) {
       if (this.isNumeric(this.listDispenser.dispensers[dIndex].nozzle[nIndex].end_reading)) {
@@ -10686,52 +10701,52 @@ __webpack_require__.r(__webpack_exports__);
       this.getTotalSale();
     },
     getProduct: function getProduct() {
-      var _this3 = this;
+      var _this4 = this;
       _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].ProductList, {
         limit: 5000,
         page: 1,
         order_mode: 'ASC'
       }, function (res) {
-        _this3.TableLoading = false;
+        _this4.TableLoading = false;
         if (parseInt(res.status) === 200) {
-          _this3.listData = res.data.data;
+          _this4.listData = res.data.data;
         }
       });
     },
     getCategory: function getCategory() {
-      var _this4 = this;
+      var _this5 = this;
       this.categories = [];
       _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].ShiftSaleGetCategory, {}, function (res) {
         if (parseInt(res.status) === 200) {
-          _this4.allAmountCategory = res.data;
-          _this4.categories.push({
+          _this5.allAmountCategory = res.data;
+          _this5.categories.push({
             amount: '',
-            category_id: _this4.allAmountCategory[0].id
+            category_id: _this5.allAmountCategory[0].id
           });
         }
       });
     },
     getProductDispenser: function getProductDispenser() {
-      var _this5 = this;
+      var _this6 = this;
       this.totalSale = 0;
       this.totalAmount = 0;
       _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].ProductDispenser, {
         product_id: this.product_id
       }, function (res) {
-        _this5.TableLoading = false;
+        _this6.TableLoading = false;
         if (parseInt(res.status) === 200) {
-          _this5.listDispenser = res.data;
-          _this5.getCategory();
-          _this5.updateOilStock();
+          _this6.listDispenser = res.data;
+          _this6.getCategory();
+          _this6.updateOilStock();
         }
-        _this5.getTotalSale();
+        _this6.getTotalSale();
       });
     },
     totalShiftParcent: function totalShiftParcent(totalNozzleConsumption) {
       return totalNozzleConsumption / this.listDispenser.consumption * 100;
     },
     save: function save() {
-      var _this6 = this;
+      var _this7 = this;
       _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].ClearErrorHandler();
       this.loading = true;
       this.listDispenser.categories = this.categories;
@@ -10764,15 +10779,15 @@ __webpack_require__.r(__webpack_exports__);
         this.listDispenser.consumption = totalConsumption;
       }
       _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].ShiftSaleAdd, this.listDispenser, function (res) {
-        _this6.loading = false;
+        _this7.loading = false;
         if (parseInt(res.status) === 200) {
-          _this6.$toast.success(res.message);
-          if (_this6.listDispenser.status == 'start') {
-            _this6.$router.push({
+          _this7.$toast.success(res.message);
+          if (_this7.listDispenser.status == 'start') {
+            _this7.$router.push({
               name: 'ShiftSaleListStart'
             });
           } else {
-            _this6.$router.push({
+            _this7.$router.push({
               name: 'ShiftSaleList'
             });
           }
@@ -10782,11 +10797,11 @@ __webpack_require__.r(__webpack_exports__);
       });
     },
     getSingleMitchMatch: function getSingleMitchMatch() {
-      var _this7 = this;
+      var _this8 = this;
       _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].companySingle, this.param, function (res) {
         if (parseInt(res.status) === 200) {
           if (res.data.sale_mismatch_allow != null) {
-            _this7.mismatchAllow = res.data.sale_mismatch_allow;
+            _this8.mismatchAllow = res.data.sale_mismatch_allow;
           }
         } else {
           _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].ErrorHandler(res.errors);
@@ -10803,6 +10818,7 @@ __webpack_require__.r(__webpack_exports__);
       this.product_id = this.$route.query.product_id;
       this.getProduct();
       this.getProductDispenser();
+      this.getBstiChart();
     }
     $('#dashboard_bar').text('Shift Sale Start');
   }
@@ -32710,9 +32726,62 @@ var render = function render() {
     staticClass: "card-body"
   }, [_c("div", {
     staticClass: "row align-items-center text-start"
-  }, [_vm._m(2), _vm._v(" "), _c("div", {
+  }, [_vm._m(2), _vm._v(" "), _vm._m(3), _vm._v(" "), _vm._m(4), _vm._v(" "), _vm._m(5), _vm._v(" "), _vm._m(6), _vm._v(" "), _vm._m(7), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-2 offset-2"
+  }, [_c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.listDispenser.start_reading_mm,
+      expression: "listDispenser.start_reading_mm"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      disabled: "",
+      id: "prReading",
+      type: "text"
+    },
+    domProps: {
+      value: _vm.listDispenser.start_reading_mm
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.listDispenser, "start_reading_mm", $event.target.value);
+      }
+    }
+  })]), _vm._v(" "), _c("div", {
     staticClass: "mb-3 col-md-2"
-  }, [_c("label", [_vm._v("Previous Reading ")]), _vm._v(" "), _c("input", {
+  }), _vm._v(" "), _vm.listDispenser.status == "end" ? _c("div", {
+    staticClass: "mb-3 col-md-2"
+  }, [_c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.listDispenser.end_reading_mm,
+      expression: "listDispenser.end_reading_mm"
+    }],
+    staticClass: "form-control text-end",
+    attrs: {
+      id: "prReading",
+      type: "text"
+    },
+    domProps: {
+      value: _vm.listDispenser.end_reading_mm
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.listDispenser, "end_reading_mm", $event.target.value);
+      }
+    }
+  })]) : _vm._e(), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-2"
+  }), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-2"
+  }), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 col-md-2 offset-2"
+  }, [_c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -32736,7 +32805,7 @@ var render = function render() {
     }
   })]), _vm._v(" "), _vm.listDispenser.status == "end" ? _c("div", {
     staticClass: "mb-3 col-md-2"
-  }, [_c("label", [_vm._v("Tank Refill ")]), _vm._v(" "), _c("input", {
+  }, [_c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -32759,43 +32828,38 @@ var render = function render() {
     }
   })]) : _vm._e(), _vm._v(" "), _vm.listDispenser.status == "end" ? _c("div", {
     staticClass: "mb-3 col-md-2"
-  }, [_c("label", [_vm._v("Final Reading ")]), _vm._v(" "), _c("input", {
+  }, [_c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
       value: _vm.listDispenser.end_reading,
       expression: "listDispenser.end_reading"
     }],
-    staticClass: "form-control text-end",
+    staticClass: "form-control",
     attrs: {
       id: "frReading",
+      disabled: "",
       type: "text"
     },
     domProps: {
       value: _vm.listDispenser.end_reading
     },
     on: {
-      blur: function blur($event) {
-        return _vm.disableInput("frReading");
-      },
-      click: function click($event) {
-        return _vm.enableInput("frReading");
-      },
-      input: [function ($event) {
+      input: function input($event) {
         if ($event.target.composing) return;
         _vm.$set(_vm.listDispenser, "end_reading", $event.target.value);
-      }, _vm.calculateAmount]
+      }
     }
   })]) : _vm._e(), _vm._v(" "), _vm.listDispenser.status == "end" ? _c("div", {
     staticClass: "mb-3 col-md-2"
-  }, [_c("label", [_vm._v("Adjustment ")]), _vm._v(" "), _vm.listDispenser.status == "end" ? _c("input", {
+  }, [_vm.listDispenser.status == "end" ? _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
       value: _vm.listDispenser.adjustment,
       expression: "listDispenser.adjustment"
     }],
-    staticClass: "form-control text-end",
+    staticClass: "form-control",
     attrs: {
       id: "frReading",
       type: "text",
@@ -32815,7 +32879,7 @@ var render = function render() {
     }
   }) : _vm._e()]) : _vm._e(), _vm._v(" "), _vm.listDispenser.status == "end" ? _c("div", {
     staticClass: "mb-3 col-md-2"
-  }, [_c("label", [_vm._v("Consumption ")]), _vm._v(" "), _vm.listDispenser.status == "end" ? _c("input", {
+  }, [_vm.listDispenser.status == "end" ? _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -33272,6 +33336,36 @@ var staticRenderFns = [function () {
   }, [_c("p", {
     staticClass: "m-0"
   }, [_vm._v("OIL Stock ")])])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "mb-3 col-md-2"
+  }, [_c("label", [_vm._v("Start Reading ")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "mb-3 col-md-2"
+  }, [_c("label", [_vm._v("Tank Refill ")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "mb-3 col-md-2"
+  }, [_c("label", [_vm._v("End Reading ")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "mb-3 col-md-2"
+  }, [_c("label", [_vm._v("Adjustment ")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "mb-3 col-md-2"
+  }, [_c("label", [_vm._v("Consumption ")])]);
 }];
 render._withStripped = true;
 
@@ -97588,6 +97682,7 @@ var ApiRoutes = {
   TankSingle: ApiVersion + '/tank/single',
   TankGetNozzle: ApiVersion + '/tank/get/nozzle',
   TankByProduct: ApiVersion + '/tank/byProduct',
+  TankBstiChart: ApiVersion + '/tank/getBstiChart',
   //Tank Reading
   TankReadingAdd: ApiVersion + '/tank/reading/save',
   TankReadingEdit: ApiVersion + '/tank/reading/update',
@@ -98043,6 +98138,16 @@ vue__WEBPACK_IMPORTED_MODULE_1___default.a.mixin({
         id: 12,
         name: 'December'
       }];
+    },
+    filterBstiChart: function filterBstiChart(data, value, matchField, findField) {
+      var returnValue = 0;
+      value = Math.floor(value);
+      data.map(function (v) {
+        if (v[matchField] == value) {
+          returnValue = v[findField];
+        }
+      });
+      return parseFloat(returnValue);
     }
   },
   mounted: function mounted() {
