@@ -10779,6 +10779,10 @@ __webpack_require__.r(__webpack_exports__);
         }
         this.listDispenser.amount = totalCategoryAmount;
         this.listDispenser.consumption = totalConsumption;
+        if (this.listDispenser.consumption == 0) {
+          this.$toast.error('The consumption amount is 0');
+          return;
+        }
       }
       _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].ShiftSaleAdd, this.listDispenser, function (res) {
         _this7.loading = false;

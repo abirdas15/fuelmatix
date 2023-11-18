@@ -431,7 +431,10 @@ export default {
                 }
                 this.listDispenser.amount = totalCategoryAmount;
                 this.listDispenser.consumption = totalConsumption;
-
+                if (this.listDispenser.consumption == 0) {
+                    this.$toast.error('The consumption amount is 0');
+                    return;
+                }
             }
             ApiService.POST(ApiRoutes.ShiftSaleAdd, this.listDispenser, res => {
                 this.loading = false
