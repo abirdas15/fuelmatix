@@ -3073,6 +3073,225 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/Pages/CompanyBills/List.vue?vue&type=script&lang=js&":
+/*!***********************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/Pages/CompanyBills/List.vue?vue&type=script&lang=js& ***!
+  \***********************************************************************************************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var sweetalert2_dist_sweetalert2_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! sweetalert2/dist/sweetalert2.js */ "./node_modules/sweetalert2/dist/sweetalert2.js");
+/* harmony import */ var sweetalert2_dist_sweetalert2_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(sweetalert2_dist_sweetalert2_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _Services_ApiService__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../Services/ApiService */ "./resources/js/Services/ApiService.js");
+/* harmony import */ var _Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../Services/ApiRoutes */ "./resources/js/Services/ApiRoutes.js");
+/* harmony import */ var _Helpers_Pagination__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../Helpers/Pagination */ "./resources/js/Helpers/Pagination.vue");
+/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
+/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(lodash__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var _Helpers_Section__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../Helpers/Section */ "./resources/js/Helpers/Section.js");
+/* harmony import */ var _Helpers_Action__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../../Helpers/Action */ "./resources/js/Helpers/Action.js");
+
+
+
+
+
+
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+  components: {
+    Pagination: _Helpers_Pagination__WEBPACK_IMPORTED_MODULE_3__["default"]
+  },
+  data: function data() {
+    return {
+      paginateData: {},
+      Param: {
+        keyword: '',
+        limit: 10,
+        order_by: 'transactions.id',
+        order_mode: 'DESC',
+        page: 1
+      },
+      Loading: false,
+      generateLoading: false,
+      TableLoading: false,
+      listData: [],
+      selectedData: null,
+      expandParam: {
+        id: '',
+        data: []
+      },
+      selectedIDs: []
+    };
+  },
+  watch: {
+    'Param.keyword': function ParamKeyword() {
+      this.list();
+    }
+  },
+  created: function created() {
+    this.list();
+  },
+  computed: {
+    Action: function Action() {
+      return _Helpers_Action__WEBPACK_IMPORTED_MODULE_6__["default"];
+    },
+    Section: function Section() {
+      return _Helpers_Section__WEBPACK_IMPORTED_MODULE_5__["default"];
+    },
+    Auth: function Auth() {
+      return this.$store.getters.GetAuth;
+    }
+  },
+  methods: {
+    generateInvoice: function generateInvoice() {
+      var _this = this;
+      this.generateLoading = true;
+      _Services_ApiService__WEBPACK_IMPORTED_MODULE_1__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_2__["default"].invoiceGenerate, {
+        ids: this.selectedIDs
+      }, function (res) {
+        _this.generateLoading = false;
+        if (parseInt(res.status) === 200) {
+          _this.selectedIDs = [];
+          _this.$toast.success(res.message);
+          _this.list();
+        } else {
+          _this.$toast.error(res.error);
+        }
+      });
+    },
+    isExist: function isExist(id) {
+      var index = this.selectedIDs.indexOf(id);
+      return index > -1;
+    },
+    selectIds: function selectIds(e, id) {
+      if (e.target.checked) {
+        this.selectedIDs.push(id);
+      } else {
+        this.selectedIDs.splice(this.selectedIDs.indexOf(id), 1);
+      }
+    },
+    selectAll: function selectAll(e) {
+      var _this2 = this;
+      if (e.target.checked) {
+        this.listData.map(function (v) {
+          if (!v.invoice_id) {
+            _this2.selectedIDs.push(v.id);
+          }
+        });
+      } else {
+        this.selectedIDs = [];
+      }
+    },
+    expand: function expand() {
+      var _this3 = this;
+      _Services_ApiService__WEBPACK_IMPORTED_MODULE_1__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_2__["default"].TransactionSplit, this.expandParam, function (res) {
+        if (parseInt(res.status) === 200) {
+          _this3.$toast.success(res.message);
+          $('.createExpand').addClass('d-none');
+          _this3.list();
+        } else {
+          _this3.$toast.error(res.error);
+          _Services_ApiService__WEBPACK_IMPORTED_MODULE_1__["default"].ErrorHandler(res.error);
+        }
+      });
+    },
+    tableAction: function tableAction(e, data) {
+      var _this4 = this;
+      var i = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+      if (e == 'expand') {
+        this.selectedData = data;
+        this.expandParam.id = data.id;
+        this.expandParam.data = [];
+        this.expandParam.data.push({
+          amount: 0,
+          description: ''
+        });
+        $('.createExpand').removeClass('d-none');
+      } else if (e == 'generate') {
+        if (data.is_invoice) {
+          this.$toast.success('Invoice already Created');
+          return;
+        }
+        $('.genloading' + i).toggle();
+        _Services_ApiService__WEBPACK_IMPORTED_MODULE_1__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_2__["default"].invoiceGenerate, {
+          id: data.id
+        }, function (res) {
+          $('.genloading' + i).toggle();
+          if (parseInt(res.status) === 200) {
+            _this4.$toast.success(res.message);
+            _this4.list();
+          } else {
+            _Services_ApiService__WEBPACK_IMPORTED_MODULE_1__["default"].ErrorHandler(res.errors);
+          }
+        });
+      }
+    },
+    addMore: function addMore() {
+      this.expandParam.data.push({
+        amount: 0,
+        description: ''
+      });
+    },
+    spliceData: function spliceData(i) {
+      this.expandParam.data.splice(i, 1);
+    },
+    list: function list(page) {
+      var _this5 = this;
+      if (page == undefined) {
+        page = {
+          page: 1
+        };
+      }
+      this.Param.page = page.page;
+      this.TableLoading = true;
+      _Services_ApiService__WEBPACK_IMPORTED_MODULE_1__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_2__["default"].companyBillsList, this.Param, function (res) {
+        _this5.TableLoading = false;
+        if (parseInt(res.status) === 200) {
+          _this5.paginateData = res.data;
+          _this5.listData = res.data.data;
+        } else {
+          _Services_ApiService__WEBPACK_IMPORTED_MODULE_1__["default"].ErrorHandler(res.error);
+        }
+      });
+    },
+    Delete: function Delete(data) {
+      var _this6 = this;
+      _Services_ApiService__WEBPACK_IMPORTED_MODULE_1__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_2__["default"].companyBillsDelete, {
+        id: data.id
+      }, function (res) {
+        if (parseInt(res.status) === 200) {
+          _this6.$toast.success(res.message);
+          _this6.list();
+        } else {
+          _Services_ApiService__WEBPACK_IMPORTED_MODULE_1__["default"].ErrorHandler(res.error);
+        }
+      });
+    },
+    sortClass: function sortClass(order_by) {
+      var cls;
+      if (this.Param.order_by == order_by && this.Param.order_mode == 'DESC') {
+        cls = 'sorting_desc';
+      } else if (this.Param.order_by == order_by && this.Param.order_mode == 'ASC') {
+        cls = 'sorting_asc';
+      } else {
+        cls = 'sorting';
+      }
+      return cls;
+    },
+    sortData: function sortData(sort_name) {
+      this.Param.order_by = sort_name;
+      this.Param.order_mode = this.Param.order_mode == 'DESC' ? 'ASC' : 'DESC';
+      this.list();
+    }
+  },
+  mounted: function mounted() {
+    $('#dashboard_bar').text('Company Bills');
+  }
+});
+
+/***/ }),
+
 /***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/Pages/CompanySale/List.vue?vue&type=script&lang=js&":
 /*!**********************************************************************************************************************************************************************!*\
   !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/Pages/CompanySale/List.vue?vue&type=script&lang=js& ***!
@@ -3202,6 +3421,7 @@ __webpack_require__.r(__webpack_exports__);
       if (e == 'expand') {
         this.selectedData = data;
         this.expandParam.id = data.id;
+        this.expandParam.data = [];
         this.expandParam.data.push({
           amount: 0,
           description: ''
@@ -14831,6 +15051,414 @@ render._withStripped = true;
 
 /***/ }),
 
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/Pages/CompanyBills/List.vue?vue&type=template&id=3f445aa5&scoped=true&":
+/*!*********************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib/loaders/templateLoader.js??ref--6!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/Pages/CompanyBills/List.vue?vue&type=template&id=3f445aa5&scoped=true& ***!
+  \*********************************************************************************************************************************************************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
+var render = function render() {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "content-body"
+  }, [_c("div", {
+    staticClass: "container-fluid"
+  }, [_c("div", {
+    staticClass: "row page-titles"
+  }, [_c("ol", {
+    staticClass: "breadcrumb align-items-center"
+  }, [_c("li", {
+    staticClass: "breadcrumb-item active"
+  }, [_c("router-link", {
+    attrs: {
+      to: {
+        name: "Dashboard"
+      }
+    }
+  }, [_vm._v("Home")])], 1), _vm._v(" "), _vm._m(0)])]), _vm._v(" "), _c("div", {
+    staticClass: "row"
+  }, [_c("div", {
+    staticClass: "col-12"
+  }, [_c("div", {
+    staticClass: "card"
+  }, [_vm._m(1), _vm._v(" "), _c("div", {
+    staticClass: "card-body"
+  }, [_c("div", {
+    staticClass: "row mt-4"
+  }, [_c("div", {
+    staticClass: "table-responsive"
+  }, [_c("div", {
+    staticClass: "dataTables_wrapper no-footer"
+  }, [_c("div", {
+    staticClass: "dataTables_length"
+  }, [_c("label", {
+    staticClass: "d-flex align-items-center"
+  }, [_vm._v("Show\n                                            "), _c("select", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.Param.limit,
+      expression: "Param.limit"
+    }],
+    staticClass: "mx-2",
+    on: {
+      change: [function ($event) {
+        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
+          return o.selected;
+        }).map(function (o) {
+          var val = "_value" in o ? o._value : o.value;
+          return val;
+        });
+        _vm.$set(_vm.Param, "limit", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
+      }, _vm.list]
+    }
+  }, [_c("option", {
+    attrs: {
+      value: "10"
+    }
+  }, [_vm._v("10")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "25"
+    }
+  }, [_vm._v("25")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "50"
+    }
+  }, [_vm._v("50")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "100"
+    }
+  }, [_vm._v("100")])]), _vm._v("\n                                            entries\n                                        ")])]), _vm._v(" "), _c("div", {
+    staticClass: "dataTables_filter",
+    attrs: {
+      id: "example3_filter"
+    }
+  }, [_c("label", [_vm._v("Search:\n                                            "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.Param.keyword,
+      expression: "Param.keyword"
+    }],
+    attrs: {
+      type: "search",
+      placeholder: ""
+    },
+    domProps: {
+      value: _vm.Param.keyword
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.Param, "keyword", $event.target.value);
+      }
+    }
+  })])]), _vm._v(" "), _c("table", {
+    staticClass: "display dataTable no-footer",
+    staticStyle: {
+      "min-width": "845px"
+    }
+  }, [_c("thead", [_c("tr", {
+    staticClass: "text-white",
+    staticStyle: {
+      "background-color": "#4886EE",
+      color: "#ffffff"
+    }
+  }, [_c("th", [_c("input", {
+    staticClass: "form-check-input",
+    attrs: {
+      type: "checkbox"
+    },
+    on: {
+      change: function change($event) {
+        return _vm.selectAll($event);
+      }
+    }
+  })]), _vm._v(" "), _c("th", {
+    staticClass: "text-white",
+    "class": _vm.sortClass("created_at"),
+    on: {
+      click: function click($event) {
+        return _vm.sortData("created_at");
+      }
+    }
+  }, [_vm._v("Date")]), _vm._v(" "), _c("th", {
+    staticClass: "text-white",
+    "class": _vm.sortClass("name"),
+    on: {
+      click: function click($event) {
+        return _vm.sortData("name");
+      }
+    }
+  }, [_vm._v("Company")]), _vm._v(" "), _c("th", {
+    staticClass: "text-white",
+    "class": _vm.sortClass("description"),
+    on: {
+      click: function click($event) {
+        return _vm.sortData("description");
+      }
+    }
+  }, [_vm._v("Car Number")]), _vm._v(" "), _c("th", {
+    staticClass: "text-white",
+    "class": _vm.sortClass("amount"),
+    on: {
+      click: function click($event) {
+        return _vm.sortData("amount");
+      }
+    }
+  }, [_vm._v("Amount")]), _vm._v(" "), _c("th", {
+    staticClass: "text-white",
+    staticStyle: {
+      width: "375px"
+    }
+  }, [_vm._v("Action")])])]), _vm._v(" "), _vm.listData.length > 0 && _vm.TableLoading == false ? _c("tbody", _vm._l(_vm.listData, function (f, i) {
+    return _c("tr", [_c("td", [!f.invoice_id ? _c("input", {
+      staticClass: "form-check-input",
+      attrs: {
+        type: "checkbox"
+      },
+      domProps: {
+        checked: _vm.isExist(f.id)
+      },
+      on: {
+        change: function change($event) {
+          return _vm.selectIds($event, f.id);
+        }
+      }
+    }) : _vm._e()]), _vm._v(" "), _c("td", [_vm._v(_vm._s(f.created_at))]), _vm._v(" "), _c("td", [_c("a", {
+      attrs: {
+        href: "javascript:void(0);"
+      }
+    }, [_vm._v(_vm._s(f.name))])]), _vm._v(" "), _c("td", [_c("a", {
+      attrs: {
+        href: "javascript:void(0);"
+      }
+    }, [_vm._v(_vm._s(f.description))])]), _vm._v(" "), _c("td", [_c("a", {
+      attrs: {
+        href: "javascript:void(0);"
+      }
+    }, [_vm._v(_vm._s(f === null || f === void 0 ? void 0 : f.amount))])]), _vm._v(" "), _c("td", [f.module == "shift sale" && _vm.CheckPermission(_vm.Section.COMPANY_SALE + "-" + _vm.Action.CREATE) ? [!f.invoice_id ? _c("button", {
+      staticClass: "btn btn-sm btn-primary",
+      on: {
+        click: function click($event) {
+          return _vm.tableAction("expand", f);
+        }
+      }
+    }, [_vm._v("Expand")]) : _vm._e()] : _vm._e(), _vm._v(" "), _vm.CheckPermission(_vm.Section.INVOICE + "-" + _vm.Action.VIEW) && f.invoice_id ? _c("router-link", {
+      staticClass: "btn btn-sm btn-info",
+      attrs: {
+        to: {
+          name: "InvoicesView",
+          params: {
+            id: f.invoice_id
+          }
+        }
+      },
+      on: {
+        click: function click($event) {
+          return _vm.tableAction("view", f);
+        }
+      }
+    }, [_vm._v("View Invoices")]) : _vm._e()], 2)]);
+  }), 0) : _vm._e(), _vm._v(" "), _vm.listData.length == 0 && _vm.TableLoading == false ? _c("tbody", [_vm._m(2)]) : _vm._e(), _vm._v(" "), _vm.TableLoading == true ? _c("tbody", [_vm._m(3)]) : _vm._e()]), _vm._v(" "), _vm.paginateData != null ? _c("div", {
+    staticClass: "dataTables_info",
+    attrs: {
+      id: "example3_info",
+      role: "status",
+      "aria-live": "polite"
+    }
+  }, [_vm._v("Showing\n                                        " + _vm._s(_vm.paginateData.from) + " to " + _vm._s(_vm.paginateData.to) + " of " + _vm._s(_vm.paginateData.total) + " entries\n                                    ")]) : _vm._e(), _vm._v(" "), _c("div", {
+    staticClass: "dataTables_paginate paging_simple_numbers",
+    attrs: {
+      id: "example3_paginate"
+    }
+  }, [_c("Pagination", {
+    attrs: {
+      data: _vm.paginateData,
+      onChange: _vm.list
+    }
+  })], 1)])])])])])])])]), _vm._v(" "), _c("div", {
+    staticClass: "popup-wrapper-modal createExpand d-none"
+  }, [_c("form", {
+    staticClass: "popup-box",
+    staticStyle: {
+      "max-width": "800px"
+    },
+    on: {
+      submit: function submit($event) {
+        $event.preventDefault();
+        return _vm.expand.apply(null, arguments);
+      }
+    }
+  }, [_vm._m(4), _vm._v(" "), _vm._l(_vm.expandParam.data, function (e, i) {
+    return _c("div", {
+      staticClass: "row align-items-center"
+    }, [_c("div", {
+      staticClass: "col-sm-5"
+    }, [_c("div", {
+      staticClass: "input-wrapper form-group mb-3"
+    }, [_c("label", {
+      attrs: {
+        "for": "description"
+      }
+    }, [_vm._v("Car Number")]), _vm._v(" "), _c("input", {
+      directives: [{
+        name: "model",
+        rawName: "v-model",
+        value: e.description,
+        expression: "e.description"
+      }],
+      staticClass: "w-100 form-control",
+      attrs: {
+        type: "text",
+        name: "description",
+        id: "description",
+        placeholder: "Car Number"
+      },
+      domProps: {
+        value: e.description
+      },
+      on: {
+        input: function input($event) {
+          if ($event.target.composing) return;
+          _vm.$set(e, "description", $event.target.value);
+        }
+      }
+    }), _vm._v(" "), _c("small", {
+      staticClass: "invalid-feedback"
+    })])]), _vm._v(" "), _c("div", {
+      staticClass: "col-sm-5"
+    }, [_c("div", {
+      staticClass: "input-wrapper form-group mb-3"
+    }, [_c("label", {
+      attrs: {
+        "for": "amount"
+      }
+    }, [_vm._v("Amount")]), _vm._v(" "), _c("input", {
+      directives: [{
+        name: "model",
+        rawName: "v-model",
+        value: e.amount,
+        expression: "e.amount"
+      }],
+      staticClass: "w-100 form-control",
+      attrs: {
+        type: "text",
+        name: "amount",
+        id: "amount",
+        placeholder: "Amount here"
+      },
+      domProps: {
+        value: e.amount
+      },
+      on: {
+        input: function input($event) {
+          if ($event.target.composing) return;
+          _vm.$set(e, "amount", $event.target.value);
+        }
+      }
+    }), _vm._v(" "), _c("small", {
+      staticClass: "invalid-feedback"
+    })])]), _vm._v(" "), _c("div", {
+      staticClass: "col-sm-2"
+    }, [_c("button", {
+      staticClass: "btn btn-danger",
+      staticStyle: {
+        height: "54px"
+      },
+      attrs: {
+        type: "button"
+      },
+      on: {
+        click: function click($event) {
+          return _vm.spliceData(i);
+        }
+      }
+    }, [_c("i", {
+      staticClass: "fa-solid fa-xmark"
+    })])])]);
+  }), _vm._v(" "), _c("div", {
+    staticClass: "text-end"
+  }, [_c("button", {
+    staticClass: "btn btn-primary",
+    attrs: {
+      type: "button"
+    },
+    on: {
+      click: _vm.addMore
+    }
+  }, [_vm._v("Add More")])]), _vm._v(" "), !_vm.Loading ? _c("button", {
+    staticClass: "btn btn-primary",
+    attrs: {
+      type: "submit"
+    }
+  }, [_vm._v("Submit")]) : _vm._e(), _vm._v(" "), _vm.Loading ? _c("button", {
+    staticClass: "btn btn-primary",
+    attrs: {
+      type: "button",
+      disabled: ""
+    }
+  }, [_vm._v("Submitting...")]) : _vm._e()], 2)])]);
+};
+var staticRenderFns = [function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("li", {
+    staticClass: "breadcrumb-item"
+  }, [_c("a", {
+    attrs: {
+      href: "javascript:void(0)"
+    }
+  }, [_vm._v("Company Bills")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "card-header bg-secondary"
+  }, [_c("h4", {
+    staticClass: "card-title"
+  }, [_vm._v("Company Bills")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("tr", [_c("td", {
+    staticClass: "text-center",
+    attrs: {
+      colspan: "10"
+    }
+  }, [_vm._v("No data found")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("tr", [_c("td", {
+    staticClass: "text-center",
+    attrs: {
+      colspan: "10"
+    }
+  }, [_vm._v("Loading....")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("button", {
+    staticClass: "btn closeBtn",
+    attrs: {
+      type: "button"
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-times"
+  })]);
+}];
+render._withStripped = true;
+
+
+/***/ }),
+
 /***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/Pages/CompanySale/List.vue?vue&type=template&id=5b96ba9c&scoped=true&":
 /*!********************************************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib/loaders/templateLoader.js??ref--6!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/Pages/CompanySale/List.vue?vue&type=template&id=5b96ba9c&scoped=true& ***!
@@ -15112,7 +15740,7 @@ var render = function render() {
       attrs: {
         "for": "description"
       }
-    }, [_vm._v("Description")]), _vm._v(" "), _c("input", {
+    }, [_vm._v("Car Number")]), _vm._v(" "), _c("input", {
       directives: [{
         name: "model",
         rawName: "v-model",
@@ -15124,7 +15752,7 @@ var render = function render() {
         type: "text",
         name: "description",
         id: "description",
-        placeholder: "Description here"
+        placeholder: "Car Number"
       },
       domProps: {
         value: e.description
@@ -27734,7 +28362,13 @@ var render = function render() {
         name: "Invoices"
       }
     }
-  }, [_vm._v("Bills ")])], 1) : _vm._e()])]), _vm._v(" "), _c("li", [_vm._m(4), _vm._v(" "), _c("ul", {
+  }, [_vm._v("Invoices ")])], 1) : _vm._e(), _vm._v(" "), _vm.CheckPermission(_vm.Section.BILL + "-" + _vm.Action.VIEW) ? _c("li", [_c("router-link", {
+    attrs: {
+      to: {
+        name: "CompanyBills"
+      }
+    }
+  }, [_vm._v("Company Bills ")])], 1) : _vm._e()])]), _vm._v(" "), _c("li", [_vm._m(4), _vm._v(" "), _c("ul", {
     staticClass: "bichi",
     attrs: {
       "aria-expanded": "false"
@@ -91436,6 +92070,75 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./resources/js/Pages/CompanyBills/List.vue":
+/*!**************************************************!*\
+  !*** ./resources/js/Pages/CompanyBills/List.vue ***!
+  \**************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _List_vue_vue_type_template_id_3f445aa5_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./List.vue?vue&type=template&id=3f445aa5&scoped=true& */ "./resources/js/Pages/CompanyBills/List.vue?vue&type=template&id=3f445aa5&scoped=true&");
+/* harmony import */ var _List_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./List.vue?vue&type=script&lang=js& */ "./resources/js/Pages/CompanyBills/List.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+/* normalize component */
+
+var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _List_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _List_vue_vue_type_template_id_3f445aa5_scoped_true___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _List_vue_vue_type_template_id_3f445aa5_scoped_true___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  false,
+  null,
+  "3f445aa5",
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/Pages/CompanyBills/List.vue"
+/* harmony default export */ __webpack_exports__["default"] = (component.exports);
+
+/***/ }),
+
+/***/ "./resources/js/Pages/CompanyBills/List.vue?vue&type=script&lang=js&":
+/*!***************************************************************************!*\
+  !*** ./resources/js/Pages/CompanyBills/List.vue?vue&type=script&lang=js& ***!
+  \***************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_List_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib??ref--4-0!../../../../node_modules/vue-loader/lib??vue-loader-options!./List.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/Pages/CompanyBills/List.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_List_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/js/Pages/CompanyBills/List.vue?vue&type=template&id=3f445aa5&scoped=true&":
+/*!*********************************************************************************************!*\
+  !*** ./resources/js/Pages/CompanyBills/List.vue?vue&type=template&id=3f445aa5&scoped=true& ***!
+  \*********************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ref_6_node_modules_vue_loader_lib_index_js_vue_loader_options_List_vue_vue_type_template_id_3f445aa5_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib??ref--4-0!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??ref--6!../../../../node_modules/vue-loader/lib??vue-loader-options!./List.vue?vue&type=template&id=3f445aa5&scoped=true& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/Pages/CompanyBills/List.vue?vue&type=template&id=3f445aa5&scoped=true&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ref_6_node_modules_vue_loader_lib_index_js_vue_loader_options_List_vue_vue_type_template_id_3f445aa5_scoped_true___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ref_6_node_modules_vue_loader_lib_index_js_vue_loader_options_List_vue_vue_type_template_id_3f445aa5_scoped_true___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+
+
+
+/***/ }),
+
 /***/ "./resources/js/Pages/CompanySale/List.vue":
 /*!*************************************************!*\
   !*** ./resources/js/Pages/CompanySale/List.vue ***!
@@ -97452,13 +98155,15 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Pages_FuelAdjustment_Edit_vue__WEBPACK_IMPORTED_MODULE_90__ = __webpack_require__(/*! ../Pages/FuelAdjustment/Edit.vue */ "./resources/js/Pages/FuelAdjustment/Edit.vue");
 /* harmony import */ var _Pages_UnauthorizedBill_UnauthorizedBill_vue__WEBPACK_IMPORTED_MODULE_91__ = __webpack_require__(/*! ../Pages/UnauthorizedBill/UnauthorizedBill.vue */ "./resources/js/Pages/UnauthorizedBill/UnauthorizedBill.vue");
 /* harmony import */ var _Pages_SalesReport_List_vue__WEBPACK_IMPORTED_MODULE_92__ = __webpack_require__(/*! ../Pages/SalesReport/List.vue */ "./resources/js/Pages/SalesReport/List.vue");
-/* harmony import */ var _Helpers_Section__WEBPACK_IMPORTED_MODULE_93__ = __webpack_require__(/*! ../Helpers/Section */ "./resources/js/Helpers/Section.js");
-/* harmony import */ var _Helpers_Action__WEBPACK_IMPORTED_MODULE_94__ = __webpack_require__(/*! ../Helpers/Action */ "./resources/js/Helpers/Action.js");
+/* harmony import */ var _Pages_CompanyBills_List_vue__WEBPACK_IMPORTED_MODULE_93__ = __webpack_require__(/*! ../Pages/CompanyBills/List.vue */ "./resources/js/Pages/CompanyBills/List.vue");
+/* harmony import */ var _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__ = __webpack_require__(/*! ../Helpers/Section */ "./resources/js/Helpers/Section.js");
+/* harmony import */ var _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__ = __webpack_require__(/*! ../Helpers/Action */ "./resources/js/Helpers/Action.js");
 
 
 
 
 vue__WEBPACK_IMPORTED_MODULE_0___default.a.use(vuex__WEBPACK_IMPORTED_MODULE_2__["default"]);
+
 
 
 
@@ -97574,574 +98279,581 @@ var router = new vue_router__WEBPACK_IMPORTED_MODULE_1__["default"]({
       name: "Accounts",
       component: _Pages_Category_Category_vue__WEBPACK_IMPORTED_MODULE_7__["default"],
       beforeEnter: function beforeEnter(to, from, next) {
-        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_93__["default"].ACCOUNTING + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_94__["default"].VIEW);
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].ACCOUNTING + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].VIEW);
       }
     }, {
       path: ROOT_URL + "/transaction/:id",
       name: "Transaction",
       component: _Pages_Transaction_Transaction_vue__WEBPACK_IMPORTED_MODULE_8__["default"],
       beforeEnter: function beforeEnter(to, from, next) {
-        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_93__["default"].ACCOUNTING + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_94__["default"].CREATE);
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].ACCOUNTING + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].CREATE);
       }
     }, {
       path: ROOT_URL + "/balance-sheet",
       name: "BalanceSheet",
       component: _Pages_BalanceSheet_Balance__WEBPACK_IMPORTED_MODULE_9__["default"],
       beforeEnter: function beforeEnter(to, from, next) {
-        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_93__["default"].BALANCE_SHEET + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_94__["default"].VIEW);
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].BALANCE_SHEET + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].VIEW);
       }
     }, {
       path: ROOT_URL + "/profit-loss",
       name: "ProfitLoss",
       component: _Pages_ProfitLoss_profit_loss__WEBPACK_IMPORTED_MODULE_10__["default"],
       beforeEnter: function beforeEnter(to, from, next) {
-        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_93__["default"].PROFIT_AND_LOSS + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_94__["default"].VIEW);
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].PROFIT_AND_LOSS + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].VIEW);
       }
     }, {
       path: ROOT_URL + "/income-statement",
       name: "IncomeStatement",
       component: _Pages_IncomeStatement_income_statement__WEBPACK_IMPORTED_MODULE_11__["default"],
       beforeEnter: function beforeEnter(to, from, next) {
-        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_93__["default"].INCOME_STATEMENT + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_94__["default"].VIEW);
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].INCOME_STATEMENT + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].VIEW);
       }
     }, {
       path: ROOT_URL + "/account-payable",
       name: "AccountPayable",
       component: _Pages_AccountPayable_payable__WEBPACK_IMPORTED_MODULE_12__["default"],
       beforeEnter: function beforeEnter(to, from, next) {
-        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_93__["default"].ACCOUNT_PAYABLE + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_94__["default"].VIEW);
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].ACCOUNT_PAYABLE + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].VIEW);
       }
     }, {
       path: ROOT_URL + "/account-receivable",
       name: "AccountReceivable",
       component: _Pages_AccountReceivable_receivable__WEBPACK_IMPORTED_MODULE_13__["default"],
       beforeEnter: function beforeEnter(to, from, next) {
-        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_93__["default"].ACCOUNT_RECEIVABLE + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_94__["default"].VIEW);
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].ACCOUNT_RECEIVABLE + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].VIEW);
       }
     }, {
       path: ROOT_URL + "/trial-balance",
       name: "TrailBalance",
       component: _Pages_TrialBalance_trail__WEBPACK_IMPORTED_MODULE_14__["default"],
       beforeEnter: function beforeEnter(to, from, next) {
-        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_93__["default"].TRAIL_BALANCE + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_94__["default"].VIEW);
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].TRAIL_BALANCE + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].VIEW);
       }
     }, {
       path: ROOT_URL + "/ledger-sheet",
       name: "LedgerSheet",
       component: _Pages_Ledger_ledger__WEBPACK_IMPORTED_MODULE_15__["default"],
       beforeEnter: function beforeEnter(to, from, next) {
-        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_93__["default"].LEDGER + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_94__["default"].VIEW);
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].LEDGER + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].VIEW);
       }
     }, {
       path: ROOT_URL + "/product",
       name: "Product",
       component: _Pages_Fuel_Product_List__WEBPACK_IMPORTED_MODULE_16__["default"],
       beforeEnter: function beforeEnter(to, from, next) {
-        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_93__["default"].PRODUCT + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_94__["default"].VIEW);
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].PRODUCT + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].VIEW);
       }
     }, {
       path: ROOT_URL + "/product/add",
       name: "ProductAdd",
       component: _Pages_Fuel_Product_Add__WEBPACK_IMPORTED_MODULE_17__["default"],
       beforeEnter: function beforeEnter(to, from, next) {
-        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_93__["default"].PRODUCT + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_94__["default"].CREATE);
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].PRODUCT + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].CREATE);
       }
     }, {
       path: ROOT_URL + "/product/edit/:id",
       name: "ProductEdit",
       component: _Pages_Fuel_Product_Edit__WEBPACK_IMPORTED_MODULE_18__["default"],
       beforeEnter: function beforeEnter(to, from, next) {
-        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_93__["default"].PRODUCT + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_94__["default"].EDIT);
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].PRODUCT + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].EDIT);
       }
     }, {
       path: ROOT_URL + "/dispenser",
       name: "Dispenser",
       component: _Pages_Fuel_Dispenser_List__WEBPACK_IMPORTED_MODULE_19__["default"],
       beforeEnter: function beforeEnter(to, from, next) {
-        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_93__["default"].DISPENSER + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_94__["default"].VIEW);
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].DISPENSER + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].VIEW);
       }
     }, {
       path: ROOT_URL + "/dispenser/add",
       name: "DispenserAdd",
       component: _Pages_Fuel_Dispenser_Add__WEBPACK_IMPORTED_MODULE_20__["default"],
       beforeEnter: function beforeEnter(to, from, next) {
-        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_93__["default"].DISPENSER + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_94__["default"].CREATE);
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].DISPENSER + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].CREATE);
       }
     }, {
       path: ROOT_URL + "/dispenser/edit/:id",
       name: "DispenserEdit",
       component: _Pages_Fuel_Dispenser_Edit__WEBPACK_IMPORTED_MODULE_21__["default"],
       beforeEnter: function beforeEnter(to, from, next) {
-        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_93__["default"].DISPENSER + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_94__["default"].EDIT);
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].DISPENSER + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].EDIT);
       }
     }, {
       path: ROOT_URL + "/nozzle",
       name: "Nozzle",
       component: _Pages_Fuel_Nozzle_List__WEBPACK_IMPORTED_MODULE_25__["default"],
       beforeEnter: function beforeEnter(to, from, next) {
-        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_93__["default"].NOZZLE_READING + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_94__["default"].VIEW);
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].NOZZLE_READING + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].VIEW);
       }
     }, {
       path: ROOT_URL + "/nozzle/add",
       name: "NozzleAdd",
       component: _Pages_Fuel_Nozzle_Add__WEBPACK_IMPORTED_MODULE_26__["default"],
       beforeEnter: function beforeEnter(to, from, next) {
-        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_93__["default"].NOZZLE_READING + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_94__["default"].CREATE);
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].NOZZLE_READING + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].CREATE);
       }
     }, {
       path: ROOT_URL + "/nozzle/edit/:id",
       name: "NozzleEdit",
       component: _Pages_Fuel_Nozzle_Edit__WEBPACK_IMPORTED_MODULE_27__["default"],
       beforeEnter: function beforeEnter(to, from, next) {
-        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_93__["default"].NOZZLE_READING + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_94__["default"].EDIT);
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].NOZZLE_READING + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].EDIT);
       }
     }, {
       path: ROOT_URL + "/nozzle/reading",
       name: "NozzleReading",
       component: _Pages_Fuel_NozzleReading_List__WEBPACK_IMPORTED_MODULE_28__["default"],
       beforeEnter: function beforeEnter(to, from, next) {
-        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_93__["default"].NOZZLE_READING + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_94__["default"].VIEW);
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].NOZZLE_READING + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].VIEW);
       }
     }, {
       path: ROOT_URL + "/nozzle/reading/add",
       name: "NozzleReadingAdd",
       component: _Pages_Fuel_NozzleReading_Add__WEBPACK_IMPORTED_MODULE_29__["default"],
       beforeEnter: function beforeEnter(to, from, next) {
-        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_93__["default"].NOZZLE_READING + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_94__["default"].CREATE);
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].NOZZLE_READING + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].CREATE);
       }
     }, {
       path: ROOT_URL + "/nozzle/reading/edit/:id",
       name: "NozzleReadingEdit",
       component: _Pages_Fuel_NozzleReading_Edit__WEBPACK_IMPORTED_MODULE_30__["default"],
       beforeEnter: function beforeEnter(to, from, next) {
-        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_93__["default"].NOZZLE_READING + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_94__["default"].EDIT);
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].NOZZLE_READING + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].EDIT);
       }
     }, {
       path: ROOT_URL + "/shift/sale/start",
       name: "ShiftSaleAdd",
       component: _Pages_ShiftSale_ShiftSaleAdd__WEBPACK_IMPORTED_MODULE_31__["default"],
       beforeEnter: function beforeEnter(to, from, next) {
-        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_93__["default"].SHIFT_SALE + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_94__["default"].CREATE);
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].SHIFT_SALE + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].CREATE);
       }
     }, {
       path: ROOT_URL + "/shift/sale/list",
       name: "ShiftSaleList",
       component: _Pages_ShiftSale_List_vue__WEBPACK_IMPORTED_MODULE_32__["default"],
       beforeEnter: function beforeEnter(to, from, next) {
-        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_93__["default"].SHIFT_SALE + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_94__["default"].VIEW);
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].SHIFT_SALE + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].VIEW);
       }
     }, {
       path: ROOT_URL + "/shift/sale/list/start",
       name: "ShiftSaleListStart",
       component: _Pages_ShiftSale_ListStart_vue__WEBPACK_IMPORTED_MODULE_33__["default"],
       beforeEnter: function beforeEnter(to, from, next) {
-        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_93__["default"].SHIFT_SALE + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_94__["default"].VIEW);
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].SHIFT_SALE + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].VIEW);
       }
     }, {
       path: ROOT_URL + "/shift/sale/edit/:id",
       name: "ShiftSaleEdit",
       component: _Pages_ShiftSale_ShiftSaleEdit_vue__WEBPACK_IMPORTED_MODULE_34__["default"],
       beforeEnter: function beforeEnter(to, from, next) {
-        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_93__["default"].SHIFT_SALE + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_94__["default"].EDIT);
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].SHIFT_SALE + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].EDIT);
       }
     }, {
       path: ROOT_URL + "/pos",
       name: "Pos",
       component: _Pages_Pos_Pos__WEBPACK_IMPORTED_MODULE_35__["default"],
       beforeEnter: function beforeEnter(to, from, next) {
-        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_93__["default"].POS + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_94__["default"].CREATE);
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].POS + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].CREATE);
       }
     }, {
       path: ROOT_URL + "/pos/list",
       name: "PosList",
       component: _Pages_Pos_List_vue__WEBPACK_IMPORTED_MODULE_36__["default"],
       beforeEnter: function beforeEnter(to, from, next) {
-        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_93__["default"].POS + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_94__["default"].VIEW);
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].POS + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].VIEW);
       }
     }, {
       path: ROOT_URL + "/pos/edit/:id",
       name: "PosEdit",
       component: _Pages_Pos_Edit_vue__WEBPACK_IMPORTED_MODULE_37__["default"],
       beforeEnter: function beforeEnter(to, from, next) {
-        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_93__["default"].POS + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_94__["default"].EDIT);
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].POS + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].EDIT);
       }
     }, {
       path: ROOT_URL + "/expense",
       name: "Expense",
       component: _Pages_Expenses_List__WEBPACK_IMPORTED_MODULE_38__["default"],
       beforeEnter: function beforeEnter(to, from, next) {
-        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_93__["default"].EXPENSE + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_94__["default"].VIEW);
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].EXPENSE + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].VIEW);
       }
     }, {
       path: ROOT_URL + "/expense/add",
       name: "ExpenseAdd",
       component: _Pages_Expenses_Add__WEBPACK_IMPORTED_MODULE_39__["default"],
       beforeEnter: function beforeEnter(to, from, next) {
-        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_93__["default"].EXPENSE + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_94__["default"].CREATE);
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].EXPENSE + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].CREATE);
       }
     }, {
       path: ROOT_URL + "/expense/edit/:id",
       name: "ExpenseEdit",
       component: _Pages_Expenses_Edit__WEBPACK_IMPORTED_MODULE_40__["default"],
       beforeEnter: function beforeEnter(to, from, next) {
-        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_93__["default"].EXPENSE + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_94__["default"].EDIT);
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].EXPENSE + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].EDIT);
       }
     }, {
       path: ROOT_URL + "/tank",
       name: "Tank",
       component: _Pages_Fuel_Tank_List__WEBPACK_IMPORTED_MODULE_41__["default"],
       beforeEnter: function beforeEnter(to, from, next) {
-        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_93__["default"].TANK + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_94__["default"].VIEW);
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].TANK + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].VIEW);
       }
     }, {
       path: ROOT_URL + "/tank/visual",
       name: "TankVisual",
       component: _Pages_Fuel_TankVisual_List__WEBPACK_IMPORTED_MODULE_42__["default"],
       beforeEnter: function beforeEnter(to, from, next) {
-        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_93__["default"].TANK_VISUAL + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_94__["default"].VIEW);
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].TANK_VISUAL + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].VIEW);
       }
     }, {
       path: ROOT_URL + "/tank/add",
       name: "TankAdd",
       component: _Pages_Fuel_Tank_Add__WEBPACK_IMPORTED_MODULE_43__["default"],
       beforeEnter: function beforeEnter(to, from, next) {
-        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_93__["default"].TANK + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_94__["default"].CREATE);
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].TANK + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].CREATE);
       }
     }, {
       path: ROOT_URL + "/tank/edit/:id",
       name: "TankEdit",
       component: _Pages_Fuel_Tank_Edit__WEBPACK_IMPORTED_MODULE_44__["default"],
       beforeEnter: function beforeEnter(to, from, next) {
-        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_93__["default"].TANK + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_94__["default"].EDIT);
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].TANK + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].EDIT);
       }
     }, {
       path: ROOT_URL + "/tank/reading",
       name: "TankReading",
       component: _Pages_Fuel_TankReading_List__WEBPACK_IMPORTED_MODULE_45__["default"],
       beforeEnter: function beforeEnter(to, from, next) {
-        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_93__["default"].TANK_READING + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_94__["default"].VIEW);
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].TANK_READING + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].VIEW);
       }
     }, {
       path: ROOT_URL + "/tank/reading/add",
       name: "TankReadingAdd",
       component: _Pages_Fuel_TankReading_Add__WEBPACK_IMPORTED_MODULE_46__["default"],
       beforeEnter: function beforeEnter(to, from, next) {
-        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_93__["default"].TANK_READING + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_94__["default"].CREATE);
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].TANK_READING + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].CREATE);
       }
     }, {
       path: ROOT_URL + "/tank/reading/edit/:id",
       name: "TankReadingEdit",
       component: _Pages_Fuel_TankReading_Edit__WEBPACK_IMPORTED_MODULE_47__["default"],
       beforeEnter: function beforeEnter(to, from, next) {
-        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_93__["default"].TANK_READING + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_94__["default"].EDIT);
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].TANK_READING + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].EDIT);
       }
     }, {
       path: ROOT_URL + "/tank/refill",
       name: "TankRefill",
       component: _Pages_Fuel_TankRefill_List__WEBPACK_IMPORTED_MODULE_48__["default"],
       beforeEnter: function beforeEnter(to, from, next) {
-        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_93__["default"].TANK_REFILL + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_94__["default"].VIEW);
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].TANK_REFILL + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].VIEW);
       }
     }, {
       path: ROOT_URL + "/tank/refill/add",
       name: "TankRefillAdd",
       component: _Pages_Fuel_TankRefill_Add__WEBPACK_IMPORTED_MODULE_49__["default"],
       beforeEnter: function beforeEnter(to, from, next) {
-        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_93__["default"].TANK_REFILL + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_94__["default"].CREATE);
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].TANK_REFILL + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].CREATE);
       }
     }, {
       path: ROOT_URL + "/tank/refill/edit/:id",
       name: "TankRefillEdit",
       component: _Pages_Fuel_TankRefill_Edit__WEBPACK_IMPORTED_MODULE_50__["default"],
       beforeEnter: function beforeEnter(to, from, next) {
-        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_93__["default"].TANK_REFILL + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_94__["default"].EDIT);
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].TANK_REFILL + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].EDIT);
       }
     }, {
       path: ROOT_URL + "/bank",
       name: "Bank",
       component: _Pages_Banks_List__WEBPACK_IMPORTED_MODULE_51__["default"],
       beforeEnter: function beforeEnter(to, from, next) {
-        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_93__["default"].BANK + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_94__["default"].VIEW);
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].BANK + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].VIEW);
       }
     }, {
       path: ROOT_URL + "/bank/add",
       name: "BankAdd",
       component: _Pages_Banks_Add__WEBPACK_IMPORTED_MODULE_52__["default"],
       beforeEnter: function beforeEnter(to, from, next) {
-        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_93__["default"].BANK + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_94__["default"].CREATE);
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].BANK + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].CREATE);
       }
     }, {
       path: ROOT_URL + "/bank/edit/:id",
       name: "BankEdit",
       component: _Pages_Banks_Edit__WEBPACK_IMPORTED_MODULE_53__["default"],
       beforeEnter: function beforeEnter(to, from, next) {
-        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_93__["default"].BANK + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_94__["default"].EDIT);
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].BANK + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].EDIT);
       }
     }, {
       path: ROOT_URL + "/vendor",
       name: "Vendor",
       component: _Pages_Vendors_List__WEBPACK_IMPORTED_MODULE_54__["default"],
       beforeEnter: function beforeEnter(to, from, next) {
-        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_93__["default"].VENDOR + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_94__["default"].VIEW);
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].VENDOR + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].VIEW);
       }
     }, {
       path: ROOT_URL + "/vendor/add",
       name: "VendorAdd",
       component: _Pages_Vendors_Add__WEBPACK_IMPORTED_MODULE_55__["default"],
       beforeEnter: function beforeEnter(to, from, next) {
-        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_93__["default"].VENDOR + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_94__["default"].CREATE);
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].VENDOR + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].CREATE);
       }
     }, {
       path: ROOT_URL + "/vendor/edit/:id",
       name: "VendorEdit",
       component: _Pages_Vendors_Edit__WEBPACK_IMPORTED_MODULE_56__["default"],
       beforeEnter: function beforeEnter(to, from, next) {
-        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_93__["default"].VENDOR + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_94__["default"].EDIT);
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].VENDOR + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].EDIT);
       }
     }, {
       path: ROOT_URL + "/pay/order",
       name: "PayOrder",
       component: _Pages_PayOrder_List__WEBPACK_IMPORTED_MODULE_57__["default"],
       beforeEnter: function beforeEnter(to, from, next) {
-        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_93__["default"].PAY_ORDER + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_94__["default"].VIEW);
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].PAY_ORDER + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].VIEW);
       }
     }, {
       path: ROOT_URL + "/pay/order/add",
       name: "PayOrderAdd",
       component: _Pages_PayOrder_Add__WEBPACK_IMPORTED_MODULE_58__["default"],
       beforeEnter: function beforeEnter(to, from, next) {
-        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_93__["default"].PAY_ORDER + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_94__["default"].CREATE);
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].PAY_ORDER + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].CREATE);
       }
     }, {
       path: ROOT_URL + "/pay/order/edit/:id",
       name: "PayOrderEdit",
       component: _Pages_PayOrder_Edit__WEBPACK_IMPORTED_MODULE_59__["default"],
       beforeEnter: function beforeEnter(to, from, next) {
-        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_93__["default"].PAY_ORDER + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_94__["default"].EDIT);
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].PAY_ORDER + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].EDIT);
       }
     }, {
       path: ROOT_URL + "/credit/company",
       name: "CreditCompany",
       component: _Pages_CreditCompany_List_vue__WEBPACK_IMPORTED_MODULE_60__["default"],
       beforeEnter: function beforeEnter(to, from, next) {
-        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_93__["default"].CREDIT_COMPANY + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_94__["default"].VIEW);
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].CREDIT_COMPANY + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].VIEW);
       }
     }, {
       path: ROOT_URL + "/credit/company/add",
       name: "CreditCompanyAdd",
       component: _Pages_CreditCompany_Add_vue__WEBPACK_IMPORTED_MODULE_61__["default"],
       beforeEnter: function beforeEnter(to, from, next) {
-        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_93__["default"].CREDIT_COMPANY + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_94__["default"].CREATE);
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].CREDIT_COMPANY + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].CREATE);
       }
     }, {
       path: ROOT_URL + "/credit/company/edit/:id",
       name: "CreditCompanyEdit",
       component: _Pages_CreditCompany_Edit_vue__WEBPACK_IMPORTED_MODULE_62__["default"],
       beforeEnter: function beforeEnter(to, from, next) {
-        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_93__["default"].CREDIT_COMPANY + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_94__["default"].EDIT);
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].CREDIT_COMPANY + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].EDIT);
       }
     }, {
       path: ROOT_URL + "/pos/machine",
       name: "posMachine",
       component: _Pages_posMachine_List_vue__WEBPACK_IMPORTED_MODULE_63__["default"],
       beforeEnter: function beforeEnter(to, from, next) {
-        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_93__["default"].POS_MACHINE + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_94__["default"].VIEW);
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].POS_MACHINE + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].VIEW);
       }
     }, {
       path: ROOT_URL + "/pos/machine/add",
       name: "posMachineAdd",
       component: _Pages_posMachine_Add_vue__WEBPACK_IMPORTED_MODULE_64__["default"],
       beforeEnter: function beforeEnter(to, from, next) {
-        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_93__["default"].POS_MACHINE + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_94__["default"].CREATE);
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].POS_MACHINE + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].CREATE);
       }
     }, {
       path: ROOT_URL + "/pos/machine/edit/:id",
       name: "posMachineEdit",
       component: _Pages_posMachine_Edit_vue__WEBPACK_IMPORTED_MODULE_65__["default"],
       beforeEnter: function beforeEnter(to, from, next) {
-        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_93__["default"].POS_MACHINE + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_94__["default"].EDIT);
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].POS_MACHINE + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].EDIT);
       }
     }, {
       path: ROOT_URL + "/employee",
       name: "employee",
       component: _Pages_Employee_List_vue__WEBPACK_IMPORTED_MODULE_66__["default"],
       beforeEnter: function beforeEnter(to, from, next) {
-        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_93__["default"].EMPLOYEE + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_94__["default"].VIEW);
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].EMPLOYEE + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].VIEW);
       }
     }, {
       path: ROOT_URL + "/employee/add",
       name: "employeeAdd",
       component: _Pages_Employee_Add_vue__WEBPACK_IMPORTED_MODULE_67__["default"],
       beforeEnter: function beforeEnter(to, from, next) {
-        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_93__["default"].EMPLOYEE + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_94__["default"].CREATE);
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].EMPLOYEE + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].CREATE);
       }
     }, {
       path: ROOT_URL + "/employee/edit/:id",
       name: "employeeEdit",
       component: _Pages_Employee_Edit_vue__WEBPACK_IMPORTED_MODULE_68__["default"],
       beforeEnter: function beforeEnter(to, from, next) {
-        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_93__["default"].EMPLOYEE + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_94__["default"].EDIT);
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].EMPLOYEE + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].EDIT);
       }
     }, {
       path: ROOT_URL + "/salary",
       name: "salary",
       component: _Pages_Salary_List_vue__WEBPACK_IMPORTED_MODULE_75__["default"],
       beforeEnter: function beforeEnter(to, from, next) {
-        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_93__["default"].SALARY + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_94__["default"].VIEW);
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].SALARY + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].VIEW);
       }
     }, {
       path: ROOT_URL + "/salary/add",
       name: "salaryAdd",
       component: _Pages_Salary_Add_vue__WEBPACK_IMPORTED_MODULE_76__["default"],
       beforeEnter: function beforeEnter(to, from, next) {
-        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_93__["default"].SALARY + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_94__["default"].CREATE);
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].SALARY + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].CREATE);
       }
     }, {
       path: ROOT_URL + "/salary/edit/:id",
       name: "salaryEdit",
       component: _Pages_Salary_Edit_vue__WEBPACK_IMPORTED_MODULE_77__["default"],
       beforeEnter: function beforeEnter(to, from, next) {
-        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_93__["default"].SALARY + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_94__["default"].EDIT);
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].SALARY + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].EDIT);
       }
     }, {
       path: ROOT_URL + "/company/sale",
       name: "CompanySale",
       component: _Pages_CompanySale_List_vue__WEBPACK_IMPORTED_MODULE_78__["default"],
       beforeEnter: function beforeEnter(to, from, next) {
-        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_93__["default"].COMPANY_SALE + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_94__["default"].VIEW);
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].COMPANY_SALE + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].VIEW);
       }
     }, {
       path: ROOT_URL + "/invoices",
       name: "Invoices",
       component: _Pages_Invoices_List_vue__WEBPACK_IMPORTED_MODULE_79__["default"],
       beforeEnter: function beforeEnter(to, from, next) {
-        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_93__["default"].INVOICE + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_94__["default"].VIEW);
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].INVOICE + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].VIEW);
       }
     }, {
       path: ROOT_URL + "/invoices/view/:id",
       name: "InvoicesView",
       component: _Pages_Invoices_View_vue__WEBPACK_IMPORTED_MODULE_80__["default"],
       beforeEnter: function beforeEnter(to, from, next) {
-        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_93__["default"].INVOICE + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_94__["default"].VIEW);
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].INVOICE + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].VIEW);
       }
     }, {
       path: ROOT_URL + "/daily/report",
       name: "dailyReport",
       component: _Pages_DailyReport_dailyReport_vue__WEBPACK_IMPORTED_MODULE_81__["default"],
       beforeEnter: function beforeEnter(to, from, next) {
-        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_93__["default"].DAILY_REPORT + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_94__["default"].VIEW);
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].DAILY_REPORT + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].VIEW);
       }
     }, {
       path: ROOT_URL + "/user",
       name: "user",
       component: _Pages_Users_List_vue__WEBPACK_IMPORTED_MODULE_72__["default"],
       beforeEnter: function beforeEnter(to, from, next) {
-        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_93__["default"].USER + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_94__["default"].VIEW);
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].USER + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].VIEW);
       }
     }, {
       path: ROOT_URL + "/user/add",
       name: "userAdd",
       component: _Pages_Users_Add_vue__WEBPACK_IMPORTED_MODULE_73__["default"],
       beforeEnter: function beforeEnter(to, from, next) {
-        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_93__["default"].USER + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_94__["default"].CREATE);
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].USER + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].CREATE);
       }
     }, {
       path: ROOT_URL + "/user/edit/:id",
       name: "userEdit",
       component: _Pages_Users_Edit_vue__WEBPACK_IMPORTED_MODULE_74__["default"],
       beforeEnter: function beforeEnter(to, from, next) {
-        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_93__["default"].USER + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_94__["default"].EDIT);
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].USER + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].EDIT);
       }
     }, {
       path: ROOT_URL + "/balanceTransfer",
       name: "balanceTransfer",
       component: _Pages_AssetTransfer_List_vue__WEBPACK_IMPORTED_MODULE_69__["default"],
       beforeEnter: function beforeEnter(to, from, next) {
-        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_93__["default"].TRANSFER + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_94__["default"].VIEW);
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].TRANSFER + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].VIEW);
       }
     }, {
       path: ROOT_URL + "/balanceTransfer/add",
       name: "balanceTransferAdd",
       component: _Pages_AssetTransfer_Add_vue__WEBPACK_IMPORTED_MODULE_70__["default"],
       beforeEnter: function beforeEnter(to, from, next) {
-        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_93__["default"].TRANSFER + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_94__["default"].CREATE);
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].TRANSFER + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].CREATE);
       }
     }, {
       path: ROOT_URL + "/balanceTransfer/edit/:id",
       name: "balanceTransferEdit",
       component: _Pages_AssetTransfer_Edit_vue__WEBPACK_IMPORTED_MODULE_71__["default"],
       beforeEnter: function beforeEnter(to, from, next) {
-        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_93__["default"].TRANSFER + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_94__["default"].EDIT);
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].TRANSFER + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].EDIT);
       }
     }, {
       path: ROOT_URL + "/system/setup",
       name: "system",
       component: _Pages_System_Company_vue__WEBPACK_IMPORTED_MODULE_82__["default"],
       beforeEnter: function beforeEnter(to, from, next) {
-        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_93__["default"].SYSTEM_SETTING + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_94__["default"].VIEW);
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].SYSTEM_SETTING + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].VIEW);
       }
     }, {
       path: ROOT_URL + "/voucher",
       name: "voucher",
       component: _Pages_Voucher_Voucher_vue__WEBPACK_IMPORTED_MODULE_83__["default"],
       beforeEnter: function beforeEnter(to, from, next) {
-        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_93__["default"].VOUCHER + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_94__["default"].VIEW);
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].VOUCHER + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].VIEW);
       }
     }, {
       path: ROOT_URL + "/driver",
       name: "driver",
       component: _Pages_Driver_Driver_vue__WEBPACK_IMPORTED_MODULE_84__["default"],
       beforeEnter: function beforeEnter(to, from, next) {
-        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_93__["default"].DRIVER + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_94__["default"].VIEW);
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].DRIVER + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].VIEW);
       }
     }, {
       path: ROOT_URL + "/role",
       name: "role",
       component: _Pages_Role_Role_vue__WEBPACK_IMPORTED_MODULE_85__["default"],
       beforeEnter: function beforeEnter(to, from, next) {
-        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_93__["default"].ROLE + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_94__["default"].VIEW);
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].ROLE + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].VIEW);
       }
     }, {
       path: ROOT_URL + "/role/create",
       name: "createRole",
       component: _Pages_Role_Create_vue__WEBPACK_IMPORTED_MODULE_86__["default"],
       beforeEnter: function beforeEnter(to, from, next) {
-        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_93__["default"].ROLE + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_94__["default"].CREATE);
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].ROLE + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].CREATE);
       }
     }, {
       path: ROOT_URL + "/role/edit/:id",
       name: "roleEdit",
       component: _Pages_Role_Edit_vue__WEBPACK_IMPORTED_MODULE_87__["default"],
       beforeEnter: function beforeEnter(to, from, next) {
-        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_93__["default"].ROLE + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_94__["default"].EDIT);
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].ROLE + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].EDIT);
       }
     }, {
       path: ROOT_URL + "/fuel/adjustment/add",
       name: "fuelAdjustment",
       component: _Pages_FuelAdjustment_Adjustment_vue__WEBPACK_IMPORTED_MODULE_88__["default"],
       beforeEnter: function beforeEnter(to, from, next) {
-        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_93__["default"].FUEL_ADJUSTMENT + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_94__["default"].CREATE);
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].FUEL_ADJUSTMENT + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].CREATE);
       }
     }, {
       path: ROOT_URL + "/fuel/adjustment/list",
       name: "adjustment",
       component: _Pages_FuelAdjustment_List_vue__WEBPACK_IMPORTED_MODULE_89__["default"],
       beforeEnter: function beforeEnter(to, from, next) {
-        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_93__["default"].FUEL_ADJUSTMENT + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_94__["default"].VIEW);
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].FUEL_ADJUSTMENT + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].VIEW);
       }
     }, {
       path: ROOT_URL + "/unauthorizedBill",
       name: "unauthorizedBill",
       component: _Pages_UnauthorizedBill_UnauthorizedBill_vue__WEBPACK_IMPORTED_MODULE_91__["default"],
       beforeEnter: function beforeEnter(to, from, next) {
-        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_93__["default"].UNAUTHORIZED_BILL + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_94__["default"].EDIT);
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].UNAUTHORIZED_BILL + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].EDIT);
       }
     }, {
       path: ROOT_URL + "/sales/report",
       name: "salesReport",
       component: _Pages_SalesReport_List_vue__WEBPACK_IMPORTED_MODULE_92__["default"],
       beforeEnter: function beforeEnter(to, from, next) {
-        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_93__["default"].SALES_REPORT + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_94__["default"].EDIT);
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].SALES_REPORT + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].EDIT);
+      }
+    }, {
+      path: ROOT_URL + "/company/bills",
+      name: "CompanyBills",
+      component: _Pages_CompanyBills_List_vue__WEBPACK_IMPORTED_MODULE_93__["default"],
+      beforeEnter: function beforeEnter(to, from, next) {
+        CheckPermission(to, from, next, _Helpers_Section__WEBPACK_IMPORTED_MODULE_94__["default"].SALES_REPORT + '-' + _Helpers_Action__WEBPACK_IMPORTED_MODULE_95__["default"].EDIT);
       }
     }]
   }]

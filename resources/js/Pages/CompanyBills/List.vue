@@ -4,18 +4,14 @@
             <div class="row page-titles">
                 <ol class="breadcrumb align-items-center ">
                     <li class="breadcrumb-item active"><router-link :to="{name: 'Dashboard'}">Home</router-link></li>
-                    <li class="breadcrumb-item"><a href="javascript:void(0)">Company Sale</a></li>
-                    <li style="margin-left: auto;" v-if="CheckPermission(Section.COMPANY_SALE + '-' + Action.CREATE)">
-                        <a class="btn btn-success text-white" style="padding: 8px 20px" v-if="selectedIDs.length > 0 && !generateLoading" @click="generateInvoice()" href="javascript:void(0)">Generate Invoice</a>
-                        <a class="btn btn-success text-white" style="padding: 8px 20px" v-if="selectedIDs.length > 0 && generateLoading" href="javascript:void(0)">Generating....</a>
-                    </li>
+                    <li class="breadcrumb-item"><a href="javascript:void(0)">Company Bills</a></li>
                 </ol>
             </div>
             <div class="row">
                 <div class="col-12">
                     <div class="card">
                         <div class="card-header bg-secondary">
-                            <h4 class="card-title">Company Sale</h4>
+                            <h4 class="card-title">Company Bills</h4>
                         </div>
                         <div class="card-body">
                             <div class="row mt-4">
@@ -270,7 +266,7 @@ export default {
             }
             this.Param.page = page.page;
             this.TableLoading = true
-            ApiService.POST(ApiRoutes.companySaleList, this.Param,res => {
+            ApiService.POST(ApiRoutes.companyBillsList, this.Param,res => {
                 this.TableLoading = false
                 if (parseInt(res.status) === 200) {
                     this.paginateData = res.data;
@@ -281,7 +277,7 @@ export default {
             });
         },
         Delete: function (data) {
-            ApiService.POST(ApiRoutes.companySaleDelete, {id: data.id },res => {
+            ApiService.POST(ApiRoutes.companyBillsDelete, {id: data.id },res => {
                 if (parseInt(res.status) === 200) {
                     this.$toast.success(res.message);
                     this.list()
@@ -310,7 +306,7 @@ export default {
 
     },
     mounted() {
-        $('#dashboard_bar').text('Company Sale')
+        $('#dashboard_bar').text('Company Bills')
     }
 }
 </script>

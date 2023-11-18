@@ -47,7 +47,8 @@
                         <li v-if="CheckPermission(Section.PAY_ORDER + '-' + Action.VIEW)"><router-link :to="{name: 'PayOrder'}">Pay Orders</router-link></li>
                         <li v-if="CheckPermission(Section.TRANSFER + '-' + Action.VIEW)"><router-link :to="{name:'balanceTransfer'}">Transfer</router-link></li>
                         <li v-if="CheckPermission(Section.EXPENSE + '-' + Action.VIEW)"><router-link :to="{name:'Expense'}">Expense</router-link></li>
-                        <li v-if="CheckPermission(Section.BILL + '-' + Action.VIEW)"><router-link :to="{name: 'Invoices'}">Bills </router-link></li>
+                        <li v-if="CheckPermission(Section.BILL + '-' + Action.VIEW)"><router-link :to="{name: 'Invoices'}">Invoices </router-link></li>
+                        <li v-if="CheckPermission(Section.BILL + '-' + Action.VIEW)"><router-link :to="{name: 'CompanyBills'}">Company Bills </router-link></li>
                     </ul>
 
                 </li>
