@@ -94,6 +94,7 @@ import fuelAdjustmentList from "../Pages/FuelAdjustment/List.vue";
 import fuelAdjustmentEdit from "../Pages/FuelAdjustment/Edit.vue";
 import UnauthorizedBill from "../Pages/UnauthorizedBill/UnauthorizedBill.vue";
 import salesReport from "../Pages/SalesReport/List.vue";
+import companyBills from "../Pages/CompanyBills/List.vue";
 
 const ROOT_URL = "";
 const router = new VueRouter({
@@ -516,6 +517,11 @@ const router = new VueRouter({
                 },
                 {
                     path: ROOT_URL + "/sales/report", name: "salesReport", component: salesReport,  beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.SALES_REPORT + '-' + Action.EDIT)
+                    },
+                },
+                {
+                    path: ROOT_URL + "/company/bills", name: "CompanyBills", component: companyBills,  beforeEnter: (to, from, next) => {
                         CheckPermission(to, from, next, Section.SALES_REPORT + '-' + Action.EDIT)
                     },
                 }
