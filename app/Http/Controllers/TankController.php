@@ -330,27 +330,22 @@ class TankController extends Controller
             ->where('tank_id', $inputData['tank_id'])
             ->where('client_company_id', $inputData['session_user']['client_company_id'])
             ->orderBy('id',  'DESC')
-            ->limit(2)
-            ->get()
-            ->toArray();
-
-        $start_height = isset($result[1]) ? $result[1]['height'] : 0;
-        $bstiChart = BstiChart::where('tank_id', $inputData['tank_id'])
-            ->where('height', '=', floor($start_height))
-            ->first();
-        $start_reading = $bstiChart != null ? $bstiChart['volume'] : 0;
-
-        $end_height = isset($result[0]) ? $result[0]['height'] : 0;
-        $bstiChart = BstiChart::where('tank_id', $inputData['tank_id'])
-            ->where('height', '=', floor($end_height))
-            ->first();
-        $end_reading = $bstiChart != null ? $bstiChart['volume'] : 0;
-
+           ->first();
+        $start_reading = 0;
+        $end_reading = 0;
+        if ($result instanceof TankLog) {
+            $start_reading = $result['height'];
+        }
+        $bstiChart = BstiChart::select('height', 'volume')->where('tank_id', $inputData['tank_id'])->get()->toArray();
+        $start_reading_mm = Helpers::filterBstiChart($bstiChart, floor($start_reading), 'height', 'volume');
+        $end_reading_mm = Helpers::filterBstiChart($bstiChart, floor($end_reading), 'height', 'volume');
         return response()->json([
             'status' => 200,
             'data' => [
+                'start_reading_mm' => $start_reading_mm,
+                'end_reading_mm' => $end_reading_mm,
                 'start_reading' => $start_reading,
-                'end_reading' => $end_reading,
+                'end_reading' => $end_reading
             ]
         ]);
     }
