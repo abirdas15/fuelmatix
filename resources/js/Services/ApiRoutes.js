@@ -220,7 +220,11 @@ const ApiRoutes = {
     FuelAdjustmentDelete: ApiVersion + '/fuelAdjustment/delete',
 
     //sales report
-    SalesReport: ApiVersion + '/report/sales'
+    SalesReport: ApiVersion + '/report/sales',
+
+    //Company Bills
+    CompanyBillList: ApiVersion + '/companyBill/list',
+    CompanyBillDownload: ApiVersion + '/companyBill/download',
 };
 
 export default ApiRoutes;

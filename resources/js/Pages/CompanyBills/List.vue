@@ -15,6 +15,26 @@
                         </div>
                         <div class="card-body">
                             <div class="row mt-4">
+                                <div class="col-12 d-flex mb-3 align-items-center">
+                                    <div class="form-group position-relative me-3 w-25">
+                                        <label for="year" class="form-label">Select Year<span class="text-danger">*</span></label>
+                                        <select v-model="Param.year" name="year" class="form-control form-select" id="year">
+                                            <option v-for="year in years(new Date().getFullYear()-5)" :value="year.id">{{ year.name}}</option>
+                                        </select>
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                    <div class="form-group me-3 w-25">
+                                        <label for="month" class="form-label">Select Month<span class="text-danger">*</span></label>
+                                        <select v-model="Param.month" name="month" class="form-control form-select" id="month">
+                                            <option v-for="month in months()" :value="month.id">{{ month.name}}</option>
+                                        </select>
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                    <div class="form-group mt-4">
+                                        <button @click="list" v-if="!TableLoading" class="btn btn-primary">Filter</button>
+                                        <button v-if="TableLoading" class="btn btn-primary">Filtering...</button>
+                                    </div>
+                                </div>
                                 <div class="table-responsive">
                                     <div class="dataTables_wrapper no-footer">
                                         <div class="dataTables_length">
@@ -36,30 +56,22 @@
                                         <table class="display  dataTable no-footer" style="min-width: 845px">
                                             <thead>
                                             <tr class="text-white" style="background-color: #4886EE;color:#ffffff">
-                                                <th>
-                                                    <input type="checkbox" class="form-check-input" @change="selectAll($event)">
-                                                </th>
-                                                <th class="text-white" @click="sortData('created_at')" :class="sortClass('created_at')">Date</th>
-                                                <th class="text-white" @click="sortData('name')" :class="sortClass('name')">Company</th>
-                                                <th class="text-white" @click="sortData('description')" :class="sortClass('description')">Car Number</th>
+                                                <th class="text-white" @click="sortData('name')" :class="sortClass('name')">Name</th>
                                                 <th class="text-white" @click="sortData('amount')" :class="sortClass('amount')">Amount</th>
                                                 <th class="text-white" style="width: 375px">Action</th>
                                             </tr>
                                             </thead>
                                             <tbody v-if="listData.length > 0 && TableLoading == false">
                                             <tr v-for="(f, i) in listData">
-                                                <td>
-                                                    <input v-if="!f.invoice_id" type="checkbox" :checked="isExist(f.id)" class="form-check-input" @change="selectIds($event, f.id)">
-                                                </td>
-                                                <td >{{f.created_at}}</td>
                                                 <td><a href="javascript:void(0);">{{f.name}}</a></td>
-                                                <td><a href="javascript:void(0);">{{f.description}}</a></td>
                                                 <td><a href="javascript:void(0);">{{f?.amount}}</a></td>
                                                 <td>
-                                                    <template v-if="f.module == 'shift sale' && CheckPermission(Section.COMPANY_SALE + '-' + Action.CREATE)">
-                                                        <button class="btn btn-sm btn-primary" v-if="!f.invoice_id"  @click="tableAction('expand', f)">Expand</button>
+                                                    <template>
+                                                        <button class="btn btn-sm btn-primary"  @click="tableAction('download', f, i)">
+                                                            <i class="fa-solid fa-file-pdf" :class="'genloading'+i" style="display: block"></i>
+                                                            <i class="fa fa-spinner fa-spin" :class="'genloading'+i" style="display: none"></i>
+                                                        </button>
                                                     </template>
-                                                    <router-link v-if="CheckPermission(Section.INVOICE + '-' + Action.VIEW) && f.invoice_id" :to="{name: 'InvoicesView', params: { id: f.invoice_id }}" class="btn btn-sm btn-info" @click="tableAction('view', f)">View Invoices</router-link>
                                                 </td>
                                             </tr>
                                             </tbody>
@@ -89,40 +101,6 @@
                 </div>
             </div>
         </div>
-        <div class="popup-wrapper-modal createExpand d-none">
-            <form @submit.prevent="expand" class="popup-box" style="max-width: 800px">
-                <button type="button" class=" btn  closeBtn"><i class="fas fa-times"></i></button>
-                <div class="row align-items-center" v-for="(e, i) in expandParam.data">
-                    <div class="col-sm-5">
-                        <div class="input-wrapper form-group mb-3">
-                            <label for="description">Car Number</label>
-                            <input type="text" class="w-100 form-control" name="description" id="description"
-                                   v-model="e.description" placeholder="Car Number">
-                            <small class="invalid-feedback"></small>
-                        </div>
-                    </div>
-                    <div class="col-sm-5">
-                        <div class="input-wrapper form-group mb-3">
-                            <label for="amount">Amount</label>
-                            <input type="text" class="w-100 form-control" name="amount" id="amount"
-                                   v-model="e.amount" placeholder="Amount here">
-                            <small class="invalid-feedback"></small>
-                        </div>
-                    </div>
-                    <div class="col-sm-2">
-                        <button class="btn btn-danger"  style="height: 54px" type="button" @click="spliceData(i)">
-                            <i class="fa-solid fa-xmark"></i>
-                        </button>
-                    </div>
-                </div>
-                <div class="text-end">
-                    <button type="button" class="btn btn-primary" @click="addMore">Add More</button>
-                </div>
-
-                <button type="submit" class="btn btn-primary " v-if="!Loading">Submit</button>
-                <button type="button" class="btn btn-primary " disabled v-if="Loading">Submitting...</button>
-            </form>
-        </div>
     </div>
 </template>
 
@@ -147,6 +125,8 @@ export default {
                 order_by: 'transactions.id',
                 order_mode: 'DESC',
                 page: 1,
+                month: '',
+                year: '',
             },
             Loading: false,
             generateLoading: false,
@@ -166,7 +146,7 @@ export default {
         },
     },
     created() {
-        this.list();
+        this.list()
     },
     computed: {
         Action() {
@@ -180,83 +160,19 @@ export default {
         },
     },
     methods: {
-        generateInvoice: function () {
-            this.generateLoading = true
-            ApiService.POST(ApiRoutes.invoiceGenerate, {ids: this.selectedIDs},res => {
-                this.generateLoading = false
-                if (parseInt(res.status) === 200) {
-                    this.selectedIDs = []
-                    this.$toast.success(res.message);
-                    this.list();
-                } else {
-                    this.$toast.error(res.error)
-                }
-            });
-        },
-        isExist: function (id) {
-            let index = this.selectedIDs.indexOf(id)
-            return index > -1;
-        },
-        selectIds: function (e, id) {
-            if (e.target.checked) {
-                this.selectedIDs.push(id)
-            } else {
-                this.selectedIDs.splice(this.selectedIDs.indexOf(id), 1)
-            }
-        },
-        selectAll: function (e) {
-            if (e.target.checked) {
-                this.listData.map(v => {
-                    if (!v.invoice_id) {
-                        this.selectedIDs.push(v.id)
-                    }
-                })
-            } else {
-                this.selectedIDs = []
-            }
-        },
-        expand: function () {
-            ApiService.POST(ApiRoutes.TransactionSplit, this.expandParam,res => {
-                if (parseInt(res.status) === 200) {
-                    this.$toast.success(res.message);
-                    $('.createExpand').addClass('d-none')
-                    this.list()
-                } else {
-                    this.$toast.error(res.error)
-                    ApiService.ErrorHandler(res.error);
-                }
-            });
-        },
         tableAction: function (e, data, i = null) {
-            if (e == 'expand') {
-                this.selectedData = data
-                this.expandParam.id = data.id
-                this.expandParam.data = []
-                this.expandParam.data.push({amount: 0, description: ''})
-                $('.createExpand').removeClass('d-none')
-            } else if (e == 'generate') {
-                if (data.is_invoice) {
-                    this.$toast.success('Invoice already Created');
-                    return;
-                }
+            if (e == 'download') {
+                this.Param.company_id = data.id
                 $('.genloading'+ i).toggle()
-                ApiService.POST(ApiRoutes.invoiceGenerate, {id: data.id},res => {
+                ApiService.DOWNLOAD(ApiRoutes.CompanyBillDownload, this.Param,'',res => {
                     $('.genloading'+ i).toggle()
-                    if (parseInt(res.status) === 200) {
-                        this.$toast.success(res.message);
-                        this.list()
-                    } else {
-                        ApiService.ErrorHandler(res.errors);
-                    }
+                    let blob = new Blob([res], {type: 'pdf'});
+                    const link = document.createElement('a');
+                    link.href = window.URL.createObjectURL(blob);
+                    link.download = 'Company Bills.pdf';
+                    link.click();
                 });
-
             }
-        },
-        addMore: function () {
-            this.expandParam.data.push({amount: 0, description: ''})
-        },
-        spliceData: function (i) {
-            this.expandParam.data.splice(i, 1)
         },
         list: function (page) {
             if (page == undefined) {
@@ -265,22 +181,18 @@ export default {
                 };
             }
             this.Param.page = page.page;
+            if (this.Param.month == '') {
+                this.Param.month = new Date().getMonth()+1
+            }
+            if (this.Param.year == '') {
+                this.Param.year = new Date().getFullYear()
+            }
             this.TableLoading = true
-            ApiService.POST(ApiRoutes.companyBillsList, this.Param,res => {
+            ApiService.POST(ApiRoutes.CompanyBillList, this.Param,res => {
                 this.TableLoading = false
                 if (parseInt(res.status) === 200) {
                     this.paginateData = res.data;
                     this.listData = res.data.data;
-                } else {
-                    ApiService.ErrorHandler(res.error);
-                }
-            });
-        },
-        Delete: function (data) {
-            ApiService.POST(ApiRoutes.companyBillsDelete, {id: data.id },res => {
-                if (parseInt(res.status) === 200) {
-                    this.$toast.success(res.message);
-                    this.list()
                 } else {
                     ApiService.ErrorHandler(res.error);
                 }

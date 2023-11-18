@@ -3110,7 +3110,9 @@ __webpack_require__.r(__webpack_exports__);
         limit: 10,
         order_by: 'transactions.id',
         order_mode: 'DESC',
-        page: 1
+        page: 1,
+        month: '',
+        year: ''
       },
       Loading: false,
       generateLoading: false,
@@ -3144,125 +3146,43 @@ __webpack_require__.r(__webpack_exports__);
     }
   },
   methods: {
-    generateInvoice: function generateInvoice() {
-      var _this = this;
-      this.generateLoading = true;
-      _Services_ApiService__WEBPACK_IMPORTED_MODULE_1__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_2__["default"].invoiceGenerate, {
-        ids: this.selectedIDs
-      }, function (res) {
-        _this.generateLoading = false;
-        if (parseInt(res.status) === 200) {
-          _this.selectedIDs = [];
-          _this.$toast.success(res.message);
-          _this.list();
-        } else {
-          _this.$toast.error(res.error);
-        }
-      });
-    },
-    isExist: function isExist(id) {
-      var index = this.selectedIDs.indexOf(id);
-      return index > -1;
-    },
-    selectIds: function selectIds(e, id) {
-      if (e.target.checked) {
-        this.selectedIDs.push(id);
-      } else {
-        this.selectedIDs.splice(this.selectedIDs.indexOf(id), 1);
-      }
-    },
-    selectAll: function selectAll(e) {
-      var _this2 = this;
-      if (e.target.checked) {
-        this.listData.map(function (v) {
-          if (!v.invoice_id) {
-            _this2.selectedIDs.push(v.id);
-          }
-        });
-      } else {
-        this.selectedIDs = [];
-      }
-    },
-    expand: function expand() {
-      var _this3 = this;
-      _Services_ApiService__WEBPACK_IMPORTED_MODULE_1__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_2__["default"].TransactionSplit, this.expandParam, function (res) {
-        if (parseInt(res.status) === 200) {
-          _this3.$toast.success(res.message);
-          $('.createExpand').addClass('d-none');
-          _this3.list();
-        } else {
-          _this3.$toast.error(res.error);
-          _Services_ApiService__WEBPACK_IMPORTED_MODULE_1__["default"].ErrorHandler(res.error);
-        }
-      });
-    },
     tableAction: function tableAction(e, data) {
-      var _this4 = this;
       var i = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
-      if (e == 'expand') {
-        this.selectedData = data;
-        this.expandParam.id = data.id;
-        this.expandParam.data = [];
-        this.expandParam.data.push({
-          amount: 0,
-          description: ''
-        });
-        $('.createExpand').removeClass('d-none');
-      } else if (e == 'generate') {
-        if (data.is_invoice) {
-          this.$toast.success('Invoice already Created');
-          return;
-        }
+      if (e == 'download') {
+        this.Param.company_id = data.id;
         $('.genloading' + i).toggle();
-        _Services_ApiService__WEBPACK_IMPORTED_MODULE_1__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_2__["default"].invoiceGenerate, {
-          id: data.id
-        }, function (res) {
+        _Services_ApiService__WEBPACK_IMPORTED_MODULE_1__["default"].DOWNLOAD(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_2__["default"].CompanyBillDownload, this.Param, '', function (res) {
           $('.genloading' + i).toggle();
-          if (parseInt(res.status) === 200) {
-            _this4.$toast.success(res.message);
-            _this4.list();
-          } else {
-            _Services_ApiService__WEBPACK_IMPORTED_MODULE_1__["default"].ErrorHandler(res.errors);
-          }
+          var blob = new Blob([res], {
+            type: 'pdf'
+          });
+          var link = document.createElement('a');
+          link.href = window.URL.createObjectURL(blob);
+          link.download = 'Company Bills.pdf';
+          link.click();
         });
       }
-    },
-    addMore: function addMore() {
-      this.expandParam.data.push({
-        amount: 0,
-        description: ''
-      });
-    },
-    spliceData: function spliceData(i) {
-      this.expandParam.data.splice(i, 1);
     },
     list: function list(page) {
-      var _this5 = this;
+      var _this = this;
       if (page == undefined) {
         page = {
           page: 1
         };
       }
       this.Param.page = page.page;
+      if (this.Param.month == '') {
+        this.Param.month = new Date().getMonth() + 1;
+      }
+      if (this.Param.year == '') {
+        this.Param.year = new Date().getFullYear();
+      }
       this.TableLoading = true;
-      _Services_ApiService__WEBPACK_IMPORTED_MODULE_1__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_2__["default"].companyBillsList, this.Param, function (res) {
-        _this5.TableLoading = false;
+      _Services_ApiService__WEBPACK_IMPORTED_MODULE_1__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_2__["default"].CompanyBillList, this.Param, function (res) {
+        _this.TableLoading = false;
         if (parseInt(res.status) === 200) {
-          _this5.paginateData = res.data;
-          _this5.listData = res.data.data;
-        } else {
-          _Services_ApiService__WEBPACK_IMPORTED_MODULE_1__["default"].ErrorHandler(res.error);
-        }
-      });
-    },
-    Delete: function Delete(data) {
-      var _this6 = this;
-      _Services_ApiService__WEBPACK_IMPORTED_MODULE_1__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_2__["default"].companyBillsDelete, {
-        id: data.id
-      }, function (res) {
-        if (parseInt(res.status) === 200) {
-          _this6.$toast.success(res.message);
-          _this6.list();
+          _this.paginateData = res.data;
+          _this.listData = res.data.data;
         } else {
           _Services_ApiService__WEBPACK_IMPORTED_MODULE_1__["default"].ErrorHandler(res.error);
         }
@@ -15092,6 +15012,83 @@ var render = function render() {
   }, [_c("div", {
     staticClass: "row mt-4"
   }, [_c("div", {
+    staticClass: "col-12 d-flex mb-3 align-items-center"
+  }, [_c("div", {
+    staticClass: "form-group position-relative me-3 w-25"
+  }, [_vm._m(2), _vm._v(" "), _c("select", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.Param.year,
+      expression: "Param.year"
+    }],
+    staticClass: "form-control form-select",
+    attrs: {
+      name: "year",
+      id: "year"
+    },
+    on: {
+      change: function change($event) {
+        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
+          return o.selected;
+        }).map(function (o) {
+          var val = "_value" in o ? o._value : o.value;
+          return val;
+        });
+        _vm.$set(_vm.Param, "year", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
+      }
+    }
+  }, _vm._l(_vm.years(new Date().getFullYear() - 5), function (year) {
+    return _c("option", {
+      domProps: {
+        value: year.id
+      }
+    }, [_vm._v(_vm._s(year.name))]);
+  }), 0), _vm._v(" "), _c("div", {
+    staticClass: "invalid-feedback"
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "form-group me-3 w-25"
+  }, [_vm._m(3), _vm._v(" "), _c("select", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.Param.month,
+      expression: "Param.month"
+    }],
+    staticClass: "form-control form-select",
+    attrs: {
+      name: "month",
+      id: "month"
+    },
+    on: {
+      change: function change($event) {
+        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
+          return o.selected;
+        }).map(function (o) {
+          var val = "_value" in o ? o._value : o.value;
+          return val;
+        });
+        _vm.$set(_vm.Param, "month", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
+      }
+    }
+  }, _vm._l(_vm.months(), function (month) {
+    return _c("option", {
+      domProps: {
+        value: month.id
+      }
+    }, [_vm._v(_vm._s(month.name))]);
+  }), 0), _vm._v(" "), _c("div", {
+    staticClass: "invalid-feedback"
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "form-group mt-4"
+  }, [!_vm.TableLoading ? _c("button", {
+    staticClass: "btn btn-primary",
+    on: {
+      click: _vm.list
+    }
+  }, [_vm._v("Filter")]) : _vm._e(), _vm._v(" "), _vm.TableLoading ? _c("button", {
+    staticClass: "btn btn-primary"
+  }, [_vm._v("Filtering...")]) : _vm._e()])]), _vm._v(" "), _c("div", {
     staticClass: "table-responsive"
   }, [_c("div", {
     staticClass: "dataTables_wrapper no-footer"
@@ -15170,25 +15167,7 @@ var render = function render() {
       "background-color": "#4886EE",
       color: "#ffffff"
     }
-  }, [_c("th", [_c("input", {
-    staticClass: "form-check-input",
-    attrs: {
-      type: "checkbox"
-    },
-    on: {
-      change: function change($event) {
-        return _vm.selectAll($event);
-      }
-    }
-  })]), _vm._v(" "), _c("th", {
-    staticClass: "text-white",
-    "class": _vm.sortClass("created_at"),
-    on: {
-      click: function click($event) {
-        return _vm.sortData("created_at");
-      }
-    }
-  }, [_vm._v("Date")]), _vm._v(" "), _c("th", {
+  }, [_c("th", {
     staticClass: "text-white",
     "class": _vm.sortClass("name"),
     on: {
@@ -15196,15 +15175,7 @@ var render = function render() {
         return _vm.sortData("name");
       }
     }
-  }, [_vm._v("Company")]), _vm._v(" "), _c("th", {
-    staticClass: "text-white",
-    "class": _vm.sortClass("description"),
-    on: {
-      click: function click($event) {
-        return _vm.sortData("description");
-      }
-    }
-  }, [_vm._v("Car Number")]), _vm._v(" "), _c("th", {
+  }, [_vm._v("Name")]), _vm._v(" "), _c("th", {
     staticClass: "text-white",
     "class": _vm.sortClass("amount"),
     on: {
@@ -15218,20 +15189,7 @@ var render = function render() {
       width: "375px"
     }
   }, [_vm._v("Action")])])]), _vm._v(" "), _vm.listData.length > 0 && _vm.TableLoading == false ? _c("tbody", _vm._l(_vm.listData, function (f, i) {
-    return _c("tr", [_c("td", [!f.invoice_id ? _c("input", {
-      staticClass: "form-check-input",
-      attrs: {
-        type: "checkbox"
-      },
-      domProps: {
-        checked: _vm.isExist(f.id)
-      },
-      on: {
-        change: function change($event) {
-          return _vm.selectIds($event, f.id);
-        }
-      }
-    }) : _vm._e()]), _vm._v(" "), _c("td", [_vm._v(_vm._s(f.created_at))]), _vm._v(" "), _c("td", [_c("a", {
+    return _c("tr", [_c("td", [_c("a", {
       attrs: {
         href: "javascript:void(0);"
       }
@@ -15239,34 +15197,27 @@ var render = function render() {
       attrs: {
         href: "javascript:void(0);"
       }
-    }, [_vm._v(_vm._s(f.description))])]), _vm._v(" "), _c("td", [_c("a", {
-      attrs: {
-        href: "javascript:void(0);"
-      }
-    }, [_vm._v(_vm._s(f === null || f === void 0 ? void 0 : f.amount))])]), _vm._v(" "), _c("td", [f.module == "shift sale" && _vm.CheckPermission(_vm.Section.COMPANY_SALE + "-" + _vm.Action.CREATE) ? [!f.invoice_id ? _c("button", {
+    }, [_vm._v(_vm._s(f === null || f === void 0 ? void 0 : f.amount))])]), _vm._v(" "), _c("td", [[_c("button", {
       staticClass: "btn btn-sm btn-primary",
       on: {
         click: function click($event) {
-          return _vm.tableAction("expand", f);
+          return _vm.tableAction("download", f, i);
         }
       }
-    }, [_vm._v("Expand")]) : _vm._e()] : _vm._e(), _vm._v(" "), _vm.CheckPermission(_vm.Section.INVOICE + "-" + _vm.Action.VIEW) && f.invoice_id ? _c("router-link", {
-      staticClass: "btn btn-sm btn-info",
-      attrs: {
-        to: {
-          name: "InvoicesView",
-          params: {
-            id: f.invoice_id
-          }
-        }
-      },
-      on: {
-        click: function click($event) {
-          return _vm.tableAction("view", f);
-        }
+    }, [_c("i", {
+      staticClass: "fa-solid fa-file-pdf",
+      "class": "genloading" + i,
+      staticStyle: {
+        display: "block"
       }
-    }, [_vm._v("View Invoices")]) : _vm._e()], 2)]);
-  }), 0) : _vm._e(), _vm._v(" "), _vm.listData.length == 0 && _vm.TableLoading == false ? _c("tbody", [_vm._m(2)]) : _vm._e(), _vm._v(" "), _vm.TableLoading == true ? _c("tbody", [_vm._m(3)]) : _vm._e()]), _vm._v(" "), _vm.paginateData != null ? _c("div", {
+    }), _vm._v(" "), _c("i", {
+      staticClass: "fa fa-spinner fa-spin",
+      "class": "genloading" + i,
+      staticStyle: {
+        display: "none"
+      }
+    })])]], 2)]);
+  }), 0) : _vm._e(), _vm._v(" "), _vm.listData.length == 0 && _vm.TableLoading == false ? _c("tbody", [_vm._m(4)]) : _vm._e(), _vm._v(" "), _vm.TableLoading == true ? _c("tbody", [_vm._m(5)]) : _vm._e()]), _vm._v(" "), _vm.paginateData != null ? _c("div", {
     staticClass: "dataTables_info",
     attrs: {
       id: "example3_info",
@@ -15283,128 +15234,7 @@ var render = function render() {
       data: _vm.paginateData,
       onChange: _vm.list
     }
-  })], 1)])])])])])])])]), _vm._v(" "), _c("div", {
-    staticClass: "popup-wrapper-modal createExpand d-none"
-  }, [_c("form", {
-    staticClass: "popup-box",
-    staticStyle: {
-      "max-width": "800px"
-    },
-    on: {
-      submit: function submit($event) {
-        $event.preventDefault();
-        return _vm.expand.apply(null, arguments);
-      }
-    }
-  }, [_vm._m(4), _vm._v(" "), _vm._l(_vm.expandParam.data, function (e, i) {
-    return _c("div", {
-      staticClass: "row align-items-center"
-    }, [_c("div", {
-      staticClass: "col-sm-5"
-    }, [_c("div", {
-      staticClass: "input-wrapper form-group mb-3"
-    }, [_c("label", {
-      attrs: {
-        "for": "description"
-      }
-    }, [_vm._v("Car Number")]), _vm._v(" "), _c("input", {
-      directives: [{
-        name: "model",
-        rawName: "v-model",
-        value: e.description,
-        expression: "e.description"
-      }],
-      staticClass: "w-100 form-control",
-      attrs: {
-        type: "text",
-        name: "description",
-        id: "description",
-        placeholder: "Car Number"
-      },
-      domProps: {
-        value: e.description
-      },
-      on: {
-        input: function input($event) {
-          if ($event.target.composing) return;
-          _vm.$set(e, "description", $event.target.value);
-        }
-      }
-    }), _vm._v(" "), _c("small", {
-      staticClass: "invalid-feedback"
-    })])]), _vm._v(" "), _c("div", {
-      staticClass: "col-sm-5"
-    }, [_c("div", {
-      staticClass: "input-wrapper form-group mb-3"
-    }, [_c("label", {
-      attrs: {
-        "for": "amount"
-      }
-    }, [_vm._v("Amount")]), _vm._v(" "), _c("input", {
-      directives: [{
-        name: "model",
-        rawName: "v-model",
-        value: e.amount,
-        expression: "e.amount"
-      }],
-      staticClass: "w-100 form-control",
-      attrs: {
-        type: "text",
-        name: "amount",
-        id: "amount",
-        placeholder: "Amount here"
-      },
-      domProps: {
-        value: e.amount
-      },
-      on: {
-        input: function input($event) {
-          if ($event.target.composing) return;
-          _vm.$set(e, "amount", $event.target.value);
-        }
-      }
-    }), _vm._v(" "), _c("small", {
-      staticClass: "invalid-feedback"
-    })])]), _vm._v(" "), _c("div", {
-      staticClass: "col-sm-2"
-    }, [_c("button", {
-      staticClass: "btn btn-danger",
-      staticStyle: {
-        height: "54px"
-      },
-      attrs: {
-        type: "button"
-      },
-      on: {
-        click: function click($event) {
-          return _vm.spliceData(i);
-        }
-      }
-    }, [_c("i", {
-      staticClass: "fa-solid fa-xmark"
-    })])])]);
-  }), _vm._v(" "), _c("div", {
-    staticClass: "text-end"
-  }, [_c("button", {
-    staticClass: "btn btn-primary",
-    attrs: {
-      type: "button"
-    },
-    on: {
-      click: _vm.addMore
-    }
-  }, [_vm._v("Add More")])]), _vm._v(" "), !_vm.Loading ? _c("button", {
-    staticClass: "btn btn-primary",
-    attrs: {
-      type: "submit"
-    }
-  }, [_vm._v("Submit")]) : _vm._e(), _vm._v(" "), _vm.Loading ? _c("button", {
-    staticClass: "btn btn-primary",
-    attrs: {
-      type: "button",
-      disabled: ""
-    }
-  }, [_vm._v("Submitting...")]) : _vm._e()], 2)])]);
+  })], 1)])])])])])])])])]);
 };
 var staticRenderFns = [function () {
   var _vm = this,
@@ -15427,6 +15257,28 @@ var staticRenderFns = [function () {
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
+  return _c("label", {
+    staticClass: "form-label",
+    attrs: {
+      "for": "year"
+    }
+  }, [_vm._v("Select Year"), _c("span", {
+    staticClass: "text-danger"
+  }, [_vm._v("*")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("label", {
+    staticClass: "form-label",
+    attrs: {
+      "for": "month"
+    }
+  }, [_vm._v("Select Month"), _c("span", {
+    staticClass: "text-danger"
+  }, [_vm._v("*")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
   return _c("tr", [_c("td", {
     staticClass: "text-center",
     attrs: {
@@ -15442,17 +15294,6 @@ var staticRenderFns = [function () {
       colspan: "10"
     }
   }, [_vm._v("Loading....")])]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("button", {
-    staticClass: "btn closeBtn",
-    attrs: {
-      type: "button"
-    }
-  }, [_c("i", {
-    staticClass: "fas fa-times"
-  })]);
 }];
 render._withStripped = true;
 
@@ -38644,7 +38485,7 @@ exports = module.exports = __webpack_require__(/*! ../../../../../node_modules/c
 
 
 // module
-exports.push([module.i, "\n.input-group-text[data-v-5a662738]{\r\n    border-top-left-radius: 0;\r\n    border-bottom-left-radius: 0;\r\n    border: 1px solid #c3bfbf;\r\n    padding: 16.5px 15px;\n}\n@media only screen and (max-width: 1366px) {\n.input-group-text[data-v-5a662738]{\r\n        padding: 10.5px 15px;\n}\n}\r\n", ""]);
+exports.push([module.i, "\n.input-group-text[data-v-5a662738]{\n    border-top-left-radius: 0;\n    border-bottom-left-radius: 0;\n    border: 1px solid #c3bfbf;\n    padding: 16.5px 15px;\n}\n@media only screen and (max-width: 1366px) {\n.input-group-text[data-v-5a662738]{\n        padding: 10.5px 15px;\n}\n}\n", ""]);
 
 // exports
 
@@ -38663,7 +38504,7 @@ exports = module.exports = __webpack_require__(/*! ../../../../../node_modules/c
 
 
 // module
-exports.push([module.i, "\n.input-group-text[data-v-ac6c809c]{\r\n    border-top-left-radius: 0;\r\n    border-bottom-left-radius: 0;\r\n    border: 1px solid #c3bfbf;\r\n    padding: 16.5px 15px;\n}\n.input-group-append[data-v-ac6c809c] {\r\n    width: 25%;\n}\n@media only screen and (max-width: 1366px) {\n.input-group-text[data-v-ac6c809c]{\r\n        padding: 10.5px 15px;\n}\n}\r\n", ""]);
+exports.push([module.i, "\n.input-group-text[data-v-ac6c809c]{\n    border-top-left-radius: 0;\n    border-bottom-left-radius: 0;\n    border: 1px solid #c3bfbf;\n    padding: 16.5px 15px;\n}\n.input-group-append[data-v-ac6c809c] {\n    width: 25%;\n}\n@media only screen and (max-width: 1366px) {\n.input-group-text[data-v-ac6c809c]{\n        padding: 10.5px 15px;\n}\n}\n", ""]);
 
 // exports
 
@@ -38701,7 +38542,7 @@ exports = module.exports = __webpack_require__(/*! ../../../../node_modules/css-
 
 
 // module
-exports.push([module.i, "\n.box-mula[data-v-0d4183dd]{\n    padding: 10px 30px;\n    box-shadow: 0 0 15px 0 #CBC9C8;\n    border-radius: 12px;\n    margin-bottom: 30px;\n    margin-top: 10px;\n}\n.putkir-futa[data-v-0d4183dd]{\n    border-bottom: 1px solid #c1c1c1;\n    margin: 10px 0px 15px 0px;\n    padding-bottom: 11px;\n}\n", ""]);
+exports.push([module.i, "\n.box-mula[data-v-0d4183dd]{\r\n    padding: 10px 30px;\r\n    box-shadow: 0 0 15px 0 #CBC9C8;\r\n    border-radius: 12px;\r\n    margin-bottom: 30px;\r\n    margin-top: 10px;\n}\n.putkir-futa[data-v-0d4183dd]{\r\n    border-bottom: 1px solid #c1c1c1;\r\n    margin: 10px 0px 15px 0px;\r\n    padding-bottom: 11px;\n}\r\n", ""]);
 
 // exports
 
@@ -99101,7 +98942,10 @@ var ApiRoutes = {
   FuelAdjustmentUpdate: ApiVersion + '/fuelAdjustment/update',
   FuelAdjustmentDelete: ApiVersion + '/fuelAdjustment/delete',
   //sales report
-  SalesReport: ApiVersion + '/report/sales'
+  SalesReport: ApiVersion + '/report/sales',
+  //Company Bills
+  CompanyBillList: ApiVersion + '/companyBill/list',
+  CompanyBillDownload: ApiVersion + '/companyBill/download'
 };
 /* harmony default export */ __webpack_exports__["default"] = (ApiRoutes);
 
@@ -99464,7 +99308,7 @@ var app = new vue__WEBPACK_IMPORTED_MODULE_1___default.a({
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! D:\xampp7.4\htdocs\fuelmatix\resources\js\app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! D:\xampp\htdocs\projects\fuelmatix\resources\js\app.js */"./resources/js/app.js");
 
 
 /***/ })
