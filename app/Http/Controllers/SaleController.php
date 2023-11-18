@@ -118,7 +118,7 @@ class SaleController extends Controller
             $cash_in_hand_category_id = $category['id'];
         }
         $sale = new Sale();
-        $sale->date = Carbon::parse($requestData['date'])->format('Y-m-d H:i:s');
+        $sale->date = Carbon::parse($requestData['date']. date('H:i:s'))->format('Y-m-d H:i:s');
         $sale->invoice_number = Sale::getInvoiceNumber();
         $sale->total_amount = $total_amount;
         $sale->driver_tip = $requestData['driver_tip'] ?? 0;
@@ -329,7 +329,7 @@ class SaleController extends Controller
             ->where('categories.parent_category', $accountReceivable->id)
             ->where('transactions.debit_amount', '>', 0)
             ->where('transactions.client_company_id', $sessionUser['client_company_id'])
-            ->groupBy(DB::raw('invoice_item.invoice_id  , CASE WHEN invoice_item.invoice_id IS NULL THEN transactions.module_id ELSE 0 END'));
+            ->groupBy(DB::raw('CASE WHEN invoice_item.invoice_id IS NULL THEN transactions.id ELSE invoice_item.invoice_id END, CASE WHEN invoice_item.invoice_id IS NULL THEN transactions.module_id ELSE 0 END'));
         if (!empty($keyword)) {
             $result->where(function($q) use ($keyword) {
                 $q->where('categories.name', 'LIKE', '%'.$keyword.'%');

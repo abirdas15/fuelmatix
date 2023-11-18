@@ -249,7 +249,7 @@ class TransactionController extends Controller
                 'credit_amount' => $transaction['debit_amount'] == 0 ? $data['amount'] : 0,
                 'file' => $transaction['file'] ?? null,
                 'linked_id' => $transaction['linked_id'],
-                'added_by' => $transaction['added_by'],
+                'user_id' => $transaction['user_id'],
                 'module' => $transaction['module'],
                 'module_id' => $transaction['module_id'],
                 'client_company_id' => $transaction['client_company_id'],

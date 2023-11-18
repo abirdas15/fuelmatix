@@ -73,6 +73,7 @@
     <table class="table" style="width: 95%; margin-bottom: 30px">
         <thead>
         <tr>
+            <th>Date</th>
             <th>Product</th>
             <th>Car Number</th>
             <th style="text-align: center">Quantity</th>
@@ -83,6 +84,7 @@
         <tbody>
         @foreach($data['invoice_item'] as $item)
             <tr>
+                <td>{{ $item['date'] }}</td>
                 <td>{{ $item['product_name'] }}</td>
                 <td>{{ $item['car_number'] }}</td>
                 <td style="text-align: center">{{ $item['quantity'] }}</td>
@@ -93,7 +95,7 @@
         </tbody>
         <tfoot>
         <tr>
-            <th colspan="4" style="text-align: right">Total</th>
+            <th colspan="5" style="text-align: right">Total</th>
             <th style="text-align: right">{{ $data['amount'] }}</th>
         </tr>
         </tfoot>

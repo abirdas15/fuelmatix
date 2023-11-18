@@ -27238,7 +27238,7 @@ var render = function render() {
   }, [_c("table", {
     staticClass: "table table-bordered align-top"
   }, [_vm._m(4), _vm._v(" "), _c("tbody", [_vm._l((_vm$param = _vm.param) === null || _vm$param === void 0 ? void 0 : _vm$param.invoice_item, function (item) {
-    return _c("tr", [_c("td", [_vm._v(_vm._s(item.product_name))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(item.car_number))]), _vm._v(" "), _c("td", {
+    return _c("tr", [_c("td", [_vm._v(_vm._s(item.date))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(item.product_name))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(item.car_number))]), _vm._v(" "), _c("td", {
       staticClass: "text-center"
     }, [_vm._v(_vm._s(item.quantity))]), _vm._v(" "), _c("td", {
       staticClass: "text-end"
@@ -27299,6 +27299,10 @@ var staticRenderFns = [function () {
     staticStyle: {
       "background-color": "rgba(134,183,255,0.9)"
     }
+  }, [_vm._v("Date")]), _vm._v(" "), _c("th", {
+    staticStyle: {
+      "background-color": "rgba(134,183,255,0.9)"
+    }
   }, [_vm._v("Product")]), _vm._v(" "), _c("th", {
     staticStyle: {
       "background-color": "rgba(134,183,255,0.9)"
@@ -27325,7 +27329,7 @@ var staticRenderFns = [function () {
   return _c("th", {
     staticClass: "text-end",
     attrs: {
-      colspan: "4"
+      colspan: "5"
     }
   }, [_c("strong", [_vm._v("Total")])]);
 }];

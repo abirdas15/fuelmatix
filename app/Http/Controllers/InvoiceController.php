@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Common\AccountCategory;
+use App\Common\FuelMatixDateTimeFormat;
 use App\Common\Module;
+use App\Helpers\Helpers;
 use App\Helpers\SessionUser;
 use App\Models\Category;
 use App\Models\ClientCompany;
@@ -50,8 +52,9 @@ class InvoiceController extends Controller
             $invoiceItem = [];
             foreach ($data as $row) {
                 if ($row['module'] == Module::POS_SALE) {
-                    $posSale = SaleData::select('product_id', 'quantity', 'price', 'subtotal')
-                        ->where('sale_id', $row['module_id'])
+                    $posSale = SaleData::select('sale_data.product_id', 'sale_data.quantity', 'sale_data.price', 'sale_data.subtotal', 'sale.date')
+                        ->leftJoin('sale', 'sale.id', 'sale_data.sale_id')
+                        ->where('sale_data.sale_id', $row['module_id'])
                         ->get()
                         ->toArray();
                     foreach ($posSale as &$sale) {
@@ -60,7 +63,7 @@ class InvoiceController extends Controller
                         $invoiceItem[] = $sale;
                     }
                 } else if ($row['module'] == Module::SHIFT_SALE) {
-                    $shiftSale = ShiftSale::select('shift_sale.product_id', 'products.selling_price as price')
+                    $shiftSale = ShiftSale::select('shift_sale.product_id', 'products.selling_price as price', 'shift_sale.date')
                         ->leftJoin('products', 'products.id', '=', 'shift_sale.product_id')
                         ->where('shift_sale.id', $row['module_id'])
                         ->first();
@@ -91,6 +94,7 @@ class InvoiceController extends Controller
                     $invoiceItemObj->quantity = $item['quantity'];
                     $invoiceItemObj->price = $item['price'];
                     $invoiceItemObj->subtotal = $item['subtotal'];
+                    $invoiceItemObj->date = Carbon::parse($item['date'])->format('Y-m-d');
                     $invoiceItemObj->save();
                 }
             }
@@ -109,7 +113,7 @@ class InvoiceController extends Controller
         $orderBy = $requestData['order_by'] ?? 'invoices.id';
         $orderMode = $requestData['order_mode'] ?? 'DESC';
         $keyword = $requestData['keyword'] ?? '';
-        $result = Invoice::select('invoices.*', 'categories.category as name', DB::raw('(invoices.amount - invoices.paid_amount) as due_amount'))
+        $result = Invoice::select('invoices.*', 'categories.name', DB::raw('(invoices.amount - invoices.paid_amount) as due_amount'))
             ->leftJoin('categories', 'categories.id', '=', 'invoices.category_id')
             ->where('invoices.client_company_id', $sessionUser['client_company_id']);
         $result = $result->orderBy($orderBy, $orderMode)
@@ -208,7 +212,7 @@ class InvoiceController extends Controller
         $invoice['customer_company'] = $category;
         $invoice['company'] = $company;
         $invoice['amount'] = number_format($invoice['amount'], 2);
-        $invoiceItem = InvoiceItem::select('invoice_item.id', 'invoice_item.car_number', 'invoice_item.quantity', 'invoice_item.price', 'invoice_item.subtotal', 'products.name as product_name')
+        $invoiceItem = InvoiceItem::select('invoice_item.id', 'invoice_item.date', 'invoice_item.car_number', 'invoice_item.quantity', 'invoice_item.price', 'invoice_item.subtotal', 'products.name as product_name')
             ->leftJoin('products', 'products.id', 'invoice_item.product_id')
             ->where('invoice_item.invoice_id', $requestData['id'])
             ->get()
@@ -217,6 +221,7 @@ class InvoiceController extends Controller
             $item['price'] = number_format($item['price'], 2);
             $item['subtotal'] = number_format($item['subtotal'], 2);
             $item['quantity'] = number_format($item['quantity'], 2);
+            $item['date'] = !empty($item['date']) ? Helpers::formatDate($item['date'], FuelMatixDateTimeFormat::STANDARD_DATE) : '';
         }
         $invoice['invoice_item'] = $invoiceItem;
         return response()->json(['status' => 200, 'data' => $invoice]);
@@ -247,7 +252,7 @@ class InvoiceController extends Controller
         $invoice['customer_company'] = $category;
         $invoice['company'] = $company;
         $invoice['amount'] = number_format($invoice['amount'], 2);
-        $invoiceItem = InvoiceItem::select('invoice_item.id', 'invoice_item.car_number', 'invoice_item.quantity', 'invoice_item.price', 'invoice_item.subtotal', 'products.name as product_name')
+        $invoiceItem = InvoiceItem::select('invoice_item.id', 'invoice_item.date', 'invoice_item.car_number', 'invoice_item.quantity', 'invoice_item.price', 'invoice_item.subtotal', 'products.name as product_name')
             ->leftJoin('products', 'products.id', 'invoice_item.product_id')
             ->where('invoice_item.invoice_id', $requestData['id'])
             ->get()
@@ -256,6 +261,7 @@ class InvoiceController extends Controller
             $item['price'] = number_format($item['price'], 2);
             $item['subtotal'] = number_format($item['subtotal'], 2);
             $item['quantity'] = number_format($item['quantity'], 2);
+            $item['date'] = !empty($item['date']) ? Helpers::formatDate($item['date'], FuelMatixDateTimeFormat::STANDARD_DATE) : '';
         }
         $invoice['invoice_item'] = $invoiceItem;
         $pdf = Pdf::loadView('pdf.invoice', ['data' => $invoice]);
