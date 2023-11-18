@@ -63,45 +63,84 @@
                                                         <div class="mb-3 col-md-2">
                                                             <label>Consumption </label>
                                                         </div>
+                                                        <div class="col-md-2 offset-2 mb-3">
+                                                            <div class="input-group">
+                                                                <input disabled id="prReading"
+                                                                       type="text" class="form-control"
+                                                                       v-model="listDispenser.start_reading_mm">
+                                                                <div class="input-group-append">
+                                                                    <span class="input-group-text" >mm</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="mb-3 col-md-2"></div>
+                                                        <div class="mb-3 col-md-2" v-if="listDispenser.status == 'end'">
+                                                            <div class="input-group">
+                                                                <input id="prReading"
+                                                                       type="text" class="form-control text-end"
+                                                                       v-model="listDispenser.end_reading_mm">
+                                                                <div class="input-group-append">
+                                                                    <span class="input-group-text" >mm</span>
+                                                                </div>
+                                                            </div>
+
+                                                        </div>
+                                                        <div class="mb-3 col-md-2"></div>
+                                                        <div class="mb-3 col-md-2"></div>
                                                         <div class="mb-3 col-md-2 offset-2">
-                                                            <input disabled id="prReading"
-                                                                   type="text" class="form-control"
-                                                                   v-model="listDispenser.start_reading_mm">
-                                                        </div>
-                                                        <div class="mb-3 col-md-2"></div>
-                                                        <div class="mb-3 col-md-2" v-if="listDispenser.status == 'end'">
-                                                            <input id="prReading"
-                                                                   type="text" class="form-control text-end"
-                                                                   v-model="listDispenser.end_reading_mm">
-                                                        </div>
-                                                        <div class="mb-3 col-md-2"></div>
-                                                        <div class="mb-3 col-md-2"></div>
-                                                        <div class="mb-3 col-md-2 offset-2">
-                                                            <input disabled id="prReading"
-                                                                   type="text" class="form-control"
-                                                                   v-model="listDispenser.start_reading">
+                                                            <div class="input-group">
+                                                                <input disabled id="prReading"
+                                                                       type="text" class="form-control"
+                                                                       v-model="listDispenser.start_reading">
+                                                                <div class="input-group-append">
+                                                                    <span class="input-group-text" >Liter</span>
+                                                                </div>
+                                                            </div>
                                                         </div>
                                                         <div class="mb-3 col-md-2" v-if="listDispenser.status == 'end'">
-                                                            <input type="text" class="form-control"  disabled
-                                                                v-model="listDispenser.tank_refill">
+                                                            <div class="input-group">
+                                                                <input type="text" class="form-control"  disabled
+                                                                       v-model="listDispenser.tank_refill">
+                                                                <div class="input-group-append">
+                                                                    <span class="input-group-text" >Liter</span>
+                                                                </div>
+                                                            </div>
+
                                                         </div>
                                                         <div class="mb-3 col-md-2" v-if="listDispenser.status == 'end'">
-                                                            <input id="frReading" disabled
-                                                                type="text" class="form-control"
-                                                                v-model="listDispenser.end_reading">
+                                                            <div class="input-group">
+                                                                <input id="frReading" disabled
+                                                                       type="text" class="form-control"
+                                                                       v-model="listDispenser.end_reading">
+                                                                <div class="input-group-append">
+                                                                    <span class="input-group-text" >Liter</span>
+                                                                </div>
+                                                            </div>
+
 <!--                                                            <input class="form-control" value="0" v-if="listDispenser.status == 'start'" disabled>-->
                                                         </div>
                                                         <div class="mb-3 col-md-2" v-if="listDispenser.status == 'end'">
-                                                            <input id="frReading" @blur="disableInput('frReading')" v-if="listDispenser.status == 'end'"
-                                                                   type="text" class="form-control" disabled
-                                                                   v-model="listDispenser.adjustment"
-                                                                   @input="calculateAmount">
+                                                            <div class="input-group">
+                                                                <input id="frReading" @blur="disableInput('frReading')" v-if="listDispenser.status == 'end'"
+                                                                       type="text" class="form-control" disabled
+                                                                       v-model="listDispenser.adjustment"
+                                                                       @input="calculateAmount">
+                                                                <div class="input-group-append">
+                                                                    <span class="input-group-text" >Liter</span>
+                                                                </div>
+                                                            </div>
+
 <!--                                                            <input class="form-control" value="0" v-if="listDispenser.status == 'start'" disabled>-->
                                                         </div>
 
                                                         <div class="mb-3 col-md-2" v-if="listDispenser.status == 'end'">
-                                                            <input type="text" class="form-control" id="consumption" disabled  v-if="listDispenser.status == 'end'"
-                                                                   v-model="listDispenser.consumption">
+                                                            <div class="input-group">
+                                                                <input type="text" class="form-control" id="consumption" disabled  v-if="listDispenser.status == 'end'"
+                                                                       v-model="listDispenser.consumption">
+                                                                <div class="input-group-append">
+                                                                    <span class="input-group-text" >Liter</span>
+                                                                </div>
+                                                            </div>
 <!--                                                            <input class="form-control" value="0" v-if="listDispenser.status == 'start'" disabled>-->
                                                         </div>
                                                     </div>
@@ -122,31 +161,54 @@
                                                         </div>
                                                         <div class="mb-3 col-md-2">
                                                             <label>Previous Reading </label>
-                                                            <input type="text" class="form-control" disabled
-                                                                   v-model="n.start_reading">
+                                                            <div class="input-group">
+                                                                <input type="text" class="form-control" disabled
+                                                                       v-model="n.start_reading">
+                                                                <div class="input-group-append">
+                                                                    <span class="input-group-text" >Liter</span>
+                                                                </div>
+                                                            </div>
+
                                                         </div>
                                                         <div class="mb-3 col-md-2"  v-if="listDispenser.status == 'end'">
                                                             <label>Final Reading </label>
-                                                            <input type="text" class="form-control text-end" @blur="disableInput('frReading'+nIndex+dIndex)"
-                                                                   v-if="listDispenser.status == 'end'"
-                                                                   v-model="n.end_reading" @click="enableInput('frReading'+nIndex+dIndex)"
-                                                                   @input="calculateAmountNozzle(dIndex, nIndex) ">
+                                                            <div class="input-group">
+                                                                <input type="text" class="form-control text-end" @blur="disableInput('frReading'+nIndex+dIndex)"
+                                                                       v-if="listDispenser.status == 'end'"
+                                                                       v-model="n.end_reading" @click="enableInput('frReading'+nIndex+dIndex)"
+                                                                       @input="calculateAmountNozzle(dIndex, nIndex) ">
+                                                                <div class="input-group-append">
+                                                                    <span class="input-group-text" >Liter</span>
+                                                                </div>
+                                                            </div>
+
 <!--                                                            <input class="form-control" value="0" v-if="listDispenser.status == 'start'" disabled>-->
                                                         </div>
                                                         <div class="mb-3 col-md-2" v-if="listDispenser.status == 'end'">
                                                             <label>Adjustment </label>
-                                                            <input type="text" class="form-control text-end" @blur="disableInput('frReading'+nIndex+dIndex)"
-                                                                   v-if="listDispenser.status == 'end'"
-                                                                   v-model="n.adjustment"
-                                                                   @input="calculateAmountNozzle(dIndex, nIndex) " disabled>
+                                                            <div class="input-group">
+                                                                <input type="text" class="form-control text-end" @blur="disableInput('frReading'+nIndex+dIndex)"
+                                                                       v-if="listDispenser.status == 'end'"
+                                                                       v-model="n.adjustment"
+                                                                       @input="calculateAmountNozzle(dIndex, nIndex) " disabled>
+                                                                <div class="input-group-append">
+                                                                    <span class="input-group-text" >Liter</span>
+                                                                </div>
+                                                            </div>
 <!--                                                            <input class="form-control" value="0" v-if="listDispenser.status == 'start'" disabled>-->
                                                         </div>
 
 
                                                         <div class="mb-3 col-md-2"  v-if="listDispenser.status == 'end'">
                                                             <label>Consumption </label>
-                                                            <input type="text" disabled class="form-control"
-                                                                   v-model="n.consumption">
+                                                            <div class="input-group">
+                                                                <input type="text" disabled class="form-control"
+                                                                       v-model="n.consumption">
+                                                                <div class="input-group-append">
+                                                                    <span class="input-group-text" >Liter</span>
+                                                                </div>
+                                                            </div>
+
 <!--                                                            <input class="form-control" value="0" v-if="listDispenser.status == 'start'" disabled>-->
                                                         </div>
                                                     </div>
@@ -483,5 +545,11 @@ export default {
 </script>
 
 <style scoped>
-
+.input-group-text{
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    padding: 17px 15px;
+    position: relative;
+    top: -1px;
+}
 </style>

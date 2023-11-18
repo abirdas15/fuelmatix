@@ -32733,7 +32733,9 @@ var render = function render() {
   }, [_c("div", {
     staticClass: "row align-items-center text-start"
   }, [_vm._m(2), _vm._v(" "), _vm._m(3), _vm._v(" "), _vm._m(4), _vm._v(" "), _vm._m(5), _vm._v(" "), _vm._m(6), _vm._v(" "), _vm._m(7), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 col-md-2 offset-2"
+    staticClass: "col-md-2 offset-2 mb-3"
+  }, [_c("div", {
+    staticClass: "input-group"
   }, [_c("input", {
     directives: [{
       name: "model",
@@ -32756,10 +32758,12 @@ var render = function render() {
         _vm.$set(_vm.listDispenser, "start_reading_mm", $event.target.value);
       }
     }
-  })]), _vm._v(" "), _c("div", {
+  }), _vm._v(" "), _vm._m(8)])]), _vm._v(" "), _c("div", {
     staticClass: "mb-3 col-md-2"
   }), _vm._v(" "), _vm.listDispenser.status == "end" ? _c("div", {
     staticClass: "mb-3 col-md-2"
+  }, [_c("div", {
+    staticClass: "input-group"
   }, [_c("input", {
     directives: [{
       name: "model",
@@ -32781,12 +32785,14 @@ var render = function render() {
         _vm.$set(_vm.listDispenser, "end_reading_mm", $event.target.value);
       }
     }
-  })]) : _vm._e(), _vm._v(" "), _c("div", {
+  }), _vm._v(" "), _vm._m(9)])]) : _vm._e(), _vm._v(" "), _c("div", {
     staticClass: "mb-3 col-md-2"
   }), _vm._v(" "), _c("div", {
     staticClass: "mb-3 col-md-2"
   }), _vm._v(" "), _c("div", {
     staticClass: "mb-3 col-md-2 offset-2"
+  }, [_c("div", {
+    staticClass: "input-group"
   }, [_c("input", {
     directives: [{
       name: "model",
@@ -32809,8 +32815,10 @@ var render = function render() {
         _vm.$set(_vm.listDispenser, "start_reading", $event.target.value);
       }
     }
-  })]), _vm._v(" "), _vm.listDispenser.status == "end" ? _c("div", {
+  }), _vm._v(" "), _vm._m(10)])]), _vm._v(" "), _vm.listDispenser.status == "end" ? _c("div", {
     staticClass: "mb-3 col-md-2"
+  }, [_c("div", {
+    staticClass: "input-group"
   }, [_c("input", {
     directives: [{
       name: "model",
@@ -32832,8 +32840,10 @@ var render = function render() {
         _vm.$set(_vm.listDispenser, "tank_refill", $event.target.value);
       }
     }
-  })]) : _vm._e(), _vm._v(" "), _vm.listDispenser.status == "end" ? _c("div", {
+  }), _vm._v(" "), _vm._m(11)])]) : _vm._e(), _vm._v(" "), _vm.listDispenser.status == "end" ? _c("div", {
     staticClass: "mb-3 col-md-2"
+  }, [_c("div", {
+    staticClass: "input-group"
   }, [_c("input", {
     directives: [{
       name: "model",
@@ -32856,8 +32866,10 @@ var render = function render() {
         _vm.$set(_vm.listDispenser, "end_reading", $event.target.value);
       }
     }
-  })]) : _vm._e(), _vm._v(" "), _vm.listDispenser.status == "end" ? _c("div", {
+  }), _vm._v(" "), _vm._m(12)])]) : _vm._e(), _vm._v(" "), _vm.listDispenser.status == "end" ? _c("div", {
     staticClass: "mb-3 col-md-2"
+  }, [_c("div", {
+    staticClass: "input-group"
   }, [_vm.listDispenser.status == "end" ? _c("input", {
     directives: [{
       name: "model",
@@ -32883,8 +32895,10 @@ var render = function render() {
         _vm.$set(_vm.listDispenser, "adjustment", $event.target.value);
       }, _vm.calculateAmount]
     }
-  }) : _vm._e()]) : _vm._e(), _vm._v(" "), _vm.listDispenser.status == "end" ? _c("div", {
+  }) : _vm._e(), _vm._v(" "), _vm._m(13)])]) : _vm._e(), _vm._v(" "), _vm.listDispenser.status == "end" ? _c("div", {
     staticClass: "mb-3 col-md-2"
+  }, [_c("div", {
+    staticClass: "input-group"
   }, [_vm.listDispenser.status == "end" ? _c("input", {
     directives: [{
       name: "model",
@@ -32907,7 +32921,7 @@ var render = function render() {
         _vm.$set(_vm.listDispenser, "consumption", $event.target.value);
       }
     }
-  }) : _vm._e()]) : _vm._e()])])])] : _vm._e(), _vm._v(" "), _vm._l(_vm.listDispenser.dispensers, function (d, dIndex) {
+  }) : _vm._e(), _vm._v(" "), _vm._m(14)])]) : _vm._e()])])])] : _vm._e(), _vm._v(" "), _vm._l(_vm.listDispenser.dispensers, function (d, dIndex) {
     return _vm.listDispenser.dispensers.length > 0 ? _c("div", {
       staticClass: "card"
     }, [_c("div", {
@@ -32927,7 +32941,9 @@ var render = function render() {
         staticClass: "m-0"
       }, [_vm._v(_vm._s(n.name))])])]), _vm._v(" "), _c("div", {
         staticClass: "mb-3 col-md-2"
-      }, [_c("label", [_vm._v("Previous Reading ")]), _vm._v(" "), _c("input", {
+      }, [_c("label", [_vm._v("Previous Reading ")]), _vm._v(" "), _c("div", {
+        staticClass: "input-group"
+      }, [_c("input", {
         directives: [{
           name: "model",
           rawName: "v-model",
@@ -32948,9 +32964,11 @@ var render = function render() {
             _vm.$set(n, "start_reading", $event.target.value);
           }
         }
-      })]), _vm._v(" "), _vm.listDispenser.status == "end" ? _c("div", {
+      }), _vm._v(" "), _vm._m(15, true)])]), _vm._v(" "), _vm.listDispenser.status == "end" ? _c("div", {
         staticClass: "mb-3 col-md-2"
-      }, [_c("label", [_vm._v("Final Reading ")]), _vm._v(" "), _vm.listDispenser.status == "end" ? _c("input", {
+      }, [_c("label", [_vm._v("Final Reading ")]), _vm._v(" "), _c("div", {
+        staticClass: "input-group"
+      }, [_vm.listDispenser.status == "end" ? _c("input", {
         directives: [{
           name: "model",
           rawName: "v-model",
@@ -32978,9 +32996,11 @@ var render = function render() {
             return _vm.calculateAmountNozzle(dIndex, nIndex);
           }]
         }
-      }) : _vm._e()]) : _vm._e(), _vm._v(" "), _vm.listDispenser.status == "end" ? _c("div", {
+      }) : _vm._e(), _vm._v(" "), _vm._m(16, true)])]) : _vm._e(), _vm._v(" "), _vm.listDispenser.status == "end" ? _c("div", {
         staticClass: "mb-3 col-md-2"
-      }, [_c("label", [_vm._v("Adjustment ")]), _vm._v(" "), _vm.listDispenser.status == "end" ? _c("input", {
+      }, [_c("label", [_vm._v("Adjustment ")]), _vm._v(" "), _c("div", {
+        staticClass: "input-group"
+      }, [_vm.listDispenser.status == "end" ? _c("input", {
         directives: [{
           name: "model",
           rawName: "v-model",
@@ -33006,9 +33026,11 @@ var render = function render() {
             return _vm.calculateAmountNozzle(dIndex, nIndex);
           }]
         }
-      }) : _vm._e()]) : _vm._e(), _vm._v(" "), _vm.listDispenser.status == "end" ? _c("div", {
+      }) : _vm._e(), _vm._v(" "), _vm._m(17, true)])]) : _vm._e(), _vm._v(" "), _vm.listDispenser.status == "end" ? _c("div", {
         staticClass: "mb-3 col-md-2"
-      }, [_c("label", [_vm._v("Consumption ")]), _vm._v(" "), _c("input", {
+      }, [_c("label", [_vm._v("Consumption ")]), _vm._v(" "), _c("div", {
+        staticClass: "input-group"
+      }, [_c("input", {
         directives: [{
           name: "model",
           rawName: "v-model",
@@ -33029,7 +33051,7 @@ var render = function render() {
             _vm.$set(n, "consumption", $event.target.value);
           }
         }
-      })]) : _vm._e()]);
+      }), _vm._v(" "), _vm._m(18, true)])]) : _vm._e()]);
     }), 0) : _vm._e()]) : _vm._e();
   }), _vm._v(" "), _vm.listDispenser.status != "start" ? [_c("div", {
     staticClass: "row"
@@ -33372,6 +33394,94 @@ var staticRenderFns = [function () {
   return _c("div", {
     staticClass: "mb-3 col-md-2"
   }, [_c("label", [_vm._v("Consumption ")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "input-group-append"
+  }, [_c("span", {
+    staticClass: "input-group-text"
+  }, [_vm._v("mm")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "input-group-append"
+  }, [_c("span", {
+    staticClass: "input-group-text"
+  }, [_vm._v("mm")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "input-group-append"
+  }, [_c("span", {
+    staticClass: "input-group-text"
+  }, [_vm._v("Liter")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "input-group-append"
+  }, [_c("span", {
+    staticClass: "input-group-text"
+  }, [_vm._v("Liter")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "input-group-append"
+  }, [_c("span", {
+    staticClass: "input-group-text"
+  }, [_vm._v("Liter")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "input-group-append"
+  }, [_c("span", {
+    staticClass: "input-group-text"
+  }, [_vm._v("Liter")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "input-group-append"
+  }, [_c("span", {
+    staticClass: "input-group-text"
+  }, [_vm._v("Liter")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "input-group-append"
+  }, [_c("span", {
+    staticClass: "input-group-text"
+  }, [_vm._v("Liter")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "input-group-append"
+  }, [_c("span", {
+    staticClass: "input-group-text"
+  }, [_vm._v("Liter")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "input-group-append"
+  }, [_c("span", {
+    staticClass: "input-group-text"
+  }, [_vm._v("Liter")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "input-group-append"
+  }, [_c("span", {
+    staticClass: "input-group-text"
+  }, [_vm._v("Liter")])]);
 }];
 render._withStripped = true;
 
@@ -37660,7 +37770,7 @@ exports = module.exports = __webpack_require__(/*! ../../../../node_modules/css-
 
 
 // module
-exports.push([module.i, "\n.box-mula[data-v-0d4183dd]{\n    padding: 10px 30px;\n    box-shadow: 0 0 15px 0 #CBC9C8;\n    border-radius: 12px;\n    margin-bottom: 30px;\n    margin-top: 10px;\n}\n.putkir-futa[data-v-0d4183dd]{\n    border-bottom: 1px solid #c1c1c1;\n    margin: 10px 0px 15px 0px;\n    padding-bottom: 11px;\n}\n", ""]);
+exports.push([module.i, "\n.box-mula[data-v-0d4183dd]{\r\n    padding: 10px 30px;\r\n    box-shadow: 0 0 15px 0 #CBC9C8;\r\n    border-radius: 12px;\r\n    margin-bottom: 30px;\r\n    margin-top: 10px;\n}\n.putkir-futa[data-v-0d4183dd]{\r\n    border-bottom: 1px solid #c1c1c1;\r\n    margin: 10px 0px 15px 0px;\r\n    padding-bottom: 11px;\n}\r\n", ""]);
 
 // exports
 
@@ -37680,6 +37790,25 @@ exports = module.exports = __webpack_require__(/*! ../../../../node_modules/css-
 
 // module
 exports.push([module.i, "\n.bill-to[data-v-26966675]{\r\n    background-color: rgba(134,183,255,0.9);\r\n    font-weight: bold;\r\n    padding: 10px 50px;\r\n    width: max-content;\n}\r\n", ""]);
+
+// exports
+
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/index.js?!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/Pages/ShiftSale/ShiftSaleAdd.vue?vue&type=style&index=0&id=716b8b32&scoped=true&lang=css&":
+/*!***********************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader??ref--5-1!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src??ref--5-2!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/Pages/ShiftSale/ShiftSaleAdd.vue?vue&type=style&index=0&id=716b8b32&scoped=true&lang=css& ***!
+  \***********************************************************************************************************************************************************************************************************************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(/*! ../../../../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(false);
+// imports
+
+
+// module
+exports.push([module.i, "\n.input-group-text[data-v-716b8b32]{\n    border-top-left-radius: 0;\n    border-bottom-left-radius: 0;\n    padding: 17px 15px;\n    position: relative;\n    top: -1px;\n}\n", ""]);
 
 // exports
 
@@ -68293,6 +68422,36 @@ if(false) {}
 
 /***/ }),
 
+/***/ "./node_modules/style-loader/index.js!./node_modules/css-loader/index.js?!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/Pages/ShiftSale/ShiftSaleAdd.vue?vue&type=style&index=0&id=716b8b32&scoped=true&lang=css&":
+/*!***************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/style-loader!./node_modules/css-loader??ref--5-1!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src??ref--5-2!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/Pages/ShiftSale/ShiftSaleAdd.vue?vue&type=style&index=0&id=716b8b32&scoped=true&lang=css& ***!
+  \***************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+
+var content = __webpack_require__(/*! !../../../../node_modules/css-loader??ref--5-1!../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../node_modules/postcss-loader/src??ref--5-2!../../../../node_modules/vue-loader/lib??vue-loader-options!./ShiftSaleAdd.vue?vue&type=style&index=0&id=716b8b32&scoped=true&lang=css& */ "./node_modules/css-loader/index.js?!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/Pages/ShiftSale/ShiftSaleAdd.vue?vue&type=style&index=0&id=716b8b32&scoped=true&lang=css&");
+
+if(typeof content === 'string') content = [[module.i, content, '']];
+
+var transform;
+var insertInto;
+
+
+
+var options = {"hmr":true}
+
+options.transform = transform
+options.insertInto = undefined;
+
+var update = __webpack_require__(/*! ../../../../node_modules/style-loader/lib/addStyles.js */ "./node_modules/style-loader/lib/addStyles.js")(content, options);
+
+if(content.locals) module.exports = content.locals;
+
+if(false) {}
+
+/***/ }),
+
 /***/ "./node_modules/style-loader/lib/addStyles.js":
 /*!****************************************************!*\
   !*** ./node_modules/style-loader/lib/addStyles.js ***!
@@ -95650,7 +95809,9 @@ __webpack_require__.r(__webpack_exports__);
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _ShiftSaleAdd_vue_vue_type_template_id_716b8b32_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ShiftSaleAdd.vue?vue&type=template&id=716b8b32&scoped=true& */ "./resources/js/Pages/ShiftSale/ShiftSaleAdd.vue?vue&type=template&id=716b8b32&scoped=true&");
 /* harmony import */ var _ShiftSaleAdd_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./ShiftSaleAdd.vue?vue&type=script&lang=js& */ "./resources/js/Pages/ShiftSale/ShiftSaleAdd.vue?vue&type=script&lang=js&");
-/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+/* empty/unused harmony star reexport *//* harmony import */ var _ShiftSaleAdd_vue_vue_type_style_index_0_id_716b8b32_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./ShiftSaleAdd.vue?vue&type=style&index=0&id=716b8b32&scoped=true&lang=css& */ "./resources/js/Pages/ShiftSale/ShiftSaleAdd.vue?vue&type=style&index=0&id=716b8b32&scoped=true&lang=css&");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
 
 
 
@@ -95658,7 +95819,7 @@ __webpack_require__.r(__webpack_exports__);
 
 /* normalize component */
 
-var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__["default"])(
   _ShiftSaleAdd_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
   _ShiftSaleAdd_vue_vue_type_template_id_716b8b32_scoped_true___WEBPACK_IMPORTED_MODULE_0__["render"],
   _ShiftSaleAdd_vue_vue_type_template_id_716b8b32_scoped_true___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
@@ -95687,6 +95848,22 @@ component.options.__file = "resources/js/Pages/ShiftSale/ShiftSaleAdd.vue"
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_ShiftSaleAdd_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib??ref--4-0!../../../../node_modules/vue-loader/lib??vue-loader-options!./ShiftSaleAdd.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/Pages/ShiftSale/ShiftSaleAdd.vue?vue&type=script&lang=js&");
 /* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_ShiftSaleAdd_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/js/Pages/ShiftSale/ShiftSaleAdd.vue?vue&type=style&index=0&id=716b8b32&scoped=true&lang=css&":
+/*!****************************************************************************************************************!*\
+  !*** ./resources/js/Pages/ShiftSale/ShiftSaleAdd.vue?vue&type=style&index=0&id=716b8b32&scoped=true&lang=css& ***!
+  \****************************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_style_loader_index_js_node_modules_css_loader_index_js_ref_5_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_5_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ShiftSaleAdd_vue_vue_type_style_index_0_id_716b8b32_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/style-loader!../../../../node_modules/css-loader??ref--5-1!../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../node_modules/postcss-loader/src??ref--5-2!../../../../node_modules/vue-loader/lib??vue-loader-options!./ShiftSaleAdd.vue?vue&type=style&index=0&id=716b8b32&scoped=true&lang=css& */ "./node_modules/style-loader/index.js!./node_modules/css-loader/index.js?!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/Pages/ShiftSale/ShiftSaleAdd.vue?vue&type=style&index=0&id=716b8b32&scoped=true&lang=css&");
+/* harmony import */ var _node_modules_style_loader_index_js_node_modules_css_loader_index_js_ref_5_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_5_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ShiftSaleAdd_vue_vue_type_style_index_0_id_716b8b32_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_index_js_node_modules_css_loader_index_js_ref_5_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_5_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ShiftSaleAdd_vue_vue_type_style_index_0_id_716b8b32_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__);
+/* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _node_modules_style_loader_index_js_node_modules_css_loader_index_js_ref_5_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_5_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ShiftSaleAdd_vue_vue_type_style_index_0_id_716b8b32_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__) if(["default"].indexOf(__WEBPACK_IMPORT_KEY__) < 0) (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _node_modules_style_loader_index_js_node_modules_css_loader_index_js_ref_5_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_5_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ShiftSaleAdd_vue_vue_type_style_index_0_id_716b8b32_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__[key]; }) }(__WEBPACK_IMPORT_KEY__));
+
 
 /***/ }),
 
@@ -98181,7 +98358,7 @@ var app = new vue__WEBPACK_IMPORTED_MODULE_1___default.a({
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! D:\xampp7.4\htdocs\fuelmatix\resources\js\app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! D:\xampp\htdocs\projects\fuelmatix\resources\js\app.js */"./resources/js/app.js");
 
 
 /***/ })
