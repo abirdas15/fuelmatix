@@ -43,12 +43,20 @@
                                     </div>
                                     <div class="mb-3 form-group col-md-6">
                                         <label class="form-label">Height:</label>
-                                        <input type="text" class="form-control" name="height" v-model="param.height">
-                                        <div class="invalid-feedback"></div>
-                                    </div>
-                                    <div class="mb-3 form-group col-md-6">
-                                        <label class="form-label">Water Height:</label>
-                                        <input type="text" class="form-control" name="water_height" v-model="param.water_height">
+                                        <div class="input-group mb-3">
+                                            <input type="text" class="form-control" name="height" v-model="param.height">
+                                            <div class="input-group-append">
+                                                <span class="input-group-text" >mm</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="input-group mb-3">
+                                            <input type="text" class="form-control" disabled name="height" v-model="height_liter">
+                                            <div class="input-group-append">
+                                                <span class="input-group-text" >Liter</span>
+                                            </div>
+                                        </div>
+
                                         <div class="invalid-feedback"></div>
                                     </div>
                                 </div>
@@ -84,11 +92,29 @@ export default {
                 type: '',
                 water_height: '',
             },
+            height_liter: '',
             loading: false,
             listData: [],
+            bstiChart: [],
         }
     },
+    watch: {
+      'param.tank_id': function () {
+          this.getBstiChart();
+      },
+      'param.height': function () {
+          this.height_liter = this.filterBstiChart(this.bstiChart, this.param.height, 'height', 'volume');
+      }
+    },
     methods: {
+        getBstiChart: function() {
+            ApiService.POST(ApiRoutes.TankBstiChart, {tank_id: this.param.tank_id}, res => {
+                this.TableLoading = false
+                if (parseInt(res.status) === 200) {
+                    this.bstiChart = res.data;
+                }
+            });
+        },
         getTank: function () {
             ApiService.POST(ApiRoutes.TankList, {limit: 5000, page: 1},res => {
                 this.TableLoading = false
@@ -136,5 +162,15 @@ export default {
 </script>
 
 <style scoped>
-
+.input-group-text{
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border: 1px solid #c3bfbf;
+    padding: 16.5px 15px;
+}
+@media only screen and (max-width: 1366px) {
+    .input-group-text{
+        padding: 10.5px 15px;
+    }
+}
 </style>

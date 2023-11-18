@@ -117,7 +117,6 @@ export default {
                 order_by: 'id',
                 order_mode: 'DESC',
                 page: 1,
-                status: 'start',
             },
             Loading: false,
             TableLoading: false,
