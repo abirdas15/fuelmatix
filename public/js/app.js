@@ -9150,7 +9150,8 @@ __webpack_require__.r(__webpack_exports__);
       advance_amount: '',
       advance_sale: false,
       driver_amount: 0.00,
-      car_number: ''
+      car_number: '',
+      date: ''
     };
   },
   computed: {
@@ -9253,7 +9254,8 @@ __webpack_require__.r(__webpack_exports__);
       var param = {
         payment_method: this.payment_method,
         products: this.sale,
-        car_number: this.car_number
+        car_number: this.car_number,
+        date: this.date != '' ? this.date : moment().format('YYYY-MM-DD')
       };
       if (type == 'company') {
         param.driver_tip = this.driver_tip;
@@ -9550,8 +9552,20 @@ __webpack_require__.r(__webpack_exports__);
     this.getPosMachine();
   },
   mounted: function mounted() {
+    var _this9 = this;
     this.printD = new printd__WEBPACK_IMPORTED_MODULE_2__["Printd"]();
     $('#dashboard_bar').text('Pos');
+    setTimeout(function () {
+      $('.date').flatpickr({
+        altInput: true,
+        altFormat: "d/m/Y",
+        dateFormat: "Y-m-d",
+        defaultDate: 'today',
+        onChange: function onChange(date, dateStr) {
+          _this9.date = dateStr;
+        }
+      });
+    }, 1000);
   }
 });
 
@@ -29777,6 +29791,29 @@ var render = function render() {
   }, [_c("div", {
     staticClass: "row"
   }, [_c("div", {
+    staticClass: "col-6 mb-3"
+  }, [_c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.date,
+      expression: "date"
+    }],
+    staticClass: "form-control date bg-white",
+    attrs: {
+      type: "text",
+      name: "date"
+    },
+    domProps: {
+      value: _vm.date
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.date = $event.target.value;
+      }
+    }
+  })]), _vm._v(" "), _c("div", {
     staticClass: "col-sm-6"
   }, [_c("div", {
     staticClass: "user-search"
@@ -29830,7 +29867,7 @@ var render = function render() {
   })])] : _vm._e()], 2), _vm._v(" "), _vm.company_id ? _c("div", {
     staticClass: "col-sm-6"
   }, [_c("div", {
-    staticClass: "user-search form-group"
+    staticClass: "user-search"
   }, [_c("div", {
     staticClass: "input-group mb-3"
   }, [_vm._m(2), _vm._v(" "), _c("v-select", {
