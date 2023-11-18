@@ -61,18 +61,60 @@
                                             <div class="row align-items-center">
                                                 <div class="mb-3 form-group col-md-3"></div>
                                                 <div class="mb-3 form-group col-md-3">
-                                                    <label class="form-label">Reading before refill:</label>
-                                                    <input type="text" class="form-control " disabled name="start_reading" v-model="param.start_reading">
-                                                    <div class="invalid-feedback"></div>
+                                                    <label class="form-label">Start Reading:</label>
                                                 </div>
                                                 <div class="mb-3 form-group col-md-3">
-                                                    <label class="form-label">Reading after refill:</label>
-                                                    <input type="text" class="form-control " name="end_reading" v-model="param.end_reading">
-                                                    <div class="invalid-feedback"></div>
+                                                    <label class="form-label">End Reading:</label>
                                                 </div>
                                                 <div class="mb-3 form-group col-md-3">
                                                     <label class="form-label">Tank Volume:</label>
-                                                    <input type="text" class="form-control " disabled name="dip_sale" v-model="param.dip_sale">
+                                                </div>
+                                                <div class="mb-3 form-group col-md-3"></div>
+                                                <div class="mb-3 form-group col-md-3">
+                                                    <div class="input-group">
+                                                        <input type="text" class="form-control " disabled name="start_reading" v-model="param.start_reading_mm">
+                                                        <div class="input-group-append">
+                                                            <span class="input-group-text" >mm</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="invalid-feedback"></div>
+                                                </div>
+                                                <div class="mb-3 form-group col-md-3">
+                                                    <div class="input-group">
+                                                        <input type="text" class="form-control " name="end_reading" v-model="param.end_reading_mm">
+                                                        <div class="input-group-append">
+                                                            <span class="input-group-text" >mm</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="invalid-feedback"></div>
+                                                </div>
+                                                <div class="mb-3 form-group col-md-3"></div>
+                                                <div class="mb-3 form-group col-md-3"></div>
+                                                <div class="mb-3 form-group col-md-3">
+                                                    <div class="input-group">
+                                                        <input type="text" class="form-control " disabled name="start_reading" v-model="param.start_reading">
+                                                        <div class="input-group-append">
+                                                            <span class="input-group-text">Liter</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="invalid-feedback"></div>
+                                                </div>
+                                                <div class="mb-3 form-group col-md-3">
+                                                    <div class="input-group">
+                                                        <input type="text" class="form-control" disabled name="end_reading" v-model="param.end_reading">
+                                                        <div class="input-group-append">
+                                                            <span class="input-group-text">Liter</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="invalid-feedback"></div>
+                                                </div>
+                                                <div class="mb-3 form-group col-md-3">
+                                                    <div class="input-group">
+                                                        <input type="text" class="form-control " disabled name="dip_sale" v-model="param.dip_sale">
+                                                        <div class="input-group-append">
+                                                            <span class="input-group-text">Liter</span>
+                                                        </div>
+                                                    </div>
                                                     <div class="invalid-feedback"></div>
                                                 </div>
                                             </div>
@@ -91,22 +133,37 @@
                                                     </label>
                                                 </div>
                                                 <div class="mb-3 col-md-3">
-                                                    <label>Previous Reading </label>
-                                                    <input type="text" class="form-control"
-                                                             :id="'prReading'+nIndex+dIndex" disabled
-                                                           v-model="n.start_reading">
+                                                    <label>Start Reading </label>
+                                                    <div class="input-group">
+                                                        <input type="text" class="form-control"
+                                                                 :id="'prReading'+nIndex+dIndex" disabled
+                                                               v-model="n.start_reading">
+                                                        <div class="input-group-append">
+                                                            <span class="input-group-text">Liter</span>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                                 <div class="mb-3 col-md-3">
                                                     <label>End reading </label>
-                                                    <input type="text" class="form-control"
-                                                             :id="'trReading'+nIndex+dIndex"
-                                                           v-model="n.end_reading">
+                                                    <div class="input-group">
+                                                        <input type="text" class="form-control"
+                                                                 :id="'trReading'+nIndex+dIndex"
+                                                               v-model="n.end_reading">
+                                                        <div class="input-group-append">
+                                                            <span class="input-group-text">Liter</span>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                                 <div class="mb-3 col-md-3">
                                                     <label>sale on {{ n.name }} </label>
-                                                    <input type="text" class="form-control" disabled
-                                                             :id="'sorReading'+nIndex+dIndex"
-                                                           v-model="n.sale">
+                                                    <div class="input-group">
+                                                        <input type="text" class="form-control" disabled
+                                                                 :id="'sorReading'+nIndex+dIndex"
+                                                               v-model="n.sale">
+                                                        <div class="input-group-append">
+                                                            <span class="input-group-text">Liter</span>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -156,7 +213,9 @@ export default {
                 pay_order_id: '',
                 quantity: '',
                 start_reading: 0,
+                start_reading_mm: 0,
                 end_reading: 0,
+                end_reading_mm: 0,
                 dip_sale: 0,
                 amount: 0,
                 net_profit: 0,
@@ -170,6 +229,7 @@ export default {
             tankReadingData: [],
             singlePayOrder: [],
             loading: false,
+            bstiChart: []
         }
     },
     watch: {
@@ -181,9 +241,24 @@ export default {
             this.getDispenserSingle()
             this.getTankReading()
             this.getPayOrderQuantity()
+            this.getBstiChart();
+        },
+        'param.end_reading_mm': function() {
+            this.param.end_reading = this.filterBstiChart(this.bstiChart, this.param.end_reading_mm, 'height', 'volume');
+        },
+        'param.end_reading': function() {
+            this.param.dip_sale = parseFloat(this.param.end_reading) - parseFloat(this.param.start_reading);
         },
     },
     methods: {
+        getBstiChart: function() {
+            ApiService.POST(ApiRoutes.TankBstiChart, {tank_id: this.param.tank_id}, res => {
+                this.TableLoading = false
+                if (parseInt(res.status) === 200) {
+                    this.bstiChart = res.data;
+                }
+            });
+        },
         getTank: function () {
             ApiService.POST(ApiRoutes.TankList, {limit: 5000, page: 1},res => {
                 if (parseInt(res.status) === 200) {
@@ -196,8 +271,10 @@ export default {
                 if (parseInt(res.status) === 200) {
                     this.tankDispenserData = res.data;
                     this.param.start_reading = res.data.start_reading
+                    this.param.start_reading_mm = res.data.start_reading_mm
+                    this.param.end_reading_mm = res.data.end_reading_mm
                     this.param.end_reading = res.data.end_reading
-                    this.param.dip_sale = this.param.end_reading - this.param.start_reading
+                    this.param.dip_sale = res.data.dip_sale;
                     if (this.unit_price > 0) {
                         this.param.buy_price = (this.param.end_reading - this.param.start_reading) * this.unit_price
                     }
@@ -293,5 +370,14 @@ export default {
 </script>
 
 <style scoped>
-
+.input-group-text{
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    padding: 17px 15px;
+    position: relative;
+    top: -1px;
+}
+.input-group-append {
+    width: 25%;
+}
 </style>

@@ -6706,7 +6706,9 @@ __webpack_require__.r(__webpack_exports__);
         pay_order_id: '',
         quantity: '',
         start_reading: 0,
+        start_reading_mm: 0,
         end_reading: 0,
+        end_reading_mm: 0,
         dip_sale: 0,
         amount: 0,
         net_profit: 0,
@@ -6719,7 +6721,8 @@ __webpack_require__.r(__webpack_exports__);
       tankDispenserData: [],
       tankReadingData: [],
       singlePayOrder: [],
-      loading: false
+      loading: false,
+      bstiChart: []
     };
   },
   watch: {
@@ -6731,64 +6734,84 @@ __webpack_require__.r(__webpack_exports__);
       this.getDispenserSingle();
       this.getTankReading();
       this.getPayOrderQuantity();
+      this.getBstiChart();
+    },
+    'param.end_reading_mm': function paramEnd_reading_mm() {
+      this.param.end_reading = this.filterBstiChart(this.bstiChart, this.param.end_reading_mm, 'height', 'volume');
+    },
+    'param.end_reading': function paramEnd_reading() {
+      this.param.dip_sale = parseFloat(this.param.end_reading) - parseFloat(this.param.start_reading);
     }
   },
   methods: {
-    getTank: function getTank() {
+    getBstiChart: function getBstiChart() {
       var _this = this;
+      _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].TankBstiChart, {
+        tank_id: this.param.tank_id
+      }, function (res) {
+        _this.TableLoading = false;
+        if (parseInt(res.status) === 200) {
+          _this.bstiChart = res.data;
+        }
+      });
+    },
+    getTank: function getTank() {
+      var _this2 = this;
       _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].TankList, {
         limit: 5000,
         page: 1
       }, function (res) {
         if (parseInt(res.status) === 200) {
-          _this.listDataTank = res.data.data;
+          _this2.listDataTank = res.data.data;
         }
       });
     },
     getTankReading: function getTankReading() {
-      var _this2 = this;
+      var _this3 = this;
       _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].TankReadingLatest, {
         type: 'tank refill',
         tank_id: this.param.tank_id
       }, function (res) {
         if (parseInt(res.status) === 200) {
-          _this2.tankDispenserData = res.data;
-          _this2.param.start_reading = res.data.start_reading;
-          _this2.param.end_reading = res.data.end_reading;
-          _this2.param.dip_sale = _this2.param.end_reading - _this2.param.start_reading;
-          if (_this2.unit_price > 0) {
-            _this2.param.buy_price = (_this2.param.end_reading - _this2.param.start_reading) * _this2.unit_price;
+          _this3.tankDispenserData = res.data;
+          _this3.param.start_reading = res.data.start_reading;
+          _this3.param.start_reading_mm = res.data.start_reading_mm;
+          _this3.param.end_reading_mm = res.data.end_reading_mm;
+          _this3.param.end_reading = res.data.end_reading;
+          _this3.param.dip_sale = res.data.dip_sale;
+          if (_this3.unit_price > 0) {
+            _this3.param.buy_price = (_this3.param.end_reading - _this3.param.start_reading) * _this3.unit_price;
           }
         }
       });
     },
     getDispenserSingle: function getDispenserSingle() {
-      var _this3 = this;
+      var _this4 = this;
       this.param.total_refill_volume = 0;
       _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].TankGetNozzle, {
         tank_id: this.param.tank_id
       }, function (res) {
-        _this3.param.dispensers = res;
-        _this3.param.dispensers.forEach(function (v) {
+        _this4.param.dispensers = res;
+        _this4.param.dispensers.forEach(function (v) {
           v.nozzle.forEach(function (nozzle) {
             nozzle.sale = nozzle.end_reading - nozzle.start_reading;
-            _this3.param.total_refill_volume += nozzle.sale;
+            _this4.param.total_refill_volume += nozzle.sale;
           });
         });
-        _this3.param.total_refill_volume += _this3.param.dip_sale;
-        _this3.param.net_profit = _this3.param.total_refill_volume - _this3.param.quantity;
+        _this4.param.total_refill_volume += _this4.param.dip_sale;
+        _this4.param.net_profit = _this4.param.total_refill_volume - _this4.param.quantity;
       });
     },
     getPayOrder: function getPayOrder() {
-      var _this4 = this;
+      var _this5 = this;
       _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].PayOrderLatest, {}, function (res) {
         if (parseInt(res.status) === 200) {
-          _this4.listDataPayOrder = res.data;
+          _this5.listDataPayOrder = res.data;
         }
       });
     },
     getPayOrderQuantity: function getPayOrderQuantity() {
-      var _this5 = this;
+      var _this6 = this;
       if (this.param.tank_id == '' && this.param.pay_order_id == '') {
         return;
       }
@@ -6798,37 +6821,37 @@ __webpack_require__.r(__webpack_exports__);
       }, function (res) {
         if (parseInt(res.status) === 200) {
           if (res.data != null) {
-            _this5.param.quantity = res.data.quantity;
-            _this5.param.amount = res.data.total;
-            _this5.unit_price = res.data.unit_price;
+            _this6.param.quantity = res.data.quantity;
+            _this6.param.amount = res.data.total;
+            _this6.unit_price = res.data.unit_price;
           }
         }
       });
     },
     getPayOderSingle: function getPayOderSingle() {
-      var _this6 = this;
+      var _this7 = this;
       _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].PayOrderSingle, {
         id: this.param.pay_order_id
       }, function (res) {
         if (parseInt(res.status) === 200) {
-          _this6.singlePayOrder = res.data;
-          _this6.param.quantity = res.data.quantity;
-          _this6.param.amount = res.data.amount;
-          _this6.unit_price = _this6.param.amount / _this6.param.quantity;
+          _this7.singlePayOrder = res.data;
+          _this7.param.quantity = res.data.quantity;
+          _this7.param.amount = res.data.amount;
+          _this7.unit_price = _this7.param.amount / _this7.param.quantity;
         }
       });
     },
     save: function save() {
-      var _this7 = this;
+      var _this8 = this;
       this.loading = true;
       _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].ClearErrorHandler();
       if (this.param.date == '') {
         this.param.date = moment().format('YYYY-MM-DD');
       }
       _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].TankRefillAdd, this.param, function (res) {
-        _this7.loading = false;
+        _this8.loading = false;
         if (parseInt(res.status) === 200) {
-          _this7.$router.push({
+          _this8.$router.push({
             name: 'TankRefill'
           });
         } else {
@@ -6842,7 +6865,7 @@ __webpack_require__.r(__webpack_exports__);
     this.getPayOrder();
   },
   mounted: function mounted() {
-    var _this8 = this;
+    var _this9 = this;
     $('#dashboard_bar').text('Tank Refill');
     setTimeout(function () {
       $('.date').flatpickr({
@@ -6851,7 +6874,7 @@ __webpack_require__.r(__webpack_exports__);
         dateFormat: "Y-m-d",
         defaultDate: 'today',
         onChange: function onChange(date, dateStr) {
-          _this8.param.date = dateStr;
+          _this9.param.date = dateStr;
         }
       });
     }, 1000);
@@ -24155,11 +24178,72 @@ var render = function render() {
     staticClass: "row align-items-center"
   }, [_c("div", {
     staticClass: "mb-3 form-group col-md-3"
+  }), _vm._v(" "), _vm._m(5), _vm._v(" "), _vm._m(6), _vm._v(" "), _vm._m(7), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 form-group col-md-3"
   }), _vm._v(" "), _c("div", {
     staticClass: "mb-3 form-group col-md-3"
-  }, [_c("label", {
-    staticClass: "form-label"
-  }, [_vm._v("Reading before refill:")]), _vm._v(" "), _c("input", {
+  }, [_c("div", {
+    staticClass: "input-group"
+  }, [_c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.param.start_reading_mm,
+      expression: "param.start_reading_mm"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      disabled: "",
+      name: "start_reading"
+    },
+    domProps: {
+      value: _vm.param.start_reading_mm
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.param, "start_reading_mm", $event.target.value);
+      }
+    }
+  }), _vm._v(" "), _vm._m(8)]), _vm._v(" "), _c("div", {
+    staticClass: "invalid-feedback"
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 form-group col-md-3"
+  }, [_c("div", {
+    staticClass: "input-group"
+  }, [_c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.param.end_reading_mm,
+      expression: "param.end_reading_mm"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      name: "end_reading"
+    },
+    domProps: {
+      value: _vm.param.end_reading_mm
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.param, "end_reading_mm", $event.target.value);
+      }
+    }
+  }), _vm._v(" "), _vm._m(9)]), _vm._v(" "), _c("div", {
+    staticClass: "invalid-feedback"
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 form-group col-md-3"
+  }), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 form-group col-md-3"
+  }), _vm._v(" "), _c("div", {
+    staticClass: "mb-3 form-group col-md-3"
+  }, [_c("div", {
+    staticClass: "input-group"
+  }, [_c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -24181,13 +24265,13 @@ var render = function render() {
         _vm.$set(_vm.param, "start_reading", $event.target.value);
       }
     }
-  }), _vm._v(" "), _c("div", {
+  }), _vm._v(" "), _vm._m(10)]), _vm._v(" "), _c("div", {
     staticClass: "invalid-feedback"
   })]), _vm._v(" "), _c("div", {
     staticClass: "mb-3 form-group col-md-3"
-  }, [_c("label", {
-    staticClass: "form-label"
-  }, [_vm._v("Reading after refill:")]), _vm._v(" "), _c("input", {
+  }, [_c("div", {
+    staticClass: "input-group"
+  }, [_c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -24197,6 +24281,7 @@ var render = function render() {
     staticClass: "form-control",
     attrs: {
       type: "text",
+      disabled: "",
       name: "end_reading"
     },
     domProps: {
@@ -24208,13 +24293,13 @@ var render = function render() {
         _vm.$set(_vm.param, "end_reading", $event.target.value);
       }
     }
-  }), _vm._v(" "), _c("div", {
+  }), _vm._v(" "), _vm._m(11)]), _vm._v(" "), _c("div", {
     staticClass: "invalid-feedback"
   })]), _vm._v(" "), _c("div", {
     staticClass: "mb-3 form-group col-md-3"
-  }, [_c("label", {
-    staticClass: "form-label"
-  }, [_vm._v("Tank Volume:")]), _vm._v(" "), _c("input", {
+  }, [_c("div", {
+    staticClass: "input-group"
+  }, [_c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -24236,7 +24321,7 @@ var render = function render() {
         _vm.$set(_vm.param, "dip_sale", $event.target.value);
       }
     }
-  }), _vm._v(" "), _c("div", {
+  }), _vm._v(" "), _vm._m(12)]), _vm._v(" "), _c("div", {
     staticClass: "invalid-feedback"
   })])])])]), _vm._v(" "), _vm._l(_vm.param.dispensers, function (d, dIndex) {
     return _vm.param.dispensers.length > 0 ? _c("div", {
@@ -24258,7 +24343,9 @@ var render = function render() {
         staticClass: "m-0"
       }, [_vm._v(_vm._s(n.name))])])]), _vm._v(" "), _c("div", {
         staticClass: "mb-3 col-md-3"
-      }, [_c("label", [_vm._v("Previous Reading ")]), _vm._v(" "), _c("input", {
+      }, [_c("label", [_vm._v("Start Reading ")]), _vm._v(" "), _c("div", {
+        staticClass: "input-group"
+      }, [_c("input", {
         directives: [{
           name: "model",
           rawName: "v-model",
@@ -24280,9 +24367,11 @@ var render = function render() {
             _vm.$set(n, "start_reading", $event.target.value);
           }
         }
-      })]), _vm._v(" "), _c("div", {
+      }), _vm._v(" "), _vm._m(13, true)])]), _vm._v(" "), _c("div", {
         staticClass: "mb-3 col-md-3"
-      }, [_c("label", [_vm._v("End reading ")]), _vm._v(" "), _c("input", {
+      }, [_c("label", [_vm._v("End reading ")]), _vm._v(" "), _c("div", {
+        staticClass: "input-group"
+      }, [_c("input", {
         directives: [{
           name: "model",
           rawName: "v-model",
@@ -24303,9 +24392,11 @@ var render = function render() {
             _vm.$set(n, "end_reading", $event.target.value);
           }
         }
-      })]), _vm._v(" "), _c("div", {
+      }), _vm._v(" "), _vm._m(14, true)])]), _vm._v(" "), _c("div", {
         staticClass: "mb-3 col-md-3"
-      }, [_c("label", [_vm._v("sale on " + _vm._s(n.name) + " ")]), _vm._v(" "), _c("input", {
+      }, [_c("label", [_vm._v("sale on " + _vm._s(n.name) + " ")]), _vm._v(" "), _c("div", {
+        staticClass: "input-group"
+      }, [_c("input", {
         directives: [{
           name: "model",
           rawName: "v-model",
@@ -24327,7 +24418,7 @@ var render = function render() {
             _vm.$set(n, "sale", $event.target.value);
           }
         }
-      })])]);
+      }), _vm._v(" "), _vm._m(15, true)])])]);
     }), 0) : _vm._e()]) : _vm._e();
   }), _vm._v(" "), _c("div", {
     staticClass: "row"
@@ -24460,6 +24551,94 @@ var staticRenderFns = [function () {
   }, [_c("h5", {
     staticClass: "card-title"
   }, [_vm._v("DIP")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "mb-3 form-group col-md-3"
+  }, [_c("label", {
+    staticClass: "form-label"
+  }, [_vm._v("Start Reading:")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "mb-3 form-group col-md-3"
+  }, [_c("label", {
+    staticClass: "form-label"
+  }, [_vm._v("End Reading:")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "mb-3 form-group col-md-3"
+  }, [_c("label", {
+    staticClass: "form-label"
+  }, [_vm._v("Tank Volume:")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "input-group-append"
+  }, [_c("span", {
+    staticClass: "input-group-text"
+  }, [_vm._v("mm")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "input-group-append"
+  }, [_c("span", {
+    staticClass: "input-group-text"
+  }, [_vm._v("mm")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "input-group-append"
+  }, [_c("span", {
+    staticClass: "input-group-text"
+  }, [_vm._v("Liter")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "input-group-append"
+  }, [_c("span", {
+    staticClass: "input-group-text"
+  }, [_vm._v("Liter")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "input-group-append"
+  }, [_c("span", {
+    staticClass: "input-group-text"
+  }, [_vm._v("Liter")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "input-group-append"
+  }, [_c("span", {
+    staticClass: "input-group-text"
+  }, [_vm._v("Liter")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "input-group-append"
+  }, [_c("span", {
+    staticClass: "input-group-text"
+  }, [_vm._v("Liter")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "input-group-append"
+  }, [_c("span", {
+    staticClass: "input-group-text"
+  }, [_vm._v("Liter")])]);
 }];
 render._withStripped = true;
 
@@ -32945,7 +33124,7 @@ var render = function render() {
         staticClass: "m-0"
       }, [_vm._v(_vm._s(n.name))])])]), _vm._v(" "), _c("div", {
         staticClass: "mb-3 col-md-2"
-      }, [_c("label", [_vm._v("Previous Reading ")]), _vm._v(" "), _c("div", {
+      }, [_c("label", [_vm._v("Start Reading ")]), _vm._v(" "), _c("div", {
         staticClass: "input-group"
       }, [_c("input", {
         directives: [{
@@ -32970,7 +33149,7 @@ var render = function render() {
         }
       }), _vm._v(" "), _vm._m(15, true)])]), _vm._v(" "), _vm.listDispenser.status == "end" ? _c("div", {
         staticClass: "mb-3 col-md-2"
-      }, [_c("label", [_vm._v("Final Reading ")]), _vm._v(" "), _c("div", {
+      }, [_c("label", [_vm._v("End Reading ")]), _vm._v(" "), _c("div", {
         staticClass: "input-group"
       }, [_vm.listDispenser.status == "end" ? _c("input", {
         directives: [{
@@ -37743,6 +37922,25 @@ exports.push([module.i, "\nul {\r\n    list-style: none;\n}\na {\r\n    text-dec
 
 /***/ }),
 
+/***/ "./node_modules/css-loader/index.js?!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/Pages/Fuel/TankRefill/Add.vue?vue&type=style&index=0&id=ac6c809c&scoped=true&lang=css&":
+/*!********************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader??ref--5-1!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src??ref--5-2!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/Pages/Fuel/TankRefill/Add.vue?vue&type=style&index=0&id=ac6c809c&scoped=true&lang=css& ***!
+  \********************************************************************************************************************************************************************************************************************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(/*! ../../../../../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(false);
+// imports
+
+
+// module
+exports.push([module.i, "\n.input-group-text[data-v-ac6c809c]{\r\n    border-top-left-radius: 0;\r\n    border-bottom-left-radius: 0;\r\n    padding: 17px 15px;\r\n    position: relative;\r\n    top: -1px;\n}\n.input-group-append[data-v-ac6c809c] {\r\n    width: 25%;\n}\r\n", ""]);
+
+// exports
+
+
+/***/ }),
+
 /***/ "./node_modules/css-loader/index.js?!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/Pages/FuelAdjustment/Adjustment.vue?vue&type=style&index=0&id=1b1b4180&scoped=true&lang=css&":
 /*!**************************************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/css-loader??ref--5-1!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src??ref--5-2!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/Pages/FuelAdjustment/Adjustment.vue?vue&type=style&index=0&id=1b1b4180&scoped=true&lang=css& ***!
@@ -37812,7 +38010,7 @@ exports = module.exports = __webpack_require__(/*! ../../../../node_modules/css-
 
 
 // module
-exports.push([module.i, "\n.input-group-text[data-v-716b8b32]{\n    border-top-left-radius: 0;\n    border-bottom-left-radius: 0;\n    border: 1px solid #c3bfbf;\n    padding: 16.5px 15px;\n}\n.input-group-append[data-v-716b8b32] {\n    width: 25%;\n}\n@media only screen and (max-width: 1366px) {\n.input-group-text[data-v-716b8b32]{\n        padding: 10.5px 15px;\n}\n}\n", ""]);
+exports.push([module.i, "\n.input-group-text[data-v-716b8b32]{\r\n    border-top-left-radius: 0;\r\n    border-bottom-left-radius: 0;\r\n    border: 1px solid #c3bfbf;\r\n    padding: 16.5px 15px;\n}\n.input-group-append[data-v-716b8b32] {\r\n    width: 25%;\n}\n@media only screen and (max-width: 1366px) {\n.input-group-text[data-v-716b8b32]{\r\n        padding: 10.5px 15px;\n}\n}\n.input-group-append[data-v-716b8b32] {\r\n    width: 25%;\n}\r\n", ""]);
 
 // exports
 
@@ -68336,6 +68534,36 @@ if(false) {}
 
 /***/ }),
 
+/***/ "./node_modules/style-loader/index.js!./node_modules/css-loader/index.js?!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/Pages/Fuel/TankRefill/Add.vue?vue&type=style&index=0&id=ac6c809c&scoped=true&lang=css&":
+/*!************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/style-loader!./node_modules/css-loader??ref--5-1!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src??ref--5-2!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/Pages/Fuel/TankRefill/Add.vue?vue&type=style&index=0&id=ac6c809c&scoped=true&lang=css& ***!
+  \************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+
+var content = __webpack_require__(/*! !../../../../../node_modules/css-loader??ref--5-1!../../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../../node_modules/postcss-loader/src??ref--5-2!../../../../../node_modules/vue-loader/lib??vue-loader-options!./Add.vue?vue&type=style&index=0&id=ac6c809c&scoped=true&lang=css& */ "./node_modules/css-loader/index.js?!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/Pages/Fuel/TankRefill/Add.vue?vue&type=style&index=0&id=ac6c809c&scoped=true&lang=css&");
+
+if(typeof content === 'string') content = [[module.i, content, '']];
+
+var transform;
+var insertInto;
+
+
+
+var options = {"hmr":true}
+
+options.transform = transform
+options.insertInto = undefined;
+
+var update = __webpack_require__(/*! ../../../../../node_modules/style-loader/lib/addStyles.js */ "./node_modules/style-loader/lib/addStyles.js")(content, options);
+
+if(content.locals) module.exports = content.locals;
+
+if(false) {}
+
+/***/ }),
+
 /***/ "./node_modules/style-loader/index.js!./node_modules/css-loader/index.js?!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/Pages/FuelAdjustment/Adjustment.vue?vue&type=style&index=0&id=1b1b4180&scoped=true&lang=css&":
 /*!******************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/style-loader!./node_modules/css-loader??ref--5-1!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src??ref--5-2!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/Pages/FuelAdjustment/Adjustment.vue?vue&type=style&index=0&id=1b1b4180&scoped=true&lang=css& ***!
@@ -93476,7 +93704,9 @@ __webpack_require__.r(__webpack_exports__);
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Add_vue_vue_type_template_id_ac6c809c_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Add.vue?vue&type=template&id=ac6c809c&scoped=true& */ "./resources/js/Pages/Fuel/TankRefill/Add.vue?vue&type=template&id=ac6c809c&scoped=true&");
 /* harmony import */ var _Add_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Add.vue?vue&type=script&lang=js& */ "./resources/js/Pages/Fuel/TankRefill/Add.vue?vue&type=script&lang=js&");
-/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+/* empty/unused harmony star reexport *//* harmony import */ var _Add_vue_vue_type_style_index_0_id_ac6c809c_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Add.vue?vue&type=style&index=0&id=ac6c809c&scoped=true&lang=css& */ "./resources/js/Pages/Fuel/TankRefill/Add.vue?vue&type=style&index=0&id=ac6c809c&scoped=true&lang=css&");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
 
 
 
@@ -93484,7 +93714,7 @@ __webpack_require__.r(__webpack_exports__);
 
 /* normalize component */
 
-var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__["default"])(
   _Add_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
   _Add_vue_vue_type_template_id_ac6c809c_scoped_true___WEBPACK_IMPORTED_MODULE_0__["render"],
   _Add_vue_vue_type_template_id_ac6c809c_scoped_true___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
@@ -93513,6 +93743,22 @@ component.options.__file = "resources/js/Pages/Fuel/TankRefill/Add.vue"
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_Add_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/babel-loader/lib??ref--4-0!../../../../../node_modules/vue-loader/lib??vue-loader-options!./Add.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/Pages/Fuel/TankRefill/Add.vue?vue&type=script&lang=js&");
 /* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_Add_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/js/Pages/Fuel/TankRefill/Add.vue?vue&type=style&index=0&id=ac6c809c&scoped=true&lang=css&":
+/*!*************************************************************************************************************!*\
+  !*** ./resources/js/Pages/Fuel/TankRefill/Add.vue?vue&type=style&index=0&id=ac6c809c&scoped=true&lang=css& ***!
+  \*************************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_style_loader_index_js_node_modules_css_loader_index_js_ref_5_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_5_2_node_modules_vue_loader_lib_index_js_vue_loader_options_Add_vue_vue_type_style_index_0_id_ac6c809c_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/style-loader!../../../../../node_modules/css-loader??ref--5-1!../../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../../node_modules/postcss-loader/src??ref--5-2!../../../../../node_modules/vue-loader/lib??vue-loader-options!./Add.vue?vue&type=style&index=0&id=ac6c809c&scoped=true&lang=css& */ "./node_modules/style-loader/index.js!./node_modules/css-loader/index.js?!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/Pages/Fuel/TankRefill/Add.vue?vue&type=style&index=0&id=ac6c809c&scoped=true&lang=css&");
+/* harmony import */ var _node_modules_style_loader_index_js_node_modules_css_loader_index_js_ref_5_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_5_2_node_modules_vue_loader_lib_index_js_vue_loader_options_Add_vue_vue_type_style_index_0_id_ac6c809c_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_index_js_node_modules_css_loader_index_js_ref_5_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_5_2_node_modules_vue_loader_lib_index_js_vue_loader_options_Add_vue_vue_type_style_index_0_id_ac6c809c_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__);
+/* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _node_modules_style_loader_index_js_node_modules_css_loader_index_js_ref_5_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_5_2_node_modules_vue_loader_lib_index_js_vue_loader_options_Add_vue_vue_type_style_index_0_id_ac6c809c_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__) if(["default"].indexOf(__WEBPACK_IMPORT_KEY__) < 0) (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _node_modules_style_loader_index_js_node_modules_css_loader_index_js_ref_5_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_5_2_node_modules_vue_loader_lib_index_js_vue_loader_options_Add_vue_vue_type_style_index_0_id_ac6c809c_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__[key]; }) }(__WEBPACK_IMPORT_KEY__));
+
 
 /***/ }),
 

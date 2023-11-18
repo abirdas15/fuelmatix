@@ -160,7 +160,7 @@
                                                             </label>
                                                         </div>
                                                         <div class="mb-3 col-md-2">
-                                                            <label>Previous Reading </label>
+                                                            <label>Start Reading </label>
                                                             <div class="input-group">
                                                                 <input type="text" class="form-control" disabled
                                                                        v-model="n.start_reading">
@@ -171,7 +171,7 @@
 
                                                         </div>
                                                         <div class="mb-3 col-md-2"  v-if="listDispenser.status == 'end'">
-                                                            <label>Final Reading </label>
+                                                            <label>End Reading </label>
                                                             <div class="input-group">
                                                                 <input type="text" class="form-control text-end" @blur="disableInput('frReading'+nIndex+dIndex)"
                                                                        v-if="listDispenser.status == 'end'"
@@ -558,5 +558,8 @@ export default {
     .input-group-text{
         padding: 10.5px 15px;
     }
+}
+.input-group-append {
+    width: 25%;
 }
 </style>
