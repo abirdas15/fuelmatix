@@ -27415,13 +27415,7 @@ var render = function render() {
         name: "ShiftSaleListStart"
       }
     }
-  }, [_vm._v("Start Shift Sale")])], 1) : _vm._e(), _vm._v(" "), _vm.CheckPermission(_vm.Section.SHIFT_SALE + "-" + _vm.Action.VIEW) ? _c("li", [_c("router-link", {
-    attrs: {
-      to: {
-        name: "ShiftSaleList"
-      }
-    }
-  }, [_vm._v("End Shift Sale")])], 1) : _vm._e(), _vm._v(" "), _vm.CheckPermission(_vm.Section.POS + "-" + _vm.Action.VIEW) ? _c("li", [_c("router-link", {
+  }, [_vm._v("Shift Sale")])], 1) : _vm._e(), _vm._v(" "), _vm.CheckPermission(_vm.Section.POS + "-" + _vm.Action.VIEW) ? _c("li", [_c("router-link", {
     attrs: {
       to: {
         name: "Pos"
@@ -32545,11 +32539,21 @@ var render = function render() {
       }
     }
   }, [_vm._v("Amount")]), _vm._v(" "), _c("th", {
+    staticClass: "text-white",
+    "class": _vm.sortClass("status"),
+    on: {
+      click: function click($event) {
+        return _vm.sortData("status");
+      }
+    }
+  }, [_vm._v("Status")]), _vm._v(" "), _c("th", {
     staticClass: "text-white"
   }, [_vm._v("Action")])])]), _vm._v(" "), _vm.listData.length > 0 && _vm.TableLoading == false ? _c("tbody", _vm._l(_vm.listData, function (f) {
-    return _c("tr", [_c("td", [_vm._v(_vm._s(f.date))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(f.product_name))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(f.start_reading))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(f.end_reading))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(f.consumption))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(f.amount))]), _vm._v(" "), _c("td", [_c("div", {
+    return _c("tr", [_c("td", [_vm._v(_vm._s(f.date))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(f.product_name))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(f.start_reading))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(f.end_reading))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(f.consumption))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(f.amount))]), _vm._v(" "), _c("td", {
+      staticClass: "text-capitalize"
+    }, [_vm._v(_vm._s(f.status))]), _vm._v(" "), _c("td", [_c("div", {
       staticClass: "d-flex justify-content-end"
-    }, [_vm.CheckPermission(_vm.Section.SHIFT_SALE + "-" + _vm.Action.EDIT) ? _c("router-link", {
+    }, [_vm.CheckPermission(_vm.Section.SHIFT_SALE + "-" + _vm.Action.EDIT) && f.status == "start" ? _c("router-link", {
       staticClass: "btn btn-primary shadow btn-xs sharp me-1",
       attrs: {
         to: {
@@ -37808,7 +37812,7 @@ exports = module.exports = __webpack_require__(/*! ../../../../node_modules/css-
 
 
 // module
-exports.push([module.i, "\n.input-group-text[data-v-716b8b32]{\n    border-top-left-radius: 0;\n    border-bottom-left-radius: 0;\n    padding: 17px 15px;\n    position: relative;\n    top: -1px;\n}\n", ""]);
+exports.push([module.i, "\n.input-group-text[data-v-716b8b32]{\n    border-top-left-radius: 0;\n    border-bottom-left-radius: 0;\n    border: 1px solid #c3bfbf;\n    padding: 16.5px 15px;\n}\n.input-group-append[data-v-716b8b32] {\n    width: 25%;\n}\n@media only screen and (max-width: 1366px) {\n.input-group-text[data-v-716b8b32]{\n        padding: 10.5px 15px;\n}\n}\n", ""]);
 
 // exports
 

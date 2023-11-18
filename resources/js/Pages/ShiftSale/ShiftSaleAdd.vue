@@ -548,8 +548,15 @@ export default {
 .input-group-text{
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
-    padding: 17px 15px;
-    position: relative;
-    top: -1px;
+    border: 1px solid #c3bfbf;
+    padding: 16.5px 15px;
+}
+.input-group-append {
+    width: 25%;
+}
+@media only screen and (max-width: 1366px) {
+    .input-group-text{
+        padding: 10.5px 15px;
+    }
 }
 </style>

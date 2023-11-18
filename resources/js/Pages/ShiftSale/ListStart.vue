@@ -43,6 +43,7 @@
                                                 <th class="text-white" @click="sortData('end_reading')" :class="sortClass('end_reading')">End Reading</th>
                                                 <th class="text-white" @click="sortData('consumption')" :class="sortClass('consumption')">Consumption</th>
                                                 <th class="text-white" @click="sortData('amount')" :class="sortClass('amount')">Amount</th>
+                                                <th class="text-white" @click="sortData('status')" :class="sortClass('status')">Status</th>
                                                 <th class="text-white" >Action</th>
                                             </tr>
                                             </thead>
@@ -54,9 +55,10 @@
                                                 <td >{{f.end_reading}}</td>
                                                 <td >{{f.consumption}}</td>
                                                 <td >{{f.amount}}</td>
+                                                <td class="text-capitalize">{{f.status}}</td>
                                                 <td>
                                                     <div class="d-flex justify-content-end">
-                                                        <router-link v-if="CheckPermission(Section.SHIFT_SALE + '-' + Action.EDIT)" :to="{name: 'ShiftSaleAdd', query: { product_id: f.product_id }}" class=" btn btn-primary shadow btn-xs sharp me-1">
+                                                        <router-link v-if="CheckPermission(Section.SHIFT_SALE + '-' + Action.EDIT) && f.status == 'start'" :to="{name: 'ShiftSaleAdd', query: { product_id: f.product_id }}" class=" btn btn-primary shadow btn-xs sharp me-1">
                                                             <i class="fas fa-eye"></i>
                                                         </router-link>
                                                         <a  v-if="CheckPermission(Section.SHIFT_SALE + '-' + Action.DELETE)" href="javascript:void(0)"  @click="openModalDelete(f)" class="btn btn-danger shadow btn-xs sharp">

@@ -14,8 +14,7 @@
                     <span class="nav-text">Sales</span>
                 </a>
                     <ul aria-expanded="false" class="bichi">
-                        <li v-if="CheckPermission(Section.SHIFT_SALE + '-' + Action.VIEW)"><router-link :to="{name: 'ShiftSaleListStart'}">Start Shift Sale</router-link></li>
-                        <li v-if="CheckPermission(Section.SHIFT_SALE + '-' + Action.VIEW)"><router-link :to="{name: 'ShiftSaleList'}">End Shift Sale</router-link></li>
+                        <li v-if="CheckPermission(Section.SHIFT_SALE + '-' + Action.VIEW)"><router-link :to="{name: 'ShiftSaleListStart'}">Shift Sale</router-link></li>
                         <li v-if="CheckPermission(Section.POS + '-' + Action.VIEW)"><router-link :to="{name: 'Pos'}" >POS</router-link></li>
                         <li v-if="CheckPermission(Section.POS_HISTORY + '-' + Action.VIEW)"><router-link :to="{name: 'PosList'}" >POS History</router-link></li>
                         <li v-if="CheckPermission(Section.COMPANY_SALE + '-' + Action.VIEW)"><router-link :to="{name: 'CompanySale'}">Company Sale </router-link></li>
