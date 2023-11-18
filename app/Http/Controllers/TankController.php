@@ -325,7 +325,7 @@ class TankController extends Controller
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
-        $result = TankLog::select('id', 'height')
+        $result = TankLog::select('id', 'volume', 'height')
             ->where('type', 'tank refill')
             ->where('tank_id', $inputData['tank_id'])
             ->where('client_company_id', $inputData['session_user']['client_company_id'])
@@ -333,19 +333,22 @@ class TankController extends Controller
            ->first();
         $start_reading = 0;
         $end_reading = 0;
+        $start_reading_mm = 0;
+        $end_reading_mm = 0;
         if ($result instanceof TankLog) {
-            $start_reading = $result['height'];
+            $start_reading = $result['volume'];
+            $start_reading_mm = $result['height'];
         }
-        $bstiChart = BstiChart::select('height', 'volume')->where('tank_id', $inputData['tank_id'])->get()->toArray();
-        $start_reading_mm = Helpers::filterBstiChart($bstiChart, floor($start_reading), 'height', 'volume');
-        $end_reading_mm = Helpers::filterBstiChart($bstiChart, floor($end_reading), 'height', 'volume');
+        $dip_sale = $end_reading - $start_reading;
+        $dip_sale = $dip_sale > 0 ? $dip_sale : 0;
         return response()->json([
             'status' => 200,
             'data' => [
                 'start_reading_mm' => $start_reading_mm,
                 'end_reading_mm' => $end_reading_mm,
                 'start_reading' => $start_reading,
-                'end_reading' => $end_reading
+                'end_reading' => $end_reading,
+                'dip_sale' => $dip_sale
             ]
         ]);
     }
