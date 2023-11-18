@@ -28,6 +28,7 @@ class SaleRepository
     public static function validateAdvancePayment($inputData): \Illuminate\Contracts\Validation\Validator
     {
         return Validator::make($inputData, [
+            'date' => 'required|date',
             'advance_amount' => 'required|numeric',
             'company_id' => 'required_unless:payment_method,cash',
             'voucher_number' => 'required_if:payment_method,company|integer',
@@ -45,6 +46,7 @@ class SaleRepository
     public static function validateSale($inputData): \Illuminate\Contracts\Validation\Validator
     {
         return Validator::make($inputData, [
+            'date' => 'required|date',
             'payment_method' => 'required',
             'products' => 'required|array',
             'company_id' => 'required_unless:payment_method,cash',

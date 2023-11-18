@@ -118,7 +118,7 @@ class SaleController extends Controller
             $cash_in_hand_category_id = $category['id'];
         }
         $sale = new Sale();
-        $sale->date = Carbon::now('UTC');
+        $sale->date = Carbon::parse($requestData['date'])->format('Y-m-d H:i:s');
         $sale->invoice_number = Sale::getInvoiceNumber();
         $sale->total_amount = $total_amount;
         $sale->driver_tip = $requestData['driver_tip'] ?? 0;
