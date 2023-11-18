@@ -103,7 +103,7 @@ class SaleController extends Controller
                 $driverId = $driverExpense['id'];
             }
         }
-        if (!empty($requestData['voucher_number'])) {
+        if ($requestData['payment_method'] == PaymentMethod::CASH) {
             $sessionUser = SessionUser::getUser();
             if (!$sessionUser instanceof User) {
                 return response()->json(['status' => 500, 'message' => 'Cannot find session [user].']);
@@ -112,9 +112,7 @@ class SaleController extends Controller
             if (!$category instanceof Category) {
                 return response()->json(['status' => 500, 'message' => 'You are not a cashier user.']);
             }
-            if ($requestData['payment_method'] == PaymentMethod::CASH) {
-                $payment_category_id = $category['id'];
-            }
+            $payment_category_id = $category['id'];
             $cash_in_hand_category_id = $category['id'];
         }
         $sale = new Sale();
