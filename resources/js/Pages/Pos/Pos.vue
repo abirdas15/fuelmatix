@@ -14,6 +14,9 @@
                     <div class="row">
                         <div class="col-sm-5">
                             <div class="row">
+                                <div class="col-6 mb-3">
+                                    <input type="text" class="form-control date bg-white" name="date" v-model="date">
+                                </div>
                                 <div class="col-sm-6">
                                     <div class="user-search">
                                         <div class="input-group mb-3">
@@ -34,7 +37,7 @@
                                     </template>
                                 </div>
                                 <div class="col-sm-6" v-if="company_id">
-                                    <div class="user-search form-group">
+                                    <div class="user-search">
                                         <div class="input-group mb-3">
                                                 <span class="input-group-text">
                                                     <i class="fa-regular fa-user"></i>
@@ -541,6 +544,7 @@ export default {
             advance_sale: false,
             driver_amount: 0.00,
             car_number: '',
+            date: '',
         }
     },
     computed: {
@@ -639,7 +643,8 @@ export default {
             let param = {
                 payment_method: this.payment_method,
                 products: this.sale,
-                car_number: this.car_number
+                car_number: this.car_number,
+                date: this.date != '' ? this.date : moment().format('YYYY-MM-DD')
             }
             if (type == 'company') {
                 param.driver_tip = this.driver_tip
@@ -918,6 +923,17 @@ export default {
     mounted() {
         this.printD = new Printd()
         $('#dashboard_bar').text('Pos')
+        setTimeout(() => {
+            $('.date').flatpickr({
+                altInput: true,
+                altFormat: "d/m/Y",
+                dateFormat: "Y-m-d",
+                defaultDate: 'today',
+                onChange: (date, dateStr) => {
+                    this.date = dateStr
+                }
+            })
+        }, 1000)
     }
 }
 </script>
