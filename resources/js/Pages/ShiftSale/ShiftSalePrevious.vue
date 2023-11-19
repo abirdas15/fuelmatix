@@ -304,7 +304,7 @@
                                     </div>
                                     <div class="mb-3 col-md-6">
                                         <button type="submit" class="btn btn-primary" v-if="!loading && listDispenser?.status == 'start'">Start</button>
-                                        <button type="submit" class="btn btn-primary" v-if="!loading && listDispenser?.status == 'end'">End</button>
+                                        <button type="submit" class="btn btn-primary" v-if="!loading && listDispenser?.status == 'end'">Submit</button>
                                         <button type="button" class="btn btn-primary" v-if="loading">Submitting...</button>
                                     </div>
                                 </div>
@@ -472,6 +472,7 @@ export default {
             ApiService.ClearErrorHandler();
             this.loading = true
             this.listDispenser.categories = this.categories;
+            this.listDispenser.status = 'end'
             let totalCategoryAmount = 0
             let totalConsumption = 0
             this.listDispenser.categories.map(v => {

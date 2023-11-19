@@ -11352,6 +11352,7 @@ __webpack_require__.r(__webpack_exports__);
       _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].ClearErrorHandler();
       this.loading = true;
       this.listDispenser.categories = this.categories;
+      this.listDispenser.status = 'end';
       var totalCategoryAmount = 0;
       var totalConsumption = 0;
       this.listDispenser.categories.map(function (v) {
@@ -35619,7 +35620,7 @@ var render = function render() {
     attrs: {
       type: "submit"
     }
-  }, [_vm._v("End")]) : _vm._e(), _vm._v(" "), _vm.loading ? _c("button", {
+  }, [_vm._v("Submit")]) : _vm._e(), _vm._v(" "), _vm.loading ? _c("button", {
     staticClass: "btn btn-primary",
     attrs: {
       type: "button"
