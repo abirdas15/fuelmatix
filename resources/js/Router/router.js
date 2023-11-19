@@ -95,6 +95,7 @@ import fuelAdjustmentEdit from "../Pages/FuelAdjustment/Edit.vue";
 import UnauthorizedBill from "../Pages/UnauthorizedBill/UnauthorizedBill.vue";
 import salesReport from "../Pages/SalesReport/List.vue";
 import companyBills from "../Pages/CompanyBills/List.vue";
+import ShiftSalePrevious from "../Pages/ShiftSale/ShiftSalePrevious.vue";
 
 const ROOT_URL = "";
 const router = new VueRouter({
@@ -217,6 +218,11 @@ const router = new VueRouter({
                 },
                 {
                     path: ROOT_URL + "/shift/sale/start", name: "ShiftSaleAdd", component: ShiftSaleStart,  beforeEnter: (to, from, next) => {
+                    CheckPermission(to, from, next, Section.SHIFT_SALE + '-' + Action.CREATE)
+                    },
+                },
+                {
+                    path: ROOT_URL + "/shift/sale/previous", name: "ShiftSalePrevious", component: ShiftSalePrevious,  beforeEnter: (to, from, next) => {
                     CheckPermission(to, from, next, Section.SHIFT_SALE + '-' + Action.CREATE)
                     },
                 },
