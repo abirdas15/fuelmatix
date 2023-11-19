@@ -9,6 +9,7 @@ use App\Common\Module;
 use App\Common\PaymentMethod;
 use App\Helpers\Helpers;
 use App\Helpers\SessionUser;
+use App\Models\Car;
 use App\Models\Category;
 use App\Models\Driver;
 use App\Models\Product;
@@ -101,6 +102,15 @@ class SaleController extends Controller
                     return response()->json(['status' => 400, 'message' => 'Cannot find [driver expense category].']);
                 }
                 $driverId = $driverExpense['id'];
+            }
+            if (!empty($requestData['car_number'])) {
+                $car = Car::where('car_number', $requestData['car_number'])->where('company_id', $requestData['company_id'])->first();
+                if (!$car instanceof Car) {
+                    $car = new Car();
+                    $car->car_number = $requestData['car_number'];
+                    $car->company_id = $requestData['company_id'];
+                    $car->save();
+                }
             }
         }
         if ($requestData['payment_method'] == PaymentMethod::CASH) {

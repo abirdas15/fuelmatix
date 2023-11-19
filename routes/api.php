@@ -39,6 +39,7 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\FuelAdjustmentController;
 use App\Http\Controllers\CompanyBillController;
+use App\Http\Controllers\CarController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -306,6 +307,9 @@ Route::group(['middleware' => 'AuthReqCheck'], function() {
     Route::group(['prefix' => 'companyBill'], function() {
         Route::post('list', [CompanyBillController::class, 'list']);
         Route::post('download', [CompanyBillController::class, 'download']);
+    });
+    Route::group(['prefix' => 'car'], function() {
+        Route::post('search', [CarController::class, 'search']);
     });
 });
 
