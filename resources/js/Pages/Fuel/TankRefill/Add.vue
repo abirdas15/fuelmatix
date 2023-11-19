@@ -72,7 +72,7 @@
                                                 <div class="mb-3 form-group col-md-3"></div>
                                                 <div class="mb-3 form-group col-md-3">
                                                     <div class="input-group">
-                                                        <input type="text" class="form-control " disabled name="start_reading" v-model="param.start_reading_mm">
+                                                        <input type="text" class="form-control " name="start_reading" v-model="param.start_reading_mm">
                                                         <div class="input-group-append">
                                                             <span class="input-group-text" >mm</span>
                                                         </div>
@@ -136,7 +136,7 @@
                                                     <label>Start Reading </label>
                                                     <div class="input-group">
                                                         <input type="text" class="form-control"
-                                                                 :id="'prReading'+nIndex+dIndex" disabled
+                                                                 :id="'prReading'+nIndex+dIndex"
                                                                v-model="n.start_reading">
                                                         <div class="input-group-append">
                                                             <span class="input-group-text">Liter</span>
