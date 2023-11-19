@@ -306,7 +306,6 @@
                                         <button type="submit" class="btn btn-primary" v-if="!loading && listDispenser?.status == 'start'">Start</button>
                                         <button type="submit" class="btn btn-primary" v-if="!loading && listDispenser?.status == 'end'">End</button>
                                         <button type="button" class="btn btn-primary" v-if="loading">Submitting...</button>
-                                        <router-link :to="{name: 'ShiftSaleList'}" type="button" class="btn btn-danger">Cancel</router-link>
                                     </div>
                                 </div>
                             </div>

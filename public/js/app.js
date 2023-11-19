@@ -35624,15 +35624,7 @@ var render = function render() {
     attrs: {
       type: "button"
     }
-  }, [_vm._v("Submitting...")]) : _vm._e(), _vm._v(" "), _c("router-link", {
-    staticClass: "btn btn-danger",
-    attrs: {
-      to: {
-        name: "ShiftSaleList"
-      },
-      type: "button"
-    }
-  }, [_vm._v("Cancel")])], 1)]) : _vm._e()])])])])])])]);
+  }, [_vm._v("Submitting...")]) : _vm._e()])]) : _vm._e()])])])])])])]);
 };
 var staticRenderFns = [function () {
   var _vm = this,
