@@ -76,7 +76,7 @@
                                                             </div>
                                                         </div>
                                                         <div class="mb-3 col-md-2"></div>
-                                                        <div class="mb-3 col-md-2" v-if="listDispenser.status == 'end'">
+                                                        <div class="mb-3 col-md-2">
                                                             <div class="input-group">
                                                                 <input id="prReading"
                                                                        type="text" class="form-control text-end"
@@ -99,7 +99,7 @@
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        <div class="mb-3 col-md-2" v-if="listDispenser.status == 'end'">
+                                                        <div class="mb-3 col-md-2">
                                                             <div class="input-group">
                                                                 <input type="text" class="form-control"  disabled
                                                                        v-model="listDispenser.tank_refill">
@@ -109,7 +109,7 @@
                                                             </div>
 
                                                         </div>
-                                                        <div class="mb-3 col-md-2" v-if="listDispenser.status == 'end'">
+                                                        <div class="mb-3 col-md-2">
                                                             <div class="input-group">
                                                                 <input id="frReading" disabled
                                                                        type="text" class="form-control"
@@ -121,9 +121,9 @@
 
 <!--                                                            <input class="form-control" value="0" v-if="listDispenser.status == 'start'" disabled>-->
                                                         </div>
-                                                        <div class="mb-3 col-md-2" v-if="listDispenser.status == 'end'">
+                                                        <div class="mb-3 col-md-2">
                                                             <div class="input-group">
-                                                                <input id="frReading" @blur="disableInput('frReading')" v-if="listDispenser.status == 'end'"
+                                                                <input id="frReading" @blur="disableInput('frReading')"
                                                                        type="text" class="form-control" disabled
                                                                        v-model="listDispenser.adjustment"
                                                                        @input="calculateAmount">
@@ -135,9 +135,9 @@
 <!--                                                            <input class="form-control" value="0" v-if="listDispenser.status == 'start'" disabled>-->
                                                         </div>
 
-                                                        <div class="mb-3 col-md-2" v-if="listDispenser.status == 'end'">
+                                                        <div class="mb-3 col-md-2">
                                                             <div class="input-group">
-                                                                <input type="text" class="form-control" id="consumption" disabled  v-if="listDispenser.status == 'end'"
+                                                                <input type="text" class="form-control" id="consumption" disabled
                                                                        v-model="listDispenser.consumption">
                                                                 <div class="input-group-append">
                                                                     <span class="input-group-text" >Liter</span>
@@ -172,11 +172,10 @@
                                                             </div>
 
                                                         </div>
-                                                        <div class="mb-3 col-md-2"  v-if="listDispenser.status == 'end'">
+                                                        <div class="mb-3 col-md-2" >
                                                             <label>End Reading </label>
                                                             <div class="input-group">
                                                                 <input type="text" class="form-control text-end" @blur="disableInput('frReading'+nIndex+dIndex)"
-                                                                       v-if="listDispenser.status == 'end'"
                                                                        v-model="n.end_reading" @click="enableInput('frReading'+nIndex+dIndex)"
                                                                        @input="calculateAmountNozzle(dIndex, nIndex) ">
                                                                 <div class="input-group-append">
@@ -186,11 +185,10 @@
 
 <!--                                                            <input class="form-control" value="0" v-if="listDispenser.status == 'start'" disabled>-->
                                                         </div>
-                                                        <div class="mb-3 col-md-2" v-if="listDispenser.status == 'end'">
+                                                        <div class="mb-3 col-md-2">
                                                             <label>Adjustment </label>
                                                             <div class="input-group">
                                                                 <input type="text" class="form-control text-end" @blur="disableInput('frReading'+nIndex+dIndex)"
-                                                                       v-if="listDispenser.status == 'end'"
                                                                        v-model="n.adjustment"
                                                                        @input="calculateAmountNozzle(dIndex, nIndex) " disabled>
                                                                 <div class="input-group-append">
@@ -201,7 +199,7 @@
                                                         </div>
 
 
-                                                        <div class="mb-3 col-md-2"  v-if="listDispenser.status == 'end'">
+                                                        <div class="mb-3 col-md-2" >
                                                             <label>Consumption </label>
                                                             <div class="input-group">
                                                                 <input type="text" disabled class="form-control"

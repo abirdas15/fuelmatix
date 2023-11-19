@@ -35060,7 +35060,7 @@ var render = function render() {
     }
   }), _vm._v(" "), _vm._m(8)])]), _vm._v(" "), _c("div", {
     staticClass: "mb-3 col-md-2"
-  }), _vm._v(" "), _vm.listDispenser.status == "end" ? _c("div", {
+  }), _vm._v(" "), _c("div", {
     staticClass: "mb-3 col-md-2"
   }, [_c("div", {
     staticClass: "input-group"
@@ -35085,7 +35085,7 @@ var render = function render() {
         _vm.$set(_vm.listDispenser, "end_reading_mm", $event.target.value);
       }
     }
-  }), _vm._v(" "), _vm._m(9)])]) : _vm._e(), _vm._v(" "), _c("div", {
+  }), _vm._v(" "), _vm._m(9)])]), _vm._v(" "), _c("div", {
     staticClass: "mb-3 col-md-2"
   }), _vm._v(" "), _c("div", {
     staticClass: "mb-3 col-md-2"
@@ -35115,7 +35115,7 @@ var render = function render() {
         _vm.$set(_vm.listDispenser, "start_reading", $event.target.value);
       }
     }
-  }), _vm._v(" "), _vm._m(10)])]), _vm._v(" "), _vm.listDispenser.status == "end" ? _c("div", {
+  }), _vm._v(" "), _vm._m(10)])]), _vm._v(" "), _c("div", {
     staticClass: "mb-3 col-md-2"
   }, [_c("div", {
     staticClass: "input-group"
@@ -35140,7 +35140,7 @@ var render = function render() {
         _vm.$set(_vm.listDispenser, "tank_refill", $event.target.value);
       }
     }
-  }), _vm._v(" "), _vm._m(11)])]) : _vm._e(), _vm._v(" "), _vm.listDispenser.status == "end" ? _c("div", {
+  }), _vm._v(" "), _vm._m(11)])]), _vm._v(" "), _c("div", {
     staticClass: "mb-3 col-md-2"
   }, [_c("div", {
     staticClass: "input-group"
@@ -35166,11 +35166,11 @@ var render = function render() {
         _vm.$set(_vm.listDispenser, "end_reading", $event.target.value);
       }
     }
-  }), _vm._v(" "), _vm._m(12)])]) : _vm._e(), _vm._v(" "), _vm.listDispenser.status == "end" ? _c("div", {
+  }), _vm._v(" "), _vm._m(12)])]), _vm._v(" "), _c("div", {
     staticClass: "mb-3 col-md-2"
   }, [_c("div", {
     staticClass: "input-group"
-  }, [_vm.listDispenser.status == "end" ? _c("input", {
+  }, [_c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -35195,11 +35195,11 @@ var render = function render() {
         _vm.$set(_vm.listDispenser, "adjustment", $event.target.value);
       }, _vm.calculateAmount]
     }
-  }) : _vm._e(), _vm._v(" "), _vm._m(13)])]) : _vm._e(), _vm._v(" "), _vm.listDispenser.status == "end" ? _c("div", {
+  }), _vm._v(" "), _vm._m(13)])]), _vm._v(" "), _c("div", {
     staticClass: "mb-3 col-md-2"
   }, [_c("div", {
     staticClass: "input-group"
-  }, [_vm.listDispenser.status == "end" ? _c("input", {
+  }, [_c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -35221,7 +35221,7 @@ var render = function render() {
         _vm.$set(_vm.listDispenser, "consumption", $event.target.value);
       }
     }
-  }) : _vm._e(), _vm._v(" "), _vm._m(14)])]) : _vm._e()])])])] : _vm._e(), _vm._v(" "), _vm._l(_vm.listDispenser.dispensers, function (d, dIndex) {
+  }), _vm._v(" "), _vm._m(14)])])])])])] : _vm._e(), _vm._v(" "), _vm._l(_vm.listDispenser.dispensers, function (d, dIndex) {
     return _vm.listDispenser.dispensers.length > 0 ? _c("div", {
       staticClass: "card"
     }, [_c("div", {
@@ -35264,11 +35264,11 @@ var render = function render() {
             _vm.$set(n, "start_reading", $event.target.value);
           }
         }
-      }), _vm._v(" "), _vm._m(15, true)])]), _vm._v(" "), _vm.listDispenser.status == "end" ? _c("div", {
+      }), _vm._v(" "), _vm._m(15, true)])]), _vm._v(" "), _c("div", {
         staticClass: "mb-3 col-md-2"
       }, [_c("label", [_vm._v("End Reading ")]), _vm._v(" "), _c("div", {
         staticClass: "input-group"
-      }, [_vm.listDispenser.status == "end" ? _c("input", {
+      }, [_c("input", {
         directives: [{
           name: "model",
           rawName: "v-model",
@@ -35296,11 +35296,11 @@ var render = function render() {
             return _vm.calculateAmountNozzle(dIndex, nIndex);
           }]
         }
-      }) : _vm._e(), _vm._v(" "), _vm._m(16, true)])]) : _vm._e(), _vm._v(" "), _vm.listDispenser.status == "end" ? _c("div", {
+      }), _vm._v(" "), _vm._m(16, true)])]), _vm._v(" "), _c("div", {
         staticClass: "mb-3 col-md-2"
       }, [_c("label", [_vm._v("Adjustment ")]), _vm._v(" "), _c("div", {
         staticClass: "input-group"
-      }, [_vm.listDispenser.status == "end" ? _c("input", {
+      }, [_c("input", {
         directives: [{
           name: "model",
           rawName: "v-model",
@@ -35326,7 +35326,7 @@ var render = function render() {
             return _vm.calculateAmountNozzle(dIndex, nIndex);
           }]
         }
-      }) : _vm._e(), _vm._v(" "), _vm._m(17, true)])]) : _vm._e(), _vm._v(" "), _vm.listDispenser.status == "end" ? _c("div", {
+      }), _vm._v(" "), _vm._m(17, true)])]), _vm._v(" "), _c("div", {
         staticClass: "mb-3 col-md-2"
       }, [_c("label", [_vm._v("Consumption ")]), _vm._v(" "), _c("div", {
         staticClass: "input-group"
@@ -35351,7 +35351,7 @@ var render = function render() {
             _vm.$set(n, "consumption", $event.target.value);
           }
         }
-      }), _vm._v(" "), _vm._m(18, true)])]) : _vm._e()]);
+      }), _vm._v(" "), _vm._m(18, true)])])]);
     }), 0) : _vm._e()]) : _vm._e();
   }), _vm._v(" "), _vm.listDispenser.status != "start" ? [_c("div", {
     staticClass: "row"
@@ -39669,7 +39669,7 @@ exports = module.exports = __webpack_require__(/*! ../../../../../node_modules/c
 
 
 // module
-exports.push([module.i, "\n.input-group-text[data-v-5a662738]{\r\n    border-top-left-radius: 0;\r\n    border-bottom-left-radius: 0;\r\n    border: 1px solid #c3bfbf;\r\n    padding: 16.5px 15px;\n}\n@media only screen and (max-width: 1366px) {\n.input-group-text[data-v-5a662738]{\r\n        padding: 10.5px 15px;\n}\n}\r\n", ""]);
+exports.push([module.i, "\n.input-group-text[data-v-5a662738]{\n    border-top-left-radius: 0;\n    border-bottom-left-radius: 0;\n    border: 1px solid #c3bfbf;\n    padding: 16.5px 15px;\n}\n@media only screen and (max-width: 1366px) {\n.input-group-text[data-v-5a662738]{\n        padding: 10.5px 15px;\n}\n}\n", ""]);
 
 // exports
 
@@ -39688,7 +39688,7 @@ exports = module.exports = __webpack_require__(/*! ../../../../../node_modules/c
 
 
 // module
-exports.push([module.i, "\n.input-group-text[data-v-ac6c809c]{\r\n    border-top-left-radius: 0;\r\n    border-bottom-left-radius: 0;\r\n    border: 1px solid #c3bfbf;\r\n    padding: 16.5px 15px;\n}\n.input-group-append[data-v-ac6c809c] {\r\n    width: 25%;\n}\n@media only screen and (max-width: 1366px) {\n.input-group-text[data-v-ac6c809c]{\r\n        padding: 10.5px 15px;\n}\n}\r\n", ""]);
+exports.push([module.i, "\n.input-group-text[data-v-ac6c809c]{\n    border-top-left-radius: 0;\n    border-bottom-left-radius: 0;\n    border: 1px solid #c3bfbf;\n    padding: 16.5px 15px;\n}\n.input-group-append[data-v-ac6c809c] {\n    width: 25%;\n}\n@media only screen and (max-width: 1366px) {\n.input-group-text[data-v-ac6c809c]{\n        padding: 10.5px 15px;\n}\n}\n", ""]);
 
 // exports
 
@@ -39726,7 +39726,7 @@ exports = module.exports = __webpack_require__(/*! ../../../../node_modules/css-
 
 
 // module
-exports.push([module.i, "\n.box-mula[data-v-0d4183dd]{\n    padding: 10px 30px;\n    box-shadow: 0 0 15px 0 #CBC9C8;\n    border-radius: 12px;\n    margin-bottom: 30px;\n    margin-top: 10px;\n}\n.putkir-futa[data-v-0d4183dd]{\n    border-bottom: 1px solid #c1c1c1;\n    margin: 10px 0px 15px 0px;\n    padding-bottom: 11px;\n}\n", ""]);
+exports.push([module.i, "\n.box-mula[data-v-0d4183dd]{\r\n    padding: 10px 30px;\r\n    box-shadow: 0 0 15px 0 #CBC9C8;\r\n    border-radius: 12px;\r\n    margin-bottom: 30px;\r\n    margin-top: 10px;\n}\n.putkir-futa[data-v-0d4183dd]{\r\n    border-bottom: 1px solid #c1c1c1;\r\n    margin: 10px 0px 15px 0px;\r\n    padding-bottom: 11px;\n}\r\n", ""]);
 
 // exports
 
@@ -100639,7 +100639,7 @@ var app = new vue__WEBPACK_IMPORTED_MODULE_1___default.a({
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! D:\xampp7.4\htdocs\fuelmatix\resources\js\app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! D:\xampp\htdocs\projects\fuelmatix\resources\js\app.js */"./resources/js/app.js");
 
 
 /***/ })
