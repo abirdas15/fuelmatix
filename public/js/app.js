@@ -24999,7 +24999,6 @@ var render = function render() {
     staticClass: "form-control",
     attrs: {
       type: "text",
-      disabled: "",
       name: "start_reading"
     },
     domProps: {
@@ -25160,8 +25159,7 @@ var render = function render() {
         staticClass: "form-control",
         attrs: {
           type: "text",
-          id: "prReading" + nIndex + dIndex,
-          disabled: ""
+          id: "prReading" + nIndex + dIndex
         },
         domProps: {
           value: n.start_reading
@@ -25731,7 +25729,6 @@ var render = function render() {
         staticClass: "form-control",
         attrs: {
           type: "text",
-          disabled: "",
           id: "prReading" + nIndex + dIndex
         },
         domProps: {

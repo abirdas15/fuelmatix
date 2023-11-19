@@ -85,7 +85,7 @@
                                                     </div>
                                                     <div class="mb-3 col-md-3">
                                                         <label>Previous Reading </label>
-                                                        <input type="text" class="form-control" disabled
+                                                        <input type="text" class="form-control"
                                                                :id="'prReading'+nIndex+dIndex"
                                                                v-model="n.start_reading">
                                                     </div>
