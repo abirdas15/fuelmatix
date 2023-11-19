@@ -525,6 +525,12 @@ input[type=number] {
     border: none!important;
     height: 45px!important;
 }
+@media only screen and (max-width: 1366px) {
+    .vs__dropdown-toggle{
+        border: none!important;
+        height: 35px!important;
+    }
+}
 
 button:disabled{
     opacity: .30;
