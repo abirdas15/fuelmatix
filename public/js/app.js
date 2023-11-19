@@ -11216,6 +11216,7 @@ __webpack_require__.r(__webpack_exports__);
     getDispenser: function getDispenser() {
       if (this.date != '' && this.product_id != '') {
         this.getProductDispenser();
+        this.getBstiChart();
       }
     },
     getBstiChart: function getBstiChart() {
@@ -11410,7 +11411,6 @@ __webpack_require__.r(__webpack_exports__);
   created: function created() {
     this.getProduct();
     this.getSingleMitchMatch();
-    this.getBstiChart();
   },
   mounted: function mounted() {
     var _this9 = this;

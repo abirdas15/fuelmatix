@@ -354,6 +354,7 @@ export default {
         getDispenser: function () {
             if (this.date != '' && this.product_id != '') {
                 this.getProductDispenser()
+                this.getBstiChart();
             }
         },
         getBstiChart: function() {
@@ -530,7 +531,6 @@ export default {
     created() {
         this.getProduct()
         this.getSingleMitchMatch()
-        this.getBstiChart();
     },
     mounted() {
         $('#dashboard_bar').text('Shift Sale')
