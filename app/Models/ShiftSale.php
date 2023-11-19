@@ -13,7 +13,6 @@ class ShiftSale extends Model
 
     public $timestamps = false;
     protected $hidden = [
-        'client_company_id',
         'user_id',
     ];
 }
