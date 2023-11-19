@@ -97,7 +97,16 @@ class ShiftSaleController extends Controller
      //   $productPrices = ProductPrice::where('client_company_id', $inputData['session_user']['client_company_id'])->where('product_id', $inputData['product_id'])->where('stock_quantity', '>', 0)->get();
         $shiftSale = ShiftSale::where('client_company_id', $inputData['session_user']['client_company_id'])->where('product_id', $inputData['product_id'])->where('status', 'start')->first();
         if (!$shiftSale instanceof ShiftSale) {
-            return response()->json(['status' => 400, 'message' => 'Cannot find shift sale.']);
+            $shiftSale = new ShiftSale();
+            $shiftSale->date = $inputData['date'];
+            $shiftSale->start_time = date('h:i:s');
+            $shiftSale->product_id = $inputData['product_id'];
+            $shiftSale->status = 'start';
+            $shiftSale->user_id = $sessionUser['id'];
+            $shiftSale->client_company_id = $inputData['session_user']['client_company_id'];
+            if (!$shiftSale->save()) {
+                return response()->json(['status' => 400, 'message' => 'Cannot start shift sale.']);
+            }
         }
         $shiftSale->end_time = date('h:i:s');
         $shiftSale->start_reading = $inputData['start_reading'];
@@ -112,7 +121,7 @@ class ShiftSaleController extends Controller
         }
         $tankLogData = [
             'tank_id' => $tank['id'],
-            'date' => date('Y-m-d'),
+            'date' => $inputData['date'],
             'height' => $inputData['end_reading'],
             'type' => 'shift sell',
         ];
@@ -171,7 +180,7 @@ class ShiftSaleController extends Controller
         $shiftSaleTransaction = [];
         foreach ($inputData['categories'] as $category) {
             $transactionData['transaction'] = [
-                ['date' => date('Y-m-d'), 'account_id' => $category['category_id'], 'debit_amount' => 0, 'credit_amount' => $category['amount'], 'module' => 'shift sale', 'module_id' => $shiftSale->id]
+                ['date' => $inputData['date'], 'account_id' => $category['category_id'], 'debit_amount' => 0, 'credit_amount' => $category['amount'], 'module' => 'shift sale', 'module_id' => $shiftSale->id]
             ];
             $shiftSaleTransaction[] = [
                 'shift_sale_id' => $shiftSale->id,
@@ -183,7 +192,7 @@ class ShiftSaleController extends Controller
         $transactionData = [];
         $transactionData['linked_id'] = $stockCategory['id'];
         $transactionData['transaction'] = [
-            ['date' => date('Y-m-d'), 'account_id' => $costOfGoodSoldCategory['id'], 'debit_amount' => 0, 'credit_amount' => $buyingPrice, 'module' => 'shift sale', 'module_id' => $shiftSale->id]
+            ['date' => $inputData['date'], 'account_id' => $costOfGoodSoldCategory['id'], 'debit_amount' => 0, 'credit_amount' => $buyingPrice, 'module' => 'shift sale', 'module_id' => $shiftSale->id]
         ];
         TransactionController::saveTransaction($transactionData);
         ShiftSaleTransaction::insert($shiftSaleTransaction);
