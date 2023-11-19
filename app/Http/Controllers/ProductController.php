@@ -257,7 +257,6 @@ class ProductController extends Controller
         $inputData = $request->all();
         $validator = Validator::make($inputData, [
             'product_id' => 'required',
-            'date' => 'date'
         ]);
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
