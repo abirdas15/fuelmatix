@@ -12,7 +12,7 @@
             <div class="row">
                 <div class="col-xl-12 col-lg-12">
                     <div class="row">
-                        <div class="col-sm-5">
+                        <div class="col-6">
                             <div class="row">
                                 <div class="col-6 mb-3">
                                     <input type="text" class="form-control date bg-white" name="date" v-model="date">
@@ -53,9 +53,14 @@
                                         <label>Advance Amount: <strong>{{ parseFloat(driver_amount).toFixed(2) }}</strong></label>
                                     </div>
                                 </div>
-                                <div class="col-sm-6" v-if="company_id">
-                                    <div class="user-search form-group">
-                                        <input type="text" class="form-control" placeholder="Car Number" name="car_number" v-model="car_number">
+                                <div class="col-sm-6 mb-3" v-if="company_id">
+                                    <div class="user-search form-group position-relative">
+                                        <input type="text" class="form-control" placeholder="Car Number" name="car_number" v-model="car_number" @input="getCarList">
+                                        <div class="car-drop" v-if="carList.length > 0">
+                                            <ul>
+                                                <li v-for="c in carList" @click="selectCar(c)">{{c.car_number}}</li>
+                                            </ul>
+                                        </div>
                                         <span class="invalid-feedback d-block"></span>
                                     </div>
                                 </div>
@@ -202,11 +207,11 @@
                                         <i class="fa fa-spinner fa-spin"></i></button>
 
                                 </div>
-                                <button style="width: 80%;margin: auto;" class="btn btn-danger btn-block mt-2" @click="this.sale = []">Reset <i
+                                <button style="width: 80%;margin: auto;" class="btn btn-danger btn-block mt-2" @click="sale = []">Reset <i
                                     class="fa-solid fa-arrow-rotate-left"></i></button>
                             </div>
                         </div>
-                        <div class="col-sm-7">
+                        <div class="col-6">
                             <div class="row">
                                 <div class="col-sm-12">
 <!--                                    <div class="input-group mb-3">
@@ -545,6 +550,7 @@ export default {
             driver_amount: 0.00,
             car_number: '',
             date: '',
+            carList: []
         }
     },
     computed: {
@@ -554,6 +560,7 @@ export default {
     },
     watch: {
         company_id: function () {
+            this.car_number = ''
             this.getDriver();
             if (this.company_id == null) {
                 this.enableDriverTip = false
@@ -578,6 +585,10 @@ export default {
         },
     },
     methods: {
+        selectCar: function (car) {
+            this.car_number = car.car_number
+            this.carList = []
+        },
         fetchDriverAmount: function() {
             ApiService.POST(ApiRoutes.DriverAmount, {driver_id: this.driver_sale.driver_id}, (res) => {
                 if (parseInt(res.status) == 200) {
@@ -912,7 +923,16 @@ export default {
                     this.posMachine = res.data.data
                 }
             });
-        }
+        },
+        getCarList: function () {
+            ApiService.POST(ApiRoutes.CarSearch, {company_id: this.company_id, keyword: this.car_number}, res => {
+                if (parseInt(res.status) === 200) {
+                    this.carList = res.data
+                } else {
+                    this.carList = []
+                }
+            });
+        },
     },
     created() {
         this.getProducts()
@@ -1031,6 +1051,9 @@ export default {
 
 .width-fixed {
     width: 150px;
+    @media only screen and (max-width: 1366px) {
+        width: 117px;
+    }
 }
 
 .active-btn {
@@ -1052,5 +1075,26 @@ export default {
     left: 4rem;
     font-size: 13px;
     color: red;
+}
+.car-drop{
+    width: 100%;
+    margin: 0;
+    position: absolute;
+    z-index: 9999;
+    background-color: #ffffff;
+    border: 1px solid #f2f2f2;
+    border-radius: 10px;
+    ul{
+        li{
+            padding: 10px 15px;
+            border-bottom: 1px solid #f2f2f2;
+            transition: 500ms;
+            cursor: pointer;
+            &:hover{
+                background-color: #f2f2f2;
+                transition: 500ms;
+            }
+        }
+    }
 }
 </style>

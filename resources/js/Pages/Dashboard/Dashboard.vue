@@ -90,6 +90,8 @@
 <script>
 import ApiService from "../../Services/ApiService";
 import ApiRoutes from "../../Services/ApiRoutes";
+import Action from "../../Helpers/Action";
+import Section from "../../Helpers/Section";
 
 export default {
     name: "Dashboard",
@@ -106,8 +108,13 @@ export default {
             listData: []
         }
     },
+    computed: {
+        Auth: function () {
+            return this.$store.getters.GetAuth;
+        },
+    },
     mounted() {
-        $('#dashboard_bar').text('Daily Sale')
+        $('#dashboard_bar').text(this.Auth.company_name)
     },
     methods: {
         calculateTop: function (tank) {

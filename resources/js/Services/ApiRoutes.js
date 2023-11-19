@@ -225,6 +225,9 @@ const ApiRoutes = {
     //Company Bills
     CompanyBillList: ApiVersion + '/companyBill/list',
     CompanyBillDownload: ApiVersion + '/companyBill/download',
+
+    //car search
+    CarSearch: ApiVersion + '/car/search'
 };
 
 export default ApiRoutes;
