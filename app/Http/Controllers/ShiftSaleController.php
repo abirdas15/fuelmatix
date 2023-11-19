@@ -95,7 +95,10 @@ class ShiftSaleController extends Controller
             return response()->json(['status' => 500, 'error' => 'Cannot fin account stock of good sold category.']);
         }
      //   $productPrices = ProductPrice::where('client_company_id', $inputData['session_user']['client_company_id'])->where('product_id', $inputData['product_id'])->where('stock_quantity', '>', 0)->get();
-        $shiftSale = ShiftSale::where('client_company_id', $inputData['session_user']['client_company_id'])->where('product_id', $inputData['product_id'])->where('status', 'start')->first();
+        $shiftSale = ShiftSale::where('client_company_id', $inputData['session_user']['client_company_id'])
+            ->where('product_id', $inputData['product_id'])->where('status', 'start')
+            ->where('date', '<=', $inputData['date'])
+            ->first();
         if (!$shiftSale instanceof ShiftSale) {
             $shiftSale = new ShiftSale();
             $shiftSale->date = $inputData['date'];
@@ -104,9 +107,7 @@ class ShiftSaleController extends Controller
             $shiftSale->status = 'start';
             $shiftSale->user_id = $sessionUser['id'];
             $shiftSale->client_company_id = $inputData['session_user']['client_company_id'];
-            if (!$shiftSale->save()) {
-                return response()->json(['status' => 400, 'message' => 'Cannot start shift sale.']);
-            }
+            $shiftSale->save();
         }
         $shiftSale->end_time = date('h:i:s');
         $shiftSale->start_reading = $inputData['start_reading'];
