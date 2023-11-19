@@ -29,7 +29,7 @@
                                         <input type="text" class="form-control date bg-white" name="date" v-model="date">
                                     </div>
                                     <div class="col-2">
-                                       <button class="btn btn-primary mt-4" @click="getDispenser()">Search</button>
+                                       <button class="btn btn-primary mt-4" type="button" @click="getDispenser()">Search</button>
                                     </div>
                                 </div>
 
@@ -457,7 +457,7 @@ export default {
         getProductDispenser: function () {
             this.totalSale = 0
             this.totalAmount = 0
-            ApiService.POST(ApiRoutes.ProductDispenser, {product_id: this.product_id}, res => {
+            ApiService.POST(ApiRoutes.ProductDispenser, {product_id: this.product_id, date: this.date}, res => {
                 this.TableLoading = false
                 if (parseInt(res.status) === 200) {
                     this.listDispenser = res.data;

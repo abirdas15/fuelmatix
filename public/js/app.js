@@ -11331,7 +11331,8 @@ __webpack_require__.r(__webpack_exports__);
       this.totalSale = 0;
       this.totalAmount = 0;
       _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].ProductDispenser, {
-        product_id: this.product_id
+        product_id: this.product_id,
+        date: this.date
       }, function (res) {
         _this6.TableLoading = false;
         if (parseInt(res.status) === 200) {
@@ -35005,6 +35006,9 @@ var render = function render() {
     staticClass: "col-2"
   }, [_c("button", {
     staticClass: "btn btn-primary mt-4",
+    attrs: {
+      type: "button"
+    },
     on: {
       click: function click($event) {
         return _vm.getDispenser();
