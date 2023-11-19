@@ -256,11 +256,14 @@ class ProductController extends Controller
     {
         $inputData = $request->all();
         $validator = Validator::make($inputData, [
-            'product_id' => 'required'
+            'product_id' => 'required',
+            'date' => 'date'
         ]);
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
+        $date = $inputData['date'] ?? date('Y-m-d');
+        $date = date('Y-m-d', strtotime($date . ' -1 day'));
         $sessionUser = SessionUser::getUser();
         $product = Product::where('id', $inputData['product_id'])->where('client_company_id', $sessionUser['client_company_id'])->first();
         if (!$product instanceof Product) {
@@ -270,7 +273,11 @@ class ProductController extends Controller
         if (!$tank instanceof Tank) {
             return response()->json(['status' => 500, 'error' => 'Cannot find tank.']);
         }
-        $shiftSale = ShiftSale::select('id', 'end_reading')->where('client_company_id', $sessionUser['client_company_id'])->where('status', 'end')->where('product_id', $request['product_id'])->orderBy('id', 'DESC')->first();
+        $shiftSale = ShiftSale::select('id', 'end_reading')->where('client_company_id', $sessionUser['client_company_id'])
+            ->where('status', 'end')->where('product_id', $request['product_id'])
+            ->where('date', '<=', $date)
+            ->orderBy('id', 'DESC')
+            ->first();
         $start_reading = $tank['opening_stock'] ?? 0;
         $shiftSaleId = 0;
         if ($shiftSale instanceof ShiftSale) {
@@ -279,8 +286,14 @@ class ProductController extends Controller
         }
         $end_reading = 0;
         $tank_refill = 0;
-        $shiftSale = ShiftSale::select('id', 'end_reading')->where('client_company_id', $sessionUser['client_company_id'])->where('status', 'start')->where('product_id', $request['product_id'])->orderBy('id', 'DESC')->first();
-        $fuelAdjustment = FuelAdjustment::select('id', 'loss_quantity')->where('shift_sale_id', $shiftSale['id'] ?? 0)->first();
+        $shiftSale = ShiftSale::select('id', 'end_reading')->where('client_company_id', $sessionUser['client_company_id'])
+            ->where('status', 'start')->where('product_id', $request['product_id'])
+            ->where('date', '<=', $date)
+            ->orderBy('id', 'DESC')
+            ->first();
+        $fuelAdjustment = FuelAdjustment::select('id', 'loss_quantity')
+            ->where('shift_sale_id', $shiftSale['id'] ?? 0)
+            ->first();
         $adjustment = 0;
         $nozzleAdjustment = [];
         if ($fuelAdjustment instanceof FuelAdjustment) {
@@ -294,7 +307,8 @@ class ProductController extends Controller
                 }
             }
         }
-        $tankRefill = TankRefill::where('shift_sale_id', $shiftSale['id'] ?? 0)->first();
+        $tankRefill = TankRefill::where('shift_sale_id', $shiftSale['id'] ?? 0)
+            ->first();
         if ($tankRefill instanceof TankRefill) {
             $tank_refill = $tankRefill['total_refill_volume'];
         }
@@ -346,6 +360,7 @@ class ProductController extends Controller
         $result['dispensers'] = $dispensers;
         $shiftSale = ShiftSale::where('client_company_id', $sessionUser['client_company_id'])
             ->where('product_id', $inputData['product_id'])
+            ->where('date', '<=', $date)
             ->orderBy('id', 'DESC')
             ->first();
         $result['status'] = 'start';

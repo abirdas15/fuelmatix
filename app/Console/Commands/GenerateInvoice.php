@@ -47,8 +47,8 @@ class GenerateInvoice extends Command
     {
         $startDate = date('Y-m-d', strtotime('first day of last month'));
         $endDate = date('Y-m-t', strtotime($startDate));
-        $transaction = Transaction::select('id','module', 'module_id', 'description', 'linked_id as category_id', 'debit_amount as amount')
-            ->whereBetween('date', [$startDate, $endDate])
+        $transaction = Transaction::select('id','module', 'module_id', 'description', 'linked_id as category_id', 'debit_amount as amount', 'client_company_id')
+            ->whereBetween('date', ["2023-11-01", "2023-11-31"])
             ->get()
             ->toArray();
         $transactionArray = [];
@@ -67,10 +67,11 @@ class GenerateInvoice extends Command
                     foreach ($posSale as &$sale) {
                         $sale['transaction_id'] = $row['id'];
                         $sale['description'] = $row['description'] ?? null;
-                        $invoiceItem[] = $sale;
+                        $sale['client_company_id'] = $row['client_company_id'];
+                        $invoiceItem[$key][] = $sale;
                     }
                 } else if ($row['module'] == Module::SHIFT_SALE) {
-                    $shiftSale = ShiftSale::select('shift_sale.product_id', 'products.selling_price as price', 'shift_sale.date')
+                    $shiftSale = ShiftSale::select('shift_sale.product_id', 'products.selling_price as price', 'shift_sale.date', 'shift_sale.client_company_id')
                         ->leftJoin('products', 'products.id', '=', 'shift_sale.product_id')
                         ->where('shift_sale.id', $row['module_id'])
                         ->first();
@@ -79,31 +80,32 @@ class GenerateInvoice extends Command
                         $shiftSale['subtotal'] = $row['amount'];
                         $shiftSale['transaction_id'] = $row['id'];
                         $shiftSale = $shiftSale->toArray();
-                        $invoiceItem[] = $shiftSale;
+                        $invoiceItem[$key][] = $shiftSale;
                     }
                 }
             }
-            dd($invoiceItem);
-            $invoice = new Invoice();
-            $invoice->invoice_number = Invoice::getInvoiceNumber();
-            $invoice->date = Carbon::now();
-            $invoice->category_id = $key;
-            $invoice->amount = array_sum(array_column($invoiceItem, 'subtotal'));
-            $invoice->status = 'due';
-            $invoice->due_date = Carbon::now()->add('30D');
-            $invoice->client_company_id = $sessionUser['client_company_id'];
-            if ($invoice->save()) {
-                foreach ($invoiceItem as $item) {
-                    $invoiceItemObj = new InvoiceItem();
-                    $invoiceItemObj->invoice_id = $invoice->id;
-                    $invoiceItemObj->transaction_id = $item['transaction_id'];
-                    $invoiceItemObj->car_number = $item['description'] ?? null;
-                    $invoiceItemObj->product_id = $item['product_id'];
-                    $invoiceItemObj->quantity = $item['quantity'];
-                    $invoiceItemObj->price = $item['price'];
-                    $invoiceItemObj->subtotal = $item['subtotal'];
-                    $invoiceItemObj->date = Carbon::parse($item['date'])->format('Y-m-d');
-                    $invoiceItemObj->save();
+            foreach ($invoiceItem as $key => $data) {
+                $invoice = new Invoice();
+                $invoice->invoice_number = Invoice::getInvoiceNumber();
+                $invoice->date = $data['date'];
+                $invoice->category_id = $key;
+                $invoice->amount = array_sum(array_column($invoiceItem, 'subtotal'));
+                $invoice->status = 'due';
+                $invoice->due_date = Carbon::now()->add('30D');
+             //   $invoice->client_company_id = $sessionUser['client_company_id'];
+                if ($invoice->save()) {
+                    foreach ($data as $item) {
+                        $invoiceItemObj = new InvoiceItem();
+                        $invoiceItemObj->invoice_id = $invoice->id;
+                        $invoiceItemObj->transaction_id = $item['transaction_id'];
+                        $invoiceItemObj->car_number = $item['description'] ?? null;
+                        $invoiceItemObj->product_id = $item['product_id'];
+                        $invoiceItemObj->quantity = $item['quantity'];
+                        $invoiceItemObj->price = $item['price'];
+                        $invoiceItemObj->subtotal = $item['subtotal'];
+                        $invoiceItemObj->date = Carbon::parse($item['date'])->format('Y-m-d');
+                        $invoiceItemObj->save();
+                    }
                 }
             }
         }

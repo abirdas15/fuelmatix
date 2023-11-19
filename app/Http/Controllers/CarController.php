@@ -12,7 +12,7 @@ class CarController extends Controller
     /**
      * @param Request $request
      * @return JsonResponse
-     * */
+     */
     public function search(Request $request): JsonResponse
     {
         $requestData = $request->all();
