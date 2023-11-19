@@ -35354,7 +35354,7 @@ var render = function render() {
         }
       }), _vm._v(" "), _vm._m(18, true)])])]);
     }), 0) : _vm._e()]) : _vm._e();
-  }), _vm._v(" "), _vm.listDispenser.status != "start" ? [_c("div", {
+  }), _vm._v(" "), [_c("div", {
     staticClass: "row"
   }, [_c("div", {
     staticClass: "col-sm-7"
@@ -35601,7 +35601,7 @@ var render = function render() {
       "font-size": "18px",
       padding: "0px"
     }
-  }, [_vm._v(_vm._s(isNaN(_vm.totalPaid) ? 0 : _vm.totalPaid) + " Tk")])])])])])] : _vm._e()], 2)]) : _vm._e()]), _vm._v(" "), _vm.product_id ? _c("div", {
+  }, [_vm._v(_vm._s(isNaN(_vm.totalPaid) ? 0 : _vm.totalPaid) + " Tk")])])])])])]], 2)]) : _vm._e()]), _vm._v(" "), _vm.product_id ? _c("div", {
     staticClass: "row",
     staticStyle: {
       "text-align": "right"

@@ -214,7 +214,7 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <template v-if="listDispenser.status != 'start'">
+                                            <template>
                                                 <div class="row">
                                                     <div class="col-sm-7"></div>
                                                     <div class="col-sm-5 text-end mb-2">
