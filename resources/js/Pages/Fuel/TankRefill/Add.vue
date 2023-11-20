@@ -135,7 +135,7 @@
                                                 <div class="mb-3 col-md-3">
                                                     <label>Start Reading </label>
                                                     <div class="input-group">
-                                                        <input type="text" class="form-control"
+                                                        <input type="text" class="form-control" @input="nozzleTotalSale(n)"
                                                                  :id="'prReading'+nIndex+dIndex"
                                                                v-model="n.start_reading">
                                                         <div class="input-group-append">
@@ -146,7 +146,7 @@
                                                 <div class="mb-3 col-md-3">
                                                     <label>End reading </label>
                                                     <div class="input-group">
-                                                        <input type="text" class="form-control"
+                                                        <input type="text" class="form-control" @input="nozzleTotalSale(n)"
                                                                  :id="'trReading'+nIndex+dIndex"
                                                                v-model="n.end_reading">
                                                         <div class="input-group-append">
@@ -248,15 +248,35 @@ export default {
         },
         'param.end_reading': function() {
             this.param.dip_sale = parseFloat(this.param.end_reading) - parseFloat(this.param.start_reading);
+            this.param.total_refill_volume = this.getTotalRefillVolume()
+            this.param.net_profit = this.param.total_refill_volume - this.param.quantity
         },
         'param.start_reading_mm': function() {
             this.param.start_reading = this.filterBstiChart(this.bstiChart, this.param.start_reading_mm, 'height', 'volume');
         },
         'param.start_reading': function() {
             this.param.dip_sale = parseFloat(this.param.end_reading) - parseFloat(this.param.start_reading);
+            this.param.total_refill_volume = this.getTotalRefillVolume()
+            this.param.net_profit = this.param.total_refill_volume - this.param.quantity
         },
     },
     methods: {
+        getTotalRefillVolume: function () {
+            let nozzleAmount = 0
+            this.param.dispensers.map(d => {
+                if (d.nozzle.length > 0) {
+                   d.nozzle.map(n => {
+                       nozzleAmount += n.sale
+                   })
+                }
+            })
+            return this.param.dip_sale + nozzleAmount
+        },
+        nozzleTotalSale: function (nozzle) {
+            nozzle.sale = parseFloat(nozzle.end_reading) - parseFloat(nozzle.start_reading)
+            this.param.total_refill_volume = this.getTotalRefillVolume()
+            this.param.net_profit = this.param.total_refill_volume - this.param.quantity
+        },
         getBstiChart: function() {
             ApiService.POST(ApiRoutes.TankBstiChart, {tank_id: this.param.tank_id}, res => {
                 this.TableLoading = false

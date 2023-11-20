@@ -6911,15 +6911,35 @@ __webpack_require__.r(__webpack_exports__);
     },
     'param.end_reading': function paramEnd_reading() {
       this.param.dip_sale = parseFloat(this.param.end_reading) - parseFloat(this.param.start_reading);
+      this.param.total_refill_volume = this.getTotalRefillVolume();
+      this.param.net_profit = this.param.total_refill_volume - this.param.quantity;
     },
     'param.start_reading_mm': function paramStart_reading_mm() {
       this.param.start_reading = this.filterBstiChart(this.bstiChart, this.param.start_reading_mm, 'height', 'volume');
     },
     'param.start_reading': function paramStart_reading() {
       this.param.dip_sale = parseFloat(this.param.end_reading) - parseFloat(this.param.start_reading);
+      this.param.total_refill_volume = this.getTotalRefillVolume();
+      this.param.net_profit = this.param.total_refill_volume - this.param.quantity;
     }
   },
   methods: {
+    getTotalRefillVolume: function getTotalRefillVolume() {
+      var nozzleAmount = 0;
+      this.param.dispensers.map(function (d) {
+        if (d.nozzle.length > 0) {
+          d.nozzle.map(function (n) {
+            nozzleAmount += n.sale;
+          });
+        }
+      });
+      return this.param.dip_sale + nozzleAmount;
+    },
+    nozzleTotalSale: function nozzleTotalSale(nozzle) {
+      nozzle.sale = parseFloat(nozzle.end_reading) - parseFloat(nozzle.start_reading);
+      this.param.total_refill_volume = this.getTotalRefillVolume();
+      this.param.net_profit = this.param.total_refill_volume - this.param.quantity;
+    },
     getBstiChart: function getBstiChart() {
       var _this = this;
       _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].TankBstiChart, {
@@ -11212,10 +11232,14 @@ __webpack_require__.r(__webpack_exports__);
   },
   watch: {
     'listDispenser.end_reading_mm': function listDispenserEnd_reading_mm() {
-      this.listDispenser.end_reading = this.filterBstiChart(this.bstiChart, this.listDispenser.end_reading_mm, 'height', 'volume');
+      if (this.listDispenser) {
+        this.listDispenser.end_reading = this.filterBstiChart(this.bstiChart, this.listDispenser.end_reading_mm, 'height', 'volume');
+      }
     },
     'listDispenser.end_reading': function listDispenserEnd_reading() {
-      this.calculateAmount();
+      if (this.listDispenser) {
+        this.calculateAmount();
+      }
     }
   },
   methods: {
@@ -11358,45 +11382,50 @@ __webpack_require__.r(__webpack_exports__);
       _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].ClearErrorHandler();
       this.loading = true;
       this.listDispenser.categories = this.categories;
-      this.listDispenser.status = 'end';
-      var totalCategoryAmount = 0;
-      var totalConsumption = 0;
-      this.listDispenser.categories.map(function (v) {
-        totalCategoryAmount += parseFloat(v.amount);
-      });
-      // if ((this.totalAmount - this.totalPosSale()) != totalCategoryAmount) {
-      //     this.loading = false
-      //     this.$toast.error('Please match the total amount and category list')
-      //     return
-      // }
-
-      this.listDispenser.dispensers.map(function (dispenser) {
-        dispenser.nozzle.map(function (nozzle) {
-          totalConsumption += parseFloat(nozzle.consumption);
+      if (this.listDispenser.status == 'end') {
+        var totalCategoryAmount = 0;
+        var totalConsumption = 0;
+        this.listDispenser.categories.map(function (v) {
+          totalCategoryAmount += parseFloat(v.amount);
         });
-      });
-      // check if mismatch allow
-      if (this.mismatchAllow != null) {
-        if (this.totalShiftParcent(totalConsumption) > this.mismatchAllow) {
-          this.loading = false;
-          this.$toast.error('The mismatch is grater than allowed consumption');
+        // if ((this.totalAmount - this.totalPosSale()) != totalCategoryAmount) {
+        //     this.loading = false
+        //     this.$toast.error('Please match the total amount and category list')
+        //     return
+        // }
+
+        this.listDispenser.dispensers.map(function (dispenser) {
+          dispenser.nozzle.map(function (nozzle) {
+            totalConsumption += parseFloat(nozzle.consumption);
+          });
+        });
+        // check if mismatch allow
+        if (this.mismatchAllow != null) {
+          if (this.totalShiftParcent(totalConsumption) > this.mismatchAllow) {
+            this.loading = false;
+            this.$toast.error('The mismatch is grater than allowed consumption');
+            return;
+          }
+        }
+        this.listDispenser.amount = totalCategoryAmount;
+        this.listDispenser.consumption = totalConsumption;
+        if (this.listDispenser.consumption == 0) {
+          this.$toast.error('The consumption amount is 0');
           return;
         }
-      }
-      this.listDispenser.amount = totalCategoryAmount;
-      this.listDispenser.consumption = totalConsumption;
-      if (this.listDispenser.consumption == 0) {
-        this.$toast.error('The consumption amount is 0');
-        return;
       }
       this.listDispenser.date = this.date;
       _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].ShiftSaleAdd, this.listDispenser, function (res) {
         _this7.loading = false;
         if (parseInt(res.status) === 200) {
           _this7.$toast.success(res.message);
-          _this7.listDispenser = null;
-          _this7.date = '';
-          _this7.product_id = '';
+          if (_this7.listDispenser.status == 'start') {
+            _this7.getDispenser();
+          } else {
+            _this7.listDispenser = null;
+            _this7.date = '';
+            _this7.product_id = '';
+          }
         } else {
           _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].ErrorHandler(res.errors);
         }
@@ -25171,10 +25200,12 @@ var render = function render() {
           value: n.start_reading
         },
         on: {
-          input: function input($event) {
+          input: [function ($event) {
             if ($event.target.composing) return;
             _vm.$set(n, "start_reading", $event.target.value);
-          }
+          }, function ($event) {
+            return _vm.nozzleTotalSale(n);
+          }]
         }
       }), _vm._v(" "), _vm._m(13, true)])]), _vm._v(" "), _c("div", {
         staticClass: "mb-3 col-md-3"
@@ -25196,10 +25227,12 @@ var render = function render() {
           value: n.end_reading
         },
         on: {
-          input: function input($event) {
+          input: [function ($event) {
             if ($event.target.composing) return;
             _vm.$set(n, "end_reading", $event.target.value);
-          }
+          }, function ($event) {
+            return _vm.nozzleTotalSale(n);
+          }]
         }
       }), _vm._v(" "), _vm._m(14, true)])]), _vm._v(" "), _c("div", {
         staticClass: "mb-3 col-md-3"
@@ -29027,7 +29060,7 @@ var render = function render() {
     attrs: {
       value: ""
     }
-  }, [_vm._v("Select Bank")]), _vm._v(" "), _vm._l(_vm.listDataVendor, function (d) {
+  }, [_vm._v("Select Vendor")]), _vm._v(" "), _vm._l(_vm.listDataVendor, function (d) {
     return _c("option", {
       domProps: {
         value: d.id
@@ -29407,7 +29440,7 @@ var render = function render() {
     attrs: {
       value: ""
     }
-  }, [_vm._v("Select Bank")]), _vm._v(" "), _vm._l(_vm.listDataVendor, function (d) {
+  }, [_vm._v("Select Vendor")]), _vm._v(" "), _vm._l(_vm.listDataVendor, function (d) {
     return _c("option", {
       domProps: {
         value: d.id
@@ -35032,7 +35065,7 @@ var render = function render() {
     staticClass: "card-header"
   }, [_c("h5", {
     staticClass: "card-title"
-  }, [_vm._v("\n                                                        " + _vm._s(_vm.listDispenser.product_name))])]), _vm._v(" "), _c("div", {
+  }, [_vm._v("\n                                                            " + _vm._s(_vm.listDispenser.product_name))])]), _vm._v(" "), _c("div", {
     staticClass: "card-body"
   }, [_c("div", {
     staticClass: "row align-items-center text-start"
@@ -35064,7 +35097,7 @@ var render = function render() {
     }
   }), _vm._v(" "), _vm._m(8)])]), _vm._v(" "), _c("div", {
     staticClass: "mb-3 col-md-2"
-  }), _vm._v(" "), _c("div", {
+  }), _vm._v(" "), _vm.listDispenser.status == "end" ? _c("div", {
     staticClass: "mb-3 col-md-2"
   }, [_c("div", {
     staticClass: "input-group"
@@ -35089,7 +35122,7 @@ var render = function render() {
         _vm.$set(_vm.listDispenser, "end_reading_mm", $event.target.value);
       }
     }
-  }), _vm._v(" "), _vm._m(9)])]), _vm._v(" "), _c("div", {
+  }), _vm._v(" "), _vm._m(9)])]) : _vm._e(), _vm._v(" "), _c("div", {
     staticClass: "mb-3 col-md-2"
   }), _vm._v(" "), _c("div", {
     staticClass: "mb-3 col-md-2"
@@ -35119,7 +35152,7 @@ var render = function render() {
         _vm.$set(_vm.listDispenser, "start_reading", $event.target.value);
       }
     }
-  }), _vm._v(" "), _vm._m(10)])]), _vm._v(" "), _c("div", {
+  }), _vm._v(" "), _vm._m(10)])]), _vm._v(" "), _vm.listDispenser.status == "end" ? _c("div", {
     staticClass: "mb-3 col-md-2"
   }, [_c("div", {
     staticClass: "input-group"
@@ -35144,7 +35177,7 @@ var render = function render() {
         _vm.$set(_vm.listDispenser, "tank_refill", $event.target.value);
       }
     }
-  }), _vm._v(" "), _vm._m(11)])]), _vm._v(" "), _c("div", {
+  }), _vm._v(" "), _vm._m(11)])]) : _vm._e(), _vm._v(" "), _vm.listDispenser.status == "end" ? _c("div", {
     staticClass: "mb-3 col-md-2"
   }, [_c("div", {
     staticClass: "input-group"
@@ -35170,11 +35203,11 @@ var render = function render() {
         _vm.$set(_vm.listDispenser, "end_reading", $event.target.value);
       }
     }
-  }), _vm._v(" "), _vm._m(12)])]), _vm._v(" "), _c("div", {
+  }), _vm._v(" "), _vm._m(12)])]) : _vm._e(), _vm._v(" "), _vm.listDispenser.status == "end" ? _c("div", {
     staticClass: "mb-3 col-md-2"
   }, [_c("div", {
     staticClass: "input-group"
-  }, [_c("input", {
+  }, [_vm.listDispenser.status == "end" ? _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -35199,11 +35232,11 @@ var render = function render() {
         _vm.$set(_vm.listDispenser, "adjustment", $event.target.value);
       }, _vm.calculateAmount]
     }
-  }), _vm._v(" "), _vm._m(13)])]), _vm._v(" "), _c("div", {
+  }) : _vm._e(), _vm._v(" "), _vm._m(13)])]) : _vm._e(), _vm._v(" "), _vm.listDispenser.status == "end" ? _c("div", {
     staticClass: "mb-3 col-md-2"
   }, [_c("div", {
     staticClass: "input-group"
-  }, [_c("input", {
+  }, [_vm.listDispenser.status == "end" ? _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -35225,7 +35258,7 @@ var render = function render() {
         _vm.$set(_vm.listDispenser, "consumption", $event.target.value);
       }
     }
-  }), _vm._v(" "), _vm._m(14)])])])])])] : _vm._e(), _vm._v(" "), _vm._l(_vm.listDispenser.dispensers, function (d, dIndex) {
+  }) : _vm._e(), _vm._v(" "), _vm._m(14)])]) : _vm._e()])])])] : _vm._e(), _vm._v(" "), _vm._l(_vm.listDispenser.dispensers, function (d, dIndex) {
     return _vm.listDispenser.dispensers.length > 0 ? _c("div", {
       staticClass: "card"
     }, [_c("div", {
@@ -35268,11 +35301,11 @@ var render = function render() {
             _vm.$set(n, "start_reading", $event.target.value);
           }
         }
-      }), _vm._v(" "), _vm._m(15, true)])]), _vm._v(" "), _c("div", {
+      }), _vm._v(" "), _vm._m(15, true)])]), _vm._v(" "), _vm.listDispenser.status == "end" ? _c("div", {
         staticClass: "mb-3 col-md-2"
       }, [_c("label", [_vm._v("End Reading ")]), _vm._v(" "), _c("div", {
         staticClass: "input-group"
-      }, [_c("input", {
+      }, [_vm.listDispenser.status == "end" ? _c("input", {
         directives: [{
           name: "model",
           rawName: "v-model",
@@ -35300,11 +35333,11 @@ var render = function render() {
             return _vm.calculateAmountNozzle(dIndex, nIndex);
           }]
         }
-      }), _vm._v(" "), _vm._m(16, true)])]), _vm._v(" "), _c("div", {
+      }) : _vm._e(), _vm._v(" "), _vm._m(16, true)])]) : _vm._e(), _vm._v(" "), _vm.listDispenser.status == "end" ? _c("div", {
         staticClass: "mb-3 col-md-2"
       }, [_c("label", [_vm._v("Adjustment ")]), _vm._v(" "), _c("div", {
         staticClass: "input-group"
-      }, [_c("input", {
+      }, [_vm.listDispenser.status == "end" ? _c("input", {
         directives: [{
           name: "model",
           rawName: "v-model",
@@ -35330,7 +35363,7 @@ var render = function render() {
             return _vm.calculateAmountNozzle(dIndex, nIndex);
           }]
         }
-      }), _vm._v(" "), _vm._m(17, true)])]), _vm._v(" "), _c("div", {
+      }) : _vm._e(), _vm._v(" "), _vm._m(17, true)])]) : _vm._e(), _vm._v(" "), _vm.listDispenser.status == "end" ? _c("div", {
         staticClass: "mb-3 col-md-2"
       }, [_c("label", [_vm._v("Consumption ")]), _vm._v(" "), _c("div", {
         staticClass: "input-group"
@@ -35355,9 +35388,9 @@ var render = function render() {
             _vm.$set(n, "consumption", $event.target.value);
           }
         }
-      }), _vm._v(" "), _vm._m(18, true)])])]);
+      }), _vm._v(" "), _vm._m(18, true)])]) : _vm._e()]);
     }), 0) : _vm._e()]) : _vm._e();
-  }), _vm._v(" "), [_c("div", {
+  }), _vm._v(" "), _vm.listDispenser.status != "start" ? [_c("div", {
     staticClass: "row"
   }, [_c("div", {
     staticClass: "col-sm-7"
@@ -35604,7 +35637,7 @@ var render = function render() {
       "font-size": "18px",
       padding: "0px"
     }
-  }, [_vm._v(_vm._s(isNaN(_vm.totalPaid) ? 0 : _vm.totalPaid) + " Tk")])])])])])]], 2)]) : _vm._e()]), _vm._v(" "), _vm.product_id ? _c("div", {
+  }, [_vm._v(_vm._s(isNaN(_vm.totalPaid) ? 0 : _vm.totalPaid) + " Tk")])])])])])] : _vm._e()], 2)]) : _vm._e()]), _vm._v(" "), _vm.product_id ? _c("div", {
     staticClass: "row",
     staticStyle: {
       "text-align": "right"
@@ -39665,7 +39698,7 @@ exports = module.exports = __webpack_require__(/*! ../../../../../node_modules/c
 
 
 // module
-exports.push([module.i, "\n.input-group-text[data-v-5a662738]{\r\n    border-top-left-radius: 0;\r\n    border-bottom-left-radius: 0;\r\n    border: 1px solid #c3bfbf;\r\n    padding: 16.5px 15px;\n}\n@media only screen and (max-width: 1366px) {\n.input-group-text[data-v-5a662738]{\r\n        padding: 10.5px 15px;\n}\n}\r\n", ""]);
+exports.push([module.i, "\n.input-group-text[data-v-5a662738]{\n    border-top-left-radius: 0;\n    border-bottom-left-radius: 0;\n    border: 1px solid #c3bfbf;\n    padding: 16.5px 15px;\n}\n@media only screen and (max-width: 1366px) {\n.input-group-text[data-v-5a662738]{\n        padding: 10.5px 15px;\n}\n}\n", ""]);
 
 // exports
 
@@ -39684,7 +39717,7 @@ exports = module.exports = __webpack_require__(/*! ../../../../../node_modules/c
 
 
 // module
-exports.push([module.i, "\n.input-group-text[data-v-ac6c809c]{\r\n    border-top-left-radius: 0;\r\n    border-bottom-left-radius: 0;\r\n    border: 1px solid #c3bfbf;\r\n    padding: 16.5px 15px;\n}\n.input-group-append[data-v-ac6c809c] {\r\n    width: 25%;\n}\n@media only screen and (max-width: 1366px) {\n.input-group-text[data-v-ac6c809c]{\r\n        padding: 10.5px 15px;\n}\n}\r\n", ""]);
+exports.push([module.i, "\n.input-group-text[data-v-ac6c809c]{\n    border-top-left-radius: 0;\n    border-bottom-left-radius: 0;\n    border: 1px solid #c3bfbf;\n    padding: 16.5px 15px;\n}\n.input-group-append[data-v-ac6c809c] {\n    width: 25%;\n}\n@media only screen and (max-width: 1366px) {\n.input-group-text[data-v-ac6c809c]{\n        padding: 10.5px 15px;\n}\n}\n", ""]);
 
 // exports
 
@@ -39722,7 +39755,7 @@ exports = module.exports = __webpack_require__(/*! ../../../../node_modules/css-
 
 
 // module
-exports.push([module.i, "\n.box-mula[data-v-0d4183dd]{\n    padding: 10px 30px;\n    box-shadow: 0 0 15px 0 #CBC9C8;\n    border-radius: 12px;\n    margin-bottom: 30px;\n    margin-top: 10px;\n}\n.putkir-futa[data-v-0d4183dd]{\n    border-bottom: 1px solid #c1c1c1;\n    margin: 10px 0px 15px 0px;\n    padding-bottom: 11px;\n}\n", ""]);
+exports.push([module.i, "\n.box-mula[data-v-0d4183dd]{\r\n    padding: 10px 30px;\r\n    box-shadow: 0 0 15px 0 #CBC9C8;\r\n    border-radius: 12px;\r\n    margin-bottom: 30px;\r\n    margin-top: 10px;\n}\n.putkir-futa[data-v-0d4183dd]{\r\n    border-bottom: 1px solid #c1c1c1;\r\n    margin: 10px 0px 15px 0px;\r\n    padding-bottom: 11px;\n}\r\n", ""]);
 
 // exports
 
@@ -39779,7 +39812,7 @@ exports = module.exports = __webpack_require__(/*! ../../../../node_modules/css-
 
 
 // module
-exports.push([module.i, "\n.input-group-text[data-v-85b721be]{\r\n    border-top-left-radius: 0;\r\n    border-bottom-left-radius: 0;\r\n    border: 1px solid #c3bfbf;\r\n    padding: 16.5px 15px;\n}\n.input-group-append[data-v-85b721be] {\r\n    width: 25%;\n}\n@media only screen and (max-width: 1366px) {\n.input-group-text[data-v-85b721be]{\r\n        padding: 10.5px 15px;\n}\n}\n.input-group-append[data-v-85b721be] {\r\n    width: 25%;\n}\r\n", ""]);
+exports.push([module.i, "\n.input-group-text[data-v-85b721be]{\n    border-top-left-radius: 0;\n    border-bottom-left-radius: 0;\n    border: 1px solid #c3bfbf;\n    padding: 16.5px 15px;\n}\n.input-group-append[data-v-85b721be] {\n    width: 25%;\n}\n@media only screen and (max-width: 1366px) {\n.input-group-text[data-v-85b721be]{\n        padding: 10.5px 15px;\n}\n}\n.input-group-append[data-v-85b721be] {\n    width: 25%;\n}\n", ""]);
 
 // exports
 
@@ -100635,7 +100668,7 @@ var app = new vue__WEBPACK_IMPORTED_MODULE_1___default.a({
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! D:\xampp7.4\htdocs\fuelmatix\resources\js\app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! D:\xampp\htdocs\projects\fuelmatix\resources\js\app.js */"./resources/js/app.js");
 
 
 /***/ })

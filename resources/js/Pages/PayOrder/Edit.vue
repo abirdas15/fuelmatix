@@ -30,7 +30,7 @@
                                     <div class="mb-3 form-group col-md-4">
                                         <label class="form-label">Vendor:</label>
                                         <select class="form-control" name="vendor_id" id="vendor_id"  v-model="param.vendor_id">
-                                            <option value="">Select Bank</option>
+                                            <option value="">Select Vendor</option>
                                             <option v-for="d in listDataVendor" :value="d.id">{{d.name}}</option>
                                         </select>
                                         <div class="invalid-feedback"></div>
