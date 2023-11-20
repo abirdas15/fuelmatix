@@ -8,17 +8,14 @@ use App\Helpers\SessionUser;
 use App\Models\Category;
 use App\Models\Dispenser;
 use App\Models\Product;
-use App\Models\ProductPrice;
 use App\Models\ShiftSale;
 use App\Models\ShiftSaleTransaction;
 use App\Models\ShiftSummary;
-use App\Models\Stock;
 use App\Models\Tank;
 use App\Repository\NozzleRepository;
 use App\Repository\TankRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class ShiftSaleController extends Controller
@@ -119,7 +116,6 @@ class ShiftSaleController extends Controller
             'type' => 'shift sell',
         ];
         TankRepository::readingSave($tankLogData);
-        $totalNozzleConsumption = 0;
         $stockData = [
             'client_company_id' => $inputData['session_user']['client_company_id'],
             'date' => $inputData['date'],
