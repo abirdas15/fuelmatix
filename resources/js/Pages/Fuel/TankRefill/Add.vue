@@ -249,6 +249,12 @@ export default {
         'param.end_reading': function() {
             this.param.dip_sale = parseFloat(this.param.end_reading) - parseFloat(this.param.start_reading);
         },
+        'param.start_reading_mm': function() {
+            this.param.start_reading = this.filterBstiChart(this.bstiChart, this.param.start_reading_mm, 'height', 'volume');
+        },
+        'param.start_reading': function() {
+            this.param.dip_sale = parseFloat(this.param.end_reading) - parseFloat(this.param.start_reading);
+        },
     },
     methods: {
         getBstiChart: function() {

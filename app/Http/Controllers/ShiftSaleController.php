@@ -94,20 +94,12 @@ class ShiftSaleController extends Controller
         if (!$costOfGoodSoldCategory instanceof Category) {
             return response()->json(['status' => 500, 'error' => 'Cannot fin account stock of good sold category.']);
         }
-     //   $productPrices = ProductPrice::where('client_company_id', $inputData['session_user']['client_company_id'])->where('product_id', $inputData['product_id'])->where('stock_quantity', '>', 0)->get();
         $shiftSale = ShiftSale::where('client_company_id', $inputData['session_user']['client_company_id'])
             ->where('product_id', $inputData['product_id'])->where('status', 'start')
             ->where('date', '<=', $inputData['date'])
             ->first();
         if (!$shiftSale instanceof ShiftSale) {
-            $shiftSale = new ShiftSale();
-            $shiftSale->date = $inputData['date'];
-            $shiftSale->start_time = date('h:i:s');
-            $shiftSale->product_id = $inputData['product_id'];
-            $shiftSale->status = 'start';
-            $shiftSale->user_id = $sessionUser['id'];
-            $shiftSale->client_company_id = $inputData['session_user']['client_company_id'];
-            $shiftSale->save();
+            return response()->json(['status' => 400, 'message' => 'Cannot find shift sale.']);
         }
         $shiftSale->end_time = date('h:i:s');
         $shiftSale->start_reading = $inputData['start_reading'];
@@ -137,7 +129,6 @@ class ShiftSaleController extends Controller
             'opening_stock' => $inputData['start_reading'] + $inputData['tank_refill']
         ];
         TransactionController::saveStock($stockData);
-
         foreach ($inputData['dispensers'] as $dispenser) {
             foreach ($dispenser['nozzle'] as $nozzle) {
                 $shiftSaleSummary = new ShiftSummary();
@@ -164,19 +155,6 @@ class ShiftSaleController extends Controller
         if (!empty($product['buying_price'])) {
             $buyingPrice = $product['buying_price'] * $totalNozzleConsumption;
         }
-//            foreach ($productPrices as $productPrice) {
-//                if ($productPrice['stock_quantity'] > $totalNozzleConsumption) {
-//                    $productPrice['stock_quantity'] = $productPrice['stock_quantity'] - $totalNozzleConsumption;
-//                    $buyingPrice = $productPrice['unit_price'] * $totalNozzleConsumption;
-//                    $productPrice->save();
-//                    break;
-//                } else {
-//                    $totalNozzleConsumption = $totalNozzleConsumption - $productPrice['stock_quantity'];
-//                    $buyingPrice = $buyingPrice + ($productPrice['unit_price'] * $totalNozzleConsumption);
-//                    $productPrice['stock_quantity'] = 0;
-//                    $productPrice->save();
-//                }
-//            }
         $transactionData['linked_id'] = $incomeCategory['id'];
         $shiftSaleTransaction = [];
         foreach ($inputData['categories'] as $category) {

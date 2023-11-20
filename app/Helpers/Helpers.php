@@ -100,6 +100,6 @@ class Helpers
         foreach ($data as $row) {
             $dataArray[$row[$findField]] = $row;
         }
-        return $dataArray[$value] ? $dataArray[$value][$matchField] : 0;
+        return $dataArray[$value][$matchField] ?? 0;
     }
 }

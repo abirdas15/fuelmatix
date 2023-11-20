@@ -6911,6 +6911,12 @@ __webpack_require__.r(__webpack_exports__);
     },
     'param.end_reading': function paramEnd_reading() {
       this.param.dip_sale = parseFloat(this.param.end_reading) - parseFloat(this.param.start_reading);
+    },
+    'param.start_reading_mm': function paramStart_reading_mm() {
+      this.param.start_reading = this.filterBstiChart(this.bstiChart, this.param.start_reading_mm, 'height', 'volume');
+    },
+    'param.start_reading': function paramStart_reading() {
+      this.param.dip_sale = parseFloat(this.param.end_reading) - parseFloat(this.param.start_reading);
     }
   },
   methods: {

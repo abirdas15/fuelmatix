@@ -17,7 +17,6 @@ use App\Models\PayOrderData;
 use App\Models\Product;
 use App\Models\ProductPrice;
 use App\Models\ShiftSale;
-use App\Models\Stock;
 use App\Models\Tank;
 use App\Models\TankLog;
 use App\Models\TankRefill;
@@ -28,7 +27,6 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
-use PhpOffice\PhpSpreadsheet\IOFactory;
 use Maatwebsite\Excel\Facades\Excel;
 
 class TankController extends Controller
@@ -161,10 +159,8 @@ class TankController extends Controller
             return response()->json(['status' => 400, 'message' => 'Cannot updated [tank].']);
         }
         if ($request->file('file')) {
-            if ($request->file('file')) {
-                BstiChart::where('tank_id', $inputData['id'])->delete();
-                Excel::import(new BstiChartImport($tank['id']), $request->file('file'));
-            }
+            BstiChart::where('tank_id', $inputData['id'])->delete();
+            Excel::import(new BstiChartImport($tank['id']), $request->file('file'));
         }
         $bstiChart = BstiChart::select('volume')->where('tank_id', $inputData['id']) ->where('height', '=', floor($tank->height))
             ->first();
@@ -210,7 +206,6 @@ class TankController extends Controller
             'height' => $inputData['height'],
             'water_height' => $inputData['water_height'],
             'type' => $inputData['type'],
-            'volume' => $inputData['volume'],
         ];
         $tankReading = TankRepository::readingSave($data);
         if (!$tankReading instanceof TankLog) {

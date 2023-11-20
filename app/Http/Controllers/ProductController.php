@@ -262,7 +262,6 @@ class ProductController extends Controller
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
         $date = $inputData['date'] ?? date('Y-m-d');
-        $date = date('Y-m-d', strtotime($date . ' -1 day'));
         $sessionUser = SessionUser::getUser();
         $product = Product::where('id', $inputData['product_id'])->where('client_company_id', $sessionUser['client_company_id'])->first();
         if (!$product instanceof Product) {
@@ -275,6 +274,7 @@ class ProductController extends Controller
         $shiftSale = ShiftSale::select('id', 'end_reading')->where('client_company_id', $sessionUser['client_company_id'])
             ->where('status', 'end')->where('product_id', $request['product_id'])
             ->where('date', '<=', $date)
+            ->where('status', 'end')
             ->orderBy('id', 'DESC')
             ->first();
         $start_reading = $tank['opening_stock'] ?? 0;
@@ -353,7 +353,7 @@ class ProductController extends Controller
                 $nozzle['adjustment'] = isset($nozzleAdjustment[$nozzle['id']]) ? $nozzleAdjustment[$nozzle['id']]['quantity'] : 0;
                 $nozzle['consumption'] =  $nozzle['end_reading']  - $nozzle['start_reading'] -  $nozzle['adjustment'];
                 $nozzle['amount'] = $nozzle['consumption'] * $product['selling_price'];
-                $nozzle['consumption'] = $nozzle['consumption'] > 0 ? $nozzle['consumption'] : 0;
+                $nozzle['consumption'] = max($nozzle['consumption'], 0);
             }
         }
         $result['dispensers'] = $dispensers;
