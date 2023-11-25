@@ -288,6 +288,7 @@ class ProductController extends Controller
         $shiftSale = ShiftSale::select('id', 'end_reading')->where('client_company_id', $sessionUser['client_company_id'])
             ->where('status', 'start')->where('product_id', $request['product_id'])
             ->where('date', '<=', $date)
+            ->orderBy('date', 'DESC')
             ->orderBy('id', 'DESC')
             ->first();
         $fuelAdjustment = FuelAdjustment::select('id', 'loss_quantity')
