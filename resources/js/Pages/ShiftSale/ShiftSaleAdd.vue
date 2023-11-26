@@ -417,7 +417,7 @@ export default {
             return (eachProgress * this.productIndex)
         },
         calculateAmount: function () {
-            this.listDispenser.consumption = parseFloat(this.listDispenser.start_reading) - parseFloat(this.listDispenser.end_reading) + parseFloat(this.listDispenser.adjustment)
+            this.listDispenser.consumption = parseFloat(this.listDispenser.start_reading) + parseFloat(this.listDispenser.tank_refill) - parseFloat(this.listDispenser.end_reading) + parseFloat(this.listDispenser.adjustment)
             this.listDispenser.amount = parseFloat(this.listDispenser.consumption ) * parseFloat(this.listDispenser.selling_price)
         },
         calculateAmountNozzle: function (dIndex, nIndex) {
