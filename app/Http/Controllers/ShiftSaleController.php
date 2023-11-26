@@ -92,7 +92,7 @@ class ShiftSaleController extends Controller
             return response()->json(['status' => 500, 'error' => 'Cannot fin account stock of good sold category.']);
         }
         $shiftSale = ShiftSale::where('client_company_id', $inputData['session_user']['client_company_id'])
-            ->where('product_id', $inputData['product_id'])->where('status', 'start')
+            ->where('product_id', $inputData['product_id'])->where('status', 'end')
             ->where('date', '<=', $inputData['date'])
             ->first();
         if (!$shiftSale instanceof ShiftSale) {
@@ -157,6 +157,7 @@ class ShiftSaleController extends Controller
             $transactionData['transaction'] = [
                 ['date' => $inputData['date'], 'account_id' => $category['category_id'], 'debit_amount' => 0, 'credit_amount' => $category['amount'], 'module' => 'shift sale', 'module_id' => $shiftSale->id]
             ];
+            TransactionController::saveTransaction($transactionData);
             $shiftSaleTransaction[] = [
                 'shift_sale_id' => $shiftSale->id,
                 'category_id' => $category['category_id'],
@@ -197,7 +198,7 @@ class ShiftSaleController extends Controller
         $result = $result->orderBy($order_by, $order_mode)
             ->paginate($limit);
         foreach ($result as &$data) {
-            $data['date'] = date('d/m/Y', strtotime($data['date']));
+            $data['date'] = date('d/m/Y', strtotime($data['date'])).' '.date('h:i A', strtotime($data['start_timeNSaleCOn']));
         }
         return response()->json(['status' => 200, 'data' => $result]);
     }
@@ -214,7 +215,10 @@ class ShiftSaleController extends Controller
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
-        $result = ShiftSale::find($inputData['id']);
+        $result = ShiftSale::select('shift_sale.*', 'products.name as product_name')
+            ->leftJoin('products', 'products.id', '=', 'shift_sale.product_id')
+            ->where('shift_sale.id', $request['id'])
+            ->first();
         $shiftSummary = ShiftSummary::where('shift_sale_id', $inputData['id'])->get()->keyBy('nozzle_id');
         $dispensers = Dispenser::select('id', 'dispenser_name')
             ->where('product_id', $result['product_id'])
@@ -233,7 +237,12 @@ class ShiftSaleController extends Controller
             }
         }
         $result['dispensers'] = $dispensers;
-        $result['categories'] = ShiftSaleTransaction::select('category_id', 'amount')->where('shift_sale_id', $inputData['id'])->get()->toArray();
+        $result['categories'] = ShiftSaleTransaction::select('shift_sale_transaction.category_id', 'shift_sale_transaction.amount', 'categories.name')
+            ->leftJoin('categories', 'categories.id', '=', 'shift_sale_transaction.category_id')
+            ->where('shift_sale_id', $inputData['id'])
+            ->get()
+            ->toArray();
+        $result['date_format'] = date('d/m/Y', strtotime($result['date'])).' '.date('h:i A', strtotime($result['start_time']));
         return response()->json(['status' => 200, 'data' => $result]);
     }
     /**

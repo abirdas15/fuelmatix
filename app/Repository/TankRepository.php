@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Helpers\SessionUser;
 use App\Models\BstiChart;
+use App\Models\Tank;
 use App\Models\TankLog;
 
 class TankRepository
@@ -30,5 +31,18 @@ class TankRepository
             return ['status' => 400, 'message' => 'Cannot save tank reading.'];
         }
         return $reading;
+    }
+    public static function getHeight($data)
+    {
+        $tank_id = $data['tank_id'] ?? null;
+        if (!empty($requestData['product_id'])) {
+            $tank = Tank::where('product_id', $requestData['product_id'])->first();
+            if ($tank instanceof Tank) {
+                $tank_id = $tank['id'];
+            }
+        }
+        $bstiChart = BstiChart::select('height')->where('tank_id', $tank_id) ->where('volume', '=', floor($data['volume']))
+            ->first();
+        return $bstiChart['height'] ?? 0;
     }
 }

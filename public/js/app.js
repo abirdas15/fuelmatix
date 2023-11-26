@@ -6883,6 +6883,7 @@ __webpack_require__.r(__webpack_exports__);
         amount: 0,
         net_profit: 0,
         total_refill_volume: 0,
+        tank_height: 0,
         dispensers: []
       },
       unit_price: 0,
@@ -6904,18 +6905,13 @@ __webpack_require__.r(__webpack_exports__);
       this.getDispenserSingle();
       this.getTankReading();
       this.getPayOrderQuantity();
-      this.getBstiChart();
+      //  this.getBstiChart();
     },
-    'param.end_reading_mm': function paramEnd_reading_mm() {
-      this.param.end_reading = this.filterBstiChart(this.bstiChart, this.param.end_reading_mm, 'height', 'volume');
-    },
+
     'param.end_reading': function paramEnd_reading() {
       this.param.dip_sale = parseFloat(this.param.end_reading) - parseFloat(this.param.start_reading);
       this.param.total_refill_volume = this.getTotalRefillVolume();
       this.param.net_profit = this.param.total_refill_volume - this.param.quantity;
-    },
-    'param.start_reading_mm': function paramStart_reading_mm() {
-      this.param.start_reading = this.filterBstiChart(this.bstiChart, this.param.start_reading_mm, 'height', 'volume');
     },
     'param.start_reading': function paramStart_reading() {
       this.param.dip_sale = parseFloat(this.param.end_reading) - parseFloat(this.param.start_reading);
@@ -6924,6 +6920,22 @@ __webpack_require__.r(__webpack_exports__);
     }
   },
   methods: {
+    getBstiChart: function getBstiChart(field, event) {
+      var _this = this;
+      if (this.param.tank_height < event.target.value) {
+        this.param[field] = 0;
+        this.param[field + '_mm'] = '';
+        return false;
+      }
+      _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].TankGetVolume, {
+        tank_id: this.param.tank_id,
+        height: event.target.value
+      }, function (res) {
+        if (parseInt(res.status) === 200) {
+          _this.param[field] = res.data;
+        }
+      });
+    },
     getTotalRefillVolume: function getTotalRefillVolume() {
       var nozzleAmount = 0;
       this.param.dispensers.map(function (d) {
@@ -6939,17 +6951,6 @@ __webpack_require__.r(__webpack_exports__);
       nozzle.sale = parseFloat(nozzle.end_reading) - parseFloat(nozzle.start_reading);
       this.param.total_refill_volume = this.getTotalRefillVolume();
       this.param.net_profit = this.param.total_refill_volume - this.param.quantity;
-    },
-    getBstiChart: function getBstiChart() {
-      var _this = this;
-      _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].TankBstiChart, {
-        tank_id: this.param.tank_id
-      }, function (res) {
-        _this.TableLoading = false;
-        if (parseInt(res.status) === 200) {
-          _this.bstiChart = res.data;
-        }
-      });
     },
     getTank: function getTank() {
       var _this2 = this;
@@ -6975,6 +6976,7 @@ __webpack_require__.r(__webpack_exports__);
           _this3.param.end_reading_mm = res.data.end_reading_mm;
           _this3.param.end_reading = res.data.end_reading;
           _this3.param.dip_sale = res.data.dip_sale;
+          _this3.param.tank_height = res.data.tank_height;
           if (_this3.unit_price > 0) {
             _this3.param.buy_price = (_this3.param.end_reading - _this3.param.start_reading) * _this3.unit_price;
           }
@@ -10864,21 +10866,26 @@ __webpack_require__.r(__webpack_exports__);
   },
   watch: {
     'listDispenser.end_reading_mm': function listDispenserEnd_reading_mm() {
-      this.listDispenser.end_reading = this.filterBstiChart(this.bstiChart, this.listDispenser.end_reading_mm, 'height', 'volume');
+      if (this.listDispenser.tank_height < this.listDispenser.end_reading_mm) {
+        this.listDispenser.end_reading_mm = '';
+        this.listDispenser.end_reading = 0;
+      } else {
+        this.getBstiChart(this.listDispenser.end_reading_mm);
+      }
     },
     'listDispenser.end_reading': function listDispenserEnd_reading() {
       this.calculateAmount();
     }
   },
   methods: {
-    getBstiChart: function getBstiChart() {
+    getBstiChart: function getBstiChart(height) {
       var _this = this;
-      _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].TankBstiChart, {
-        product_id: this.product_id
+      _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].TankGetVolume, {
+        product_id: this.product_id,
+        height: height
       }, function (res) {
-        _this.TableLoading = false;
         if (parseInt(res.status) === 200) {
-          _this.bstiChart = res.data;
+          _this.listDispenser.end_reading = res.data;
         }
       });
     },
@@ -11075,8 +11082,9 @@ __webpack_require__.r(__webpack_exports__);
       this.product_id = this.$route.query.product_id;
       this.getProduct();
       this.getProductDispenser();
-      this.getBstiChart();
+      // this.getBstiChart();
     }
+
     $('#dashboard_bar').text('Shift Sale Start');
   }
 });
@@ -25040,10 +25048,12 @@ var render = function render() {
       value: _vm.param.start_reading_mm
     },
     on: {
-      input: function input($event) {
+      input: [function ($event) {
         if ($event.target.composing) return;
         _vm.$set(_vm.param, "start_reading_mm", $event.target.value);
-      }
+      }, function ($event) {
+        return _vm.getBstiChart("start_reading", $event);
+      }]
     }
   }), _vm._v(" "), _vm._m(8)]), _vm._v(" "), _c("div", {
     staticClass: "invalid-feedback"
@@ -25067,10 +25077,12 @@ var render = function render() {
       value: _vm.param.end_reading_mm
     },
     on: {
-      input: function input($event) {
+      input: [function ($event) {
         if ($event.target.composing) return;
         _vm.$set(_vm.param, "end_reading_mm", $event.target.value);
-      }
+      }, function ($event) {
+        return _vm.getBstiChart("end_reading", $event);
+      }]
     }
   }), _vm._v(" "), _vm._m(9)]), _vm._v(" "), _c("div", {
     staticClass: "invalid-feedback"
@@ -36267,7 +36279,7 @@ var render = function render() {
   }, [_vm._v("Action")])])]), _vm._v(" "), !_vm.getLoading ? _c("tbody", _vm._l(_vm.transactionParam.transaction, function (transaction) {
     return _c("tr", [_c("td", {
       staticClass: "text-start"
-    }, [_vm._v(_vm._s(_vm.formatDate(transaction.date)))]), _vm._v(" "), _c("td", {
+    }, [_vm._v(_vm._s(transaction.date))]), _vm._v(" "), _c("td", {
       staticClass: "text-start"
     }, [_vm._v(_vm._s(transaction.description))]), _vm._v(" "), _c("td", {
       staticClass: "text-start"
@@ -100171,6 +100183,7 @@ var ApiRoutes = {
   TankGetNozzle: ApiVersion + '/tank/get/nozzle',
   TankByProduct: ApiVersion + '/tank/byProduct',
   TankBstiChart: ApiVersion + '/tank/getBstiChart',
+  TankGetVolume: ApiVersion + '/tank/getVolume',
   //Tank Reading
   TankReadingAdd: ApiVersion + '/tank/reading/save',
   TankReadingEdit: ApiVersion + '/tank/reading/update',

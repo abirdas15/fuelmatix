@@ -310,6 +310,11 @@ Route::group(['middleware' => 'AuthReqCheck'], function() {
     });
     Route::group(['prefix' => 'car'], function() {
         Route::post('search', [CarController::class, 'search']);
+        Route::post('save', [CarController::class, 'save']);
+        Route::post('list', [CarController::class, 'list']);
+        Route::post('single', [CarController::class, 'single']);
+        Route::post('update', [CarController::class, 'update']);
+        Route::post('delete', [CarController::class, 'delete']);
     });
 });
 

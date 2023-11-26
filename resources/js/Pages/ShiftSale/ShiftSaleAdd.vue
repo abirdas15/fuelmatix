@@ -343,18 +343,22 @@ export default {
     },
     watch: {
         'listDispenser.end_reading_mm': function() {
-            this.listDispenser.end_reading = this.filterBstiChart(this.bstiChart, this.listDispenser.end_reading_mm, 'height', 'volume');
+            if (this.listDispenser.tank_height < this.listDispenser.end_reading_mm) {
+                this.listDispenser.end_reading_mm = '';
+                this.listDispenser.end_reading = 0;
+            } else {
+                this.getBstiChart(this.listDispenser.end_reading_mm);
+            }
         },
         'listDispenser.end_reading': function() {
             this.calculateAmount();
         }
     },
     methods: {
-        getBstiChart: function() {
-            ApiService.POST(ApiRoutes.TankBstiChart, {product_id: this.product_id}, res => {
-                this.TableLoading = false
+        getBstiChart: function(height) {
+            ApiService.POST(ApiRoutes.TankGetVolume, {product_id: this.product_id, height: height}, res => {
                 if (parseInt(res.status) === 200) {
-                    this.bstiChart = res.data;
+                    this.listDispenser.end_reading =  res.data;
                 }
             });
         },
@@ -537,7 +541,7 @@ export default {
             this.product_id = this.$route.query.product_id
             this.getProduct()
             this.getProductDispenser()
-            this.getBstiChart();
+           // this.getBstiChart();
         }
         $('#dashboard_bar').text('Shift Sale Start')
     }

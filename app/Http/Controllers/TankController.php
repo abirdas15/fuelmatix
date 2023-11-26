@@ -320,6 +320,10 @@ class TankController extends Controller
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
+        $tank = Tank::where('id', $inputData['tank_id'])->first();
+        if (!$tank instanceof Tank) {
+            return response()->json(['status' => 500, 'message' => 'Cannot find tank.']);
+        }
         $result = TankLog::select('id', 'volume', 'height')
             ->where('type', 'tank refill')
             ->where('tank_id', $inputData['tank_id'])
@@ -343,7 +347,8 @@ class TankController extends Controller
                 'end_reading_mm' => $end_reading_mm,
                 'start_reading' => $start_reading,
                 'end_reading' => $end_reading,
-                'dip_sale' => $dip_sale
+                'dip_sale' => $dip_sale,
+                'tank_height' => $tank['height']
             ]
         ]);
     }
@@ -500,13 +505,17 @@ class TankController extends Controller
         $payOrder->save();
         return response()->json(['status' => 200, 'message' => 'Successfully saved tank refill.']);
     }
-    public function refillList(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     * */
+    public function refillList(Request $request): JsonResponse
     {
         $inputData = $request->all();
-        $limit = isset($inputData['limit']) ? $inputData['limit'] : 10;
-        $keyword = isset($inputData['keyword']) ? $inputData['keyword'] : '';
-        $order_by = isset($inputData['order_by']) ? $inputData['order_by'] : 'tank_refill.id';
-        $order_mode = isset($inputData['order_mode']) ? $inputData['order_mode'] : 'DESC';
+        $limit = $inputData['limit'] ?? 10;
+        $keyword = $inputData['keyword'] ?? '';
+        $order_by = $inputData['order_by'] ?? 'tank_refill.id';
+        $order_mode = $inputData['order_mode'] ?? 'DESC';
         $result = TankRefill::select('tank_refill.*', 'tank.tank_name', 'pay_order.amount')
             ->leftJoin('tank', 'tank.id', 'tank_refill.tank_id')
             ->leftJoin('pay_order', 'pay_order.id', 'tank_refill.pay_order_id')
@@ -519,7 +528,7 @@ class TankController extends Controller
         $result = $result->orderBy($order_by, $order_mode)
             ->paginate($limit);
         foreach ($result as &$data) {
-            $data['date'] = date('d/m/Y', strtotime($data['date']));
+            $data['date'] = date('d/m/Y', strtotime($data['date'])). ' '.date('h:i A', strtotime('time'));
         }
         return response()->json(['status' => 200, 'data' => $result]);
     }
@@ -666,7 +675,7 @@ class TankController extends Controller
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
-        $tank_id = $requestData['tank_id'];
+        $tank_id = $requestData['tank_id'] ?? null;
         if (!empty($requestData['product_id'])) {
             $tank = Tank::where('product_id', $requestData['product_id'])->first();
             if ($tank instanceof Tank) {

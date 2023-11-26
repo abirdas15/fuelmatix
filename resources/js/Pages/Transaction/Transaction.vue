@@ -24,7 +24,7 @@
                     </thead>
                     <tbody v-if="!getLoading">
                     <tr v-for="transaction of transactionParam.transaction">
-                        <td class="text-start">{{ formatDate(transaction.date) }}</td>
+                        <td class="text-start">{{ transaction.date }}</td>
                         <td class="text-start">{{ transaction.description }}</td>
                         <td class="text-start">{{ categoryName(transaction.account_id) }}</td>
                         <td>{{ formatPrice(transaction.debit_amount) }}</td>

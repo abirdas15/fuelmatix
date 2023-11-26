@@ -103,15 +103,15 @@ class SaleController extends Controller
                 }
                 $driverId = $driverExpense['id'];
             }
-            if (!empty($requestData['car_number'])) {
-                $car = Car::where('car_number', $requestData['car_number'])->where('company_id', $requestData['company_id'])->first();
-                if (!$car instanceof Car) {
-                    $car = new Car();
-                    $car->car_number = $requestData['car_number'];
-                    $car->company_id = $requestData['company_id'];
-                    $car->save();
-                }
-            }
+//            if (!empty($requestData['car_number'])) {
+//                $car = Car::where('car_number', $requestData['car_number'])->where('company_id', $requestData['company_id'])->first();
+//                if (!$car instanceof Car) {
+//                    $car = new Car();
+//                    $car->car_number = $requestData['car_number'];
+//                    $car->company_id = $requestData['company_id'];
+//                    $car->save();
+//                }
+//            }
         }
         if ($requestData['payment_method'] == PaymentMethod::CASH) {
             $sessionUser = SessionUser::getUser();

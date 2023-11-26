@@ -91,11 +91,12 @@ class TransactionController extends Controller
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
         $category = Category::find($inputData['id']);
-        $result = Transaction::select('id', 'date', 'account_id', 'debit_amount', 'credit_amount', 'description')
+        $result = Transaction::select('id', 'created_at', 'account_id', 'debit_amount', 'credit_amount', 'description')
             ->where('linked_id', $inputData['id'])
             ->get()
             ->toArray();
         foreach ($result as $key => &$data) {
+            $data['date'] = date('d/m/Y h:iA', strtotime($data['created_at']));
             if ($category->type == 'income') {
                 if ($key == 0) {
                     $data['balance'] = $data['credit_amount'] - $data['debit_amount'];

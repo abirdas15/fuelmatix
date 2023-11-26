@@ -22,6 +22,7 @@ use App\Models\TankLog;
 use App\Models\TankRefill;
 use App\Models\Transaction;
 use App\Repository\CategoryRepository;
+use App\Repository\TankRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -293,17 +294,19 @@ class ProductController extends Controller
             ->first();
         $fuelAdjustment = FuelAdjustment::select('id', 'loss_quantity')
             ->where('shift_sale_id', $shiftSale['id'] ?? 0)
-            ->first();
+            ->get()
+            ->toArray();
         $adjustment = 0;
         $nozzleAdjustment = [];
-        if ($fuelAdjustment instanceof FuelAdjustment) {
-            $fuelAdjustmentData = FuelAdjustmentData::where('fuel_adjustment_id', $fuelAdjustment['id'])->get()->toArray();
+        if (!empty($fuelAdjustment)) {
+            $fuelAdjustmentId = array_column($fuelAdjustment, 'id');
+            $fuelAdjustmentData = FuelAdjustmentData::whereIn('fuel_adjustment_id', $fuelAdjustmentId)->get()->toArray();
             foreach ($fuelAdjustmentData as $adjustmentData) {
                 if ($adjustmentData['tank_id'] == $tank['id']) {
-                    $adjustment = $adjustmentData['quantity'];
+                    $adjustment += $adjustmentData['quantity'];
                 }
                 if (!empty($adjustmentData['nozzle_id'])) {
-                    $nozzleAdjustment[$adjustmentData['nozzle_id']] = $adjustmentData;
+                    $nozzleAdjustment[$adjustmentData['nozzle_id']][] = $adjustmentData;
                 }
             }
         }
@@ -315,11 +318,10 @@ class ProductController extends Controller
         $consumption = $start_reading + $tank_refill + $adjustment - $end_reading;
         $amount = $consumption * $product['selling_price'];
 
-        $bstiChart = BstiChart::select('height', 'volume')->where('tank_id', $tank['id'])->get()->toArray();
-        $start_reading_mm = Helpers::filterBstiChart($bstiChart, floor($start_reading), 'height', 'volume');
-        $tank_refill_mm = Helpers::filterBstiChart($bstiChart, floor($tank_refill), 'height', 'volume');
-        $adjustment_mm = Helpers::filterBstiChart($bstiChart, floor($adjustment), 'height', 'volume');
-        $end_reading_mm = Helpers::filterBstiChart($bstiChart, floor($end_reading), 'height', 'volume');
+        $start_reading_mm = TankRepository::getHeight(['tank_id' => $tank['id'], 'volume' => $start_reading]);
+        $tank_refill_mm = 0;
+        $adjustment_mm = 0;
+        $end_reading_mm = TankRepository::getHeight(['tank_id' => $tank['id'], 'volume' => $end_reading]);
         $consumption_mm = $start_reading_mm + $tank_refill_mm +  $adjustment_mm - $end_reading_mm;
 
         $result = [
@@ -336,7 +338,8 @@ class ProductController extends Controller
             'consumption' => $consumption,
             'consumption_mm' => $consumption_mm,
             'amount' => $amount,
-            'selling_price' => $product->selling_price
+            'selling_price' => $product->selling_price,
+            'tank_height' => $tank['height']
         ];
         $dispensers = Dispenser::select('id', 'dispenser_name')
             ->where('product_id', $inputData['product_id'])
@@ -351,7 +354,7 @@ class ProductController extends Controller
             foreach ($dispenser['nozzle'] as &$nozzle) {
                 $nozzle['start_reading'] = isset($shiftSaleData[$nozzle['id']]) ? $shiftSaleData[$nozzle['id']]['end_reading'] : $nozzle['opening_stock'];
                 $nozzle['end_reading'] = 0;
-                $nozzle['adjustment'] = isset($nozzleAdjustment[$nozzle['id']]) ? $nozzleAdjustment[$nozzle['id']]['quantity'] : 0;
+                $nozzle['adjustment'] = isset($nozzleAdjustment[$nozzle['id']]) ? array_sum(array_column($nozzleAdjustment[$nozzle['id']], 'quantity')) : 0;
                 $nozzle['consumption'] =  $nozzle['end_reading']  - $nozzle['start_reading'] -  $nozzle['adjustment'];
                 $nozzle['amount'] = $nozzle['consumption'] * $product['selling_price'];
                 $nozzle['consumption'] = max($nozzle['consumption'], 0);

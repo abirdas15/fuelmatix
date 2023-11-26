@@ -72,7 +72,7 @@
                                                 <div class="mb-3 form-group col-md-3"></div>
                                                 <div class="mb-3 form-group col-md-3">
                                                     <div class="input-group">
-                                                        <input type="text" class="form-control " name="start_reading" v-model="param.start_reading_mm">
+                                                        <input type="text" class="form-control " @input="getBstiChart('start_reading', $event)" name="start_reading" v-model="param.start_reading_mm">
                                                         <div class="input-group-append">
                                                             <span class="input-group-text" >mm</span>
                                                         </div>
@@ -81,7 +81,7 @@
                                                 </div>
                                                 <div class="mb-3 form-group col-md-3">
                                                     <div class="input-group">
-                                                        <input type="text" class="form-control " name="end_reading" v-model="param.end_reading_mm">
+                                                        <input type="text" class="form-control " @input="getBstiChart('end_reading', $event)" name="end_reading" v-model="param.end_reading_mm">
                                                         <div class="input-group-append">
                                                             <span class="input-group-text" >mm</span>
                                                         </div>
@@ -220,6 +220,7 @@ export default {
                 amount: 0,
                 net_profit: 0,
                 total_refill_volume: 0,
+                tank_height: 0,
                 dispensers: [],
             },
             unit_price: 0,
@@ -241,18 +242,12 @@ export default {
             this.getDispenserSingle()
             this.getTankReading()
             this.getPayOrderQuantity()
-            this.getBstiChart();
-        },
-        'param.end_reading_mm': function() {
-            this.param.end_reading = this.filterBstiChart(this.bstiChart, this.param.end_reading_mm, 'height', 'volume');
+          //  this.getBstiChart();
         },
         'param.end_reading': function() {
             this.param.dip_sale = parseFloat(this.param.end_reading) - parseFloat(this.param.start_reading);
             this.param.total_refill_volume = this.getTotalRefillVolume()
             this.param.net_profit = this.param.total_refill_volume - this.param.quantity
-        },
-        'param.start_reading_mm': function() {
-            this.param.start_reading = this.filterBstiChart(this.bstiChart, this.param.start_reading_mm, 'height', 'volume');
         },
         'param.start_reading': function() {
             this.param.dip_sale = parseFloat(this.param.end_reading) - parseFloat(this.param.start_reading);
@@ -261,6 +256,18 @@ export default {
         },
     },
     methods: {
+        getBstiChart: function(field, event) {
+            if (this.param.tank_height <  event.target.value) {
+                this.param[field] = 0;
+                this.param[field + '_mm'] = '';
+                return false;
+            }
+            ApiService.POST(ApiRoutes.TankGetVolume, {tank_id: this.param.tank_id, height: event.target.value}, res => {
+                if (parseInt(res.status) === 200) {
+                    this.param[field] =  res.data;
+                }
+            });
+        },
         getTotalRefillVolume: function () {
             let nozzleAmount = 0
             this.param.dispensers.map(d => {
@@ -276,14 +283,6 @@ export default {
             nozzle.sale = parseFloat(nozzle.end_reading) - parseFloat(nozzle.start_reading)
             this.param.total_refill_volume = this.getTotalRefillVolume()
             this.param.net_profit = this.param.total_refill_volume - this.param.quantity
-        },
-        getBstiChart: function() {
-            ApiService.POST(ApiRoutes.TankBstiChart, {tank_id: this.param.tank_id}, res => {
-                this.TableLoading = false
-                if (parseInt(res.status) === 200) {
-                    this.bstiChart = res.data;
-                }
-            });
         },
         getTank: function () {
             ApiService.POST(ApiRoutes.TankList, {limit: 5000, page: 1},res => {
@@ -301,10 +300,10 @@ export default {
                     this.param.end_reading_mm = res.data.end_reading_mm
                     this.param.end_reading = res.data.end_reading
                     this.param.dip_sale = res.data.dip_sale;
+                    this.param.tank_height = res.data.tank_height;
                     if (this.unit_price > 0) {
                         this.param.buy_price = (this.param.end_reading - this.param.start_reading) * this.unit_price
                     }
-
                 }
             });
         },

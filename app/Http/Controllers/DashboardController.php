@@ -34,22 +34,23 @@ class DashboardController extends Controller
     public static function getShiftSale(): array
     {
         $sessionUser = SessionUser::getUser();
-        $startDate = date('Y-01-01');
-        $endDate = date('Y-12-31');
-        $shiftSale = ShiftSale::select(DB::raw('SUM(consumption) as quantity'), DB::raw('SUM(amount) as amount'), DB::raw('MONTH(date) as month'))
+        $startDate = date('Y-m-01');
+        $endDate = date('Y-m-d');
+        $shiftSale = ShiftSale::select(DB::raw('SUM(consumption) as quantity'), DB::raw('SUM(amount) as amount'), 'date')
             ->whereBetween('date',[$startDate, $endDate])
             ->where('client_company_id', $sessionUser['client_company_id'])
-            ->groupBy('month')
+            ->groupBy('date')
             ->get()
-            ->keyBy('month')
+            ->keyBy('date')
             ->toArray();
         $month = [];
         $amount = [];
         $quantity = [];
-        for($i = 1; $i <= date('m'); $i++) {
-            $month[] = date('F', strtotime(date('Y-'.$i.'-01')));
-            $amount[] = isset($shiftSale[$i]) ? $shiftSale[$i]['amount'] : 0;
-            $quantity[] = isset($shiftSale[$i]) ? $shiftSale[$i]['quantity'] : 0;
+        for($i = strtotime($startDate); $i <= strtotime($endDate); $i = $i + 86400) {
+            $month[] = date('d M', $i);
+            $date = date('Y-m-d', $i);
+            $amount[] = isset($shiftSale[$date]) ? $shiftSale[$date]['amount'] : 0;
+            $quantity[] = isset($shiftSale[$date]) ? $shiftSale[$date]['quantity'] : 0;
         }
         return [
             'month' => $month,
