@@ -164,9 +164,11 @@ class FuelAdjustmentController extends Controller
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
-        $result = FuelAdjustment::select('id', 'product_id', 'purpose', 'loss_quantity')
-            ->where('id', $requestData['id'])
+        $result = FuelAdjustment::select('fuel_adjustment.id', 'fuel_adjustment.product_id', 'fuel_adjustment.purpose', 'products.name as product_name', 'fuel_adjustment.loss_quantity', 'fuel_adjustment.date')
+            ->where('fuel_adjustment.id', $requestData['id'])
+            ->leftJoin('products', 'products.id', '=', 'fuel_adjustment.product_id')
             ->first();
+        $result['date_format'] = date('d/m/Y h:i A', strtotime($result['date']));
         $fuelAdjustmentData = FuelAdjustmentData::select('fuel_adjustment_data.*', 'nozzles.name as nozzle_name', 'tank.tank_name')
             ->leftJoin('nozzles', 'nozzles.id', '=', 'fuel_adjustment_data.nozzle_id')
             ->leftJoin('tank', 'tank.id', '=', 'fuel_adjustment_data.tank_id')
