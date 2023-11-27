@@ -92,7 +92,7 @@ class ShiftSaleController extends Controller
             return response()->json(['status' => 500, 'error' => 'Cannot fin account stock of good sold category.']);
         }
         $shiftSale = ShiftSale::where('client_company_id', $inputData['session_user']['client_company_id'])
-            ->where('product_id', $inputData['product_id'])->where('status', 'end')
+            ->where('product_id', $inputData['product_id'])->where('status', 'start')
             ->where('date', '<=', $inputData['date'])
             ->first();
         if (!$shiftSale instanceof ShiftSale) {
@@ -129,6 +129,7 @@ class ShiftSaleController extends Controller
             foreach ($dispenser['nozzle'] as $nozzle) {
                 $shiftSaleSummary = new ShiftSummary();
                 $shiftSaleSummary->shift_sale_id = $shiftSale->id;
+                $shiftSaleSummary->dispenser_id = $dispenser['id'];
                 $shiftSaleSummary->nozzle_id = $nozzle['id'];
                 $shiftSaleSummary->start_reading = $nozzle['start_reading'];
                 $shiftSaleSummary->end_reading = $nozzle['end_reading'];
@@ -172,7 +173,7 @@ class ShiftSaleController extends Controller
         ];
         TransactionController::saveTransaction($transactionData);
         ShiftSaleTransaction::insert($shiftSaleTransaction);
-        return response()->json(['status' => 200, 'message' => 'Successfully ended shift sale.']);
+        return response()->json(['status' => 200, 'message' => 'Successfully ended shift sale.', 'shift_sale_id' => $shiftSale->id]);
     }
     /**
      * @param Request $request
