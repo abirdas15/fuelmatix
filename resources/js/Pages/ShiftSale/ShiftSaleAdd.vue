@@ -514,7 +514,7 @@ export default {
                         this.$router.push({
                             name: 'ShiftSaleView',
                             params: {
-                                    id: category.id
+                                    id: res.shift_sale_id
                             }
                         })
                     }

@@ -61,6 +61,9 @@
                                                         <router-link v-if="CheckPermission(Section.SHIFT_SALE + '-' + Action.EDIT) && f.status == 'start'" :to="{name: 'ShiftSaleAdd', query: { product_id: f.product_id }}" class=" btn btn-primary shadow btn-xs sharp me-1">
                                                             <i class="fas fa-eye"></i>
                                                         </router-link>
+                                                        <router-link v-if="CheckPermission(Section.SHIFT_SALE + '-' + Action.VIEW) && f.status == 'end'" :to="{name: 'ShiftSaleView', params: { id: f.id }}" class=" btn btn-primary shadow btn-xs sharp me-1">
+                                                            <i class="fa-solid fa-magnifying-glass"></i>
+                                                        </router-link>
                                                         <a  v-if="CheckPermission(Section.SHIFT_SALE + '-' + Action.DELETE)" href="javascript:void(0)"  @click="openModalDelete(f)" class="btn btn-danger shadow btn-xs sharp">
                                                             <i class="fa fa-trash"></i>
                                                         </a>
