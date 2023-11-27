@@ -93,6 +93,7 @@ import roleEdit from "../Pages/Role/Edit.vue";
 import fuelAdjustment from "../Pages/FuelAdjustment/Adjustment.vue";
 import fuelAdjustmentList from "../Pages/FuelAdjustment/List.vue";
 import fuelAdjustmentEdit from "../Pages/FuelAdjustment/Edit.vue";
+import fuelAdjustmentView from "../Pages/FuelAdjustment/AdjustmentView.vue";
 import UnauthorizedBill from "../Pages/UnauthorizedBill/UnauthorizedBill.vue";
 import salesReport from "../Pages/SalesReport/List.vue";
 import companyBills from "../Pages/CompanyBills/List.vue";
@@ -520,6 +521,9 @@ const router = new VueRouter({
                     path: ROOT_URL + "/fuel/adjustment/list", name: "adjustment", component: fuelAdjustmentList,  beforeEnter: (to, from, next) => {
                         CheckPermission(to, from, next, Section.FUEL_ADJUSTMENT + '-' + Action.VIEW)
                     },
+                },
+                {
+                    path: ROOT_URL + "/fuel/adjustment/view/:id", name: "adjustmentView", component: fuelAdjustmentView
                 },
                 {
                     path: ROOT_URL + "/unauthorizedBill", name: "unauthorizedBill", component: UnauthorizedBill,  beforeEnter: (to, from, next) => {

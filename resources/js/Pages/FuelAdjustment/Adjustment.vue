@@ -77,7 +77,7 @@
                                     <div class="mb-3 col-md-11">
                                         <button type="submit" class="btn btn-primary" v-if="!loading">Submit</button>
                                         <button type="button" class="btn btn-primary" v-if="loading">Submitting...</button>
-                                        <router-link :to="{name: 'Bank'}" type="button" class="btn btn-primary">Cancel</router-link>
+                                        <router-link :to="{name: 'adjustment'}" type="button" class="btn btn-primary">Cancel</router-link>
                                     </div>
                                 </div>
                             </form>
@@ -165,7 +165,8 @@ export default {
                 this.loading = false
                 if (parseInt(res.status) === 200) {
                     this.$router.push({
-                        name: 'adjustment'
+                        name: 'adjustmentView',
+                        params: {id: res.adjustment_id}
                     })
                 } else {
                     ApiService.ErrorHandler(res.errors);

@@ -18,7 +18,7 @@
                         <div class="card-body">
                             <div class="process-wrapper">
                                 <div id="progress-bar-container">
-                                    <div class="fs-18 fw-bold">Date: {{ shiftSale.date }}</div>
+                                    <div class="fs-18 fw-bold">Date: {{ shiftSale.date_format }}</div>
                                     <div class="fs-18 fw-bold">Product: {{ shiftSale.product_name }}</div>
                                 </div>
 
@@ -159,7 +159,7 @@
                                                 <div class="col-sm-6 text-end">
                                                     <table class="table">
                                                         <tr v-for="(category,index) in shiftSale.categories">
-                                                            <td style="font-size: 18px;padding: 0px;" class="">{{category.name}}</td>
+                                                            <td style="font-size: 18px;padding: 0px;" class="text-end">{{category.name}}</td>
                                                             <td style="font-size: 18px;padding: 0px;" class="text-end "> {{category.amount}} Tk</td>
                                                         </tr>
                                                     </table>

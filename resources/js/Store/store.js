@@ -37,7 +37,17 @@ const store = new Vuex.Store({
         },
     },
     actions: {
-
+        Logout: function () {
+            ApiService.POST(ApiRoutes.Logout, {}, res => {
+                this.Loading = false;
+                if (parseInt(res.status) === 200) {
+                    localStorage.removeItem("userInfo");
+                    window.location.reload();
+                } else {
+                    ApiService.ErrorHandler(res.error);
+                }
+            });
+        },
     },
 });
 export default store;

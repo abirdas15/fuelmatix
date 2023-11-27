@@ -121,7 +121,7 @@ class FuelAdjustmentController extends Controller
         ];
         $transactionData['linked_id'] = $categoryId;
         TransactionController::saveTransaction($transactionData);
-        return response()->json(['status' => 200, 'message' => 'Successfully saved fuel adjustment.']);
+        return response()->json(['status' => 200, 'message' => 'Successfully saved fuel adjustment.', 'adjustment_id' => $fuelAdjustmentModel['id']]);
     }
 
     /**

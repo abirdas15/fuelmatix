@@ -70,6 +70,7 @@
 <script>
 import ApiService from "../../../Services/ApiService";
 import ApiRoutes from "../../../Services/ApiRoutes";
+import store from "../../../Store/store";
 
 export default {
     data() {
@@ -81,15 +82,7 @@ export default {
     },
     methods: {
         Logout: function () {
-            ApiService.POST(ApiRoutes.Logout, {}, res => {
-                this.Loading = false;
-                if (parseInt(res.status) === 200) {
-                    localStorage.removeItem("userInfo");
-                    window.location.reload();
-                } else {
-                    ApiService.ErrorHandler(res.error);
-                }
-            });
+           store.dispatch('Logout')
         },
     },
     mounted() {
