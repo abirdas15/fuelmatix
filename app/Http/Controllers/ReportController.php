@@ -65,8 +65,10 @@ class ReportController extends Controller
         }
         $productId = $requestData['product_id'] ?? '';
         $sessionUser = SessionUser::getUser();
-        $result = ShiftSale::select('shift_sale.date', DB::raw('SUM(shift_sale.consumption) as quantity'), 'products.name as product_name')
+        $result = ShiftSale::select('shift_sale.date', DB::raw('SUM(shift_summary.consumption) as quantity'), 'shift_sale.product_id', 'products.name as product_name', )
+            ->leftJoin('shift_summary', 'shift_summary.shift_sale_id', '=', 'shift_sale.id')
             ->leftJoin('products', 'products.id', '=', 'shift_sale.product_id')
+            ->leftJoin('nozzles', 'nozzles.id', '=', 'shift_summary.nozzle_id')
             ->whereBetween('date', [$requestData['start_date'], $requestData['end_date']])
             ->where('shift_sale.client_company_id', $sessionUser['client_company_id'])
             ->where('status', FuelMatixStatus::END);
@@ -75,7 +77,7 @@ class ReportController extends Controller
                 $q->where('shift_sale.product_id', $productId);
             });
         }
-        $result = $result->groupBy('date')
+        $result = $result->groupBy('nozzle_id')
             ->get()
             ->toArray();
         foreach ($result as &$data) {
