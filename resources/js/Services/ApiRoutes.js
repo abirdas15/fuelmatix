@@ -228,7 +228,15 @@ const ApiRoutes = {
     CompanyBillDownload: ApiVersion + '/companyBill/download',
 
     //car search
-    CarSearch: ApiVersion + '/car/search'
+    CarSearch: ApiVersion + '/car/search',
+
+    // car
+    CarSave: ApiVersion + '/car/save',
+    CarList: ApiVersion + '/car/list',
+    CarSingle: ApiVersion + '/car/single',
+    CarUpdate: ApiVersion + '/car/update',
+    CarDelete: ApiVersion + '/car/delete',
+    CarAmount: ApiVersion + '/car/amount',
 };
 
 export default ApiRoutes;

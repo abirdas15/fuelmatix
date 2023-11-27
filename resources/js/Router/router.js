@@ -36,6 +36,7 @@ import ShiftSaleStart from "../Pages/ShiftSale/ShiftSaleAdd";
 import ShiftSaleList from "../Pages/ShiftSale/List.vue";
 import ShiftSaleListStart from "../Pages/ShiftSale/ListStart.vue";
 import ShiftSaleEdit from "../Pages/ShiftSale/ShiftSaleEdit.vue";
+import ShiftSaleView from "../Pages/ShiftSale/ShiftSaleView.vue";
 import Pos from "../Pages/Pos/Pos";
 import PosList from "../Pages/Pos/List.vue";
 import PosEdit from "../Pages/Pos/Edit.vue";
@@ -96,6 +97,7 @@ import UnauthorizedBill from "../Pages/UnauthorizedBill/UnauthorizedBill.vue";
 import salesReport from "../Pages/SalesReport/List.vue";
 import companyBills from "../Pages/CompanyBills/List.vue";
 import ShiftSalePrevious from "../Pages/ShiftSale/ShiftSalePrevious.vue";
+import car from "../Pages/Car/Car.vue";
 
 const ROOT_URL = "";
 const router = new VueRouter({
@@ -240,6 +242,9 @@ const router = new VueRouter({
                     path: ROOT_URL + "/shift/sale/edit/:id", name: "ShiftSaleEdit", component: ShiftSaleEdit, beforeEnter: (to, from, next) => {
                         CheckPermission(to, from, next, Section.SHIFT_SALE + '-' + Action.EDIT)
                     },
+                },
+                {
+                    path: ROOT_URL + "/shift/sale/view/:id", name: "ShiftSaleView", component: ShiftSaleView,
                 },
                 {
                     path: ROOT_URL + "/pos", name: "Pos", component: Pos, beforeEnter: (to, from, next) => {
@@ -530,6 +535,9 @@ const router = new VueRouter({
                     path: ROOT_URL + "/company/bills", name: "CompanyBills", component: companyBills,  beforeEnter: (to, from, next) => {
                         CheckPermission(to, from, next, Section.COMPANY_BILL + '-' + Action.VIEW)
                     },
+                },
+                {
+                    path: ROOT_URL + "/cars", name: "car", component: car,
                 }
             ],
         },

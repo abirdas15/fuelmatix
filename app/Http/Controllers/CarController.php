@@ -75,7 +75,7 @@ class CarController extends Controller
             });
         }
         $result = $result->orderBy('id', 'DESC')
-            ->limit($limit);
+            ->paginate($limit);
         return response()->json(['status' => 200, 'data' => $result]);
     }
     /**

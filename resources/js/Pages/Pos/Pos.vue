@@ -55,12 +55,8 @@
                                 </div>
                                 <div class="col-sm-6 mb-3" v-if="company_id">
                                     <div class="user-search form-group position-relative">
-                                        <input type="text" class="form-control" placeholder="Car Number" name="car_number" v-model="car_number" @input="getCarList">
-                                        <div class="car-drop" v-if="carList.length > 0">
-                                            <ul>
-                                                <li v-for="c in carList" @click="selectCar(c)">{{c.car_number}}</li>
-                                            </ul>
-                                        </div>
+                                        <v-select class="form-control form-control-sm" name="car_number" placeholder="Choose Car" :options="carList" label="car_number" v-model="car_number"
+                                                  :reduce="(option) => option.car_number"></v-select>
                                         <span class="invalid-feedback d-block"></span>
                                     </div>
                                 </div>
@@ -562,6 +558,7 @@ export default {
         company_id: function () {
             this.car_number = ''
             this.getDriver();
+            this.getCarList();
             if (this.company_id == null) {
                 this.enableDriverTip = false
                 this.enableDriverSale = false;
@@ -925,9 +922,9 @@ export default {
             });
         },
         getCarList: function () {
-            ApiService.POST(ApiRoutes.CarSearch, {company_id: this.company_id, keyword: this.car_number}, res => {
+            ApiService.POST(ApiRoutes.CarList, {company_id: this.company_id}, res => {
                 if (parseInt(res.status) === 200) {
-                    this.carList = res.data
+                    this.carList = res.data.data
                 } else {
                     this.carList = []
                 }

@@ -512,10 +512,7 @@ export default {
                         })
                     } else {
                         this.$router.push({
-                            name: 'ShiftSaleView',
-                            params: {
-                                    id: category.id
-                            }
+                            name: 'ShiftSaleView'
                         })
                     }
                 } else {
