@@ -1,4 +1,426 @@
 <template>
+<!--    <div class="content-body">-->
+<!--        <div class="container-fluid">-->
+<!--            <div class="row page-titles">-->
+<!--                <ol class="breadcrumb">-->
+<!--                    <li class="breadcrumb-item active"><a href="javascript:void(0)">Home</a></li>-->
+<!--                    <li class="breadcrumb-item"><a href="javascript:void(0)">Report</a></li>-->
+<!--                </ol>-->
+<!--            </div>-->
+<!--            &lt;!&ndash; row &ndash;&gt;-->
+<!--            <div class="row">-->
+<!--                <div class="col-xl-12">-->
+<!--                    <div class="card ">-->
+<!--                        <div class="card-header bg-secondary">-->
+<!--                            <h4 class="card-title">Product Sale</h4>-->
+<!--                        </div>-->
+<!--                        <div class="card-body">-->
+
+<!--                            <div>-->
+<!--                                <div class="table-responsive">-->
+<!--                                    <table class="table table-responsive-md" >-->
+<!--                                        <thead>-->
+<!--                                        <tr>-->
+<!--                                            <th >Shift</th>-->
+<!--                                            <th lass="text-white" colspan="2" >octane </th>-->
+<!--                                            <th  colspan="2" >CNG </th>-->
+<!--                                        </tr>-->
+<!--                                        <tr>-->
+
+<!--                                            <th ></th>-->
+<!--                                            <th >Litre </th>-->
+<!--                                            <th >Amount</th>-->
+<!--                                            <th >Litre </th>-->
+<!--                                            <th >Amount</th>-->
+<!--                                        </tr>-->
+<!--                                        </thead>-->
+<!--                                        <tbody>-->
+<!--                                        <tr>-->
+<!--                                            <td>Shift(7:00 - 5:00)</td>-->
+<!--                                            <td>1000</td>-->
+<!--                                            <td>5000</td>-->
+<!--                                            <td>1000</td>-->
+<!--                                            <td>2000</td>-->
+<!--                                        </tr>-->
+<!--                                        <tr>-->
+<!--                                            <td>Shift(5:00 - 8:00)</td>-->
+<!--                                            <td>2000</td>-->
+<!--                                            <td>10000</td>-->
+<!--                                            <td>3000</td>-->
+<!--                                            <td>40000</td>-->
+<!--                                        </tr>-->
+<!--                                        <tr>-->
+<!--                                            <td>Shift(8:00 - 9:00)</td>-->
+<!--                                            <td>500</td>-->
+<!--                                            <td>1000</td>-->
+<!--                                            <td>6000</td>-->
+<!--                                            <td>100000</td>-->
+<!--                                        </tr>-->
+<!--                                        <tr>-->
+<!--                                            <td>Shift(9:00 - 10:00)</td>-->
+<!--                                            <td>1000</td>-->
+<!--                                            <td>5000</td>-->
+<!--                                            <td>1000</td>-->
+<!--                                            <td>2000</td>-->
+<!--                                        </tr>-->
+<!--                                        <tr>-->
+<!--                                            <td>Shift(10:00 - 11:00)</td>-->
+<!--                                            <td>3000</td>-->
+<!--                                            <td>50000</td>-->
+<!--                                            <td>6000</td>-->
+<!--                                            <td>60000</td>-->
+<!--                                        </tr>-->
+<!--                                        <tr>-->
+<!--                                            <td>Shift(11:00 - 12:00)</td>-->
+<!--                                            <td>1000</td>-->
+<!--                                            <td>5000</td>-->
+<!--                                            <td>1000</td>-->
+<!--                                            <td>2000</td>-->
+<!--                                        </tr>-->
+<!--                                        <tr>-->
+<!--                                            <td>Total</td>-->
+<!--                                            <td>9500</td>-->
+<!--                                            <td>76000</td>-->
+<!--                                            <td>19000</td>-->
+<!--                                            <td>206000</td>-->
+<!--                                        </tr>-->
+<!--                                        </tbody>-->
+<!--                                    </table>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--            <div class="row">-->
+<!--                <div class="col-xl-12">-->
+<!--                    <div class="card ">-->
+<!--                        <div class="card-header bg-secondary">-->
+<!--                            <h4 class="card-title">Refill</h4>-->
+<!--                        </div>-->
+<!--                        <div class="card-body">-->
+<!--                            <div>-->
+<!--                                <div class="table-responsive">-->
+<!--                                    <table class="table table-responsive-md">-->
+<!--                                        <thead>-->
+<!--                                        <tr >-->
+<!--                                            <th >Product</th>-->
+<!--                                            <th >Time</th>-->
+<!--                                            <th >Litres</th>-->
+<!--                                            <th >Loss/Gain</th>-->
+<!--                                        </tr>-->
+<!--                                        </thead>-->
+<!--                                        <tbody>-->
+<!--                                        <tr>-->
+<!--                                            <td>Octane</td>-->
+<!--                                            <td>3-3-23 4:34:56</td>-->
+<!--                                            <td>287 Litres</td>-->
+<!--                                            <td>-5 litres</td>-->
+<!--                                        </tr>-->
+<!--                                        <tr>-->
+<!--                                            <td>CNG</td>-->
+<!--                                            <td>5-3-23 6:34:56</td>-->
+<!--                                            <td>600 Litres</td>-->
+<!--                                            <td>10 litres</td>-->
+<!--                                        </tr>-->
+<!--                                        <tr>-->
+<!--                                            <td>LPG</td>-->
+<!--                                            <td>3-3-23 4:34:56</td>-->
+<!--                                            <td>520 Litres</td>-->
+<!--                                            <td>-5 litres</td>-->
+<!--                                        </tr>-->
+<!--                                        <tr>-->
+<!--                                            <td>Octane</td>-->
+<!--                                            <td>4-3-23 4:34:56</td>-->
+<!--                                            <td>300 Litres</td>-->
+<!--                                            <td>-10 litres</td>-->
+<!--                                        </tr>-->
+<!--                                        <tr>-->
+<!--                                            <td>CNG</td>-->
+<!--                                            <td>3-3-23 4:34:56</td>-->
+<!--                                            <td>287 Litres</td>-->
+<!--                                            <td>-5 litres</td>-->
+<!--                                        </tr>-->
+<!--                                        <tr>-->
+<!--                                            <td>Octane</td>-->
+<!--                                            <td>3-3-23 4:34:56</td>-->
+<!--                                            <td>287 Litres</td>-->
+<!--                                            <td>-5 litres</td>-->
+<!--                                        </tr>-->
+<!--                                        </tbody>-->
+<!--                                    </table>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--            <div class="row">-->
+<!--                <div class="col-xl-12">-->
+<!--                    <div class="card ">-->
+<!--                        <div class="card-header bg-secondary">-->
+<!--                            <h4 class="card-title">Stock</h4>-->
+<!--                        </div>-->
+<!--                        <div class="card-body">-->
+<!--                            <div>-->
+<!--                                <div class="table-responsive">-->
+<!--                                    <table class="table table-responsive-md">-->
+<!--                                        <thead>-->
+<!--                                        <tr>-->
+<!--                                            <th >Product</th>-->
+<!--                                            <th >Start (3-3-23 4:34:56)</th>-->
+<!--                                            <th >End(3-3-23 4:34:56)</th>-->
+
+<!--                                        </tr>-->
+<!--                                        </thead>-->
+<!--                                        <tbody>-->
+<!--                                        <tr>-->
+<!--                                            <td>Octane</td>-->
+<!--                                            <td>400 Litres</td>-->
+<!--                                            <td>287 Litres</td>-->
+<!--                                        </tr>-->
+<!--                                        </tbody>-->
+<!--                                    </table>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--            <div class="row">-->
+<!--                <div class="col-xl-12">-->
+<!--                    <div class="card ">-->
+<!--                        <div class="card-header bg-secondary">-->
+<!--                            <h4 class="card-title">Expenses  </h4>-->
+<!--                        </div>-->
+<!--                        <div class="card-body">-->
+<!--                            <div>-->
+<!--                                <div class="table-responsive">-->
+<!--                                    <table class="table table-responsive-md" >-->
+<!--                                        <tbody>-->
+<!--                                        <tr>-->
+<!--                                            <td>Salary</td>-->
+<!--                                            <td>3,00,000</td>-->
+<!--                                        </tr>-->
+<!--                                        <tr>-->
+<!--                                            <td>Maintenance</td>-->
+<!--                                            <td>34,000</td>-->
+<!--                                        </tr>-->
+<!--                                        <tr>-->
+<!--                                            <td>COGS (Octane)</td>-->
+<!--                                            <td>7,00,000</td>-->
+<!--                                        </tr>-->
+<!--                                        <tr>-->
+<!--                                            <td>Entertainment</td>-->
+<!--                                            <td>1,000</td>-->
+<!--                                        </tr>-->
+<!--                                        </tbody>-->
+<!--                                    </table>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--            <div class="row">-->
+<!--                <div class="col-xl-12">-->
+<!--                    <div class="card ">-->
+<!--                        <div class="card-header bg-secondary">-->
+<!--                            <h4 class="card-title">Asset Balance</h4>-->
+<!--                        </div>-->
+<!--                        <div class="card-body">-->
+<!--                            <div>-->
+<!--                                <div class="table-responsive">-->
+<!--                                    <table class="table table-responsive-md" >-->
+<!--                                        <tbody>-->
+<!--                                        <tr>-->
+<!--                                            <td>Cash</td>-->
+<!--                                            <td>3,00,000</td>-->
+<!--                                        </tr>-->
+<!--                                        <tr>-->
+<!--                                            <td>Cash in hand-Rafiq</td>-->
+<!--                                            <td>34,000</td>-->
+<!--                                        </tr>-->
+<!--                                        <tr>-->
+<!--                                            <td>Exim Bank</td>-->
+<!--                                            <td>7,00,000</td>-->
+<!--                                        </tr>-->
+<!--                                        </tbody>-->
+<!--                                    </table>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--            <div class="row">-->
+<!--                <div class="col-xl-12">-->
+<!--                    <div class="card ">-->
+<!--                        <div class="card-header bg-secondary">-->
+<!--                            <h4 class="card-title">Due Payments </h4>-->
+<!--                        </div>-->
+<!--                        <div class="card-body">-->
+<!--                            <div>-->
+<!--                                <div class="table-responsive">-->
+<!--                                    <table class="table table-responsive-md" >-->
+<!--                                        <thead>-->
+<!--                                        <tr>-->
+<!--                                            <th>Provider</th>-->
+<!--                                            <th>Date Submitted</th>-->
+<!--                                            <th>Due Date</th>-->
+<!--                                            <th>Amount</th>-->
+
+<!--                                        </tr>-->
+<!--                                        </thead>-->
+<!--                                        <tbody>-->
+<!--                                        <tr>-->
+<!--                                            <td>Broadbank INternet</td>-->
+<!--                                            <td>3-3-23 4:34:56</td>-->
+<!--                                            <td>3-3-23 4:34:56</td>-->
+<!--                                            <td>32,0000</td>-->
+<!--                                        </tr>-->
+<!--                                        <tr>-->
+<!--                                            <td>COGS (Octane)</td>-->
+<!--                                            <td>3-3-23 4:34:56</td>-->
+<!--                                            <td>3-3-23 4:34:56</td>-->
+<!--                                            <td>32,0000</td>-->
+<!--                                        </tr>-->
+<!--                                        <tr>-->
+<!--                                            <td></td>-->
+<!--                                            <td></td>-->
+<!--                                            <td>Total</td>-->
+<!--                                            <td>64,0000</td>-->
+<!--                                        </tr>-->
+<!--                                        </tbody>-->
+<!--                                    </table>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--            <div class="row">-->
+<!--                <div class="col-xl-12">-->
+<!--                    <div class="card ">-->
+<!--                        <div class="card-header bg-secondary">-->
+<!--                            <h4 class="card-title">Due Invoices</h4>-->
+<!--                        </div>-->
+<!--                        <div class="card-body">-->
+<!--                            <div class=" mt-4">-->
+<!--                                <div class="table-responsive">-->
+<!--                                    <table class="table table-responsive-md">-->
+<!--                                        <thead>-->
+<!--                                        <tr>-->
+<!--                                            <th>Party</th>-->
+<!--                                            <th>Billed/Invoiced</th>-->
+<!--                                            <th>Due </th>-->
+<!--                                            <th>Overdue</th>-->
+<!--                                            <th>Total</th>-->
+<!--                                        </tr>-->
+<!--                                        </thead>-->
+<!--                                        <tbody>-->
+<!--                                        <tr>-->
+<!--                                            <td>Boisakhi</td>-->
+<!--                                            <td>32,000</td>-->
+<!--                                            <td>32,000</td>-->
+<!--                                            <td>66767</td>-->
+<!--                                            <td>32,0000</td>-->
+<!--                                        </tr>-->
+<!--                                        <tr>-->
+<!--                                            <td>Akij Grojp</td>-->
+<!--                                            <td>32,000</td>-->
+<!--                                            <td>32,000</td>-->
+<!--                                            <td>3,000</td>-->
+<!--                                            <td>32,0000</td>-->
+<!--                                        </tr>-->
+<!--                                        <tr>-->
+<!--                                            <td></td>-->
+<!--                                            <td></td>-->
+<!--                                            <td></td>-->
+<!--                                            <td>Total</td>-->
+<!--                                            <td>64,0000</td>-->
+<!--                                        </tr>-->
+<!--                                        </tbody>-->
+<!--                                    </table>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--            <div class="row">-->
+<!--                <div class="col-xl-12">-->
+<!--                    <div class="card ">-->
+<!--                        <div class="card-header bg-secondary">-->
+<!--                            <h4 class="card-title">Attendance</h4>-->
+<!--                        </div>-->
+<!--                        <div class="card-body">-->
+<!--                            <div>-->
+<!--                                <div class="table-responsive">-->
+<!--                                    <table class="table table-responsive-md" >-->
+<!--                                        <thead>-->
+<!--                                        <tr>-->
+<!--                                            <th >Shift 1</th>-->
+<!--                                            <th >Shift 1</th>-->
+<!--                                        </tr>-->
+<!--                                        </thead>-->
+<!--                                        <tbody>-->
+<!--                                        <tr>-->
+<!--                                            <td>Fuelman -3</td>-->
+<!--                                            <td>Fuelman -3</td>-->
+
+<!--                                        </tr>-->
+<!--                                        <tr>-->
+<!--                                            <td>Guard -2</td>-->
+<!--                                            <td>Guard -2</td>-->
+<!--                                        </tr>-->
+<!--                                        <tr>-->
+<!--                                            <td>Suprevisor (suvo)-1</td>-->
+<!--                                            <td>Suprevisor (suvo)-1</td>-->
+<!--                                        </tr>-->
+<!--                                        <tr>-->
+<!--                                            <td>Engineer (Yasin) -1</td>-->
+<!--                                            <td>Engineer (Yasin) -1</td>-->
+<!--                                        </tr>-->
+<!--                                        </tbody>-->
+<!--                                    </table>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+
+
+<!--        </div>-->
+<!--        &lt;!&ndash;**********************************-->
+<!--        Content body end-->
+<!--    ***********************************&ndash;&gt;-->
+
+
+<!--        &lt;!&ndash;**********************************-->
+<!--        Footer start-->
+<!--    ***********************************&ndash;&gt;-->
+<!--        <div class="footer">-->
+<!--            <div class="copyright">-->
+<!--                <p>Copyright © Designed &amp; Developed by <a href="https://informatix.asia/">informatix</a> 2023-->
+<!--                </p>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--        &lt;!&ndash;**********************************-->
+<!--        Footer end-->
+<!--    ***********************************&ndash;&gt;-->
+
+<!--        &lt;!&ndash;**********************************-->
+<!--       Support ticket button start-->
+<!--    ***********************************&ndash;&gt;-->
+
+<!--        &lt;!&ndash;**********************************-->
+<!--       Support ticket button end-->
+<!--    ***********************************&ndash;&gt;-->
+
+
+<!--    </div>-->
     <div class="content-body">
         <div class="container-fluid">
             <div class="row page-titles">

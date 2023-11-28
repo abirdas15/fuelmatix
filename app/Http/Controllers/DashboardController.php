@@ -79,7 +79,7 @@ class DashboardController extends Controller
             'data' => $data
         ];
     }
-    public static function getPayableAmount()
+    public static function getPayableAmount(): array
     {
         $sessionUser = SessionUser::getUser();
         $payableCategory = Category::where('client_company_id', $sessionUser['client_company_id'])->where('slug', strtolower(AccountCategory::ACCOUNT_PAYABLE))->first();

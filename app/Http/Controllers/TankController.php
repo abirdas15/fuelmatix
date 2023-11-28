@@ -23,6 +23,7 @@ use App\Models\TankRefill;
 use App\Models\TankRefillHistory;
 use App\Repository\NozzleRepository;
 use App\Repository\TankRepository;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -440,6 +441,7 @@ class TankController extends Controller
         }
         $tankRefill = new TankRefill();
         $tankRefill->date = $inputData['date'];
+        $tankRefill->time = Carbon::now('UTC')->format(FuelMatixDateTimeFormat::ONLY_TIME);
         $tankRefill->tank_id = $inputData['tank_id'];
         $tankRefill->pay_order_id = $inputData['pay_order_id'];
         $tankRefill->quantity = $inputData['quantity'];

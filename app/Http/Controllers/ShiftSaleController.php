@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Common\AccountCategory;
+use App\Common\FuelMatixDateTimeFormat;
 use App\Common\Module;
+use App\Helpers\Helpers;
 use App\Helpers\SessionUser;
 use App\Models\Category;
 use App\Models\Dispenser;
@@ -14,6 +16,7 @@ use App\Models\ShiftSummary;
 use App\Models\Tank;
 use App\Repository\NozzleRepository;
 use App\Repository\TankRepository;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -29,6 +32,7 @@ class ShiftSaleController extends Controller
         $inputData = $request->all();
         $validator = Validator::make($inputData, [
             'date' => 'required',
+            'tank' => 'required',
             'status' => 'required',
             'product_id' => 'required',
             'start_reading' => $inputData['status'] == 'end' ? 'required' : 'nullable',
@@ -49,7 +53,7 @@ class ShiftSaleController extends Controller
         if ($inputData['status'] == 'start') {
             $shiftSale = new ShiftSale();
             $shiftSale->date = $inputData['date'];
-            $shiftSale->start_time = date('h:i:s');
+            $shiftSale->start_time = Carbon::now('UTC')->format(FuelMatixDateTimeFormat::ONLY_TIME);
             $shiftSale->product_id = $inputData['product_id'];
             $shiftSale->status = 'start';
             $shiftSale->user_id = $sessionUser['id'];
@@ -59,10 +63,11 @@ class ShiftSaleController extends Controller
             }
             return response()->json(['status' => 200, 'message' => 'Successfully started shift sale.']);
         }
-
-        $tank = Tank::where('product_id', $inputData['product_id'])->first();
-        if (!$tank instanceof Tank) {
-            return response()->json(['status' => 400, 'message' => 'Cannot find tank.']);
+        if (!empty($inputData['tank']) && $inputData['tank'] == 1) {
+            $tank = Tank::where('product_id', $inputData['product_id'])->first();
+            if (!$tank instanceof Tank) {
+                return response()->json(['status' => 400, 'message' => 'Cannot find tank.']);
+            }
         }
         $category = Category::where('slug', strtolower(AccountCategory::DIRECT_INCOME))->where('client_company_id', $inputData['session_user']['client_company_id'])->first();
         $incomeCategory = Category::where('parent_category', $category['id'])
@@ -98,7 +103,7 @@ class ShiftSaleController extends Controller
         if (!$shiftSale instanceof ShiftSale) {
             return response()->json(['status' => 400, 'message' => 'Cannot find shift sale.']);
         }
-        $shiftSale->end_time = date('h:i:s');
+        $shiftSale->end_time = Carbon::now('UTC')->format(FuelMatixDateTimeFormat::ONLY_TIME);
         $shiftSale->start_reading = $inputData['start_reading'];
         $shiftSale->tank_refill = $inputData['tank_refill'];
         $shiftSale->end_reading = $inputData['end_reading'];
@@ -109,13 +114,15 @@ class ShiftSaleController extends Controller
         if (!$shiftSale->save()) {
             return response()->json(['status' => 500, 'error' => 'Cannot ended shift sale.']);
         }
-        $tankLogData = [
-            'tank_id' => $tank['id'],
-            'date' => $inputData['date'],
-            'height' => $inputData['end_reading'],
-            'type' => 'shift sell',
-        ];
-        TankRepository::readingSave($tankLogData);
+        if (!empty($inputData['tank']) && $inputData['tank'] == 1) {
+            $tankLogData = [
+                'tank_id' => $tank['id'],
+                'date' => $inputData['date'],
+                'height' => $inputData['end_reading'],
+                'type' => 'shift sell',
+            ];
+            TankRepository::readingSave($tankLogData);
+        }
         $stockData = [
             'client_company_id' => $inputData['session_user']['client_company_id'],
             'date' => $inputData['date'],
@@ -199,7 +206,7 @@ class ShiftSaleController extends Controller
         $result = $result->orderBy($order_by, $order_mode)
             ->paginate($limit);
         foreach ($result as &$data) {
-            $data['date'] = date('d/m/Y', strtotime($data['date'])).' '.date('h:i A', strtotime($data['start_timeNSaleCOn']));
+            $data['date'] = Helpers::formatDate($data['date'].' '.$data['start_time'], FuelMatixDateTimeFormat::STANDARD_DATE_TIME);
         }
         return response()->json(['status' => 200, 'data' => $result]);
     }
@@ -216,8 +223,9 @@ class ShiftSaleController extends Controller
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
-        $result = ShiftSale::select('shift_sale.*', 'products.name as product_name')
+        $result = ShiftSale::select('shift_sale.*', 'products.name as product_name', 'product_types.tank')
             ->leftJoin('products', 'products.id', '=', 'shift_sale.product_id')
+            ->leftJoin('product_types', 'product_types.id', '=', 'products.type_id')
             ->where('shift_sale.id', $request['id'])
             ->first();
         $shiftSummary = ShiftSummary::where('shift_sale_id', $inputData['id'])->get()->keyBy('nozzle_id');
@@ -243,7 +251,7 @@ class ShiftSaleController extends Controller
             ->where('shift_sale_id', $inputData['id'])
             ->get()
             ->toArray();
-        $result['date_format'] = date('d/m/Y', strtotime($result['date'])).' '.date('h:i A', strtotime($result['start_time']));
+        $result['date_format'] = Helpers::formatDate($result['date']. ' '.$result['start_time'], FuelMatixDateTimeFormat::STANDARD_DATE_TIME);
         return response()->json(['status' => 200, 'data' => $result]);
     }
     /**

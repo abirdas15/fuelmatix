@@ -13,6 +13,7 @@ use App\Models\FuelAdjustment;
 use App\Models\FuelAdjustmentData;
 use App\Models\NozzleReading;
 use App\Models\Product;
+use App\Models\ProductType;
 use App\Models\SaleData;
 use App\Models\ShiftSale;
 use App\Models\ShiftSummary;
@@ -101,12 +102,18 @@ class ProductController extends Controller
         $keyword = $inputData['keyword'] ?? '';
         $order_by = $inputData['order_by'] ?? 'id';
         $order_mode = $inputData['order_mode'] ?? 'DESC';
-        $result = Product::select('products.*', 'product_types.name as product_type')
+        $shift_sale = $inputData['shift_sale'] ?? '';
+        $result = Product::select('products.*', 'product_types.name as product_type', 'product_types.shift_sale')
             ->leftJoin('product_types', 'product_types.id', '=', 'products.type_id')
             ->where('client_company_id', $inputData['session_user']['client_company_id']);
         if (!empty($inputData['type_id'])) {
             $result->where(function($q) use ($inputData) {
                 $q->where('products.type_id', $inputData['type_id']);
+            });
+        }
+        if (!empty($shift_sale)) {
+            $result->where(function($q) use ($shift_sale) {
+                $q->where('product_types.shift_sale', $shift_sale);
             });
         }
         if (!empty($keyword)) {
@@ -264,14 +271,17 @@ class ProductController extends Controller
         }
         $date = $inputData['date'] ?? date('Y-m-d');
         $sessionUser = SessionUser::getUser();
-        $product = Product::where('id', $inputData['product_id'])->where('client_company_id', $sessionUser['client_company_id'])->first();
+        $product = Product::where('id', $inputData['product_id'])
+            ->where('client_company_id', $sessionUser['client_company_id'])
+            ->first();
         if (!$product instanceof Product) {
             return response()->json(['status' => 500, 'error' => 'Cannot find product.']);
         }
-        $tank = Tank::where('product_id', $product['id'])->first();
-        if (!$tank instanceof Tank) {
-            return response()->json(['status' => 500, 'error' => 'Cannot find tank.']);
+        $productType = ProductType::where('id', $product['type_id'])->first();
+        if (!$productType instanceof ProductType) {
+            return response()->json(['status' => 500, 'error' => 'Cannot find product type.']);
         }
+        $tank = Tank::where('product_id', $product['id'])->first();
         $shiftSale = ShiftSale::select('id', 'end_reading')->where('client_company_id', $sessionUser['client_company_id'])
             ->where('status', 'end')->where('product_id', $request['product_id'])
             ->where('date', '<=', $date)
@@ -318,10 +328,10 @@ class ProductController extends Controller
         $consumption = $start_reading + $tank_refill + $adjustment - $end_reading;
         $amount = $consumption * $product['selling_price'];
 
-        $start_reading_mm = TankRepository::getHeight(['tank_id' => $tank['id'], 'volume' => $start_reading]);
+        $start_reading_mm = TankRepository::getHeight(['tank_id' => $tank['id'] ?? 0, 'volume' => $start_reading]);
         $tank_refill_mm = 0;
         $adjustment_mm = 0;
-        $end_reading_mm = TankRepository::getHeight(['tank_id' => $tank['id'], 'volume' => $end_reading]);
+        $end_reading_mm = TankRepository::getHeight(['tank_id' => $tank['id'] ?? 0, 'volume' => $end_reading]);
         $consumption_mm = $start_reading_mm + $tank_refill_mm +  $adjustment_mm - $end_reading_mm;
 
         $result = [
@@ -339,7 +349,9 @@ class ProductController extends Controller
             'consumption_mm' => $consumption_mm,
             'amount' => $amount,
             'selling_price' => $product->selling_price,
-            'tank_height' => $tank['height']
+            'tank_height' => $tank['height'] ?? 0,
+            'unit' => $productType['unit'],
+            'tank' => $productType['tank']
         ];
         $dispensers = Dispenser::select('id', 'dispenser_name')
             ->where('product_id', $inputData['product_id'])
@@ -352,7 +364,7 @@ class ProductController extends Controller
         $shiftSaleData = ShiftSummary::select('nozzle_id', 'end_reading')->where('shift_sale_id', $shiftSaleId)->get()->keyBy('nozzle_id')->toArray();
         foreach ($dispensers as &$dispenser) {
             foreach ($dispenser['nozzle'] as &$nozzle) {
-                $nozzle['start_reading'] = isset($shiftSaleData[$nozzle['id']]) ? $shiftSaleData[$nozzle['id']]['end_reading'] : $nozzle['opening_stock'];
+                $nozzle['start_reading'] = isset($shiftSaleData[$nozzle['id']]) ? $shiftSaleData[$nozzle['id']]['end_reading'] : $nozzle['opening_stock'] ?? 0;
                 $nozzle['end_reading'] = 0;
                 $nozzle['adjustment'] = isset($nozzleAdjustment[$nozzle['id']]) ? array_sum(array_column($nozzleAdjustment[$nozzle['id']], 'quantity')) : 0;
                 $nozzle['consumption'] =  $nozzle['end_reading']  - $nozzle['start_reading'] -  $nozzle['adjustment'];

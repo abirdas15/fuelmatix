@@ -3,10 +3,13 @@
 namespace App\Repository;
 
 use App\Common\AccountCategory;
+use App\Common\FuelMatixDateTimeFormat;
+use App\Helpers\Helpers;
 use App\Helpers\SessionUser;
 use App\Models\Category;
 use App\Models\Invoice;
 use App\Models\Product;
+use App\Models\Sale;
 use App\Models\ShiftSale;
 use App\Models\TankLog;
 use App\Models\TankRefill;
@@ -15,58 +18,14 @@ use Illuminate\Support\Facades\DB;
 
 class ReportRepository
 {
-    public static function dailyLog($filter)
+    /**
+     * @param array $filter
+     * @return array
+     */
+    public static function dailyLog(array $filter): array
     {
-        $sessionUser = SessionUser::getUser();
-        $products = Product::select('id', 'name')->where('client_company_id', $sessionUser['client_company_id'])->get()->toArray();
-        $currentShiftSales = self::getShiftSale($filter['date']);
-
-        $lastDate =  date('Y-m-d', strtotime("-1 day", strtotime($filter['date'])));
-        $lastShiftSales = self::getShiftSale($lastDate);
-
-        $lastShiftSaleArray = [];
-        $shiftSaleArray = [];
-        foreach ($currentShiftSales as $shiftSale) {
-            $shiftSaleArray[$shiftSale['product_id']][] = $shiftSale;
-        }
-        foreach ($lastShiftSales as $shiftSale) {
-            $lastShiftSaleArray[$shiftSale['product_id']][] = $shiftSale;
-        }
-        $totalShift = count($shiftSaleArray) ?  count(max($shiftSaleArray)) : 0;
-        foreach ($products as &$product) {
-            $totalQuantity = 0;
-            $totalAmount = 0;
-            $lastDateQuantity = 0;
-            for ($i = 0; $i < $totalShift; $i++) {
-                if (isset($shiftSaleArray[$product['id']])) {
-                    $consumption = isset($shiftSaleArray[$product['id']][$i]) ? $shiftSaleArray[$product['id']][$i]['consumption'] : 0;
-                    $amount = isset($shiftSaleArray[$product['id']][$i]) ? $shiftSaleArray[$product['id']][$i]['amount'] : 0;
-
-                    $lastDateQuantity +=  isset($lastShiftSaleArray[$product['id']][$i]) ? $lastShiftSaleArray[$product['id']][$i]['consumption'] : 0;
-
-                    $product['value'][] = [
-                        'quantity' => $consumption,
-                        'amount' => number_format($amount, 2)
-                    ];
-                    $totalQuantity += $consumption;
-                    $totalAmount += $amount;
-                } else {
-                    $product['value'][] = [
-                        'quantity' => 0,
-                        'amount' => 0,
-                    ];
-                }
-            }
-            $product['total'] = [
-                'quantity' => $totalQuantity,
-                'amount' => number_format($totalAmount, 2),
-                'percent' => $totalQuantity > 0 && $lastDateQuantity > 0 ? number_format((($totalQuantity - $lastDateQuantity) / $lastDateQuantity) * 100, 2) : 0
-            ];
-        }
-        $result['shift_sale'] = [
-            'totalShift' => $totalShift,
-            'data' => $products
-        ];
+        $result['shift_sale'] = self::getShiftSale($filter['date']);
+        $result['pos_sale'] = self::getPosSale($filter['date']);
         $result['tank_refill'] = self::getTankRefill($filter['date']);
         $result['stock'] = self::getStock($filter['date']);
         $result['expense']['salary'] = self::getSalaryExpense($filter['date']);
@@ -77,7 +36,33 @@ class ReportRepository
         $result['asset_balance']['bank'] = self::getAssetBalance($filter['date'], AccountCategory::BANK);
         return $result;
     }
-    public static function getAssetBalance($date, $accountCategoryName)
+    /**
+     * @param string $date
+     * @return array
+     */
+    public static function getPosSale(string $date): array
+    {
+        $result =  Sale::select('products.name as product_name', DB::raw('SUM(quantity) as quantity'), DB::raw('SUM(subtotal) as amount'), 'date', 'product_types.unit')
+            ->leftJoin('sale_data', 'sale_data.sale_id', '=', 'sale.id')
+            ->leftJoin('products', 'products.id', '=', 'sale_data.product_id')
+            ->leftJoin('product_types', 'product_types.id', '=', 'products.type_id')
+            ->where(DB::raw('DATE(date)'), $date)
+            ->where('product_types.shift_sale', '0')
+            ->groupBy('sale_data.product_id')
+            ->get()
+            ->toArray();
+        foreach ($result as &$data) {
+            $data['time'] = Helpers::formatDate($data['date'], FuelMatixDateTimeFormat::STANDARD_DATE_TIME);
+            $data['amount'] = number_format($data['amount'], 2);
+        }
+        return $result;
+    }
+    /**
+     * @param string $date
+     * @param string $accountCategoryName
+     * @return array
+     */
+    public static function getAssetBalance(string $date, string $accountCategoryName): array
     {
         $sessionUser = SessionUser::getUser();
         $accountCategory = Category::select('id')->where('client_company_id', $sessionUser['client_company_id'])->where('slug', strtolower($accountCategoryName))->first();
@@ -90,9 +75,16 @@ class ReportRepository
             ->groupBy('transactions.linked_id')
             ->get()
             ->toArray();
+        foreach ($transaction as &$data) {
+            $data['amount'] = number_format($data['amount'], 2);
+        }
         return $transaction;
     }
-    public static function getDueInvoice($date)
+    /**
+     * @param string $date
+     * @return array
+     * */
+    public static function getDueInvoice(string $date): array
     {
         $sessionUser = SessionUser::getUser();
         $result = Invoice::select(DB::raw('SUM(amount - paid_amount) as amount'), 'categories.name as category_name')
@@ -103,9 +95,16 @@ class ReportRepository
             ->groupBy('invoices.category_id')
             ->get()
             ->toArray();
+        foreach ($result as &$data) {
+            $data['amount'] = number_format($data['amount'], 2);
+        }
         return $result;
     }
-    public static function getDuePayments($date)
+    /**
+     * @param string $date
+     * @return array
+     */
+    public static function getDuePayments(string $date): array
     {
         $sessionUser = SessionUser::getUser();
         $accountPayable = Category::select('id')->where('client_company_id', $sessionUser['client_company_id'])->where('slug', strtolower(AccountCategory::ACCOUNT_PAYABLE))->first();
@@ -118,10 +117,17 @@ class ReportRepository
             ->groupBy('transactions.linked_id')
             ->get()
             ->toArray();
+        foreach ($transaction as &$data) {
+            $data['amount'] = number_format($data['amount'], 2);
+        }
         return $transaction;
     }
 
-    public static function getCostOfGoodSoldExpense($date)
+    /**
+     * @param string $date
+     * @return array
+     */
+    public static function getCostOfGoodSoldExpense(string $date): array
     {
         $sessionUser = SessionUser::getUser();
         $costOfGoodSoldCategory = Category::select('id')->where('client_company_id', $sessionUser['client_company_id'])->where('slug', strtolower(AccountCategory::COST_OF_GOOD_SOLD))->first();
@@ -134,9 +140,16 @@ class ReportRepository
             ->groupBy('transactions.linked_id')
             ->get()
             ->toArray();
+        foreach ($transaction as &$data) {
+            $data['amount'] = number_format($data['amount'], 2);
+        }
         return $transaction;
     }
-    public static function getSalaryExpense($date)
+    /**
+     * @param string $date
+     * @return string
+     */
+    public static function getSalaryExpense(string $date): string
     {
         $sessionUser = SessionUser::getUser();
         $salaryExpense = Category::select('id')->where('client_company_id', $sessionUser['client_company_id'])->where('slug', strtolower(AccountCategory::SALARY_EXPENSE))->first();
@@ -145,15 +158,20 @@ class ReportRepository
             ->where('categories.parent_category', $salaryExpense->id)
             ->where('date', $date)
             ->sum('debit_amount');
-        return $transaction;
+        return number_format($transaction, 2);
     }
-    public static function getStock($date)
+    /**
+     * @param string $date
+     * @return array
+     */
+    public static function getStock(string $date): array
     {
         $sessionUser = SessionUser::getUser();
-        $result = TankLog::select('tank_log.id', 'tank_log.volume', 'products.id', 'products.name as product_name')
+        $result = TankLog::select('tank_log.id', 'tank_log.volume', 'products.id', 'products.name as product_name', 'product_types.unit')
             ->leftJoin('tank', 'tank.id', 'tank_log.tank_id')
             ->leftJoin('products', 'products.id', 'tank.product_id')
-            ->where('date', $date)
+            ->leftJoin('product_types', 'product_types.id', 'products.type_id')
+            ->where(DB::raw('DATE(tank_log.date)'), $date)
             ->where('tank_log.client_company_id', $sessionUser['client_company_id'])
             ->get()
             ->toArray();
@@ -165,36 +183,65 @@ class ReportRepository
         foreach ($dataArray as $key => $data) {
             $resultArray[] = [
                 'name' => $key,
+                'unit' =>  $data[0]['unit'],
                 'opening_stock' => $data[0]['volume'],
-                'closing_stock' => count($data) > 1 ? $data[count($data) - 1]['volume'] : 0
+                'closing_stock' => count($data) > 1 ? $data[count($data) - 1]['volume'] : $data[0]['volume']
             ];
         }
         return $resultArray;
     }
-    public static function getTankRefill($date)
+
+    /**
+     * @param string $date
+     * @return mixed
+     */
+    public static function getTankRefill(string $date)
     {
         $sessionUser = SessionUser::getUser();
-        $result = TankRefill::select('tank_refill.id', 'tank_refill.date', 'tank_refill.total_refill_volume as quantity', 'tank_refill.net_profit', 'products.name as product_name')
+        $result = TankRefill::select('tank_refill.id', 'tank_refill.date', 'tank_refill.time', 'tank_refill.total_refill_volume as quantity', 'tank_refill.net_profit', 'products.name as product_name', 'product_types.unit')
             ->leftJoin('tank', 'tank.id', 'tank_refill.tank_id')
             ->leftJoin('products', 'products.id', 'tank.product_id')
+            ->leftJoin('product_types', 'product_types.id', 'products.type_id')
             ->where('tank_refill.date', $date)
             ->where('tank_refill.client_company_id', $sessionUser['client_company_id'])
             ->get()
             ->toArray();
         foreach ($result as &$data) {
-            $data['date'] = date('d/m/Y', strtotime($data['date']));
+            $data['date'] = Helpers::formatDate($data['date']. ' '.$data['time'], FuelMatixDateTimeFormat::STANDARD_DATE_TIME);
         }
         return $result;
     }
-    public static function getShiftSale($date)
+    /**
+     * @param string $date
+     * @return array
+     */
+    public static function getShiftSale(string $date): array
     {
         $sessionUser = SessionUser::getUser();
-        $result = ShiftSale::select('consumption', 'amount', 'product_id')
+        $result = ShiftSale::select('consumption', 'amount', 'product_id', 'start_time', 'end_time', 'products.name as product_name', 'product_types.unit')
+            ->leftJoin('products', 'products.id', '=', 'shift_sale.product_id')
+            ->leftJoin('product_types', 'product_types.id', '=', 'products.type_id')
             ->where('date', $date)
-            ->where('client_company_id', $sessionUser['client_company_id'])
+            ->where('shift_sale.client_company_id', $sessionUser['client_company_id'])
             ->where('status', 'end')
             ->get()
             ->toArray();
-        return $result;
+        $resultArray = [];
+        foreach ($result as $data) {
+            $resultArray[$data['product_name']][] = [
+                'time' => 'Shift('.Helpers::formatDate($data['start_time'], FuelMatixDateTimeFormat::STANDARD_TIME).' - '.Helpers::formatDate($data['end_time'], FuelMatixDateTimeFormat::STANDARD_TIME).')',
+                'quantity' => $data['consumption'],
+                'unit' => $data['unit'],
+                'amount' => number_format($data['amount'], 2)
+            ];
+        }
+        $finalResult = [];
+        foreach ($resultArray as $key => $row) {
+            $finalResult[] = [
+                'product_name' => $key,
+                'data' => $row
+            ];
+        }
+        return $finalResult;
     }
 }

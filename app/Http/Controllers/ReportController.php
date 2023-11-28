@@ -6,6 +6,7 @@ use App\Common\FuelMatixDateTimeFormat;
 use App\Common\FuelMatixStatus;
 use App\Helpers\Helpers;
 use App\Helpers\SessionUser;
+use App\Models\ClientCompany;
 use App\Models\ShiftSale;
 use App\Repository\ReportRepository;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -16,11 +17,15 @@ use Illuminate\Support\Facades\Validator;
 
 class ReportController extends Controller
 {
-    public function dailyLog(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function dailyLog(Request $request): JsonResponse
     {
         $requestData = $request->all();
         $validator = Validator::make($requestData, [
-            'date' => 'required'
+            'date' => 'required|date'
         ]);
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
@@ -31,12 +36,17 @@ class ReportController extends Controller
         $result = ReportRepository::dailyLog($filter);
         return response()->json(['status' => 200, 'data' => $result]);
     }
+
+    /**
+     * @param Request $request
+     * @return JsonResponse|string
+     */
     public function dailyLogExportPdf(Request $request)
     {
 
         $requestData = $request->all();
         $validator = Validator::make($requestData, [
-            'date' => 'required'
+            'date' => 'required|date'
         ]);
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
@@ -65,10 +75,11 @@ class ReportController extends Controller
         }
         $productId = $requestData['product_id'] ?? '';
         $sessionUser = SessionUser::getUser();
-        $result = ShiftSale::select('shift_sale.date', DB::raw('SUM(shift_summary.consumption) as quantity'), 'shift_sale.product_id', 'products.name as product_name', )
+        $result = ShiftSale::select('shift_sale.date', DB::raw('SUM(shift_summary.consumption) as quantity'), 'shift_sale.product_id', 'products.name as product_name', 'shift_summary.nozzle_id', 'nozzles.name as nozzle_name', 'shift_summary.dispenser_id', 'dispensers.dispenser_name')
             ->leftJoin('shift_summary', 'shift_summary.shift_sale_id', '=', 'shift_sale.id')
             ->leftJoin('products', 'products.id', '=', 'shift_sale.product_id')
             ->leftJoin('nozzles', 'nozzles.id', '=', 'shift_summary.nozzle_id')
+            ->leftJoin('dispensers', 'dispensers.id', '=', 'shift_summary.dispenser_id')
             ->whereBetween('date', [$requestData['start_date'], $requestData['end_date']])
             ->where('shift_sale.client_company_id', $sessionUser['client_company_id'])
             ->where('status', FuelMatixStatus::END);
@@ -78,11 +89,14 @@ class ReportController extends Controller
             });
         }
         $result = $result->groupBy('nozzle_id')
+            ->groupBy('date')
             ->get()
             ->toArray();
+        $resultArray = [];
         foreach ($result as &$data) {
             $data['date'] = Helpers::formatDate($data['date'], FuelMatixDateTimeFormat::STANDARD_DATE);
+            $resultArray[$data['product_name']][$data['dispenser_name']][$data['nozzle_name']][] = $data;
         }
-        return response()->json(['status' => 200, 'data' => $result]);
+        return response()->json(['status' => 200, 'data' => $resultArray]);
     }
 }

@@ -9826,6 +9826,7 @@ __webpack_require__.r(__webpack_exports__);
         income_category_id: p.income_category_id,
         stock_category_id: p.stock_category_id,
         expense_category_id: p.expense_category_id,
+        shift_sale: p.shift_sale,
         product_id: p.id,
         quantity: parseFloat(quantity).toFixed(2),
         price: parseFloat(selling_price).toFixed(2),
@@ -11120,10 +11121,10 @@ __webpack_require__.r(__webpack_exports__);
     },
     updateOilStock: function updateOilStock() {
       if (this.listData.length > 0) {
-        if (this.listData[this.productIndex].product_type == 'Octane' || this.listData[this.productIndex].product_type == 'Diesel' || this.listData[this.productIndex].product_type == 'Petrol' || this.listData[this.productIndex].product_type == 'LPG') {
-          this.oilStock = true;
+        if (this.listData[this.productIndex].tank == 1) {
+          return true;
         } else {
-          this.oilStock = false;
+          return false;
         }
       }
     },
@@ -11194,7 +11195,8 @@ __webpack_require__.r(__webpack_exports__);
       _Services_ApiService__WEBPACK_IMPORTED_MODULE_0__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_1__["default"].ProductList, {
         limit: 5000,
         page: 1,
-        order_mode: 'ASC'
+        order_mode: 'ASC',
+        shift_sale: 1
       }, function (res) {
         _this4.TableLoading = false;
         if (parseInt(res.status) === 200) {
@@ -11246,18 +11248,13 @@ __webpack_require__.r(__webpack_exports__);
           totalCategoryAmount += parseFloat(v.amount);
         });
         // if ((this.totalAmount - this.totalPosSale()) != totalCategoryAmount) {
-        //     this.loading = false
-        //     this.$toast.error('Please match the total amount and category list')
-        //     return
-        // }
-
         this.listDispenser.dispensers.map(function (dispenser) {
           dispenser.nozzle.map(function (nozzle) {
             totalConsumption += parseFloat(nozzle.consumption);
           });
         });
         // check if mismatch allow
-        if (this.mismatchAllow != null) {
+        if (this.mismatchAllow != null && this.listDispenser.tank == 1) {
           if (this.totalShiftParcent(totalConsumption) > this.mismatchAllow) {
             this.loading = false;
             this.$toast.error('The mismatch is grater than allowed consumption');
@@ -11910,7 +11907,7 @@ __webpack_require__.r(__webpack_exports__);
       var rv = '';
       this.parentCategory.map(function (v) {
         if (v.id == id) {
-          rv = v.category;
+          rv = v.name;
         }
       });
       return rv;
@@ -15141,7 +15138,7 @@ var render = function render() {
         return _vm.sortData("driver_name");
       }
     }
-  }, [_vm._v("Car Name")]), _vm._v(" "), _c("th", {
+  }, [_vm._v("Car Number")]), _vm._v(" "), _c("th", {
     staticClass: "text-white",
     "class": _vm.sortClass("company_name"),
     on: {
@@ -15152,7 +15149,7 @@ var render = function render() {
   }, [_vm._v("Company Name")]), _vm._v(" "), _c("th", {
     staticClass: "text-white"
   }, [_vm._v("Action")])])]), _vm._v(" "), _vm.listData.length > 0 && _vm.TableLoading == false ? _c("tbody", _vm._l(_vm.listData, function (f) {
-    return _c("tr", [_c("td", [_vm._v(_vm._s(f.car_name))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(f.company_name))]), _vm._v(" "), _c("td", [_c("a", {
+    return _c("tr", [_c("td", [_vm._v(_vm._s(f.car_number))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(f.company_name))]), _vm._v(" "), _c("td", [_c("a", {
       staticClass: "btn btn-primary shadow btn-xs sharp me-1",
       attrs: {
         href: "javascript:void(0)"
@@ -17604,7 +17601,7 @@ var render = function render() {
       attrs: {
         colspan: _vm.data["shift_sale"]["totalShift"] + 1
       }
-    }, [_vm._v("\n                                        Shift " + _vm._s(index) + "\n                                    ")]);
+    }, [_vm._v("\r\n                                        Shift " + _vm._s(index) + "\r\n                                    ")]);
   }), _vm._v(" "), _c("th", {
     staticClass: "text-center",
     attrs: {
@@ -17731,7 +17728,7 @@ var staticRenderFns = [function () {
     _c = _vm._self._c;
   return _c("table", {
     staticClass: "table table-bordered mb-5"
-  }, [_c("thead", [_c("tr", [_c("th", [_vm._v("Shift 1")]), _vm._v(" "), _c("th", [_vm._v("Shift 2")])])]), _vm._v(" "), _c("tbody", [_c("tr", [_c("td", [_c("div", [_vm._v("Fuelman -3")]), _vm._v(" "), _c("div", [_vm._v("Guard -2")]), _vm._v(" "), _c("div", [_vm._v("Suprevisor (suvo)-1")]), _vm._v(" "), _c("div", [_vm._v("Engineer (Yasin) -1")])]), _vm._v(" "), _c("td", [_c("div", [_vm._v("Fuelman -3")]), _vm._v(" "), _c("div", [_vm._v("Guard -2")]), _vm._v(" "), _c("div", [_vm._v("Suprevisor (suvo)-1")]), _vm._v(" "), _c("div", [_vm._v("Engineer (Yasin) -1")])])]), _vm._v(" "), _c("tr", [_c("td", [_vm._v("\n                                        Leave\n                                    ")]), _vm._v(" "), _c("td")])])]);
+  }, [_c("thead", [_c("tr", [_c("th", [_vm._v("Shift 1")]), _vm._v(" "), _c("th", [_vm._v("Shift 2")])])]), _vm._v(" "), _c("tbody", [_c("tr", [_c("td", [_c("div", [_vm._v("Fuelman -3")]), _vm._v(" "), _c("div", [_vm._v("Guard -2")]), _vm._v(" "), _c("div", [_vm._v("Suprevisor (suvo)-1")]), _vm._v(" "), _c("div", [_vm._v("Engineer (Yasin) -1")])]), _vm._v(" "), _c("td", [_c("div", [_vm._v("Fuelman -3")]), _vm._v(" "), _c("div", [_vm._v("Guard -2")]), _vm._v(" "), _c("div", [_vm._v("Suprevisor (suvo)-1")]), _vm._v(" "), _c("div", [_vm._v("Engineer (Yasin) -1")])])]), _vm._v(" "), _c("tr", [_c("td", [_vm._v("\r\n                                        Leave\r\n                                    ")]), _vm._v(" "), _c("td")])])]);
 }];
 render._withStripped = true;
 
@@ -27962,7 +27959,7 @@ var render = function render() {
       staticClass: "btn btn-primary shadow btn-xs sharp me-1",
       attrs: {
         to: {
-          name: "fuelAdjustmentView",
+          name: "adjustmentView",
           params: {
             id: f.id
           }
@@ -34573,7 +34570,7 @@ var render = function render() {
     }
   }, [_c("div", {
     staticClass: "section-content discovery active"
-  }, [_vm.oilStock ? [_c("div", {
+  }, [_vm.listDispenser.tank == 1 ? [_c("div", {
     staticClass: "card"
   }, [_c("div", {
     staticClass: "card-header"
@@ -34666,7 +34663,11 @@ var render = function render() {
         _vm.$set(_vm.listDispenser, "start_reading", $event.target.value);
       }
     }
-  }), _vm._v(" "), _vm._m(10)])]), _vm._v(" "), _vm.listDispenser.status == "end" ? _c("div", {
+  }), _vm._v(" "), _c("div", {
+    staticClass: "input-group-append"
+  }, [_c("span", {
+    staticClass: "input-group-text"
+  }, [_vm._v(_vm._s(_vm.listDispenser.unit))])])])]), _vm._v(" "), _vm.listDispenser.status == "end" ? _c("div", {
     staticClass: "mb-3 col-md-2"
   }, [_c("div", {
     staticClass: "input-group"
@@ -34691,7 +34692,11 @@ var render = function render() {
         _vm.$set(_vm.listDispenser, "tank_refill", $event.target.value);
       }
     }
-  }), _vm._v(" "), _vm._m(11)])]) : _vm._e(), _vm._v(" "), _vm.listDispenser.status == "end" ? _c("div", {
+  }), _vm._v(" "), _c("div", {
+    staticClass: "input-group-append"
+  }, [_c("span", {
+    staticClass: "input-group-text"
+  }, [_vm._v(_vm._s(_vm.listDispenser.unit))])])])]) : _vm._e(), _vm._v(" "), _vm.listDispenser.status == "end" ? _c("div", {
     staticClass: "mb-3 col-md-2"
   }, [_c("div", {
     staticClass: "input-group"
@@ -34717,7 +34722,7 @@ var render = function render() {
         _vm.$set(_vm.listDispenser, "end_reading", $event.target.value);
       }
     }
-  }), _vm._v(" "), _vm._m(12)])]) : _vm._e(), _vm._v(" "), _vm.listDispenser.status == "end" ? _c("div", {
+  }), _vm._v(" "), _vm._m(10)])]) : _vm._e(), _vm._v(" "), _vm.listDispenser.status == "end" ? _c("div", {
     staticClass: "mb-3 col-md-2"
   }, [_c("div", {
     staticClass: "input-group"
@@ -34746,7 +34751,11 @@ var render = function render() {
         _vm.$set(_vm.listDispenser, "adjustment", $event.target.value);
       }, _vm.calculateAmount]
     }
-  }) : _vm._e(), _vm._v(" "), _vm._m(13)])]) : _vm._e(), _vm._v(" "), _vm.listDispenser.status == "end" ? _c("div", {
+  }) : _vm._e(), _vm._v(" "), _c("div", {
+    staticClass: "input-group-append"
+  }, [_c("span", {
+    staticClass: "input-group-text"
+  }, [_vm._v(_vm._s(_vm.listDispenser.unit))])])])]) : _vm._e(), _vm._v(" "), _vm.listDispenser.status == "end" ? _c("div", {
     staticClass: "mb-3 col-md-2"
   }, [_c("div", {
     staticClass: "input-group"
@@ -34772,7 +34781,7 @@ var render = function render() {
         _vm.$set(_vm.listDispenser, "consumption", $event.target.value);
       }
     }
-  }) : _vm._e(), _vm._v(" "), _vm._m(14)])]) : _vm._e()])])])] : _vm._e(), _vm._v(" "), _vm._l(_vm.listDispenser.dispensers, function (d, dIndex) {
+  }) : _vm._e(), _vm._v(" "), _vm._m(11)])]) : _vm._e()])])])] : _vm._e(), _vm._v(" "), _vm._l(_vm.listDispenser.dispensers, function (d, dIndex) {
     return _vm.listDispenser.dispensers.length > 0 ? _c("div", {
       staticClass: "card"
     }, [_c("div", {
@@ -34815,7 +34824,11 @@ var render = function render() {
             _vm.$set(n, "start_reading", $event.target.value);
           }
         }
-      }), _vm._v(" "), _vm._m(15, true)])]), _vm._v(" "), _vm.listDispenser.status == "end" ? _c("div", {
+      }), _vm._v(" "), _c("div", {
+        staticClass: "input-group-append"
+      }, [_c("span", {
+        staticClass: "input-group-text"
+      }, [_vm._v(_vm._s(_vm.listDispenser.unit))])])])]), _vm._v(" "), _vm.listDispenser.status == "end" ? _c("div", {
         staticClass: "mb-3 col-md-2"
       }, [_c("label", [_vm._v("End Reading ")]), _vm._v(" "), _c("div", {
         staticClass: "input-group"
@@ -34847,7 +34860,11 @@ var render = function render() {
             return _vm.calculateAmountNozzle(dIndex, nIndex);
           }]
         }
-      }) : _vm._e(), _vm._v(" "), _vm._m(16, true)])]) : _vm._e(), _vm._v(" "), _vm.listDispenser.status == "end" ? _c("div", {
+      }) : _vm._e(), _vm._v(" "), _c("div", {
+        staticClass: "input-group-append"
+      }, [_c("span", {
+        staticClass: "input-group-text"
+      }, [_vm._v(_vm._s(_vm.listDispenser.unit))])])])]) : _vm._e(), _vm._v(" "), _vm.listDispenser.status == "end" ? _c("div", {
         staticClass: "mb-3 col-md-2"
       }, [_c("label", [_vm._v("Adjustment ")]), _vm._v(" "), _c("div", {
         staticClass: "input-group"
@@ -34877,7 +34894,11 @@ var render = function render() {
             return _vm.calculateAmountNozzle(dIndex, nIndex);
           }]
         }
-      }) : _vm._e(), _vm._v(" "), _vm._m(17, true)])]) : _vm._e(), _vm._v(" "), _vm.listDispenser.status == "end" ? _c("div", {
+      }) : _vm._e(), _vm._v(" "), _c("div", {
+        staticClass: "input-group-append"
+      }, [_c("span", {
+        staticClass: "input-group-text"
+      }, [_vm._v(_vm._s(_vm.listDispenser.unit))])])])]) : _vm._e(), _vm._v(" "), _vm.listDispenser.status == "end" ? _c("div", {
         staticClass: "mb-3 col-md-2"
       }, [_c("label", [_vm._v("Consumption ")]), _vm._v(" "), _c("div", {
         staticClass: "input-group"
@@ -34902,7 +34923,11 @@ var render = function render() {
             _vm.$set(n, "consumption", $event.target.value);
           }
         }
-      }), _vm._v(" "), _vm._m(18, true)])]) : _vm._e()]);
+      }), _vm._v(" "), _c("div", {
+        staticClass: "input-group-append"
+      }, [_c("span", {
+        staticClass: "input-group-text"
+      }, [_vm._v(_vm._s(_vm.listDispenser.unit))])])])]) : _vm._e()]);
     }), 0) : _vm._e()]) : _vm._e();
   }), _vm._v(" "), _vm.listDispenser.status != "start" ? [_c("div", {
     staticClass: "row"
@@ -35261,62 +35286,6 @@ var staticRenderFns = [function () {
   }, [_c("span", {
     staticClass: "input-group-text"
   }, [_vm._v("mm")])]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("div", {
-    staticClass: "input-group-append"
-  }, [_c("span", {
-    staticClass: "input-group-text"
-  }, [_vm._v("Liter")])]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("div", {
-    staticClass: "input-group-append"
-  }, [_c("span", {
-    staticClass: "input-group-text"
-  }, [_vm._v("Liter")])]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("div", {
-    staticClass: "input-group-append"
-  }, [_c("span", {
-    staticClass: "input-group-text"
-  }, [_vm._v("Liter")])]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("div", {
-    staticClass: "input-group-append"
-  }, [_c("span", {
-    staticClass: "input-group-text"
-  }, [_vm._v("Liter")])]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("div", {
-    staticClass: "input-group-append"
-  }, [_c("span", {
-    staticClass: "input-group-text"
-  }, [_vm._v("Liter")])]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("div", {
-    staticClass: "input-group-append"
-  }, [_c("span", {
-    staticClass: "input-group-text"
-  }, [_vm._v("Liter")])]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("div", {
-    staticClass: "input-group-append"
-  }, [_c("span", {
-    staticClass: "input-group-text"
-  }, [_vm._v("Liter")])]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
@@ -36647,7 +36616,7 @@ var render = function render() {
     }
   }, [_c("div", {
     staticClass: "section-content discovery active"
-  }, [[_c("div", {
+  }, [_vm.shiftSale.tank == 1 ? [_c("div", {
     staticClass: "card"
   }, [_c("div", {
     staticClass: "card-header"
@@ -36669,7 +36638,7 @@ var render = function render() {
     staticClass: "mb-3 col-md-2"
   }, [_c("div", [_vm._v(_vm._s(_vm.shiftSale.adjustment) + " Liter")])]), _vm._v(" "), _c("div", {
     staticClass: "mb-3 col-md-2"
-  }, [_c("div", [_vm._v(_vm._s(_vm.shiftSale.consumption) + " Liter")])])])])])], _vm._v(" "), _vm._l(_vm.shiftSale.dispensers, function (d, dIndex) {
+  }, [_c("div", [_vm._v(_vm._s(_vm.shiftSale.consumption) + " Liter")])])])])])] : _vm._e(), _vm._v(" "), _vm._l(_vm.shiftSale.dispensers, function (d, dIndex) {
     return _vm.shiftSale.dispensers.length > 0 ? _c("div", {
       staticClass: "card"
     }, [_c("div", {
@@ -40750,7 +40719,7 @@ exports = module.exports = __webpack_require__(/*! ../../../../../node_modules/c
 
 
 // module
-exports.push([module.i, "\n.input-group-text[data-v-5a662738]{\n    border-top-left-radius: 0;\n    border-bottom-left-radius: 0;\n    border: 1px solid #c3bfbf;\n    padding: 16.5px 15px;\n}\n@media only screen and (max-width: 1366px) {\n.input-group-text[data-v-5a662738]{\n        padding: 10.5px 15px;\n}\n}\n", ""]);
+exports.push([module.i, "\n.input-group-text[data-v-5a662738]{\r\n    border-top-left-radius: 0;\r\n    border-bottom-left-radius: 0;\r\n    border: 1px solid #c3bfbf;\r\n    padding: 16.5px 15px;\n}\n@media only screen and (max-width: 1366px) {\n.input-group-text[data-v-5a662738]{\r\n        padding: 10.5px 15px;\n}\n}\r\n", ""]);
 
 // exports
 
@@ -40788,7 +40757,7 @@ exports = module.exports = __webpack_require__(/*! ../../../../node_modules/css-
 
 
 // module
-exports.push([module.i, "\n.box-mula[data-v-1b1b4180]{\n    padding: 10px 30px;\n    box-shadow: 0 0 15px 0 #CBC9C8;\n    border-radius: 12px;\n    margin-bottom: 30px;\n    margin-top: 10px;\n}\n.putkir-futa[data-v-1b1b4180]{\n    border-bottom: 1px solid #c1c1c1;\n    margin: 10px 0px 15px 0px;\n    padding-bottom: 11px;\n}\n", ""]);
+exports.push([module.i, "\n.box-mula[data-v-1b1b4180]{\r\n    padding: 10px 30px;\r\n    box-shadow: 0 0 15px 0 #CBC9C8;\r\n    border-radius: 12px;\r\n    margin-bottom: 30px;\r\n    margin-top: 10px;\n}\n.putkir-futa[data-v-1b1b4180]{\r\n    border-bottom: 1px solid #c1c1c1;\r\n    margin: 10px 0px 15px 0px;\r\n    padding-bottom: 11px;\n}\r\n", ""]);
 
 // exports
 
@@ -40807,7 +40776,7 @@ exports = module.exports = __webpack_require__(/*! ../../../../node_modules/css-
 
 
 // module
-exports.push([module.i, "\n.box-mula[data-v-21e351c5]{\n    padding: 10px 30px;\n    box-shadow: 0 0 15px 0 #CBC9C8;\n    border-radius: 12px;\n    margin-bottom: 30px;\n    margin-top: 10px;\n}\n.putkir-futa[data-v-21e351c5]{\n    border-bottom: 1px solid #c1c1c1;\n    margin: 10px 0px 15px 0px;\n    padding-bottom: 11px;\n}\n", ""]);
+exports.push([module.i, "\n.box-mula[data-v-21e351c5]{\r\n    padding: 10px 30px;\r\n    box-shadow: 0 0 15px 0 #CBC9C8;\r\n    border-radius: 12px;\r\n    margin-bottom: 30px;\r\n    margin-top: 10px;\n}\n.putkir-futa[data-v-21e351c5]{\r\n    border-bottom: 1px solid #c1c1c1;\r\n    margin: 10px 0px 15px 0px;\r\n    padding-bottom: 11px;\n}\r\n", ""]);
 
 // exports
 
@@ -40826,7 +40795,7 @@ exports = module.exports = __webpack_require__(/*! ../../../../node_modules/css-
 
 
 // module
-exports.push([module.i, "\n.box-mula[data-v-0d4183dd]{\r\n    padding: 10px 30px;\r\n    box-shadow: 0 0 15px 0 #CBC9C8;\r\n    border-radius: 12px;\r\n    margin-bottom: 30px;\r\n    margin-top: 10px;\n}\n.putkir-futa[data-v-0d4183dd]{\r\n    border-bottom: 1px solid #c1c1c1;\r\n    margin: 10px 0px 15px 0px;\r\n    padding-bottom: 11px;\n}\r\n", ""]);
+exports.push([module.i, "\n.box-mula[data-v-0d4183dd]{\n    padding: 10px 30px;\n    box-shadow: 0 0 15px 0 #CBC9C8;\n    border-radius: 12px;\n    margin-bottom: 30px;\n    margin-top: 10px;\n}\n.putkir-futa[data-v-0d4183dd]{\n    border-bottom: 1px solid #c1c1c1;\n    margin: 10px 0px 15px 0px;\n    padding-bottom: 11px;\n}\n", ""]);
 
 // exports
 
@@ -40864,7 +40833,7 @@ exports = module.exports = __webpack_require__(/*! ../../../../node_modules/css-
 
 
 // module
-exports.push([module.i, "\n.input-group-text[data-v-716b8b32]{\n    border-top-left-radius: 0;\n    border-bottom-left-radius: 0;\n    border: 1px solid #c3bfbf;\n    padding: 16.5px 15px;\n}\n.input-group-append[data-v-716b8b32] {\n    width: 25%;\n}\n@media only screen and (max-width: 1366px) {\n.input-group-text[data-v-716b8b32]{\n        padding: 10.5px 15px;\n}\n}\n.input-group-append[data-v-716b8b32] {\n    width: 25%;\n}\n", ""]);
+exports.push([module.i, "\n.input-group-text[data-v-716b8b32]{\r\n    border-top-left-radius: 0;\r\n    border-bottom-left-radius: 0;\r\n    border: 1px solid #c3bfbf;\r\n    padding: 16.5px 15px;\n}\n.input-group-append[data-v-716b8b32] {\r\n    width: 25%;\n}\n@media only screen and (max-width: 1366px) {\n.input-group-text[data-v-716b8b32]{\r\n        padding: 10.5px 15px;\n}\n}\n.input-group-append[data-v-716b8b32] {\r\n    width: 25%;\n}\r\n", ""]);
 
 // exports
 
@@ -40883,7 +40852,7 @@ exports = module.exports = __webpack_require__(/*! ../../../../node_modules/css-
 
 
 // module
-exports.push([module.i, "\n.input-group-text[data-v-85b721be]{\n    border-top-left-radius: 0;\n    border-bottom-left-radius: 0;\n    border: 1px solid #c3bfbf;\n    padding: 16.5px 15px;\n}\n.input-group-append[data-v-85b721be] {\n    width: 25%;\n}\n@media only screen and (max-width: 1366px) {\n.input-group-text[data-v-85b721be]{\n        padding: 10.5px 15px;\n}\n}\n.input-group-append[data-v-85b721be] {\n    width: 25%;\n}\n", ""]);
+exports.push([module.i, "\n.input-group-text[data-v-85b721be]{\r\n    border-top-left-radius: 0;\r\n    border-bottom-left-radius: 0;\r\n    border: 1px solid #c3bfbf;\r\n    padding: 16.5px 15px;\n}\n.input-group-append[data-v-85b721be] {\r\n    width: 25%;\n}\n@media only screen and (max-width: 1366px) {\n.input-group-text[data-v-85b721be]{\r\n        padding: 10.5px 15px;\n}\n}\n.input-group-append[data-v-85b721be] {\r\n    width: 25%;\n}\r\n", ""]);
 
 // exports
 
@@ -40902,7 +40871,7 @@ exports = module.exports = __webpack_require__(/*! ../../../../node_modules/css-
 
 
 // module
-exports.push([module.i, "\n.input-group-text[data-v-94e47e62]{\n    border-top-left-radius: 0;\n    border-bottom-left-radius: 0;\n    border: 1px solid #c3bfbf;\n    padding: 16.5px 15px;\n}\n.input-group-append[data-v-94e47e62] {\n    width: 25%;\n}\n@media only screen and (max-width: 1366px) {\n.input-group-text[data-v-94e47e62]{\n        padding: 10.5px 15px;\n}\n}\n.input-group-append[data-v-94e47e62] {\n    width: 25%;\n}\n", ""]);
+exports.push([module.i, "\n.input-group-text[data-v-94e47e62]{\r\n    border-top-left-radius: 0;\r\n    border-bottom-left-radius: 0;\r\n    border: 1px solid #c3bfbf;\r\n    padding: 16.5px 15px;\n}\n.input-group-append[data-v-94e47e62] {\r\n    width: 25%;\n}\n@media only screen and (max-width: 1366px) {\n.input-group-text[data-v-94e47e62]{\r\n        padding: 10.5px 15px;\n}\n}\n.input-group-append[data-v-94e47e62] {\r\n    width: 25%;\n}\r\n", ""]);
 
 // exports
 
@@ -102101,7 +102070,7 @@ var app = new vue__WEBPACK_IMPORTED_MODULE_1___default.a({
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! D:\xampp\htdocs\projects\fuelmatix\resources\js\app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! D:\xampp7.4\htdocs\fuelmatix\resources\js\app.js */"./resources/js/app.js");
 
 
 /***/ })

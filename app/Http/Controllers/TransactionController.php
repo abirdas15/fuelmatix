@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Common\FuelMatixDateTimeFormat;
+use App\Helpers\Helpers;
 use App\Helpers\SessionUser;
 use App\Models\Category;
 use App\Models\Stock;
 use App\Models\Transaction;
 use Carbon\Carbon;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -47,7 +50,7 @@ class TransactionController extends Controller
             $newTransaction->module_id = $transaction['module_id'] ?? null;
             $newTransaction->client_company_id = $sessionUser['client_company_id'];
             $newTransaction->user_id = $sessionUser['id'];
-            $newTransaction->created_at = $transaction['date'].' '.date('H:i:s');
+            $newTransaction->created_at = Carbon::parse($transaction['date'].' '.date('H:i:s'))->format(FuelMatixDateTimeFormat::DATABASE_DATE_TIME);
             if ($newTransaction->save()) {
                 $id = $newTransaction->id;
                 $newTransaction = new Transaction();
@@ -61,7 +64,7 @@ class TransactionController extends Controller
                 $newTransaction->module_id = $transaction['module_id'] ?? null;
                 $newTransaction->client_company_id = $sessionUser['client_company_id'];
                 $newTransaction->user_id = $sessionUser['id'];
-                $newTransaction->created_at = $transaction['date'].' '.date('H:i:s');
+                $newTransaction->created_at = Carbon::parse($transaction['date'].' '.date('H:i:s'))->format(FuelMatixDateTimeFormat::DATABASE_DATE_TIME);
                 $newTransaction->parent_id = $id;
                 $newTransaction->save();
                 $previous = Transaction::find($id);
@@ -81,11 +84,16 @@ class TransactionController extends Controller
         }
         return true;
     }
+
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function single(Request $request)
     {
         $inputData = $request->all();
         $validator = Validator::make($inputData, [
-            'id' => 'required'
+            'id' => 'required|integer'
         ]);
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
@@ -96,7 +104,7 @@ class TransactionController extends Controller
             ->get()
             ->toArray();
         foreach ($result as $key => &$data) {
-            $data['date'] = date('d/m/Y h:iA', strtotime($data['created_at']));
+            $data['date'] = Helpers::formatDate($data['created_at'], FuelMatixDateTimeFormat::STANDARD_DATE_TIME);
             if ($category->type == 'income') {
                 if ($key == 0) {
                     $data['balance'] = $data['credit_amount'] - $data['debit_amount'];

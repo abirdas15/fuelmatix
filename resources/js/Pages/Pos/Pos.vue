@@ -801,6 +801,7 @@ export default {
                 income_category_id: p.income_category_id,
                 stock_category_id: p.stock_category_id,
                 expense_category_id: p.expense_category_id,
+                shift_sale: p.shift_sale,
                 product_id: p.id,
                 quantity: parseFloat(quantity).toFixed(2),
                 price: parseFloat(selling_price).toFixed(2),

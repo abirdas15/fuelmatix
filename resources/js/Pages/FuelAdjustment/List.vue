@@ -59,7 +59,7 @@
 <!--                                                        <router-link v-if="CheckPermission(Section.FUEL_ADJUSTMENT + '-' + Action.EDIT)" :to="{name: 'fuelAdjustmentEdit', params: { id: f.id }}" class=" btn btn-primary shadow btn-xs sharp me-1">-->
 <!--                                                            <i class="fas fa-pencil-alt"></i>-->
 <!--                                                        </router-link>-->
-                                                        <router-link  :to="{name: 'fuelAdjustmentView', params: { id: f.id }}" class=" btn btn-primary shadow btn-xs sharp me-1">
+                                                        <router-link  :to="{name: 'adjustmentView', params: { id: f.id }}" class=" btn btn-primary shadow btn-xs sharp me-1">
                                                             <i class="fa-solid fa-magnifying-glass"></i>
                                                         </router-link>
                                                         <a v-if="CheckPermission(Section.FUEL_ADJUSTMENT + '-' + Action.DELETE)" href="javascript:void(0)"  @click="openModalDelete(f.id)" class="btn btn-danger shadow btn-xs sharp">

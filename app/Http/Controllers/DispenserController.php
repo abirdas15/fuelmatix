@@ -14,7 +14,7 @@ class DispenserController extends Controller
         $inputData = $request->all();
         $validator = Validator::make($inputData, [
             'product_id' => 'required',
-            'tank_id' => 'required',
+//            'tank_id' => 'required',
             'dispenser_name' => 'required',
             'brand' => 'required',
             'serial' => 'required'
@@ -75,7 +75,7 @@ class DispenserController extends Controller
         $validator = Validator::make($inputData, [
             'id' => 'required',
             'product_id' => 'required',
-            'tank_id' => 'required',
+//            'tank_id' => 'required',
             'dispenser_name' => 'required',
             'brand' => 'required',
             'serial' => 'required'

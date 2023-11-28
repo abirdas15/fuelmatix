@@ -34,7 +34,7 @@
 
                                     <div id="progress-content-section" v-if="listDispenser">
                                         <div class="section-content discovery active">
-                                            <template v-if="oilStock">
+                                            <template v-if="listDispenser.tank == 1">
                                                 <div class="card">
                                                 <div class="card-header">
                                                     <h5 class="card-title">
@@ -93,7 +93,7 @@
                                                                        type="text" class="form-control"
                                                                        v-model="listDispenser.start_reading">
                                                                 <div class="input-group-append">
-                                                                    <span class="input-group-text" >Liter</span>
+                                                                    <span class="input-group-text" >{{ listDispenser.unit }}</span>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -102,7 +102,7 @@
                                                                 <input type="text" class="form-control"  disabled
                                                                        v-model="listDispenser.tank_refill">
                                                                 <div class="input-group-append">
-                                                                    <span class="input-group-text" >Liter</span>
+                                                                    <span class="input-group-text" >{{ listDispenser.unit }}</span>
                                                                 </div>
                                                             </div>
 
@@ -126,7 +126,7 @@
                                                                        v-model="listDispenser.adjustment"
                                                                        @input="calculateAmount">
                                                                 <div class="input-group-append">
-                                                                    <span class="input-group-text" >Liter</span>
+                                                                    <span class="input-group-text" >{{ listDispenser.unit }}</span>
                                                                 </div>
                                                             </div>
 
@@ -165,7 +165,7 @@
                                                                 <input type="text" class="form-control" disabled
                                                                        v-model="n.start_reading">
                                                                 <div class="input-group-append">
-                                                                    <span class="input-group-text" >Liter</span>
+                                                                    <span class="input-group-text" >{{ listDispenser.unit }}</span>
                                                                 </div>
                                                             </div>
 
@@ -178,7 +178,7 @@
                                                                        v-model="n.end_reading" @click="enableInput('frReading'+nIndex+dIndex)"
                                                                        @input="calculateAmountNozzle(dIndex, nIndex) ">
                                                                 <div class="input-group-append">
-                                                                    <span class="input-group-text" >Liter</span>
+                                                                    <span class="input-group-text" >{{ listDispenser.unit }}</span>
                                                                 </div>
                                                             </div>
 
@@ -192,7 +192,7 @@
                                                                        v-model="n.adjustment"
                                                                        @input="calculateAmountNozzle(dIndex, nIndex) " disabled>
                                                                 <div class="input-group-append">
-                                                                    <span class="input-group-text" >Liter</span>
+                                                                    <span class="input-group-text" >{{ listDispenser.unit }}</span>
                                                                 </div>
                                                             </div>
 <!--                                                            <input class="form-control" value="0" v-if="listDispenser.status == 'start'" disabled>-->
@@ -205,7 +205,7 @@
                                                                 <input type="text" disabled class="form-control"
                                                                        v-model="n.consumption">
                                                                 <div class="input-group-append">
-                                                                    <span class="input-group-text" >Liter</span>
+                                                                    <span class="input-group-text" >{{ listDispenser.unit }}</span>
                                                                 </div>
                                                             </div>
 
@@ -364,11 +364,11 @@ export default {
         },
         updateOilStock: function() {
             if (this.listData.length > 0) {
-                if (this.listData[this.productIndex].product_type == 'Octane' || this.listData[this.productIndex].product_type == 'Diesel' || this.listData[this.productIndex].product_type == 'Petrol' || this.listData[this.productIndex].product_type == 'LPG') {
-                    this.oilStock = true;
-                } else {
-                    this.oilStock = false;
-                }
+               if ( this.listData[this.productIndex].tank == 1) {
+                   return true;
+               } else {
+                   return false;
+               }
             }
         },
         totalPosSale: function () {
@@ -431,7 +431,7 @@ export default {
             this.getTotalSale()
         },
         getProduct: function () {
-            ApiService.POST(ApiRoutes.ProductList, {limit: 5000, page: 1, order_mode: 'ASC'}, res => {
+            ApiService.POST(ApiRoutes.ProductList, {limit: 5000, page: 1, order_mode: 'ASC', shift_sale: 1}, res => {
                 this.TableLoading = false
                 if (parseInt(res.status) === 200) {
                     this.listData = res.data.data;
@@ -477,18 +477,13 @@ export default {
                     totalCategoryAmount += parseFloat(v.amount)
                 })
                 // if ((this.totalAmount - this.totalPosSale()) != totalCategoryAmount) {
-                //     this.loading = false
-                //     this.$toast.error('Please match the total amount and category list')
-                //     return
-                // }
-
                 this.listDispenser.dispensers.map(dispenser => {
                     dispenser.nozzle.map(nozzle => {
                         totalConsumption += parseFloat(nozzle.consumption)
                     })
                 })
                 // check if mismatch allow
-                if (this.mismatchAllow != null) {
+                if (this.mismatchAllow != null && this.listDispenser.tank == 1) {
                     if (this.totalShiftParcent(totalConsumption) > this.mismatchAllow) {
                         this.loading = false
                         this.$toast.error('The mismatch is grater than allowed consumption')

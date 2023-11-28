@@ -24,7 +24,7 @@
 
                                 <div id="progress-content-section">
                                     <div class="section-content discovery active">
-                                        <template>
+                                        <template v-if="shiftSale.tank == 1">
                                             <div class="card">
                                                 <div class="card-header">
                                                     <h5 class="card-title">

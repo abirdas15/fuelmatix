@@ -178,7 +178,7 @@ export default {
             let rv = ''
             this.parentCategory.map(v => {
                 if (v.id == id) {
-                    rv = v.category
+                    rv = v.name
                 }
             })
             return rv

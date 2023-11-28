@@ -37,14 +37,14 @@
                                         <table class="display  dataTable no-footer" style="min-width: 845px">
                                             <thead>
                                             <tr class="text-white" style="background-color: #4886EE;color:#ffffff">
-                                                <th class="text-white" @click="sortData('driver_name')" :class="sortClass('car_name')">Car Name</th>
+                                                <th class="text-white" @click="sortData('driver_name')" :class="sortClass('car_name')">Car Number</th>
                                                 <th class="text-white" @click="sortData('company_name')" :class="sortClass('company_name')">Company Name</th>
                                                 <th class="text-white">Action</th>
                                             </tr>
                                             </thead>
                                             <tbody v-if="listData.length > 0 && TableLoading == false">
                                             <tr v-for="f in listData">
-                                                <td >{{f.car_name}}</td>
+                                                <td >{{f.car_number}}</td>
                                                 <td >{{f.company_name}}</td>
                                                 <td>
                                                     <a href="javascript:void(0)" @click="openCarEditModal(f.id)" class=" btn btn-primary shadow btn-xs sharp me-1">
