@@ -343,7 +343,7 @@ export default {
     },
     watch: {
         'listDispenser.end_reading_mm': function() {
-            if (this.listDispenser.tank_height < this.listDispenser.end_reading_mm) {
+            if (parseFloat(this.listDispenser.end_reading_mm) > parseFloat(this.listDispenser.tank_height)) {
                 this.listDispenser.end_reading_mm = '';
                 this.listDispenser.end_reading = 0;
             } else {
