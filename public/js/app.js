@@ -17534,8 +17534,6 @@ var render = function render() {
       }
     }
   }, [_vm._v("Home")])], 1), _vm._v(" "), _vm._m(0)])]), _vm._v(" "), _c("div", {
-    staticClass: "col-sm-12"
-  }, [_c("div", {
     staticClass: "card"
   }, [_vm._m(1), _vm._v(" "), _c("div", {
     staticClass: "card-body"
@@ -17586,108 +17584,159 @@ var render = function render() {
     }
   }, [_vm._v("Download PDF")]) : _vm._e(), _vm._v(" "), _vm.loadingFile ? _c("button", {
     staticClass: "btn btn-primary"
-  }, [_vm._v("Downloading PDF...")]) : _vm._e()])]), _vm._v(" "), _vm.data && !_vm.loading ? _c("div", [_c("h3", {
-    staticClass: "text-center mb-4"
-  }, [_vm._v("Product Sale")]), _vm._v(" "), _c("table", {
-    staticClass: "table table-bordered mb-5"
-  }, [_c("thead", [_c("tr", [_c("th", {
-    attrs: {
-      rowspan: "2"
-    }
-  }, [_vm._v("Sale")]), _vm._v(" "), _vm._l(_vm.data["shift_sale"]["totalShift"], function (index) {
-    return _c("th", {
-      key: index,
-      staticClass: "text-center",
+  }, [_vm._v("Downloading PDF...")]) : _vm._e()])])])]), _vm._v(" "), _vm.data && !_vm.loading ? [_c("div", {
+    staticClass: "row"
+  }, [_c("div", {
+    staticClass: "col-xl-12"
+  }, [_c("div", {
+    staticClass: "card"
+  }, [_vm._m(2), _vm._v(" "), _c("div", {
+    staticClass: "card-body"
+  }, [_c("div", [_c("div", {
+    staticClass: "table-responsive"
+  }, [_c("table", {
+    staticClass: "table table-responsive-md"
+  }, [_vm._m(3), _vm._v(" "), _vm._l(_vm.data["shift_sale"], function ($shiftSale) {
+    return [_c("tbody", [_c("tr", [_c("th", {
+      staticStyle: {
+        "text-align": "center",
+        "background-color": "#eae9e9"
+      },
       attrs: {
-        colspan: _vm.data["shift_sale"]["totalShift"] + 1
+        colspan: "3"
       }
-    }, [_vm._v("\r\n                                        Shift " + _vm._s(index) + "\r\n                                    ")]);
-  }), _vm._v(" "), _c("th", {
-    staticClass: "text-center",
-    attrs: {
-      colspan: "2"
-    }
-  }, [_vm._v("Total")])], 2), _vm._v(" "), _c("tr", [_vm._l(_vm.data["shift_sale"]["totalShift"], function (index) {
-    return [_c("th", {}, [_vm._v("Quantity")]), _vm._v(" "), _c("th", {
-      staticClass: "text-end"
-    }, [_vm._v("Amount")])];
-  }), _vm._v(" "), _c("th", {}, [_vm._v("Quantity")]), _vm._v(" "), _c("th", {
-    staticClass: "text-end"
-  }, [_vm._v("Amount")])], 2)]), _vm._v(" "), _c("tbody", _vm._l(_vm.data["shift_sale"]["data"], function (row) {
-    var _row$total, _row$total2, _row$total3, _row$total4;
-    return _c("tr", [_c("td", [_vm._v(_vm._s(row === null || row === void 0 ? void 0 : row.name))]), _vm._v(" "), _vm._l(row === null || row === void 0 ? void 0 : row.value, function (value) {
-      return [_c("td", [_vm._v(_vm._s(value["quantity"]) + "liters")]), _vm._v(" "), _c("td", {
-        staticClass: "text-end"
-      }, [_c("div", [_vm._v(_vm._s(value["amount"]))])])];
-    }), _vm._v(" "), _c("td", [_c("div", [_vm._v(_vm._s(row === null || row === void 0 ? void 0 : (_row$total = row.total) === null || _row$total === void 0 ? void 0 : _row$total.quantity) + " liters")]), _vm._v(" "), _c("div", [_c("i", {
-      staticClass: "fa-solid",
-      "class": _vm.getClass(row === null || row === void 0 ? void 0 : (_row$total2 = row.total) === null || _row$total2 === void 0 ? void 0 : _row$total2.percent)
-    })]), _vm._v(" "), _c("div", {
-      domProps: {
-        innerHTML: _vm._s(_vm.getPercent(row === null || row === void 0 ? void 0 : (_row$total3 = row.total) === null || _row$total3 === void 0 ? void 0 : _row$total3.percent))
+    }, [_vm._v(_vm._s($shiftSale["product_name"]))])])]), _vm._v(" "), _vm._l($shiftSale["data"], function ($row) {
+      return [_c("tbody", [_c("tr", [_c("td", [_vm._v(_vm._s($row["time"]))]), _vm._v(" "), _c("td", [_vm._v(_vm._s($row["quantity"] + " " + $row["unit"]))]), _vm._v(" "), _c("td", {
+        staticStyle: {
+          "text-align": "right"
+        }
+      }, [_vm._v(_vm._s($row["amount"]))])])])];
+    })];
+  }), _vm._v(" "), _vm._l(_vm.data["pos_sale"], function ($posSale) {
+    return [_c("tbody", [_c("tr", [_c("th", {
+      staticStyle: {
+        "text-align": "center",
+        "background-color": "#eae9e9"
+      },
+      attrs: {
+        colspan: "3"
       }
-    })]), _vm._v(" "), _c("td", {
-      staticClass: "text-end"
-    }, [_c("div", [_vm._v(_vm._s(row === null || row === void 0 ? void 0 : (_row$total4 = row.total) === null || _row$total4 === void 0 ? void 0 : _row$total4.amount))])])], 2);
-  }), 0)]), _vm._v(" "), _c("h3", {
-    staticClass: "text-center mb-4"
-  }, [_vm._v("Refill")]), _vm._v(" "), _c("table", {
-    staticClass: "table table-bordered mb-5"
-  }, [_vm._m(2), _vm._v(" "), _c("tbody", _vm._l(_vm.data["tank_refill"], function (row) {
-    return _c("tr", [_c("td", [_vm._v(_vm._s(row["product_name"]))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(row["date"]))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(row["quantity"]) + "litres")]), _vm._v(" "), _c("td", [_vm._v(_vm._s(row["net_profit"]) + " litres")])]);
-  }), 0)]), _vm._v(" "), _c("h3", {
-    staticClass: "text-center mb-4"
-  }, [_vm._v("Stock (tank_log)")]), _vm._v(" "), _c("table", {
-    staticClass: "table table-bordered mb-5"
-  }, [_vm._m(3), _vm._v(" "), _c("tbody", _vm._l(_vm.data["stock"], function (row) {
-    return _c("tr", [_c("td", [_vm._v(_vm._s(row === null || row === void 0 ? void 0 : row.name))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(row["opening_stock"]) + " litres")]), _vm._v(" "), _c("td", [_vm._v(_vm._s(row["closing_stock"]) + " litres")])]);
-  }), 0)]), _vm._v(" "), _c("h3", {
-    staticClass: "text-center mb-4"
-  }, [_vm._v("Expenses")]), _vm._v(" "), _c("table", {
-    staticClass: "table table-bordered mb-5"
-  }, [_c("tr", [_c("th", [_vm._v("Salary")]), _vm._v(" "), _c("td", {
+    }, [_vm._v(_vm._s($posSale["product_name"]))])]), _vm._v(" "), _c("tr", [_c("td", [_vm._v(_vm._s($posSale["time"]))]), _vm._v(" "), _c("td", [_vm._v(_vm._s($posSale["quantity"] + " " + $posSale["unit"]))]), _vm._v(" "), _c("td", {
+      staticStyle: {
+        "text-align": "right"
+      }
+    }, [_vm._v(_vm._s($posSale["amount"]))])])])];
+  })], 2)])])])])])]), _vm._v(" "), _c("div", {
+    staticClass: "row"
+  }, [_c("div", {
+    staticClass: "col-xl-12"
+  }, [_c("div", {
+    staticClass: "card"
+  }, [_vm._m(4), _vm._v(" "), _c("div", {
+    staticClass: "card-body"
+  }, [_c("div", [_c("div", {
+    staticClass: "table-responsive"
+  }, [_c("table", {
+    staticClass: "table table-responsive-md"
+  }, [_vm._m(5), _vm._v(" "), _c("tbody", _vm._l(_vm.data["tank_refill"], function ($row) {
+    return _c("tr", [_c("td", [_vm._v(_vm._s($row["product_name"]))]), _vm._v(" "), _c("td", [_vm._v(_vm._s($row["date"]))]), _vm._v(" "), _c("td", [_vm._v(_vm._s($row["quantity"] + " " + $row["unit"]))]), _vm._v(" "), _c("td", [_vm._v(_vm._s($row["net_profit"] + " " + $row["unit"]))])]);
+  }), 0)])])])])])])]), _vm._v(" "), _c("div", {
+    staticClass: "row"
+  }, [_c("div", {
+    staticClass: "col-xl-12"
+  }, [_c("div", {
+    staticClass: "card"
+  }, [_vm._m(6), _vm._v(" "), _c("div", {
+    staticClass: "card-body"
+  }, [_c("div", [_c("div", {
+    staticClass: "table-responsive"
+  }, [_c("table", {
+    staticClass: "table table-responsive-md"
+  }, [_vm._m(7), _vm._v(" "), _c("tbody", _vm._l(_vm.data["stock"], function ($row) {
+    return _c("tr", [_c("td", [_vm._v(_vm._s($row["name"]))]), _vm._v(" "), _c("td", [_vm._v(_vm._s($row["opening_stock"] + " " + $row["unit"]))]), _vm._v(" "), _c("td", [_vm._v(_vm._s($row["closing_stock"] + " " + $row["unit"]))])]);
+  }), 0)])])])])])])]), _vm._v(" "), _c("div", {
+    staticClass: "row"
+  }, [_c("div", {
+    staticClass: "col-xl-12"
+  }, [_c("div", {
+    staticClass: "card"
+  }, [_vm._m(8), _vm._v(" "), _c("div", {
+    staticClass: "card-body"
+  }, [_c("div", [_c("div", {
+    staticClass: "table-responsive"
+  }, [_c("table", {
+    staticClass: "table table-responsive-md"
+  }, [_c("tbody", [_c("tr", [_c("td", [_vm._v("Salary")]), _vm._v(" "), _c("td", {
     staticClass: "text-end"
-  }, [_vm._v(_vm._s(_vm.data["expense"]["salary"]))])]), _vm._v(" "), _vm._l(_vm.data["expense"]["cost_of_good_sold"], function (row) {
-    return _c("tr", [_c("th", [_vm._v("COGS (" + _vm._s(row["category_name"]) + ")")]), _vm._v(" "), _c("td", {
+  }, [_vm._v(_vm._s(_vm.data["expense"]["salary"]))])]), _vm._v(" "), _vm._l(_vm.data["expense"]["cost_of_good_sold"], function ($row) {
+    return _c("tr", [_c("td", [_vm._v("COGS (" + _vm._s($row["category_name"]) + ")")]), _vm._v(" "), _c("td", {
       staticClass: "text-end"
-    }, [_vm._v(_vm._s(row["amount"]))])]);
-  })], 2), _vm._v(" "), _c("h3", {
-    staticClass: "text-center mb-4"
-  }, [_vm._v("Due Payments")]), _vm._v(" "), _c("table", {
-    staticClass: "table table-bordered mb-5"
-  }, [_vm._m(4), _vm._v(" "), _c("tbody", _vm._l(_vm.data["due_payments"], function (row) {
-    return _c("tr", [_c("td", {}, [_vm._v(_vm._s(row["category_name"]))]), _vm._v(" "), _c("td", {
+    }, [_vm._v(_vm._s($row["amount"]))])]);
+  })], 2)])])])])])])]), _vm._v(" "), _c("div", {
+    staticClass: "row"
+  }, [_c("div", {
+    staticClass: "col-xl-12"
+  }, [_c("div", {
+    staticClass: "card"
+  }, [_vm._m(9), _vm._v(" "), _c("div", {
+    staticClass: "card-body"
+  }, [_c("div", [_c("div", {
+    staticClass: "table-responsive"
+  }, [_c("table", {
+    staticClass: "table table-responsive-md"
+  }, [_c("tbody", [_vm._l(_vm.data["asset_balance"]["cash"], function ($row) {
+    return _c("tr", [_c("td", [_vm._v(_vm._s($row["category_name"]))]), _vm._v(" "), _c("td", {
       staticClass: "text-end"
-    }, [_vm._v(_vm._s(row["amount"]))])]);
-  }), 0)]), _vm._v(" "), _c("h3", {
-    staticClass: "text-center mb-4"
-  }, [_vm._v("Due Invoices")]), _vm._v(" "), _c("table", {
-    staticClass: "table table-bordered mb-5"
-  }, [_vm._m(5), _vm._v(" "), _c("tbody", _vm._l(_vm.data["due_invoice"], function (row) {
-    return _c("tr", [_c("td", {}, [_vm._v(_vm._s(row["category_name"]))]), _vm._v(" "), _c("td", {
+    }, [_vm._v(_vm._s($row["amount"]))])]);
+  }), _vm._v(" "), _vm._l(_vm.data["asset_balance"]["bank"], function ($row) {
+    return _c("tr", [_c("td", [_vm._v(_vm._s($row["category_name"]))]), _vm._v(" "), _c("td", {
       staticClass: "text-end"
-    }, [_vm._v(_vm._s(row["amount"]))])]);
-  }), 0)]), _vm._v(" "), _c("h3", {
-    staticClass: "text-center mb-4"
-  }, [_vm._v("Asset Balance ")]), _vm._v(" "), _c("table", {
-    staticClass: "table table-bordered mb-5"
-  }, [_vm._l(_vm.data["asset_balance"]["cash"], function (row) {
-    return _c("tr", [_c("th", [_vm._v(_vm._s(row["category_name"]))]), _vm._v(" "), _c("td", {
-      staticClass: "text-end"
-    }, [_vm._v(_vm._s(row["amount"]))])]);
-  }), _vm._v(" "), _vm._l(_vm.data["asset_balance"]["bank"], function (row) {
-    return _c("tr", [_c("th", [_vm._v(_vm._s(row["category_name"]))]), _vm._v(" "), _c("td", {
-      staticClass: "text-end"
-    }, [_vm._v(_vm._s(row["amount"]))])]);
-  })], 2), _vm._v(" "), _c("h3", {
-    staticClass: "text-center mb-4"
-  }, [_vm._v("Attendance")]), _vm._v(" "), _vm._m(6)]) : _c("div", {
+    }, [_vm._v(_vm._s($row["amount"]))])]);
+  })], 2)])])])])])])]), _vm._v(" "), _c("div", {
+    staticClass: "row"
+  }, [_c("div", {
+    staticClass: "col-xl-12"
+  }, [_c("div", {
+    staticClass: "card"
+  }, [_vm._m(10), _vm._v(" "), _c("div", {
+    staticClass: "card-body"
+  }, [_c("div", [_c("div", {
+    staticClass: "table-responsive"
+  }, [_c("table", {
+    staticClass: "table table-responsive-md"
+  }, [_vm._m(11), _vm._v(" "), _c("tbody", _vm._l(_vm.data["due_payments"], function ($row) {
+    return _c("tr", [_c("td", [_vm._v(_vm._s($row["category_name"]))]), _vm._v(" "), _c("td", {
+      staticStyle: {
+        "text-align": "right"
+      }
+    }, [_vm._v(_vm._s($row["amount"]))])]);
+  }), 0)])])])])])])]), _vm._v(" "), _c("div", {
+    staticClass: "row"
+  }, [_c("div", {
+    staticClass: "col-xl-12"
+  }, [_c("div", {
+    staticClass: "card"
+  }, [_vm._m(12), _vm._v(" "), _c("div", {
+    staticClass: "card-body"
+  }, [_c("div", {
+    staticClass: "mt-4"
+  }, [_c("div", {
+    staticClass: "table-responsive"
+  }, [_c("table", {
+    staticClass: "table table-responsive-md"
+  }, [_vm._m(13), _vm._v(" "), _c("tbody", _vm._l(_vm.data["due_invoice"], function ($row) {
+    return _c("tr", [_c("td", [_vm._v(_vm._s($row["category_name"]))]), _vm._v(" "), _c("td", {
+      staticStyle: {
+        "text-align": "right"
+      }
+    }, [_vm._v(_vm._s($row["amount"]))])]);
+  }), 0)])])])])])])])] : _c("div", {
     staticClass: "text-center"
   }, [_vm._v("Please Press filter button to get Report")]), _vm._v(" "), _vm.loading ? _c("div", {
     staticClass: "text-center"
   }, [_c("i", {
     staticClass: "fas fa-spinner fa-5x fa-spin"
-  })]) : _vm._e()])])])])]);
+  })]) : _vm._e()], 2)]);
 };
 var staticRenderFns = [function () {
   var _vm = this,
@@ -17706,11 +17755,43 @@ var staticRenderFns = [function () {
     staticClass: "card-header"
   }, [_c("h4", {
     staticClass: "card-title"
-  }, [_vm._v("Daily Report")])]);
+  }, [_vm._v("Daily Log Report")])]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
-  return _c("thead", [_c("tr", [_c("th", [_vm._v("Product")]), _vm._v(" "), _c("th", [_vm._v("Time")]), _vm._v(" "), _c("th", [_vm._v("Liters")]), _vm._v(" "), _c("th", [_vm._v("Loss/Gain")])])]);
+  return _c("div", {
+    staticClass: "card-header bg-secondary"
+  }, [_c("h4", {
+    staticClass: "card-title"
+  }, [_vm._v("Product Sale")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("thead", [_c("tr", [_c("th", [_vm._v("Shift")]), _vm._v(" "), _c("th", [_vm._v("Quantity")]), _vm._v(" "), _c("th", {
+    staticStyle: {
+      "text-align": "right"
+    }
+  }, [_vm._v("Amount")])])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "card-header bg-secondary"
+  }, [_c("h4", {
+    staticClass: "card-title"
+  }, [_vm._v("Refill")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("thead", [_c("tr", [_c("th", [_vm._v("Product")]), _vm._v(" "), _c("th", [_vm._v("Time")]), _vm._v(" "), _c("th", [_vm._v("Litres")]), _vm._v(" "), _c("th", [_vm._v("Loss/Gain")])])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "card-header bg-secondary"
+  }, [_c("h4", {
+    staticClass: "card-title"
+  }, [_vm._v("Stock")])]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
@@ -17718,17 +17799,43 @@ var staticRenderFns = [function () {
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "card-header bg-secondary"
+  }, [_c("h4", {
+    staticClass: "card-title"
+  }, [_vm._v("Expenses  ")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "card-header bg-secondary"
+  }, [_c("h4", {
+    staticClass: "card-title"
+  }, [_vm._v("Asset Balance")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "card-header bg-secondary"
+  }, [_c("h4", {
+    staticClass: "card-title"
+  }, [_vm._v("Due Payments ")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
   return _c("thead", [_c("tr", [_c("th", [_vm._v("Provider")]), _vm._v(" "), _c("th", [_vm._v("Amount")])])]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
-  return _c("thead", [_c("tr", [_c("th", [_vm._v("Party")]), _vm._v(" "), _c("th", [_vm._v("Total ")])])]);
+  return _c("div", {
+    staticClass: "card-header bg-secondary"
+  }, [_c("h4", {
+    staticClass: "card-title"
+  }, [_vm._v("Due Invoices")])]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
-  return _c("table", {
-    staticClass: "table table-bordered mb-5"
-  }, [_c("thead", [_c("tr", [_c("th", [_vm._v("Shift 1")]), _vm._v(" "), _c("th", [_vm._v("Shift 2")])])]), _vm._v(" "), _c("tbody", [_c("tr", [_c("td", [_c("div", [_vm._v("Fuelman -3")]), _vm._v(" "), _c("div", [_vm._v("Guard -2")]), _vm._v(" "), _c("div", [_vm._v("Suprevisor (suvo)-1")]), _vm._v(" "), _c("div", [_vm._v("Engineer (Yasin) -1")])]), _vm._v(" "), _c("td", [_c("div", [_vm._v("Fuelman -3")]), _vm._v(" "), _c("div", [_vm._v("Guard -2")]), _vm._v(" "), _c("div", [_vm._v("Suprevisor (suvo)-1")]), _vm._v(" "), _c("div", [_vm._v("Engineer (Yasin) -1")])])]), _vm._v(" "), _c("tr", [_c("td", [_vm._v("\r\n                                        Leave\r\n                                    ")]), _vm._v(" "), _c("td")])])]);
+  return _c("thead", [_c("tr", [_c("th", [_vm._v("Party")]), _vm._v(" "), _c("th", [_vm._v("Total")])])]);
 }];
 render._withStripped = true;
 
@@ -40719,7 +40826,7 @@ exports = module.exports = __webpack_require__(/*! ../../../../../node_modules/c
 
 
 // module
-exports.push([module.i, "\n.input-group-text[data-v-5a662738]{\r\n    border-top-left-radius: 0;\r\n    border-bottom-left-radius: 0;\r\n    border: 1px solid #c3bfbf;\r\n    padding: 16.5px 15px;\n}\n@media only screen and (max-width: 1366px) {\n.input-group-text[data-v-5a662738]{\r\n        padding: 10.5px 15px;\n}\n}\r\n", ""]);
+exports.push([module.i, "\n.input-group-text[data-v-5a662738]{\n    border-top-left-radius: 0;\n    border-bottom-left-radius: 0;\n    border: 1px solid #c3bfbf;\n    padding: 16.5px 15px;\n}\n@media only screen and (max-width: 1366px) {\n.input-group-text[data-v-5a662738]{\n        padding: 10.5px 15px;\n}\n}\n", ""]);
 
 // exports
 
@@ -40757,7 +40864,7 @@ exports = module.exports = __webpack_require__(/*! ../../../../node_modules/css-
 
 
 // module
-exports.push([module.i, "\n.box-mula[data-v-1b1b4180]{\r\n    padding: 10px 30px;\r\n    box-shadow: 0 0 15px 0 #CBC9C8;\r\n    border-radius: 12px;\r\n    margin-bottom: 30px;\r\n    margin-top: 10px;\n}\n.putkir-futa[data-v-1b1b4180]{\r\n    border-bottom: 1px solid #c1c1c1;\r\n    margin: 10px 0px 15px 0px;\r\n    padding-bottom: 11px;\n}\r\n", ""]);
+exports.push([module.i, "\n.box-mula[data-v-1b1b4180]{\n    padding: 10px 30px;\n    box-shadow: 0 0 15px 0 #CBC9C8;\n    border-radius: 12px;\n    margin-bottom: 30px;\n    margin-top: 10px;\n}\n.putkir-futa[data-v-1b1b4180]{\n    border-bottom: 1px solid #c1c1c1;\n    margin: 10px 0px 15px 0px;\n    padding-bottom: 11px;\n}\n", ""]);
 
 // exports
 
@@ -40776,7 +40883,7 @@ exports = module.exports = __webpack_require__(/*! ../../../../node_modules/css-
 
 
 // module
-exports.push([module.i, "\n.box-mula[data-v-21e351c5]{\r\n    padding: 10px 30px;\r\n    box-shadow: 0 0 15px 0 #CBC9C8;\r\n    border-radius: 12px;\r\n    margin-bottom: 30px;\r\n    margin-top: 10px;\n}\n.putkir-futa[data-v-21e351c5]{\r\n    border-bottom: 1px solid #c1c1c1;\r\n    margin: 10px 0px 15px 0px;\r\n    padding-bottom: 11px;\n}\r\n", ""]);
+exports.push([module.i, "\n.box-mula[data-v-21e351c5]{\n    padding: 10px 30px;\n    box-shadow: 0 0 15px 0 #CBC9C8;\n    border-radius: 12px;\n    margin-bottom: 30px;\n    margin-top: 10px;\n}\n.putkir-futa[data-v-21e351c5]{\n    border-bottom: 1px solid #c1c1c1;\n    margin: 10px 0px 15px 0px;\n    padding-bottom: 11px;\n}\n", ""]);
 
 // exports
 
@@ -40795,7 +40902,7 @@ exports = module.exports = __webpack_require__(/*! ../../../../node_modules/css-
 
 
 // module
-exports.push([module.i, "\n.box-mula[data-v-0d4183dd]{\n    padding: 10px 30px;\n    box-shadow: 0 0 15px 0 #CBC9C8;\n    border-radius: 12px;\n    margin-bottom: 30px;\n    margin-top: 10px;\n}\n.putkir-futa[data-v-0d4183dd]{\n    border-bottom: 1px solid #c1c1c1;\n    margin: 10px 0px 15px 0px;\n    padding-bottom: 11px;\n}\n", ""]);
+exports.push([module.i, "\n.box-mula[data-v-0d4183dd]{\r\n    padding: 10px 30px;\r\n    box-shadow: 0 0 15px 0 #CBC9C8;\r\n    border-radius: 12px;\r\n    margin-bottom: 30px;\r\n    margin-top: 10px;\n}\n.putkir-futa[data-v-0d4183dd]{\r\n    border-bottom: 1px solid #c1c1c1;\r\n    margin: 10px 0px 15px 0px;\r\n    padding-bottom: 11px;\n}\r\n", ""]);
 
 // exports
 
@@ -40852,7 +40959,7 @@ exports = module.exports = __webpack_require__(/*! ../../../../node_modules/css-
 
 
 // module
-exports.push([module.i, "\n.input-group-text[data-v-85b721be]{\r\n    border-top-left-radius: 0;\r\n    border-bottom-left-radius: 0;\r\n    border: 1px solid #c3bfbf;\r\n    padding: 16.5px 15px;\n}\n.input-group-append[data-v-85b721be] {\r\n    width: 25%;\n}\n@media only screen and (max-width: 1366px) {\n.input-group-text[data-v-85b721be]{\r\n        padding: 10.5px 15px;\n}\n}\n.input-group-append[data-v-85b721be] {\r\n    width: 25%;\n}\r\n", ""]);
+exports.push([module.i, "\n.input-group-text[data-v-85b721be]{\n    border-top-left-radius: 0;\n    border-bottom-left-radius: 0;\n    border: 1px solid #c3bfbf;\n    padding: 16.5px 15px;\n}\n.input-group-append[data-v-85b721be] {\n    width: 25%;\n}\n@media only screen and (max-width: 1366px) {\n.input-group-text[data-v-85b721be]{\n        padding: 10.5px 15px;\n}\n}\n.input-group-append[data-v-85b721be] {\n    width: 25%;\n}\n", ""]);
 
 // exports
 
@@ -102070,7 +102177,7 @@ var app = new vue__WEBPACK_IMPORTED_MODULE_1___default.a({
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! D:\xampp7.4\htdocs\fuelmatix\resources\js\app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! D:\xampp\htdocs\projects\fuelmatix\resources\js\app.js */"./resources/js/app.js");
 
 
 /***/ })
