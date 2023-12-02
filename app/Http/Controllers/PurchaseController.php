@@ -95,4 +95,58 @@ class PurchaseController extends Controller
         }
         return response()->json(['status' => 200, 'message' => 'Successfully saved purchase.']);
     }
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function list(Request $request): JsonResponse
+    {
+        $requestData = $request->all();
+        $paginatedFilter = [
+            'limit' => $requestData['limit'] ?? 10,
+            'page' => $requestData['page'] ?? 1,
+            'order_by' => $requestData['order_by'] ?? 'id',
+            'order_mode' => $requestData['order_mode'] ?? 'desc',
+            'start_date' => $requestData['start_date'] ?? '',
+            'end_date' => $requestData['end_date'] ?? '',
+            'vendor_id' => $requestData['vendor_id'] ?? ''
+        ];
+        $response = PurchaseRepository::list($paginatedFilter);
+        return response()->json(['status' => 200, 'data' => $response]);
+    }
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function pay(Request $request): JsonResponse
+    {
+        $requestData = $request->all();
+        $validator = Validator::make($requestData, [
+            'purchase_id' => 'required|integer',
+            'payment_id' => 'required|integer',
+            'amount' => 'required'
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['status' => 500, 'errors' => $validator->errors()]);
+        }
+        $purchase = Purchase::where('id', $requestData['purchase_id'])->first();
+        if (!$purchase instanceof Purchase) {
+            return response()->json(['status' => 400, 'message' => 'Cannot find purchase.']);
+        }
+        $category = Category::where('id', $requestData['payment_id'])->first();
+        if (!$category instanceof Category) {
+            return response()->json(['status' => 500, 'message' => 'Cannot find payment category.']);
+        }
+        $purchase->paid = $requestData['amount'] + $purchase['paid'];
+        $purchase->status = $purchase->paid == 0 ? 'paid' : 'partially paid';
+        if (!$purchase->save()) {
+            return response()->json(['status' => 400, 'message' => 'Cannot pay amount.']);
+        }
+        $transactionData['linked_id'] = $requestData['payment_id'];
+        $transactionData['transaction'] = [
+            ['date' => date('Y-m-d'), 'account_id' => $purchase['vendor_id'], 'debit_amount' => 0, 'credit_amount' => $requestData['amount'], 'module' => Module::PURCHASE_PAYMENT, 'module_id' => $purchase->id]
+        ];
+        TransactionController::saveTransaction($transactionData);
+        return response()->json(['status' => 200, 'message' => 'Successfully paid amount.']);
+    }
 }

@@ -319,6 +319,8 @@ Route::group(['middleware' => 'AuthReqCheck'], function() {
     });
     Route::group(['prefix' => 'purchase'], function() {
         Route::post('save', [PurchaseController::class, 'save']);
+        Route::post('list', [PurchaseController::class, 'list']);
+        Route::post('pay', [PurchaseController::class, 'pay']);
     });
 });
 

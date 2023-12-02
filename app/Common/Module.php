@@ -27,5 +27,6 @@ class Module
     const UN_AUTHORIZED_BILL = 'un authorized bill';
 
     const PURCHASE = 'purchase';
+    const PURCHASE_PAYMENT = 'purchase payment';
 
 }
