@@ -240,6 +240,7 @@ const ApiRoutes = {
     // Purchase Bill
     PurchaseSave: ApiVersion + '/purchase/save',
     PurchaseList: ApiVersion + '/purchase/list',
+    PurchasePay: ApiVersion + '/purchase/pay',
     PurchaseSingle: ApiVersion + '/purchase/single',
     PurchaseUpdate: ApiVersion + '/purchase/update',
     PurchaseDelete: ApiVersion + '/purchase/delete',

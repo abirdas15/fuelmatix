@@ -10275,11 +10275,20 @@ __webpack_require__.r(__webpack_exports__);
         limit: 10,
         order_by: 'id',
         order_mode: 'DESC',
-        page: 1
+        page: 1,
+        vendor_id: ''
       },
       Loading: false,
       TableLoading: false,
-      listData: []
+      listData: [],
+      vendor: [],
+      allAmountCategory: [],
+      paymentParam: {
+        purchase_id: '',
+        amount: '',
+        payment_id: ''
+      },
+      expandInfo: []
     };
   },
   watch: {
@@ -10289,6 +10298,8 @@ __webpack_require__.r(__webpack_exports__);
   },
   created: function created() {
     this.list();
+    this.getVendor();
+    this.getCategory();
   },
   computed: {
     Action: function Action() {
@@ -10302,24 +10313,45 @@ __webpack_require__.r(__webpack_exports__);
     }
   },
   methods: {
-    openModalDelete: function openModalDelete(data) {
+    getCategory: function getCategory() {
       var _this = this;
-      sweetalert2_dist_sweetalert2_js__WEBPACK_IMPORTED_MODULE_0___default.a.fire({
-        title: 'Are you sure you want to delete?',
-        text: "You won't be able to revert this!",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, delete it!'
-      }).then(function (result) {
-        if (result.isConfirmed) {
-          _this.Delete(data);
+      this.categories = [];
+      _Services_ApiService__WEBPACK_IMPORTED_MODULE_1__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_2__["default"].salaryGetCategory, {}, function (res) {
+        if (parseInt(res.status) === 200) {
+          _this.allAmountCategory = res.data;
         }
       });
     },
-    list: function list(page) {
+    paymentModal: function paymentModal(f) {
+      _Services_ApiService__WEBPACK_IMPORTED_MODULE_1__["default"].ClearErrorHandler();
+      this.paymentInfo = f;
+      this.paymentParam.purchase_id = f.id;
+      this.paymentParam.amount = parseFloat(f.due.replace(',', ''));
+      this.paymentParam.payment_id = '';
+      $('.invoiceModal').removeClass('d-none');
+    },
+    payment: function payment() {
       var _this2 = this;
+      this.Loading = true;
+      this.paymentParam.amount = parseFloat(this.paymentParam.amount);
+      _Services_ApiService__WEBPACK_IMPORTED_MODULE_1__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_2__["default"].PurchasePay, this.paymentParam, function (res) {
+        _this2.Loading = false;
+        if (parseInt(res.status) === 200) {
+          _this2.$toast.success(res.message);
+          $('.invoiceModal').addClass('d-none');
+          _this2.list();
+        } else {
+          _Services_ApiService__WEBPACK_IMPORTED_MODULE_1__["default"].ErrorHandler(res.errors);
+        }
+      });
+    },
+    expandModal: function expandModal(f) {
+      _Services_ApiService__WEBPACK_IMPORTED_MODULE_1__["default"].ClearErrorHandler();
+      this.expandInfo = f.purchase_item;
+      $('.expandModal').removeClass('d-none');
+    },
+    list: function list(page) {
+      var _this3 = this;
       if (page == undefined) {
         page = {
           page: 1
@@ -10327,24 +10359,22 @@ __webpack_require__.r(__webpack_exports__);
       }
       this.Param.page = page.page;
       this.TableLoading = true;
-      _Services_ApiService__WEBPACK_IMPORTED_MODULE_1__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_2__["default"].BankList, this.Param, function (res) {
-        _this2.TableLoading = false;
+      _Services_ApiService__WEBPACK_IMPORTED_MODULE_1__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_2__["default"].PurchaseList, this.Param, function (res) {
+        _this3.TableLoading = false;
         if (parseInt(res.status) === 200) {
-          _this2.paginateData = res.data;
-          _this2.listData = res.data.data;
+          _this3.paginateData = res.data;
+          _this3.listData = res.data.data;
         } else {
           _Services_ApiService__WEBPACK_IMPORTED_MODULE_1__["default"].ErrorHandler(res.error);
         }
       });
     },
-    Delete: function Delete(data) {
-      var _this3 = this;
-      _Services_ApiService__WEBPACK_IMPORTED_MODULE_1__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_2__["default"].BankDelete, {
-        id: data.id
-      }, function (res) {
+    getVendor: function getVendor() {
+      var _this4 = this;
+      _Services_ApiService__WEBPACK_IMPORTED_MODULE_1__["default"].POST(_Services_ApiRoutes__WEBPACK_IMPORTED_MODULE_2__["default"].VendorList, this.Param, function (res) {
+        _this4.TableLoading = false;
         if (parseInt(res.status) === 200) {
-          _this3.$toast.success(res.message);
-          _this3.list();
+          _this4.vendor = res.data.data;
         } else {
           _Services_ApiService__WEBPACK_IMPORTED_MODULE_1__["default"].ErrorHandler(res.error);
         }
@@ -10368,7 +10398,23 @@ __webpack_require__.r(__webpack_exports__);
     }
   },
   mounted: function mounted() {
-    $('#dashboard_bar').text('Bank List');
+    var _this5 = this;
+    setTimeout(function () {
+      $('.date-range').flatpickr({
+        altInput: true,
+        altFormat: "d/m/Y",
+        dateFormat: "Y-m-d",
+        mode: 'range',
+        onChange: function onChange(date, dateStr) {
+          var dateArr = dateStr.split('to');
+          if (dateArr.length == 2) {
+            _this5.Param.start_date = dateArr[0];
+            _this5.Param.end_date = dateArr[1];
+          }
+        }
+      });
+    }, 1000);
+    $('#dashboard_bar').text('Purchase List');
   }
 });
 
@@ -33204,7 +33250,7 @@ var render = function render() {
     }
   }, [_c("i", {
     staticClass: "fa-solid fa-plus"
-  }), _vm._v(" Add Purchase Bill")])], 1)])]), _vm._v(" "), _c("div", {
+  }), _vm._v(" Add Purchase Bill\n                        ")])], 1)])]), _vm._v(" "), _c("div", {
     staticClass: "row"
   }, [_c("div", {
     staticClass: "col-12"
@@ -33213,6 +33259,52 @@ var render = function render() {
   }, [_vm._m(1), _vm._v(" "), _c("div", {
     staticClass: "card-body"
   }, [_c("div", {
+    staticClass: "row align-items-end"
+  }, [_vm._m(2), _vm._v(" "), _c("div", {
+    staticClass: "col-xl-3 mb-3"
+  }, [_c("div", {
+    staticClass: "example"
+  }, [_c("p", {
+    staticClass: "mb-1"
+  }, [_vm._v("Vendor")]), _vm._v(" "), _c("select", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.Param.vendor_id,
+      expression: "Param.vendor_id"
+    }],
+    staticClass: "form-control form-select",
+    attrs: {
+      name: "vendor_id"
+    },
+    on: {
+      change: function change($event) {
+        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
+          return o.selected;
+        }).map(function (o) {
+          var val = "_value" in o ? o._value : o.value;
+          return val;
+        });
+        _vm.$set(_vm.Param, "vendor_id", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
+      }
+    }
+  }, _vm._l(_vm.vendor, function (v) {
+    return _c("option", {
+      domProps: {
+        value: v.id
+      }
+    }, [_vm._v(_vm._s(v.name))]);
+  }), 0)])]), _vm._v(" "), _c("div", {
+    staticClass: "col-xl-3 mb-3"
+  }, [_c("button", {
+    staticClass: "btn btn-rounded btn-white border",
+    attrs: {
+      type: "button"
+    },
+    on: {
+      click: _vm.list
+    }
+  }, [_vm._m(3), _vm._v("Filter\n                                    ")])])]), _vm._v(" "), _c("div", {
     staticClass: "row mt-4"
   }, [_c("div", {
     staticClass: "table-responsive"
@@ -33222,7 +33314,7 @@ var render = function render() {
     staticClass: "dataTables_length"
   }, [_c("label", {
     staticClass: "d-flex align-items-center"
-  }, [_vm._v("Show\n                                            "), _c("select", {
+  }, [_vm._v("Show\n                                                "), _c("select", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -33257,12 +33349,12 @@ var render = function render() {
     attrs: {
       value: "100"
     }
-  }, [_vm._v("100")])]), _vm._v("\n                                            entries\n                                        ")])]), _vm._v(" "), _c("div", {
+  }, [_vm._v("100")])]), _vm._v("\n                                                entries\n                                            ")])]), _vm._v(" "), _c("div", {
     staticClass: "dataTables_filter",
     attrs: {
       id: "example3_filter"
     }
-  }, [_c("label", [_vm._v("Search:\n                                            "), _c("input", {
+  }, [_c("label", [_vm._v("Search:\n                                                "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -33295,50 +33387,80 @@ var render = function render() {
     }
   }, [_c("th", {
     staticClass: "text-white",
-    "class": _vm.sortClass("name"),
+    "class": _vm.sortClass("date"),
     on: {
       click: function click($event) {
-        return _vm.sortData("name");
+        return _vm.sortData("date");
       }
     }
-  }, [_vm._v("Bank Name")]), _vm._v(" "), _c("th", {
+  }, [_vm._v("Date")]), _vm._v(" "), _c("th", {
+    staticClass: "text-white",
+    "class": _vm.sortClass("bill_id"),
+    on: {
+      click: function click($event) {
+        return _vm.sortData("bill_id");
+      }
+    }
+  }, [_vm._v("Bill ID")]), _vm._v(" "), _c("th", {
+    staticClass: "text-white",
+    "class": _vm.sortClass("vendor_id"),
+    on: {
+      click: function click($event) {
+        return _vm.sortData("vendor_id");
+      }
+    }
+  }, [_vm._v("Vendor")]), _vm._v(" "), _c("th", {
+    staticClass: "text-white",
+    "class": _vm.sortClass("billed"),
+    on: {
+      click: function click($event) {
+        return _vm.sortData("billed");
+      }
+    }
+  }, [_vm._v("Billed")]), _vm._v(" "), _c("th", {
+    staticClass: "text-white",
+    "class": _vm.sortClass("paid"),
+    on: {
+      click: function click($event) {
+        return _vm.sortData("paid");
+      }
+    }
+  }, [_vm._v("Paid")]), _vm._v(" "), _c("th", {
+    staticClass: "text-white",
+    "class": _vm.sortClass("due"),
+    on: {
+      click: function click($event) {
+        return _vm.sortData("due");
+      }
+    }
+  }, [_vm._v("Due")]), _vm._v(" "), _c("th", {
     staticClass: "text-white"
   }, [_vm._v("Action")])])]), _vm._v(" "), _vm.listData.length > 0 && _vm.TableLoading == false ? _c("tbody", _vm._l(_vm.listData, function (f) {
-    return _c("tr", [_c("td", [_vm._v(_vm._s(f.name))]), _vm._v(" "), _c("td", [_c("div", {
-      staticClass: "d-flex justify-content-end"
-    }, [_vm.CheckPermission(_vm.Section.BANK + "-" + _vm.Action.EDIT) ? _c("router-link", {
-      staticClass: "btn btn-primary shadow btn-xs sharp me-1",
-      attrs: {
-        to: {
-          name: "BankEdit",
-          params: {
-            id: f.id
-          }
-        }
-      }
-    }, [_c("i", {
-      staticClass: "fas fa-pencil-alt"
-    })]) : _vm._e(), _vm._v(" "), _vm.CheckPermission(_vm.Section.BANK + "-" + _vm.Action.DELETE) ? _c("a", {
-      staticClass: "btn btn-danger shadow btn-xs sharp",
-      attrs: {
-        href: "javascript:void(0)"
-      },
+    return _c("tr", [_c("td", [_vm._v(_vm._s(f.date))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(f.bill_id))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(f.vendor_name))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(f.total_amount))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(f.paid))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(f.due))]), _vm._v(" "), _c("td", [_c("div", {
+      staticClass: "d-flex"
+    }, [_c("button", {
+      staticClass: "btn btn-primary ms-2",
       on: {
         click: function click($event) {
-          return _vm.openModalDelete(f);
+          return _vm.paymentModal(f);
         }
       }
-    }, [_c("i", {
-      staticClass: "fa fa-trash"
-    })]) : _vm._e()], 1)])]);
-  }), 0) : _vm._e(), _vm._v(" "), _vm.listData.length == 0 && _vm.TableLoading == false ? _c("tbody", [_vm._m(2)]) : _vm._e(), _vm._v(" "), _vm.TableLoading == true ? _c("tbody", [_vm._m(3)]) : _vm._e()]), _vm._v(" "), _vm.paginateData != null ? _c("div", {
+    }, [_vm._v("\n                                                            Pay\n                                                        ")]), _vm._v(" "), _c("button", {
+      staticClass: "btn btn-primary ms-2",
+      on: {
+        click: function click($event) {
+          return _vm.expandModal(f);
+        }
+      }
+    }, [_vm._v("\n                                                            Expand\n                                                        ")])])])]);
+  }), 0) : _vm._e(), _vm._v(" "), _vm.listData.length == 0 && _vm.TableLoading == false ? _c("tbody", [_vm._m(4)]) : _vm._e(), _vm._v(" "), _vm.TableLoading == true ? _c("tbody", [_vm._m(5)]) : _vm._e()]), _vm._v(" "), _vm.paginateData != null ? _c("div", {
     staticClass: "dataTables_info",
     attrs: {
       id: "example3_info",
       role: "status",
       "aria-live": "polite"
     }
-  }, [_vm._v("Showing\n                                        " + _vm._s(_vm.paginateData.from) + " to " + _vm._s(_vm.paginateData.to) + " of " + _vm._s(_vm.paginateData.total) + " entries\n                                    ")]) : _vm._e(), _vm._v(" "), _c("div", {
+  }, [_vm._v("Showing\n                                            " + _vm._s(_vm.paginateData.from) + " to " + _vm._s(_vm.paginateData.to) + " of " + _vm._s(_vm.paginateData.total) + "\n                                            entries\n                                        ")]) : _vm._e(), _vm._v(" "), _c("div", {
     staticClass: "dataTables_paginate paging_simple_numbers",
     attrs: {
       id: "example3_paginate"
@@ -33348,7 +33470,123 @@ var render = function render() {
       data: _vm.paginateData,
       onChange: _vm.list
     }
-  })], 1)])])])])])])])])]);
+  })], 1)])])])])])])])]), _vm._v(" "), _c("div", {
+    staticClass: "popup-wrapper-modal invoiceModal d-none"
+  }, [_c("form", {
+    staticClass: "popup-box",
+    staticStyle: {
+      "max-width": "800px"
+    },
+    on: {
+      submit: function submit($event) {
+        $event.preventDefault();
+        return _vm.payment.apply(null, arguments);
+      }
+    }
+  }, [_vm._m(6), _vm._v(" "), _c("div", {
+    staticClass: "row align-items-center"
+  }, [_c("div", {
+    staticClass: "col-sm-12"
+  }, [_c("div", {
+    staticClass: "input-wrapper form-group mb-3"
+  }, [_c("label", {
+    attrs: {
+      "for": "amount"
+    }
+  }, [_vm._v("Amount")]), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.paymentParam.amount,
+      expression: "paymentParam.amount"
+    }],
+    staticClass: "w-100 form-control bg-white",
+    attrs: {
+      type: "text",
+      name: "amount",
+      id: "amount",
+      placeholder: "Amount here"
+    },
+    domProps: {
+      value: _vm.paymentParam.amount
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.paymentParam, "amount", $event.target.value);
+      }
+    }
+  }), _vm._v(" "), _c("small", {
+    staticClass: "invalid-feedback"
+  })])]), _vm._v(" "), _c("div", {
+    staticClass: "col-sm-12"
+  }, [_c("div", {
+    staticClass: "input-wrapper form-group mb-3"
+  }, [_c("label", {
+    attrs: {
+      "for": "description"
+    }
+  }, [_vm._v("Payment Method")]), _vm._v(" "), _c("select", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.paymentParam.payment_id,
+      expression: "paymentParam.payment_id"
+    }],
+    staticClass: "form-control form-select",
+    attrs: {
+      name: "payment_id"
+    },
+    on: {
+      change: function change($event) {
+        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
+          return o.selected;
+        }).map(function (o) {
+          var val = "_value" in o ? o._value : o.value;
+          return val;
+        });
+        _vm.$set(_vm.paymentParam, "payment_id", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
+      }
+    }
+  }, [_c("option", {
+    attrs: {
+      value: ""
+    }
+  }, [_vm._v("Select Method")]), _vm._v(" "), _vm._l(_vm.allAmountCategory, function (m) {
+    return _c("option", {
+      domProps: {
+        value: m.id
+      }
+    }, [_vm._v(_vm._s(m.name))]);
+  })], 2), _vm._v(" "), _c("small", {
+    staticClass: "invalid-feedback"
+  })])])]), _vm._v(" "), !_vm.Loading ? _c("button", {
+    staticClass: "btn btn-primary",
+    attrs: {
+      type: "submit"
+    }
+  }, [_vm._v("Submit")]) : _vm._e(), _vm._v(" "), _vm.Loading ? _c("button", {
+    staticClass: "btn btn-primary",
+    attrs: {
+      type: "button",
+      disabled: ""
+    }
+  }, [_vm._v("Submitting...")]) : _vm._e()])]), _vm._v(" "), _c("div", {
+    staticClass: "popup-wrapper-modal expandModal d-none"
+  }, [_c("form", {
+    staticClass: "popup-box",
+    staticStyle: {
+      "max-width": "800px"
+    }
+  }, [_vm._m(7), _vm._v(" "), _c("div", {
+    staticClass: "row align-items-center"
+  }, [_c("div", {
+    staticClass: "col-sm-12"
+  }, [_c("table", {
+    staticClass: "table"
+  }, [_vm._m(8), _vm._v(" "), _c("tbody", _vm._l(_vm.expandInfo, function (e) {
+    return _c("tr", [_c("td", [_vm._v(_vm._s(e.product_name))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(e.unit_price))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(e.quantity))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(e.total))])]);
+  }), 0)])])])])])]);
 };
 var staticRenderFns = [function () {
   var _vm = this,
@@ -33371,6 +33609,30 @@ var staticRenderFns = [function () {
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "col-xl-3 mb-3"
+  }, [_c("div", {
+    staticClass: "example"
+  }, [_c("p", {
+    staticClass: "mb-1"
+  }, [_vm._v("Select Date")]), _vm._v(" "), _c("input", {
+    staticClass: "form-control date-range bg-white",
+    attrs: {
+      type: "text",
+      name: "daterange"
+    }
+  })])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("span", {
+    staticClass: "btn-icon-start text-info"
+  }, [_c("i", {
+    staticClass: "fa fa-filter color-white"
+  })]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
   return _c("tr", [_c("td", {
     staticClass: "text-center",
     attrs: {
@@ -33386,6 +33648,32 @@ var staticRenderFns = [function () {
       colspan: "10"
     }
   }, [_vm._v("Loading....")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("button", {
+    staticClass: "btn closeBtn",
+    attrs: {
+      type: "button"
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-times"
+  })]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("button", {
+    staticClass: "btn closeBtn",
+    attrs: {
+      type: "button"
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-times"
+  })]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("thead", [_c("tr", [_c("th", [_vm._v("Product Name")]), _vm._v(" "), _c("th", [_vm._v("Price")]), _vm._v(" "), _c("th", [_vm._v("Quantity")]), _vm._v(" "), _c("th", [_vm._v("Total")])])]);
 }];
 render._withStripped = true;
 
@@ -103040,6 +103328,7 @@ var ApiRoutes = {
   // Purchase Bill
   PurchaseSave: ApiVersion + '/purchase/save',
   PurchaseList: ApiVersion + '/purchase/list',
+  PurchasePay: ApiVersion + '/purchase/pay',
   PurchaseSingle: ApiVersion + '/purchase/single',
   PurchaseUpdate: ApiVersion + '/purchase/update',
   PurchaseDelete: ApiVersion + '/purchase/delete',
