@@ -4,13 +4,18 @@ namespace App\Http\Controllers;
 
 use App\Helpers\SessionUser;
 use App\Models\Transaction;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class IncomeStatementController extends Controller
 {
-    public static function get(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     * */
+    public static function get(Request $request): JsonResponse
     {
         $inputData = $request->all();
         $validator = Validator::make($inputData, [
@@ -34,18 +39,28 @@ class IncomeStatementController extends Controller
         ];
         return response()->json(['status' => 200, 'data' => $result]);
     }
-    public static function getExpenses($start_date, $end_date)
+    /**
+     * @param string $start_date
+     * @param string $end_date
+     * @return array
+     */
+    public static function getExpenses(string $start_date, string $end_date): array
     {
-        $result = Transaction::select('categories.name', DB::raw('SUM(credit_amount - debit_amount) as balance'))
+        $sessionUser = SessionUser::getUser();
+        return Transaction::select('categories.name', DB::raw('SUM(credit_amount - debit_amount) as balance'))
             ->whereBetween('date', [$start_date, $end_date])
             ->leftJoin('categories', 'categories.id', '=', 'transactions.account_id')
+            ->where('transactions.client_company_id', $sessionUser['client_company_id'])
             ->where('type', '=', 'expenses')
             ->groupBy('account_id')
             ->get()
             ->toArray();
-        return $result;
     }
-    public static function getTotal($data)
+    /**
+     * @param array $data
+     * @return float
+     */
+    public static function getTotal(array $data): float
     {
         $total = 0;
         foreach ($data as $row) {

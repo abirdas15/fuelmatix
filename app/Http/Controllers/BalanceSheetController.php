@@ -16,7 +16,7 @@ class BalanceSheetController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-    public function get(Request $request)
+    public function get(Request $request): JsonResponse
     {
         $inputData = $request->all();
         $validator = Validator::make($inputData, [
@@ -66,7 +66,11 @@ class BalanceSheetController extends Controller
         $expense = array_sum($expense);
         return $income - $expense;
     }
-    public static function getEquity($transactions)
+    /**
+     * @param array $transactions
+     * @return array
+     */
+    public static function getEquity(array $transactions): array
     {
         $sessionUser = SessionUser::getUser();
         $categories = Category::select('id', 'name', 'balance', 'parent_category', 'description', 'category_ids', 'type')
@@ -80,7 +84,12 @@ class BalanceSheetController extends Controller
             ->toArray();
         return CategoryController::updateCategoryBalance($categories, $transactions);
     }
-    public static function getAssets($transactions)
+
+    /**
+     * @param array $transactions
+     * @return array
+     */
+    public static function getAssets(array $transactions): array
     {
         $sessionUser = SessionUser::getUser();
         $categories = Category::select('id', 'name', 'balance', 'parent_category', 'description', 'category_ids', 'type')
@@ -94,7 +103,11 @@ class BalanceSheetController extends Controller
             ->toArray();
         return CategoryController::updateCategoryBalance($categories, $transactions);
     }
-    public static function getLiabilities($transactions)
+    /**
+     * @param array $transactions
+     * @return array
+     */
+    public static function getLiabilities($transactions): array
     {
         $sessionUser = SessionUser::getUser();
         $categories = Category::select('id', 'name', 'balance', 'parent_category', 'description', 'category_ids', 'type')
