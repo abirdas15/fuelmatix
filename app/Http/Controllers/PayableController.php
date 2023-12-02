@@ -28,11 +28,12 @@ class PayableController extends Controller
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
         $sessionUser = SessionUser::getUser();
-        $payableCategory = Category::where('client_company_id', $sessionUser['client_company_id'])->where('slug', strtolower(AccountCategory::CURRENT_LIABILITIES))->first();
-        $result = Transaction::select('categories.name', DB::raw('SUM(debit_amount - credit_amount) as balance'))
+        $payableCategory = Category::where('client_company_id', $sessionUser['client_company_id'])->where('slug', strtolower(AccountCategory::ACCOUNT_PAYABLE))->first();
+        $payableId = Category::select('id')->where('parent_category', $payableCategory->id)->get()->pluck('id')->toArray();
+        $result = Transaction::select('categories.name as category', DB::raw('SUM(debit_amount - credit_amount) as balance'))
             ->whereBetween('date', [$inputData['start_date'], $inputData['end_date']])
             ->leftJoin('categories', 'categories.id', '=', 'transactions.account_id')
-            ->where('account_id', $payableCategory->id)
+            ->whereIn('account_id', $payableId)
             ->where('transactions.client_company_id', $sessionUser['client_company_id'])
             ->groupBy('account_id')
             ->get()
