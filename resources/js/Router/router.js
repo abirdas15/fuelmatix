@@ -99,6 +99,7 @@ import salesReport from "../Pages/SalesReport/List.vue";
 import companyBills from "../Pages/CompanyBills/List.vue";
 import ShiftSalePrevious from "../Pages/ShiftSale/ShiftSalePrevious.vue";
 import car from "../Pages/Car/Car.vue";
+import purchase from "../Pages/PurchaseBill/Add.vue";
 
 const ROOT_URL = "";
 const router = new VueRouter({
@@ -542,6 +543,9 @@ const router = new VueRouter({
                 },
                 {
                     path: ROOT_URL + "/cars", name: "car", component: car,
+                }
+                {
+                    path: ROOT_URL + "/purchase", name: "purchase", component: purchase,
                 }
             ],
         },
