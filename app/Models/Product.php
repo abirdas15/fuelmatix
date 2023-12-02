@@ -13,4 +13,17 @@ class Product extends Model
     protected $hidden = [
         'client_company_id'
     ];
+
+    /**
+     * @param float $quantity
+     * @return bool
+     */
+    public function updateQuantity(float $quantity): bool
+    {
+        $this->current_stock = $quantity;
+        if (!$this->save()) {
+            return false;
+        }
+        return true;
+    }
 }

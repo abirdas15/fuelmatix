@@ -6,6 +6,7 @@ use App\Common\AccountCategory;
 use App\Common\Module;
 use App\Helpers\SessionUser;
 use App\Models\Category;
+use App\Models\Product;
 use App\Models\ProductPrice;
 use App\Models\Purchase;
 use App\Models\PurchaseItem;
@@ -58,6 +59,10 @@ class PurchaseController extends Controller
             return response()->json(['status' => 400, 'message' => 'Cannot save purchase.']);
         }
         foreach ($requestData['purchase_item'] as $purchase_item) {
+            $product = Product::where('id', $purchase_item['product_id'])->first();
+            if (!$product instanceof Product) {
+                return response()->json(['status' => 400, 'message' => 'Cannot find product.']);
+            }
             $purchaseItem = PurchaseRepository::saveItem(new PurchaseItem(), [
                 'purchase_id' => $purchase['id'],
                 'product_id' => $purchase_item['product_id'],
@@ -92,6 +97,8 @@ class PurchaseController extends Controller
                 'module_id' => $purchase['id'],
                 'client_company_id' => $sessionUser['client_company_id']
             ]);
+            $currentStock = !empty($product['current_stock']) ? $product['current_stock'] : 0;
+            $product->updateQuantity($currentStock + $purchase_item['quantity']);
         }
         return response()->json(['status' => 200, 'message' => 'Successfully saved purchase.']);
     }

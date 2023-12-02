@@ -13,12 +13,14 @@ use App\Models\Car;
 use App\Models\Category;
 use App\Models\Driver;
 use App\Models\Product;
+use App\Models\ProductType;
 use App\Models\Sale;
 use App\Models\SaleData;
 use App\Models\Transaction;
 use App\Models\User;
 use App\Models\Voucher;
 use App\Repository\DriverRepository;
+use App\Repository\ProductPriceRepository;
 use App\Repository\SaleRepository;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
@@ -103,15 +105,6 @@ class SaleController extends Controller
                 }
                 $driverId = $driverExpense['id'];
             }
-//            if (!empty($requestData['car_number'])) {
-//                $car = Car::where('car_number', $requestData['car_number'])->where('company_id', $requestData['company_id'])->first();
-//                if (!$car instanceof Car) {
-//                    $car = new Car();
-//                    $car->car_number = $requestData['car_number'];
-//                    $car->company_id = $requestData['company_id'];
-//                    $car->save();
-//                }
-//            }
         }
         if ($requestData['payment_method'] == PaymentMethod::CASH) {
             $sessionUser = SessionUser::getUser();
@@ -141,10 +134,15 @@ class SaleController extends Controller
 
         foreach ($requestData['products'] as $product) {
             $productModel = Product::where('id', $product['product_id'])->first();
-            $buyingPrice = 0;
-            if (!empty($productModel['buying_price'])) {
-                $buyingPrice = $productModel['buying_price'] * $product['quantity'];
+            if (!$productModel instanceof Product) {
+                return response()->json(['status' => 400, 'message' => 'Cannot find product.']);
             }
+            $productType = ProductType::where('id', $productModel['type_id'])->first();
+            if (!empty($productType['inventory']) && $productType['inventory'] == 1) {
+                $currentStock = !empty($productModel['current_stock']) ? $productModel['current_stock'] : 0;
+                $productModel->updateQuantity($currentStock - $product['quantity']);
+            }
+            $buyingPrice = ProductPriceRepository::updateAndGetProductBuyingPrice($product['product_id'], $product['quantity']);
             $saleData = new SaleData();
             $saleData->sale_id = $sale->id;
             $saleData->product_id = $product['product_id'];
