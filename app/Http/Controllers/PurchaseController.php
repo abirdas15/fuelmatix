@@ -10,6 +10,7 @@ use App\Models\ProductPrice;
 use App\Models\Purchase;
 use App\Models\PurchaseItem;
 use App\Repository\ProductPriceRepository;
+use App\Repository\PurchaseRepository;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -42,27 +43,31 @@ class PurchaseController extends Controller
         }
         $sessionUser = SessionUser::getUser();
         $category = Category::where('slug', strtolower(AccountCategory::STOCK_IN_HAND))->where('client_company_id', $sessionUser['client_company_id'])->first();
-        $purchase = new Purchase();
-        $purchase->date = Carbon::parse($requestData['date'].' '.date('H:i:s'))->format('Y-m-d H:i:s');
-        $purchase->vendor_id = $requestData['vendor_id'];
-        $purchase->total_amount = array_sum(array_column($requestData['purchase_item'], 'total'));
-        $purchase->status = 'due';
-        $purchase->bill_id = $requestData['bill_id'] ?? null;
-        $purchase->client_company_id = $sessionUser['client_company_id'];
-        if (!$purchase->save()) {
+        if (!$category instanceof Category) {
+            return response()->json(['status' => 400, 'message' => 'Cannot find stock category.']);
+        }
+        $purchase = PurchaseRepository::save(new Purchase(), [
+            'date' => Carbon::parse($requestData['date'].' '.date('H:i:s'))->format('Y-m-d H:i:s'),
+            'vendor_id' => $requestData['vendor_id'],
+            'total_amount' => array_sum(array_column($requestData['purchase_item'], 'total')),
+            'status' => 'due',
+            'bill_id' =>  $requestData['bill_id'] ?? null,
+            'client_company_id' => $sessionUser['client_company_id']
+        ]);
+        if (!$purchase instanceof Purchase) {
             return response()->json(['status' => 400, 'message' => 'Cannot save purchase.']);
         }
         foreach ($requestData['purchase_item'] as $purchase_item) {
-            $purchaseItemModel = new PurchaseItem();
-            $purchaseItemModel->purchase_id = $purchase['id'];
-            $purchaseItemModel->product_id = $purchase_item['product_id'];
-            $purchaseItemModel->unit_price = $purchase_item['unit_price'];
-            $purchaseItemModel->quantity = $purchase_item['quantity'];
-            $purchaseItemModel->total = $purchase_item['total'];
-            if (!$purchaseItemModel->save()) {
+            $purchaseItem = PurchaseRepository::saveItem(new PurchaseItem(), [
+                'purchase_id' => $purchase['id'],
+                'product_id' => $purchase_item['product_id'],
+                'unit_price' => $purchase_item['unit_price'],
+                'quantity' => $purchase_item['quantity'],
+                'total' => $purchase_item['total'],
+            ]);
+            if (!$purchaseItem instanceof PurchaseItem) {
                 return response()->json(['status' => 400, 'message' => 'Cannot save purchase item']);
             }
-            $purchaseItemModel->save();
             $stockCategory = Category::where('parent_category', $category['id'])
                 ->where('module', 'product')
                 ->where('module_id', $purchase_item['product_id'])
@@ -89,5 +94,59 @@ class PurchaseController extends Controller
             ]);
         }
         return response()->json(['status' => 200, 'message' => 'Successfully saved purchase.']);
+    }
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function list(Request $request): JsonResponse
+    {
+        $requestData = $request->all();
+        $paginatedFilter = [
+            'limit' => $requestData['limit'] ?? 10,
+            'page' => $requestData['page'] ?? 1,
+            'order_by' => $requestData['order_by'] ?? 'id',
+            'order_mode' => $requestData['order_mode'] ?? 'desc',
+            'start_date' => $requestData['start_date'] ?? '',
+            'end_date' => $requestData['end_date'] ?? '',
+            'vendor_id' => $requestData['vendor_id'] ?? ''
+        ];
+        $response = PurchaseRepository::list($paginatedFilter);
+        return response()->json(['status' => 200, 'data' => $response]);
+    }
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function pay(Request $request): JsonResponse
+    {
+        $requestData = $request->all();
+        $validator = Validator::make($requestData, [
+            'purchase_id' => 'required|integer',
+            'payment_id' => 'required|integer',
+            'amount' => 'required'
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['status' => 500, 'errors' => $validator->errors()]);
+        }
+        $purchase = Purchase::where('id', $requestData['purchase_id'])->first();
+        if (!$purchase instanceof Purchase) {
+            return response()->json(['status' => 400, 'message' => 'Cannot find purchase.']);
+        }
+        $category = Category::where('id', $requestData['payment_id'])->first();
+        if (!$category instanceof Category) {
+            return response()->json(['status' => 500, 'message' => 'Cannot find payment category.']);
+        }
+        $purchase->paid = $requestData['amount'] + $purchase['paid'];
+        $purchase->status = $purchase->paid == 0 ? 'paid' : 'partially paid';
+        if (!$purchase->save()) {
+            return response()->json(['status' => 400, 'message' => 'Cannot pay amount.']);
+        }
+        $transactionData['linked_id'] = $requestData['payment_id'];
+        $transactionData['transaction'] = [
+            ['date' => date('Y-m-d'), 'account_id' => $purchase['vendor_id'], 'debit_amount' => 0, 'credit_amount' => $requestData['amount'], 'module' => Module::PURCHASE_PAYMENT, 'module_id' => $purchase->id]
+        ];
+        TransactionController::saveTransaction($transactionData);
+        return response()->json(['status' => 200, 'message' => 'Successfully paid amount.']);
     }
 }
