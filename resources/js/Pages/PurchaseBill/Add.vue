@@ -4,7 +4,7 @@
             <div class="row page-titles">
                 <ol class="breadcrumb align-items-center ">
                     <li class="breadcrumb-item active"><router-link :to="{name: 'Dashboard'}">Home</router-link></li>
-                    <li class="breadcrumb-item active"><router-link :to="{name: 'purchaseList'}">Purchase Bill</router-link></li>
+                    <li class="breadcrumb-item active"><router-link :to="{name: 'purchase'}">Purchase Bill</router-link></li>
                     <li class="breadcrumb-item"><a href="javascript:void(0)">Add</a></li>
 
                 </ol>
@@ -18,75 +18,56 @@
                     <div class="card-body">
                         <div class="basic-form">
                             <form @submit.prevent="save">
-
                                 <div class="row">
-                                    <div class="mb-3 col-md-3">
+                                    <div class="mb-3 col-md-3 form-group">
                                         <label class="form-label">Date:</label>
-                                        <input type="date" class="form-control" name="date" value="Tank Name">
+                                        <input type="date" class="form-control date bg-white" name="date">
+                                        <div class="invalid-feedback"></div>
                                     </div>
-                                    <div class="mb-3 col-md-3">
+                                    <div class="mb-3 col-md-3 form-group">
                                         <label class="form-label">Vendor</label>
-                                        <select id="inputState" class="default-select form-control wide">
-                                            <option selected>vendor-1</option>
-                                            <option>vendor-2</option>
-                                            <option>vendor-3</option>
-                                            <option>vendor-4</option>
+                                        <select class="form-control form-select" name="vendor_id" v-model="param.vendor_id">
+                                            <option v-for="v in listData" :value="v.id">{{ v.name }}</option>
                                         </select>
+                                        <div class="invalid-feedback"></div>
                                     </div>
 
-                                    <div class="mb-3 col-md-3">
+                                    <div class="mb-3 col-md-3 form-group">
                                         <label class="form-label">Bill ID</label>
-                                        <input type="text" class="form-control" value="Dispenser Brand" name="Bill ID">
+                                        <input type="text" class="form-control" value="Dispenser Brand" name="Bill ID" v-model="param.bill_id">
                                     </div>
                                 </div>
-
-                                <div class="row">
-                                    <div class="mb-3 col-md-3">
-                                        <label class="form-label">Product</label>
-                                        <input type="text" class="form-control" placeholder="Product">
+                                <div class="row" v-for="(p, index) in param.purchase_item">
+                                    <div class="mb-3 col-md-3 form-group">
+                                        <select class="form-control form-select" :name="'purchase_item.'+index+'.product_id'" v-model="p.product_id">
+                                            <option v-for="v in ProductList" :value="v.id">{{ v.name }}</option>
+                                        </select>
+                                        <div class="invalid-feedback"></div>
                                     </div>
-                                    <div class="mb-3 col-md-3">
-                                        <label class="form-label">Unit Price</label>
-                                        <input type="text" class="form-control" placeholder="Unit Price">
-                                    </div>
-
-                                    <div class="mb-3 col-md-3">
-                                        <label class="form-label">Quantity </label>
-                                        <input type="text" class="form-control" placeholder="Quantity">
-                                    </div>
-                                    <div class="mb-3 col-md-2">
-                                        <label class="form-label">Amount</label>
-                                        <input type="text" class="form-control"  name="Amount" placeholder="Amount">
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="mb-3 col-md-3">
-
-                                        <input type="text" class="form-control" placeholder="Product">
-                                    </div>
-                                    <div class="mb-3 col-md-3">
-
-                                        <input type="text" class="form-control" placeholder="Unit Price">
+                                    <div class="mb-3 col-md-3 form-group">
+                                        <input type="number" class="form-control" placeholder="Unit Price" :name="'purchase_item.'+index+'.unit_price'" v-model="p.unit_price" @input="sumTotal(index)">
+                                        <div class="invalid-feedback"></div>
                                     </div>
 
-                                    <div class="mb-3 col-md-3">
-
-                                        <input type="text" class="form-control" placeholder="Quantity">
+                                    <div class="mb-3 col-md-3 form-group">
+                                        <input type="number" class="form-control" placeholder="Quantity" :name="'purchase_item.'+index+'.quantity'" v-model="p.quantity" @input="sumTotal(index)">
+                                        <div class="invalid-feedback"></div>
                                     </div>
                                     <div class="mb-3 col-md-2">
-
-                                        <input type="text" class="form-control" name="Amount" placeholder="Amount">
-
+                                        <input type="text" class="form-control" disabled placeholder="Total" :name="'purchase_item.'+index+'.total'" v-model="p.total">
+                                        <div class="invalid-feedback"></div>
                                     </div>
                                     <div class="mb-3 col-md-1">
                                         <label class="form-label"> <br> </label>
-                                        <button class="btn btn-primary" type="submit">+</button>
+                                        <button class="btn btn-primary" v-if="param.purchase_item.length-1 == index" @click="addItem" type="button">+</button>
+                                        <button class="btn btn-danger" v-else @click="removeItem(index)" type="button">×</button>
                                     </div>
                                 </div>
                                 <div class="row" style="text-align: right;" >
-                                    <div class="toolbar toolbar-bottom " style="margin-top: 5px;" role="toolbar"><button
-                                        class="btn btn-primary ms-2" type="submit">Submit</button>
-                                        <router-link :to="{name: 'purchaseList'}" class="btn btn-primary ms-2" type="button">Cancel</router-link>
+                                    <div class="toolbar toolbar-bottom " style="margin-top: 5px;">
+                                        <button class="btn btn-primary ms-2" v-if="!loading" type="submit">Submit</button>
+                                        <button class="btn btn-primary ms-2" v-else type="button">Submitting...</button>
+                                        <router-link :to="{name: 'purchase'}" class="btn btn-primary ms-2">Cancel</router-link>
                                     </div>
                                 </div>
                             </form>
@@ -105,7 +86,10 @@ export default {
     data() {
         return {
             param: {
-                name: '',
+                date: '',
+                vendor_id: '',
+                bill_id: '',
+                purchase_item: [],
             },
             listParam: {
                 limit: 5000,
@@ -113,17 +97,27 @@ export default {
             },
             loading: false,
             listData: [],
+            ProductList: [],
         }
     },
     methods: {
+        sumTotal: function (index) {
+            let total = parseInt(this.param.purchase_item[index].unit_price) * parseInt(this.param.purchase_item[index].quantity)
+            if (!isNaN(total)) {
+                this.param.purchase_item[index].total = total
+            }
+        },
         save: function () {
             ApiService.ClearErrorHandler();
             this.loading = true
-            ApiService.POST(ApiRoutes.BankAdd, this.param,res => {
+            if (this.param.date == '') {
+                this.param.date = moment().format('YYYY-MM-DD')
+            }
+            ApiService.POST(ApiRoutes.PurchaseSave, this.param,res => {
                 this.loading = false
                 if (parseInt(res.status) === 200) {
                     this.$router.push({
-                        name: 'purchaseList'
+                        name: 'purchase'
                     })
                 } else {
                     ApiService.ErrorHandler(res.errors);
@@ -140,11 +134,44 @@ export default {
                 }
             });
         },
+        getProduct: function () {
+            ApiService.POST(ApiRoutes.ProductList, this.Param,res => {
+                this.TableLoading = false
+                if (parseInt(res.status) === 200) {
+                    this.ProductList = res.data.data;
+                } else {
+                    ApiService.ErrorHandler(res.error);
+                }
+            });
+        },
+        addItem: function () {
+            this.param.purchase_item.push(
+                {product_id: '', unit_price: '', quantity: '', total: ''}
+            )
+        },
+        removeItem: function (index) {
+            this.param.purchase_item.splice(index, 1)
+        }
     },
     created() {
+        this.param.purchase_item.push(
+            {product_id: '', unit_price: '', quantity: '', total: ''}
+        )
+        this.getProduct()
         this.getVendor()
     },
     mounted() {
+        setTimeout(() => {
+            $('.date').flatpickr({
+                altInput: true,
+                altFormat: "d/m/Y",
+                dateFormat: "Y-m-d",
+                defaultDate: 'today',
+                onChange: (dateStr, date) => {
+                    this.param.date = date
+                }
+            })
+        }, 1000)
         $('#dashboard_bar').text('Purchase Bill')
     }
 }

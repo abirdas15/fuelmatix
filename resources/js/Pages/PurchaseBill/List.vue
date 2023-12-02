@@ -4,15 +4,15 @@
             <div class="row page-titles">
                 <ol class="breadcrumb align-items-center ">
                     <li class="breadcrumb-item active"><router-link :to="{name: 'Dashboard'}">Home</router-link></li>
-                    <li class="breadcrumb-item"><a href="javascript:void(0)">Bank List</a></li>
-                    <li v-if="CheckPermission(Section.BANK + '-' + Action.CREATE)" style="margin-left: auto;"><router-link :to="{name: 'BankAdd'}"><i class="fa-solid fa-plus"></i> Add New Bank</router-link></li>
+                    <li class="breadcrumb-item"><a href="javascript:void(0)">Purchase List</a></li>
+                    <li style="margin-left: auto;"><router-link :to="{name: 'purchaseAdd'}"><i class="fa-solid fa-plus"></i> Add Purchase Bill</router-link></li>
                 </ol>
             </div>
             <div class="row">
                 <div class="col-12">
                     <div class="card">
                         <div class="card-header bg-secondary">
-                            <h4 class="card-title">Bank List</h4>
+                            <h4 class="card-title">Purchase List</h4>
                         </div>
                         <div class="card-body">
                             <div class="row mt-4">
