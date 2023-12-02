@@ -26,4 +26,6 @@ class Module
     const FUEL_ADJUSTMENT = 'fuel adjustment';
     const UN_AUTHORIZED_BILL = 'un authorized bill';
 
+    const PURCHASE = 'purchase';
+
 }
