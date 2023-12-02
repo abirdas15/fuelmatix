@@ -24,7 +24,7 @@ class ReceivableController extends Controller
         }
         $sessionUser = SessionUser::getUser();
         $receivableCategory = Category::where('client_company_id', $sessionUser['client_company_id'])->where('slug', strtolower(AccountCategory::ACCOUNT_RECEIVABLE))->first();
-        $result = Transaction::select('categories.name', DB::raw('SUM(credit_amount - debit_amount) as balance'))
+        $result = Transaction::select('categories.name as category', DB::raw('SUM(credit_amount - debit_amount) as balance'))
             ->whereBetween('date', [$inputData['start_date'], $inputData['end_date']])
             ->leftJoin('categories', 'categories.id', '=', 'transactions.account_id')
             ->where('categories.parent_category', $receivableCategory['id'])
