@@ -10,6 +10,7 @@ use App\Models\ProductPrice;
 use App\Models\Purchase;
 use App\Models\PurchaseItem;
 use App\Repository\ProductPriceRepository;
+use App\Repository\PurchaseRepository;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -42,27 +43,31 @@ class PurchaseController extends Controller
         }
         $sessionUser = SessionUser::getUser();
         $category = Category::where('slug', strtolower(AccountCategory::STOCK_IN_HAND))->where('client_company_id', $sessionUser['client_company_id'])->first();
-        $purchase = new Purchase();
-        $purchase->date = Carbon::parse($requestData['date'].' '.date('H:i:s'))->format('Y-m-d H:i:s');
-        $purchase->vendor_id = $requestData['vendor_id'];
-        $purchase->total_amount = array_sum(array_column($requestData['purchase_item'], 'total'));
-        $purchase->status = 'due';
-        $purchase->bill_id = $requestData['bill_id'] ?? null;
-        $purchase->client_company_id = $sessionUser['client_company_id'];
-        if (!$purchase->save()) {
+        if (!$category instanceof Category) {
+            return response()->json(['status' => 400, 'message' => 'Cannot find stock category.']);
+        }
+        $purchase = PurchaseRepository::save(new Purchase(), [
+            'date' => Carbon::parse($requestData['date'].' '.date('H:i:s'))->format('Y-m-d H:i:s'),
+            'vendor_id' => $requestData['vendor_id'],
+            'total_amount' => array_sum(array_column($requestData['purchase_item'], 'total')),
+            'status' => 'due',
+            'bill_id' =>  $requestData['bill_id'] ?? null,
+            'client_company_id' => $sessionUser['client_company_id']
+        ]);
+        if (!$purchase instanceof Purchase) {
             return response()->json(['status' => 400, 'message' => 'Cannot save purchase.']);
         }
         foreach ($requestData['purchase_item'] as $purchase_item) {
-            $purchaseItemModel = new PurchaseItem();
-            $purchaseItemModel->purchase_id = $purchase['id'];
-            $purchaseItemModel->product_id = $purchase_item['product_id'];
-            $purchaseItemModel->unit_price = $purchase_item['unit_price'];
-            $purchaseItemModel->quantity = $purchase_item['quantity'];
-            $purchaseItemModel->total = $purchase_item['total'];
-            if (!$purchaseItemModel->save()) {
+            $purchaseItem = PurchaseRepository::saveItem(new PurchaseItem(), [
+                'purchase_id' => $purchase['id'],
+                'product_id' => $purchase_item['product_id'],
+                'unit_price' => $purchase_item['unit_price'],
+                'quantity' => $purchase_item['quantity'],
+                'total' => $purchase_item['total'],
+            ]);
+            if (!$purchaseItem instanceof PurchaseItem) {
                 return response()->json(['status' => 400, 'message' => 'Cannot save purchase item']);
             }
-            $purchaseItemModel->save();
             $stockCategory = Category::where('parent_category', $category['id'])
                 ->where('module', 'product')
                 ->where('module_id', $purchase_item['product_id'])
