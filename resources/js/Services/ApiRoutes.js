@@ -237,6 +237,14 @@ const ApiRoutes = {
     CarUpdate: ApiVersion + '/car/update',
     CarDelete: ApiVersion + '/car/delete',
     CarAmount: ApiVersion + '/car/amount',
+    // Purchase Bill
+    PurchaseSave: ApiVersion + '/purchase/save',
+    PurchaseList: ApiVersion + '/purchase/list',
+    PurchasePay: ApiVersion + '/purchase/pay',
+    PurchaseSingle: ApiVersion + '/purchase/single',
+    PurchaseUpdate: ApiVersion + '/purchase/update',
+    PurchaseDelete: ApiVersion + '/purchase/delete',
+    PurchaseAmount: ApiVersion + '/purchase/amount',
 };
 
 export default ApiRoutes;

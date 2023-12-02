@@ -50,6 +50,7 @@
                         <li v-if="CheckPermission(Section.EXPENSE + '-' + Action.VIEW)"><router-link :to="{name:'Expense'}">Expense</router-link></li>
                         <li v-if="CheckPermission(Section.BILL + '-' + Action.VIEW)"><router-link :to="{name: 'Invoices'}">Invoices </router-link></li>
                         <li v-if="CheckPermission(Section.COMPANY_BILL + '-' + Action.VIEW)"><router-link :to="{name: 'CompanyBills'}">Company Bills </router-link></li>
+                        <li  ><router-link :to="{name: 'purchase'}">Purchase</router-link></li>
                     </ul>
 
                 </li>
