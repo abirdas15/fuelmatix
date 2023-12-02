@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\SessionUser;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -52,15 +53,22 @@ class IncomeStatementController extends Controller
         }
         return $total;
     }
-    public static function getRevenue($start_date, $end_date)
+
+    /**
+     * @param string $start_date
+     * @param string $end_date
+     * @return array
+     */
+    public static function getRevenue(string $start_date, string $end_date): array
     {
-        $result = Transaction::select('categories.name', DB::raw('SUM(debit_amount - credit_amount) as balance'))
+        $sessionUser = SessionUser::getUser();
+        return Transaction::select('categories.name', DB::raw('SUM(debit_amount - credit_amount) as balance'))
             ->whereBetween('date', [$start_date, $end_date])
+            ->where('transactions.client_company_id', $sessionUser['client_company_id'])
             ->leftJoin('categories', 'categories.id', '=', 'transactions.account_id')
             ->where('type', '=', 'income')
             ->groupBy('account_id')
             ->get()
             ->toArray();
-        return $result;
     }
 }
