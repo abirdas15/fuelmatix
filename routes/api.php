@@ -40,6 +40,7 @@ use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\FuelAdjustmentController;
 use App\Http\Controllers\CompanyBillController;
 use App\Http\Controllers\CarController;
+use App\Http\Controllers\PurchaseController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -315,6 +316,9 @@ Route::group(['middleware' => 'AuthReqCheck'], function() {
         Route::post('single', [CarController::class, 'single']);
         Route::post('update', [CarController::class, 'update']);
         Route::post('delete', [CarController::class, 'delete']);
+    });
+    Route::group(['prefix' => 'purchase'], function() {
+        Route::post('save', [PurchaseController::class, 'save']);
     });
 });
 

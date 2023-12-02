@@ -5,12 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class ProductPrice extends Model
+class PurchaseItem extends Model
 {
     use HasFactory;
-    protected $table = 'product_price';
+    protected $table = 'purchase_item';
     public $timestamps = false;
-    protected $fillable = [
-        'id'
-    ];
 }
