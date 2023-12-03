@@ -16,8 +16,8 @@
                                     <h4 class="text-center mb-4">Sign in your account</h4>
                                     <form @submit.prevent="Login">
                                         <div class="mb-3 form-group">
-                                            <label class="mb-1"><strong>Email</strong></label>
-                                            <input type="email" placeholder="hello@example.com" name="email" class="form-control" v-model="param.email" autocomplete="new-email">
+                                            <label class="mb-1"><strong>Email or Phone</strong></label>
+                                            <input type="text" placeholder="hello@example.com" name="email" class="form-control" v-model="param.email" autocomplete="new-email">
                                             <small class="error-report text-danger"></small>
                                         </div>
                                         <div class="mb-3 form-group">

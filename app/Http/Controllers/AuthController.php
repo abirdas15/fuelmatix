@@ -14,19 +14,21 @@ class AuthController extends Controller
     {
         $inputData = $request->all();
         $validator = Validator::make($inputData, [
-            'email' => 'required|email',
+            'email' => 'required',
             'password' => 'required'
         ]);
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'error' => $validator->errors()]);
         }
-        $remember = isset($input['remember']) && $input['remember'] == 1 ? true : false;
-        $credential = [
-            'email' => $inputData['email'],
-            'password' => $inputData['password']
-        ];
+        $remember = isset($input['remember']) && $input['remember'] == 1;
+        $field = 'phone';
+        if(filter_var($inputData['email'], FILTER_VALIDATE_EMAIL)) {
+            $field = 'email';
+        }
+        $credential[$field] = $inputData['email'];
+        $credential['password'] = $inputData['password'];
         if (Auth::attempt($credential, $remember)) {
-            $userInfo = User::where('email', $inputData['email'])->first();
+            $userInfo = User::where($field, $inputData['email'])->first();
             $userInfo->save();
             return response()->json(['status' => 200, 'msg' => 'Successfully login.', 'data' => User::ParseData($userInfo)]);
         }
