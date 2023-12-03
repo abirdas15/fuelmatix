@@ -310,8 +310,10 @@ class ProductController extends Controller
             $fuelAdjustmentId = array_column($fuelAdjustment, 'id');
             $fuelAdjustmentData = FuelAdjustmentData::whereIn('fuel_adjustment_id', $fuelAdjustmentId)->get()->toArray();
             foreach ($fuelAdjustmentData as $adjustmentData) {
-                if ($adjustmentData['tank_id'] == $tank['id']) {
-                    $adjustment += $adjustmentData['quantity'];
+                if (!empty($adjustmentData['tank_id'])) {
+                    if ($adjustmentData['tank_id'] == $tank['id']) {
+                        $adjustment += $adjustmentData['quantity'];
+                    }
                 }
                 if (!empty($adjustmentData['nozzle_id'])) {
                     $nozzleAdjustment[$adjustmentData['nozzle_id']][] = $adjustmentData;
