@@ -31,7 +31,7 @@
                                     </div>
                                 </div>
                                 <div class="row justify-content-between">
-                                    <div class="col-sm-6 box-mula" style="width:49%" v-if="param.nozzles.length > 0">
+                                    <div class="col-sm-6 box-mula" style="width:49%" v-if="param.nozzles != undefined && param.nozzles.length > 0">
                                         <div class="" >
                                             <h5 class="putkir-futa">Out</h5>
                                             <div class="row mb-3 align-items-center" v-for="n in param.nozzles">
@@ -40,7 +40,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-sm-6 box-mula" style="width:49%" v-if="param.tank.id != ''">
+                                    <div class="col-sm-6 box-mula" style="width:49%" v-if="param.tank != undefined && param.tank.id != ''">
                                         <div class="" >
                                             <h5 class="putkir-futa">In</h5>
                                             <div class="row mb-3 align-items-center">

@@ -5,7 +5,6 @@
                 <ol class="breadcrumb align-items-center ">
                     <li class="breadcrumb-item active"><router-link :to="{name: 'Dashboard'}">Home</router-link></li>
                     <li class="breadcrumb-item"><a href="javascript:void(0)">Fuel Adjustment</a></li>
-
                 </ol>
             </div>
             <!-- row -->
@@ -168,6 +167,8 @@ export default {
                         name: 'adjustmentView',
                         params: {id: res.adjustment_id}
                     })
+                } else if(parseInt(res.status) === 400) {
+                    this.$toast.warning(res.message);
                 } else {
                     ApiService.ErrorHandler(res.errors);
                 }

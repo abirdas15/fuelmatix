@@ -159,9 +159,9 @@ class ShiftSaleController extends Controller
         if (!empty($product['buying_price'])) {
             $buyingPrice = $product['buying_price'] * $totalNozzleConsumption;
         }
-        $transactionData['linked_id'] = $incomeCategory['id'];
         $shiftSaleTransaction = [];
         foreach ($inputData['categories'] as $category) {
+            $transactionData['linked_id'] = $incomeCategory['id'];
             $transactionData['transaction'] = [
                 ['date' => $inputData['date'], 'account_id' => $category['category_id'], 'debit_amount' => 0, 'credit_amount' => $category['amount'], 'module' => 'shift sale', 'module_id' => $shiftSale->id]
             ];
@@ -172,7 +172,6 @@ class ShiftSaleController extends Controller
                 'amount' => $category['amount']
             ];
         }
-        TransactionController::saveTransaction($transactionData);
         $transactionData = [];
         $transactionData['linked_id'] = $stockCategory['id'];
         $transactionData['transaction'] = [
@@ -223,7 +222,7 @@ class ShiftSaleController extends Controller
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
-        $result = ShiftSale::select('shift_sale.*', 'products.name as product_name', 'product_types.tank')
+        $result = ShiftSale::select('shift_sale.*', 'products.name as product_name', 'product_types.tank', 'product_types.unit')
             ->leftJoin('products', 'products.id', '=', 'shift_sale.product_id')
             ->leftJoin('product_types', 'product_types.id', '=', 'products.type_id')
             ->where('shift_sale.id', $request['id'])

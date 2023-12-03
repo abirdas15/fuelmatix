@@ -221,7 +221,7 @@
                                                         <table class="table">
                                                             <tr>
                                                                 <td style="font-size: 18px;padding: 0px;" class="">Total sale:</td>
-                                                                <td style="font-size: 18px;padding: 0px;" class="text-end ">{{totalSale}} Liter</td>
+                                                                <td style="font-size: 18px;padding: 0px;" class="text-end ">{{totalSale}} {{ listDispenser.unit }}</td>
                                                             </tr>
                                                             <tr>
                                                                 <td style="font-size: 18px;padding: 0px;" class="">Total amount:</td>
@@ -513,6 +513,8 @@ export default {
                             }
                         })
                     }
+                } else if (parseInt(res.status) === 200) {
+                    this.$toast.warning(res.message);
                 } else {
                     ApiService.ErrorHandler(res.errors);
                 }

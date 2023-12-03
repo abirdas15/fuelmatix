@@ -42,8 +42,6 @@ class TankController extends Controller
         $validator = Validator::make($inputData, [
             'product_id' => 'required',
             'tank_name' => 'required',
-            'capacity' => 'required',
-            'height' => 'required',
             'file' => 'required|file'
         ]);
         if ($validator->fails()) {
@@ -53,7 +51,6 @@ class TankController extends Controller
         $tank = new Tank();
         $tank->product_id = $inputData['product_id'];
         $tank->tank_name = $inputData['tank_name'];
-        $tank->height = $inputData['height'];
         $tank->opening_stock = $inputData['opening_stock'] ?? 0;
         $tank->client_company_id = $sessionUser['client_company_id'];
         if (!$tank->save()) {
@@ -62,9 +59,10 @@ class TankController extends Controller
         if ($request->file('file')) {
             Excel::import(new BstiChartImport($tank['id']), $request->file('file'));
         }
-        $bstiChart = BstiChart::select('volume')->where('tank_id', $inputData['id']) ->where('height', '=', floor($tank->height))
+        $bstiChart = BstiChart::select('volume', 'height')->where('tank_id', $tank['id']) ->orderBy('id', 'DESC')
             ->first();
         $tank->capacity =  $bstiChart['volume'] ?? 0;
+        $tank->height =  $bstiChart['height'] ?? 0;
         $tank->save();
         return response()->json(['status' => 200, 'message' => 'Successfully saved tank.']);
     }
@@ -141,8 +139,6 @@ class TankController extends Controller
         $validator = Validator::make($inputData, [
             'id' => 'required',
             'tank_name' => 'required',
-            'capacity' => 'required',
-            'height' => 'required',
             'product_id' => 'required',
         ]);
         if ($validator->fails()) {
@@ -154,18 +150,18 @@ class TankController extends Controller
         }
         $tank->product_id = $inputData['product_id'];
         $tank->tank_name = $inputData['tank_name'];
-        $tank->height = $inputData['height'];
         $tank->opening_stock = $inputData['opening_stock'] ?? 0;
         if (!$tank->save()) {
             return response()->json(['status' => 400, 'message' => 'Cannot updated [tank].']);
         }
         if ($request->file('file')) {
-            BstiChart::where('tank_id', $inputData['id'])->delete();
+            BstiChart::where('tank_id', $tank['id'])->delete();
             Excel::import(new BstiChartImport($tank['id']), $request->file('file'));
         }
-        $bstiChart = BstiChart::select('volume')->where('tank_id', $inputData['id']) ->where('height', '=', floor($tank->height))
+        $bstiChart = BstiChart::select('volume', 'height')->where('tank_id', $tank['id']) ->orderBy('id', 'DESC')
             ->first();
         $tank->capacity =  $bstiChart['volume'] ?? 0;
+        $tank->height =  $bstiChart['height'] ?? 0;
         $tank->save();
         return response()->json(['status' => 200, 'message' => 'Successfully updated tank.']);
     }

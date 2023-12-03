@@ -33,18 +33,8 @@
                                         <div class="invalid-feedback"></div>
                                     </div>
                                     <div class="mb-3 form-group col-md-6">
-                                        <label class="form-label">Tank capacity:</label>
-                                        <input type="number" class="form-control" name="capacity" v-model="param.capacity">
-                                        <div class="invalid-feedback"></div>
-                                    </div>
-                                    <div class="mb-3 form-group col-md-6">
                                         <label class="form-label">Opening Stock:</label>
                                         <input type="number" class="form-control" name="height" v-model="param.opening_stock">
-                                        <div class="invalid-feedback"></div>
-                                    </div>
-                                    <div class="mb-3 form-group col-md-6">
-                                        <label class="form-label">Height:</label>
-                                        <input type="number" class="form-control" name="height" v-model="param.height">
                                         <div class="invalid-feedback"></div>
                                     </div>
                                     <div class="mb-3 form-group col-md-6">

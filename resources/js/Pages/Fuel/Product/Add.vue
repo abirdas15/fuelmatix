@@ -49,14 +49,6 @@
                                         <div class="invalid-feedback"></div>
                                     </div>
                                     <div class="mb-3 form-group col-md-6">
-                                        <label class="form-label">Unit:</label>
-                                        <select class="form-control wide" name="unit" v-model="param.unit">
-                                            <option value="1">Liter</option>
-                                            <option value="2">M3</option>
-                                        </select>
-                                        <div class="invalid-feedback"></div>
-                                    </div>
-                                    <div class="mb-3 form-group col-md-6">
                                         <label class="form-label">Opening Stock:</label>
                                         <input type="number" class="form-control" name="opening_stock" v-model="param.opening_stock">
                                         <div class="invalid-feedback"></div>

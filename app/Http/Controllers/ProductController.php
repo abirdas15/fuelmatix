@@ -42,7 +42,6 @@ class ProductController extends Controller
             'name' => 'required|string',
             'selling_price' => 'required|numeric',
             'type_id' => 'required|integer',
-            'unit' => 'required',
         ]);
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
@@ -67,7 +66,6 @@ class ProductController extends Controller
         $product->type_id = $inputData['type_id'];
         $product->buying_price = $inputData['buying_price'] ?? 0;
         $product->driver_selling_price = $inputData['driver_selling_price'] ?? 0;
-        $product->unit = $inputData['unit'];
         $product->opening_stock = $inputData['opening_stock'] ?? null;
         $product->client_company_id = $inputData['session_user']['client_company_id'];
         if (!$product->save()) {
@@ -103,7 +101,7 @@ class ProductController extends Controller
         $order_by = $inputData['order_by'] ?? 'id';
         $order_mode = $inputData['order_mode'] ?? 'DESC';
         $shift_sale = $inputData['shift_sale'] ?? '';
-        $result = Product::select('products.*', 'product_types.name as product_type', 'product_types.shift_sale')
+        $result = Product::select('products.*', 'product_types.name as product_type', 'product_types.shift_sale', 'product_types.unit')
             ->leftJoin('product_types', 'product_types.id', '=', 'products.type_id')
             ->where('client_company_id', $inputData['session_user']['client_company_id']);
         if (!empty($inputData['type_id'])) {
@@ -173,7 +171,6 @@ class ProductController extends Controller
             'type_id' => 'required|integer',
             'buying_price' => 'required|numeric',
             'selling_price' => 'required|numeric',
-            'unit' => 'required',
         ]);
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
@@ -201,7 +198,6 @@ class ProductController extends Controller
         $product->type_id = $inputData['type_id'];
         $product->buying_price = $inputData['buying_price'] ?? 0;
         $product->driver_selling_price = $inputData['driver_selling_price'] ?? 0;
-        $product->unit = $inputData['unit'];
         $product->opening_stock = $inputData['opening_stock'] ?? null;
         if (!$product->save()) {
             return response()->json(['status' => 400, 'message' => 'Cannot updated [product].']);

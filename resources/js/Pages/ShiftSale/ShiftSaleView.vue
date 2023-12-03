@@ -55,21 +55,21 @@
                                                         </div>
                                                         <div class="mb-3 col-md-2 offset-2">
                                                             <div class="input-group">
-                                                                <div>{{shiftSale.start_reading}} Liter</div>
+                                                                <div>{{shiftSale.start_reading}} {{ shiftSale.unit }}</div>
                                                             </div>
                                                         </div>
                                                         <div class="mb-3 col-md-2">
-                                                            <div>{{shiftSale.tank_refill}} Liter</div>
+                                                            <div>{{shiftSale.tank_refill}} {{ shiftSale.unit }}</div>
                                                         </div>
                                                         <div class="mb-3 col-md-2" >
-                                                            <div>{{shiftSale.end_reading}} Liter</div>
+                                                            <div>{{shiftSale.end_reading}} {{ shiftSale.unit }}</div>
                                                         </div>
                                                         <div class="mb-3 col-md-2">
-                                                            <div>{{shiftSale.adjustment}} Liter</div>
+                                                            <div>{{shiftSale.adjustment}} {{ shiftSale.unit }}</div>
                                                         </div>
 
                                                         <div class="mb-3 col-md-2">
-                                                            <div>{{shiftSale.consumption}} Liter</div>
+                                                            <div>{{shiftSale.consumption}} {{ shiftSale.unit }}</div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -89,20 +89,20 @@
                                                     </div>
                                                     <div class="mb-3 col-md-2">
                                                         <label class="fw-bold">Start Reading </label>
-                                                        <div>{{n.start_reading}} Liter</div>
+                                                        <div>{{n.start_reading}} {{ shiftSale.unit }}</div>
                                                     </div>
                                                     <div class="mb-3 col-md-2">
                                                         <label class="fw-bold">End Reading </label>
-                                                        <div>{{n.end_reading}} Liter</div>
+                                                        <div>{{n.end_reading}} {{ shiftSale.unit }}</div>
                                                     </div>
                                                     <div class="mb-3 col-md-2">
                                                         <label class="fw-bold">Adjustment </label>
-                                                        <div>{{n.adjustment}} Liter</div>
+                                                        <div>{{n.adjustment}} {{ shiftSale.unit }}</div>
                                                     </div>
 
                                                     <div class="mb-3 col-md-2" >
                                                         <label class="fw-bold">Consumption </label>
-                                                        <div>{{n.consumption}} Liter</div>
+                                                        <div>{{n.consumption}} {{ shiftSale.unit }}</div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -114,7 +114,7 @@
                                                     <table class="table">
                                                         <tr>
                                                             <td style="font-size: 18px;padding: 0px;" class="">Total sale:</td>
-                                                            <td style="font-size: 18px;padding: 0px;" class="text-end ">{{shiftSale.consumption}} Liter</td>
+                                                            <td style="font-size: 18px;padding: 0px;" class="text-end ">{{shiftSale.consumption}} {{ shiftSale.unit }}</td>
                                                         </tr>
                                                         <tr>
                                                             <td style="font-size: 18px;padding: 0px;" class="">Total amount:</td>
