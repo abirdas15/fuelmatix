@@ -36,7 +36,7 @@
                                 <div class="process-wrapper">
                                     <div id="progress-content-section" v-if="listDispenser">
                                         <div class="section-content discovery active">
-                                            <template v-if="oilStock">
+                                            <template v-if="listDispenser.tank == 1">
                                                 <div class="card">
                                                     <div class="card-header">
                                                         <h5 class="card-title">
@@ -95,7 +95,7 @@
                                                                            type="text" class="form-control"
                                                                            v-model="listDispenser.start_reading">
                                                                     <div class="input-group-append">
-                                                                        <span class="input-group-text" >Liter</span>
+                                                                        <span class="input-group-text" >{{ listDispenser.unit }}</span>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -104,7 +104,7 @@
                                                                     <input type="text" class="form-control"  disabled
                                                                            v-model="listDispenser.tank_refill">
                                                                     <div class="input-group-append">
-                                                                        <span class="input-group-text" >Liter</span>
+                                                                        <span class="input-group-text" >{{ listDispenser.unit }}</span>
                                                                     </div>
                                                                 </div>
 
@@ -115,7 +115,7 @@
                                                                            type="text" class="form-control"
                                                                            v-model="listDispenser.end_reading">
                                                                     <div class="input-group-append">
-                                                                        <span class="input-group-text" >Liter</span>
+                                                                        <span class="input-group-text" >{{ listDispenser.unit }}</span>
                                                                     </div>
                                                                 </div>
 
@@ -128,7 +128,7 @@
                                                                            v-model="listDispenser.adjustment"
                                                                            @input="calculateAmount">
                                                                     <div class="input-group-append">
-                                                                        <span class="input-group-text" >Liter</span>
+                                                                        <span class="input-group-text" >{{ listDispenser.unit }}</span>
                                                                     </div>
                                                                 </div>
 
@@ -140,7 +140,7 @@
                                                                     <input type="text" class="form-control" id="consumption" disabled  v-if="listDispenser.status == 'end'"
                                                                            v-model="listDispenser.consumption">
                                                                     <div class="input-group-append">
-                                                                        <span class="input-group-text" >Liter</span>
+                                                                        <span class="input-group-text" >{{ listDispenser.unit }}</span>
                                                                     </div>
                                                                 </div>
                                                                 <!--                                                            <input class="form-control" value="0" v-if="listDispenser.status == 'start'" disabled>-->
@@ -167,7 +167,7 @@
                                                                 <input type="text" class="form-control" disabled
                                                                        v-model="n.start_reading">
                                                                 <div class="input-group-append">
-                                                                    <span class="input-group-text" >Liter</span>
+                                                                    <span class="input-group-text" >{{ listDispenser.unit }}</span>
                                                                 </div>
                                                             </div>
 
@@ -180,7 +180,7 @@
                                                                        v-model="n.end_reading" @click="enableInput('frReading'+nIndex+dIndex)"
                                                                        @input="calculateAmountNozzle(dIndex, nIndex) ">
                                                                 <div class="input-group-append">
-                                                                    <span class="input-group-text" >Liter</span>
+                                                                    <span class="input-group-text" >{{ listDispenser.unit }}</span>
                                                                 </div>
                                                             </div>
 
@@ -194,7 +194,7 @@
                                                                        v-model="n.adjustment"
                                                                        @input="calculateAmountNozzle(dIndex, nIndex) " disabled>
                                                                 <div class="input-group-append">
-                                                                    <span class="input-group-text" >Liter</span>
+                                                                    <span class="input-group-text" >{{ listDispenser.unit }}</span>
                                                                 </div>
                                                             </div>
                                                             <!--                                                            <input class="form-control" value="0" v-if="listDispenser.status == 'start'" disabled>-->
@@ -207,7 +207,7 @@
                                                                 <input type="text" disabled class="form-control"
                                                                        v-model="n.consumption">
                                                                 <div class="input-group-append">
-                                                                    <span class="input-group-text" >Liter</span>
+                                                                    <span class="input-group-text" >{{ listDispenser.unit }}</span>
                                                                 </div>
                                                             </div>
 
@@ -223,11 +223,11 @@
                                                         <table class="table">
                                                             <tr>
                                                                 <td style="font-size: 18px;padding: 0px;" class="">Total sale:</td>
-                                                                <td style="font-size: 18px;padding: 0px;" class="text-end ">{{totalSale}} Liter</td>
+                                                                <td style="font-size: 18px;padding: 0px;" class="text-end ">{{parseFloat(totalSale).toFixed(3)}} {{ listDispenser.unit }}</td>
                                                             </tr>
                                                             <tr>
                                                                 <td style="font-size: 18px;padding: 0px;" class="">Total amount:</td>
-                                                                <td style="font-size: 18px;padding: 0px;" class="text-end ">{{totalAmount}} Tk</td>
+                                                                <td style="font-size: 18px;padding: 0px;" class="text-end ">{{ parseFloat(totalAmount).toFixed(3) }} Tk</td>
                                                             </tr>
                                                         </table>
                                                     </div>
@@ -497,7 +497,7 @@ export default {
                     })
                 })
                 // check if mismatch allow
-                if (this.mismatchAllow != null) {
+                if (this.mismatchAllow != null && this.listDispenser.tank == 1) {
                     if (this.totalShiftParcent(totalConsumption) > this.mismatchAllow) {
                         this.loading = false
                         this.$toast.error('The mismatch is grater than allowed consumption')

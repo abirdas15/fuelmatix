@@ -58,7 +58,7 @@
                                                 <th class="text-white" @click="sortData('product_type')" :class="sortClass('product_type')">Product Type</th>
                                                 <th class="text-white" @click="sortData('buying_price')" :class="sortClass('buying_price')">Buying Price</th>
                                                 <th class="text-white" @click="sortData('selling_price')" :class="sortClass('selling_price')">Selling Price</th>
-                                                <th class="text-white" @click="sortData('driver_selling_price')" :class="sortClass('driver_selling_price')">Driver Selling Price</th>
+                                                <th class="text-white" @click="sortData('current_stock')" :class="sortClass('current_stock')">Current Stock</th>
                                                 <th class="text-white" @click="sortData('unit')" :class="sortClass('unit')" >Unit</th>
                                                 <th class="text-white" >Action</th>
                                             </tr>
@@ -69,7 +69,13 @@
                                                 <td><a href="javascript:void(0);">{{f.product_type}}</a></td>
                                                 <td><a href="javascript:void(0);">{{f?.buying_price}}</a></td>
                                                 <td><a href="javascript:void(0);">{{f.selling_price}}</a></td>
-                                                <td><a href="javascript:void(0);">{{f.driver_selling_price}}</a></td>
+                                                <td>
+                                                    <template v-if="f.current_stock != null">
+                                                        <a href="javascript:void(0);">
+                                                            {{ f.current_stock + ' ' + f.unit }}
+                                                        </a>
+                                                    </template>
+                                                </td>
                                                 <td><a href="javascript:void(0);">{{f.unit}}</a></td>
                                                 <td>
                                                     <div class="d-flex justify-content-end">

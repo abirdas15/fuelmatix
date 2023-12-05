@@ -7,6 +7,7 @@ use App\Common\FuelMatixDateTimeFormat;
 use App\Common\Module;
 use App\Helpers\Helpers;
 use App\Helpers\SessionUser;
+use App\Models\BstiChart;
 use App\Models\Category;
 use App\Models\Dispenser;
 use App\Models\Product;
@@ -63,6 +64,7 @@ class ShiftSaleController extends Controller
             }
             return response()->json(['status' => 200, 'message' => 'Successfully started shift sale.']);
         }
+        $tank = null;
         if (!empty($inputData['tank']) && $inputData['tank'] == 1) {
             $tank = Tank::where('product_id', $inputData['product_id'])->first();
             if (!$tank instanceof Tank) {
@@ -115,13 +117,16 @@ class ShiftSaleController extends Controller
             return response()->json(['status' => 500, 'error' => 'Cannot ended shift sale.']);
         }
         if (!empty($inputData['tank']) && $inputData['tank'] == 1) {
-            $tankLogData = [
+            $bstiChart = BstiChart::where('tank_id', $tank['id'])
+                ->where('volume', '=', floor($inputData['end_reading']))
+                ->first();
+            TankRepository::readingSave([
                 'tank_id' => $tank['id'],
                 'date' => $inputData['date'],
-                'height' => $inputData['end_reading'],
+                'volume' => $inputData['end_reading'],
+                'height' => $bstiChart->height ?? 0,
                 'type' => 'shift sell',
-            ];
-            TankRepository::readingSave($tankLogData);
+            ]);
         }
         $stockData = [
             'client_company_id' => $inputData['session_user']['client_company_id'],

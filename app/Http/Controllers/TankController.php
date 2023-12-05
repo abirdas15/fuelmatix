@@ -64,6 +64,18 @@ class TankController extends Controller
         $tank->capacity =  $bstiChart['volume'] ?? 0;
         $tank->height =  $bstiChart['height'] ?? 0;
         $tank->save();
+        if (!empty($inputData['opening_stock'])) {
+            $bstiChart = BstiChart::where('tank_id', $tank['id'])
+                ->where('volume', '=', floor($inputData['opening_stock']))
+                ->first();
+            TankRepository::readingSave([
+                'tank_id' => $tank['id'],
+                'date' => Carbon::now('UTC'),
+                'height' => $bstiChart->height ?? 0,
+                'type' => 'tank refill',
+                'volume' => $inputData['opening_stock']
+            ]);
+        }
         return response()->json(['status' => 200, 'message' => 'Successfully saved tank.']);
     }
     /**
@@ -148,6 +160,7 @@ class TankController extends Controller
         if (!$tank instanceof Tank) {
             return response()->json(['status' => 400, 'message' => 'Cannot find [tank].']);
         }
+        $sessionUser = SessionUser::getUser();
         $tank->product_id = $inputData['product_id'];
         $tank->tank_name = $inputData['tank_name'];
         $tank->opening_stock = $inputData['opening_stock'] ?? 0;
@@ -163,6 +176,18 @@ class TankController extends Controller
         $tank->capacity =  $bstiChart['volume'] ?? 0;
         $tank->height =  $bstiChart['height'] ?? 0;
         $tank->save();
+        if (!empty($inputData['opening_stock']) && empty($tank->opening_stock)) {
+            $bstiChart = BstiChart::where('tank_id', $tank['id'])
+                ->where('volume', '=', floor($inputData['opening_stock']))
+                ->first();
+            TankRepository::readingSave([
+                'tank_id' => $tank['id'],
+                'date' => Carbon::now('UTC'),
+                'height' => $bstiChart->height ?? 0,
+                'type' => 'tank refill',
+                'volume' => $inputData['opening_stock']
+            ]);
+        }
         return response()->json(['status' => 200, 'message' => 'Successfully updated tank.']);
     }
     /**

@@ -34,7 +34,7 @@ class DashboardController extends Controller
     public static function getShiftSale(): array
     {
         $sessionUser = SessionUser::getUser();
-        $startDate = date('Y-m-01');
+        $startDate = date("Y-m-d", strtotime("- 15 day"));
         $endDate = date('Y-m-d');
         $shiftSale = ShiftSale::select(DB::raw('SUM(consumption) as quantity'), DB::raw('SUM(amount) as amount'), 'date')
             ->whereBetween('date',[$startDate, $endDate])

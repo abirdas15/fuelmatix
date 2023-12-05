@@ -16,16 +16,12 @@ class TankRepository
     public static function readingSave(array $data)
     {
         $sessionUser = SessionUser::getUser();
-        $bstiChart = BstiChart::where('tank_id', $data['tank_id'])
-            ->where('height', '=', floor($data['height']))
-            ->first();
         $reading = new TankLog();
         $reading->tank_id = $data['tank_id'];
-        $reading->date = $data['date'].' '.date('H:i:s');
+        $reading->date = $data['date'];
         $reading->height = $data['height'];
-        $reading->water_height = $data['water_height'] ?? null;
         $reading->type = $data['type'];
-        $reading->volume = $bstiChart != null ? $bstiChart->volume : 0;
+        $reading->volume = $data['volume'];
         $reading->client_company_id = $sessionUser['client_company_id'];
         if (!$reading->save()) {
             return ['status' => 400, 'message' => 'Cannot save tank reading.'];
