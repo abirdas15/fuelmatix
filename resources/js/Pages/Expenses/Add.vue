@@ -19,6 +19,10 @@
                         <div class="basic-form">
                             <form @submit.prevent="save">
                                 <div class="row">
+                                    <div class="col-6 mb-3 form-group">
+                                        <label class="form-label">Date:</label>
+                                        <input type="text" class="form-control date bg-white" name="date" v-model="param.date">
+                                    </div>
                                     <div class="mb-3 form-group col-md-6">
                                         <label class="form-label">Expense:</label>
                                         <select class="form-control" name="category_id" id="category_id"  v-model="param.category_id">
@@ -48,7 +52,7 @@
 
                                     <div class="mb-3 form-group col-md-6">
                                         <div class="input-group">
-                                            <div class="form-file">
+                                            <div class="form-file mt-5">
                                                 <input type="file" class="form-file-input form-control"  @change="onFileChange" name="sound_file">
                                                 <div class="invalid-feedback"></div>
                                             </div>
@@ -78,6 +82,7 @@
 <script>
 import ApiService from "../../Services/ApiService";
 import ApiRoutes from "../../Services/ApiRoutes";
+import moment from "moment";
 export default {
     data() {
         return {
@@ -86,7 +91,8 @@ export default {
                 amount: '',
                 remarks: '',
                 payment_id: '',
-                file: ''
+                file: '',
+                date: moment().format('YYYY-MM-DD')
             },
             loading: false,
             expenseData: [],
@@ -127,6 +133,7 @@ export default {
             formData.append('amount', this.param.amount)
             formData.append('remarks', this.param.remarks)
             formData.append('file', this.param.file)
+            formData.append('date', this.param.date)
             ApiService.POST(ApiRoutes.ExpenseAdd, formData, res => {
                 this.loading = false
                 if (parseInt(res.status) === 200) {
@@ -145,6 +152,17 @@ export default {
     },
     mounted() {
         $('#dashboard_bar').text('Expense Add')
+        setTimeout(() => {
+            $('.date').flatpickr({
+                altInput: true,
+                altFormat: "d/m/Y",
+                dateFormat: "Y-m-d",
+                defaultDate: 'today',
+                onChange: (date, dateStr) => {
+                    this.param.date = dateStr
+                }
+            })
+        }, 1000)
     }
 }
 </script>

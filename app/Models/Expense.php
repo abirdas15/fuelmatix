@@ -10,9 +10,6 @@ class Expense extends Model
     use HasFactory;
     protected $table = 'expense';
     public $timestamps = false;
-    protected $hidden = [
-        'date'
-    ];
     protected $appends = [
         'file_path'
     ];

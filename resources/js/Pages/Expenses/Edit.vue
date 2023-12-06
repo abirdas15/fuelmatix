@@ -19,6 +19,10 @@
                         <div class="basic-form">
                             <form @submit.prevent="save">
                                 <div class="row">
+                                    <div class="col-6 mb-3 form-group">
+                                        <label class="form-label">Date:</label>
+                                        <input type="text" class="form-control date bg-white" name="date" v-model="param.date">
+                                    </div>
                                     <div class="mb-3 form-group col-md-6">
                                         <label class="form-label">Expense:</label>
                                         <select class="form-control" name="category_id" id="category_id"  v-model="param.category_id">
@@ -48,7 +52,7 @@
 
                                     <div class="mb-3 form-group col-md-6">
                                         <div class="input-group">
-                                            <div class="form-file">
+                                            <div class="form-file mt-5">
                                                 <input type="file" class="form-file-input form-control"  @change="onFileChange" name="sound_file">
                                                 <div class="invalid-feedback"></div>
                                             </div>
@@ -122,6 +126,17 @@ export default {
                         this.param.file_name = (' ' + this.param.file).slice(1);
                         this.param.file = ''
                     }
+                    setTimeout(() => {
+                        $('.date').flatpickr({
+                            altInput: true,
+                            altFormat: "d/m/Y",
+                            dateFormat: "Y-m-d",
+                            defaultDate: 'today',
+                            onChange: (date, dateStr) => {
+                                this.param.date = dateStr
+                            }
+                        })
+                    }, 1000)
                 }
             });
         },

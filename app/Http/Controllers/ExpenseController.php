@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Common\FuelMatixDateTimeFormat;
 use App\Common\FuelMatixStatus;
 use App\Common\Module;
+use App\Helpers\Helpers;
 use App\Helpers\SessionUser;
 use App\Models\Expense;
 use Illuminate\Http\JsonResponse;
@@ -20,6 +22,7 @@ class ExpenseController extends Controller
     {
         $inputData = $request->all();
         $validator = Validator::make($inputData, [
+            'date' => 'required|date',
             'category_id' => 'required',
             'amount' => 'required',
             'payment_id' => 'required'
@@ -37,7 +40,7 @@ class ExpenseController extends Controller
         }
         $sessionUser = SessionUser::getUser();
         $expense = new Expense();
-        $expense->date = date('Y-m-d');
+        $expense->date = $inputData['date'];
         $expense->category_id = $inputData['category_id'];
         $expense->amount = $inputData['amount'];
         $expense->payment_id = $inputData['payment_id'];
@@ -74,7 +77,7 @@ class ExpenseController extends Controller
         $result = $result->orderBy('status', 'DESC')
             ->paginate($limit);
         foreach ($result as &$data) {
-            $data['date'] = date('d/m/Y', strtotime($data['date']));
+            $data['date'] = Helpers::formatDate($data['date'], FuelMatixDateTimeFormat::STANDARD_DATE);
         }
         return response()->json(['status' => 200, 'data' => $result]);
     }
@@ -91,7 +94,7 @@ class ExpenseController extends Controller
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
-        $result = Expense::select('id', 'category_id', 'payment_id', 'amount', 'file', 'remarks')
+        $result = Expense::select('id', 'category_id', 'payment_id', 'amount', 'file', 'remarks', 'date')
             ->where('id', $inputData['id'])
             ->first();
         return response()->json(['status' => 200, 'data' => $result]);
@@ -105,6 +108,7 @@ class ExpenseController extends Controller
         $inputData = $request->all();
         $validator = Validator::make($inputData, [
             'id' => 'required',
+            'date' => 'required|date',
             'category_id' => 'required',
             'amount' => 'required',
             'payment_id' => 'required',
@@ -124,6 +128,7 @@ class ExpenseController extends Controller
             $file_path = $request->file('file')->getClientOriginalName();
             move_uploaded_file($file["tmp_name"], $destinationPath.'/'.$file_path);
         }
+        $expense->date = $inputData['date'];
         $expense->category_id = $inputData['category_id'];
         $expense->amount = $inputData['amount'];
         $expense->payment_id = $inputData['payment_id'];
