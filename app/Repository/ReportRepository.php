@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Common\AccountCategory;
+use App\Common\FuelMatixCategoryType;
 use App\Common\FuelMatixDateTimeFormat;
 use App\Helpers\Helpers;
 use App\Helpers\SessionUser;
@@ -28,8 +29,7 @@ class ReportRepository
         $result['pos_sale'] = self::getPosSale($filter['date']);
         $result['tank_refill'] = self::getTankRefill($filter['date']);
         $result['stock'] = self::getStock($filter['date']);
-        $result['expense']['salary'] = self::getSalaryExpense($filter['date']);
-        $result['expense']['cost_of_good_sold'] = self::getCostOfGoodSoldExpense($filter['date']);
+        $result['expense'] = self::getAllExpense($filter['date']);
         $result['due_payments'] = self::getDuePayments($filter['date']);
         $result['due_invoice'] = self::getDueInvoice($filter['date']);
         $result['asset_balance']['cash'] = self::getAssetBalance($filter['date'], AccountCategory::CASH_IM_HAND);
@@ -71,7 +71,7 @@ class ReportRepository
             ->where('transactions.client_company_id', $sessionUser['client_company_id'])
             ->leftJoin('categories', 'categories.id', 'transactions.linked_id')
             ->whereIn('transactions.linked_id', $category)
-            ->where('transactions.date', $date)
+            ->where('transactions.date', '<=',  $date)
             ->groupBy('transactions.linked_id')
             ->get()
             ->toArray();
@@ -145,20 +145,27 @@ class ReportRepository
         }
         return $transaction;
     }
+
     /**
      * @param string $date
-     * @return string
+     * @return array
      */
-    public static function getSalaryExpense(string $date): string
+    public static function getAllExpense(string $date): array
     {
         $sessionUser = SessionUser::getUser();
-        $salaryExpense = Category::select('id')->where('client_company_id', $sessionUser['client_company_id'])->where('slug', strtolower(AccountCategory::SALARY_EXPENSE))->first();
-        $transaction = Transaction::where('transactions.client_company_id', $sessionUser['client_company_id'])
+        $transaction = Transaction::select(DB::raw('SUM(debit_amount) as amount'), 'categories.name as category_name')
+            ->where('transactions.client_company_id', $sessionUser['client_company_id'])
             ->leftJoin('categories', 'categories.id', 'transactions.linked_id')
-            ->where('categories.parent_category', $salaryExpense->id)
+            ->where('categories.type', FuelMatixCategoryType::EXPENSE)
             ->where('date', $date)
-            ->sum('debit_amount');
-        return number_format($transaction, 2);
+            ->having('amount', '>', 0)
+            ->groupBy('linked_id')
+            ->get()
+            ->toArray();
+        foreach ($transaction as $data) {
+            $data['amount'] = number_format($data['amount'], 2);
+        }
+        return $transaction;
     }
     /**
      * @param string $date

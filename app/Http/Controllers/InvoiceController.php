@@ -132,7 +132,11 @@ class InvoiceController extends Controller
         }
         return response()->json(['status' => 200, 'data' => $result]);
     }
-    public function payment(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     * */
+    public function payment(Request $request): JsonResponse
     {
         $requestData = $request->all();
         $validator = Validator::make($requestData, [
@@ -152,7 +156,7 @@ class InvoiceController extends Controller
         if ($invoice->save()) {
             $transaction['linked_id'] = $requestData['payment_id'];
             $transaction['transaction'] = [
-                ['date' => date('Y-m-d'), 'account_id' => $invoice['category_id'], 'debit_amount' => $requestData['amount'], 'credit_amount' => 0, 'module' => Module::INVOICE, 'module_id' => $invoice->id]
+                ['date' => date('Y-m-d'), 'account_id' => $invoice['category_id'], 'debit_amount' => $requestData['amount'], 'credit_amount' => 0, 'module' => Module::PAYMENT, 'module_id' => $invoice->id]
             ];
             TransactionController::saveTransaction($transaction);
             return response()->json(['status' => 200, 'message' => 'Successfully saved payment.']);

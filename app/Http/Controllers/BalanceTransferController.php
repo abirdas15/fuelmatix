@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Common\FuelMatixDateTimeFormat;
 use App\Common\FuelMatixStatus;
 use App\Common\Module;
 use App\Helpers\Helpers;
@@ -24,14 +25,15 @@ class BalanceTransferController extends Controller
         $validator = Validator::make($requestData, [
             'from_category_id' => 'required',
             'to_category_id' => 'required',
-            'amount' => 'required'
+            'amount' => 'required',
+            'date' => 'required|date'
         ]);
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
         $sessionUser = SessionUser::getUser();
         $balanceTransfer = new BalanceTransfer();
-        $balanceTransfer->date = date('Y-m-d');
+        $balanceTransfer->date = $requestData['date'];
         $balanceTransfer->from_category_id = $requestData['from_category_id'];
         $balanceTransfer->to_category_id = $requestData['to_category_id'];
         $balanceTransfer->amount = $requestData['amount'];
@@ -58,7 +60,7 @@ class BalanceTransferController extends Controller
         $result = $result->orderBy('balance_transfer.id', 'DESC')
             ->paginate($limit);
         foreach ($result as &$data) {
-            $data['date'] = Helpers::formatDate($data['date'], 'd/m/Y h:i A');
+            $data['date'] = Helpers::formatDate($data['date'], FuelMatixDateTimeFormat::STANDARD_DATE);
         }
         return response()->json(['status' => 200, 'data' => $result]);
     }
@@ -89,7 +91,8 @@ class BalanceTransferController extends Controller
             'id' => 'required',
             'from_category_id' => 'required',
             'to_category_id' => 'required',
-            'amount' => 'required'
+            'amount' => 'required',
+            'date' => 'required|date'
         ]);
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
@@ -101,6 +104,7 @@ class BalanceTransferController extends Controller
         if ($balanceTransfer['status'] == FuelMatixStatus::APPROVE) {
             return response()->json(['status' => 500, 'message' => 'Cannot update balance transfer.']);
         }
+        $balanceTransfer->date = $requestData['date'];
         $balanceTransfer->from_category_id = $requestData['from_category_id'];
         $balanceTransfer->to_category_id = $requestData['to_category_id'];
         $balanceTransfer->amount = $requestData['amount'];

@@ -18,6 +18,10 @@
                         <div class="basic-form">
                             <form @submit.prevent="save">
                                 <div class="row">
+                                    <div class="col-6 mb-3 form-group">
+                                        <label class="form-label">Date:</label>
+                                        <input type="text" class="form-control date bg-white" name="date" v-model="param.date">
+                                    </div>
                                     <div class="mb-3 form-group col-md-6">
                                         <label class="form-label">From:</label>
                                         <select name="from_category_id" class="form-control form-select" v-model="param.from_category_id">
@@ -83,7 +87,18 @@ export default {
         getSingle: function () {
             ApiService.POST(ApiRoutes.balanceTransferSingle, {id: this.id},res => {
                 if (parseInt(res.status) === 200) {
-                    this.param = res.data
+                    this.param = res.data;
+                    setTimeout(() => {
+                        $('.date').flatpickr({
+                            altInput: true,
+                            altFormat: "d/m/Y",
+                            dateFormat: "Y-m-d",
+                            defaultDate: 'today',
+                            onChange: (date, dateStr) => {
+                                this.param.date = dateStr
+                            }
+                        })
+                    }, 1000)
                 }
             });
         },

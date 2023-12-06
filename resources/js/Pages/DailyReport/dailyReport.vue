@@ -159,12 +159,8 @@
                                     <div class="table-responsive">
                                         <table class="table table-responsive-md" >
                                             <tbody>
-                                            <tr>
-                                                <td>Salary</td>
-                                                <td class="text-end">{{ data['expense']['salary'] }}</td>
-                                            </tr>
-                                            <tr v-for="$row in data['expense']['cost_of_good_sold']">
-                                                <td>COGS ({{ $row['category_name'] }})</td>
+                                            <tr v-for="$row in data['expense']">
+                                                <td>{{ $row['category_name'] }}</td>
                                                 <td class="text-end">{{ $row['amount'] }}</td>
                                             </tr>
                                             </tbody>

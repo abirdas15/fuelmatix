@@ -67,6 +67,7 @@ class ProductController extends Controller
         $product->buying_price = $inputData['buying_price'] ?? 0;
         $product->driver_selling_price = $inputData['driver_selling_price'] ?? 0;
         $product->opening_stock = $inputData['opening_stock'] ?? null;
+        $product->current_stock = $inputData['opening_stock'] ?? null;
         $product->client_company_id = $inputData['session_user']['client_company_id'];
         if (!$product->save()) {
             return response()->json(['status' => 400, 'message' => 'Cannot save [product].']);
@@ -193,12 +194,16 @@ class ProductController extends Controller
         if (!$product instanceof Product) {
             return response()->json(['status' => 400, 'error' => 'Cannot find [product].']);
         }
+
+        $opening_stock = $product['opening_stock'] ?? 0;
+        $current_stock = $product->current_stock  + ($inputData['opening_stock'] - $opening_stock);
         $product->name = $inputData['name'];
         $product->selling_price = $inputData['selling_price'];
         $product->type_id = $inputData['type_id'];
         $product->buying_price = $inputData['buying_price'] ?? 0;
         $product->driver_selling_price = $inputData['driver_selling_price'] ?? 0;
         $product->opening_stock = $inputData['opening_stock'] ?? null;
+        $product->current_stock = $current_stock;
         if (!$product->save()) {
             return response()->json(['status' => 400, 'message' => 'Cannot updated [product].']);
         }

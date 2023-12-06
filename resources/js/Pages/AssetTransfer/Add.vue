@@ -18,6 +18,10 @@
                         <div class="basic-form">
                             <form @submit.prevent="save">
                                 <div class="row">
+                                    <div class="col-6 mb-3 form-group">
+                                        <label class="form-label">Date:</label>
+                                        <input type="text" class="form-control date bg-white" name="date" v-model="param.date">
+                                    </div>
                                     <div class="mb-3 form-group col-md-6">
                                         <label class="form-label">From:</label>
                                         <select name="from_category_id" class="form-control form-select" v-model="param.from_category_id">
@@ -70,6 +74,7 @@
 <script>
 import ApiService from "../../Services/ApiService";
 import ApiRoutes from "../../Services/ApiRoutes";
+import moment from "moment/moment";
 export default {
     data() {
         return {
@@ -78,6 +83,7 @@ export default {
                 to_category_id: '',
                 amount: '',
                 remarks: '',
+                date: moment().format('YYYY-MM-DD')
             },
             loading: false,
             categories: []
@@ -113,7 +119,18 @@ export default {
         this.getParentCategory()
     },
     mounted() {
-        $('#dashboard_bar').text('Transfer Add')
+        $('#dashboard_bar').text('Transfer Add');
+        setTimeout(() => {
+            $('.date').flatpickr({
+                altInput: true,
+                altFormat: "d/m/Y",
+                dateFormat: "Y-m-d",
+                defaultDate: 'today',
+                onChange: (date, dateStr) => {
+                    this.param.date = dateStr
+                }
+            })
+        }, 1000)
     }
 }
 </script>

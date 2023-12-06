@@ -136,13 +136,9 @@
             </tr>
         </thead>
         <tbody>
-            <tr>
-                <td>Salary</td>
-                <td class="text-end">{{ $data['expense']['salary'] }}</td>
-            </tr>
-            @foreach($data['expense']['cost_of_good_sold'] as $row)
+            @foreach($data['expense'] as $row)
                 <tr>
-                    <td>COGS ({{ $row['category_name'] }})</td>
+                    <td>{{ $row['category_name'] }}</td>
                     <td class="text-end">{{ $row['amount'] }}</td>
                 </tr>
             @endforeach
