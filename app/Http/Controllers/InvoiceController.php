@@ -156,7 +156,7 @@ class InvoiceController extends Controller
         if ($invoice->save()) {
             $transaction['linked_id'] = $requestData['payment_id'];
             $transaction['transaction'] = [
-                ['date' => date('Y-m-d'), 'account_id' => $invoice['category_id'], 'debit_amount' => $requestData['amount'], 'credit_amount' => 0, 'module' => Module::PAYMENT, 'module_id' => $invoice->id]
+                ['date' => date('Y-m-d'), 'account_id' => $invoice['category_id'], 'debit_amount' => $requestData['amount'], 'credit_amount' => 0, 'module' => Module::INVOICE_PAYMENT, 'module_id' => $invoice->id]
             ];
             TransactionController::saveTransaction($transaction);
             return response()->json(['status' => 200, 'message' => 'Successfully saved payment.']);
@@ -333,5 +333,37 @@ class InvoiceController extends Controller
             InvoiceRepository::advancePayment($advancePaymentData);
         }
         return response()->json(['status' => 200, 'message' => 'Successfully saved invoice payment.']);
+    }
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function invoicePayment(Request $request): JsonResponse
+    {
+        $requestData = $request->all();
+        $keyword = $requestData['keyword'] ?? '';
+        $limit = $requestData['limit'] ?? 10;
+        $sessionUser = SessionUser::getUser();
+        $result = Transaction::select('transactions.created_at', 'transactions.debit_amount as amount', 'invoices.invoice_number', 'c1.name as payment_method', 'c2.name as company_name')
+            ->leftJoin('invoices', 'invoices.id', 'transactions.module_id')
+            ->leftJoin('categories as c1', 'c1.id', '=', 'transactions.linked_id')
+            ->leftJoin('categories as c2', 'c2.id', '=', 'transactions.account_id')
+            ->where('transactions.client_company_id', $sessionUser['client_company_id'])
+            ->where('transactions.module', Module::INVOICE_PAYMENT)
+            ->where('debit_amount', '>', 0);
+        if (!empty($keyword)) {
+            $result->where(function($q) use ($keyword) {
+                $q->where('invoices.invoice_number', 'LIKE', '%'.$keyword.'%');
+                $q->orWhere('c1.name', 'LIKE', '%'.$keyword.'%');
+                $q->orWhere('c2.name', 'LIKE', '%'.$keyword.'%');
+            });
+        }
+        $result = $result->orderBy('transactions.id', 'DESC')
+            ->paginate($limit);
+        foreach ($result as &$data) {
+            $data['created_at'] = Helpers::formatDate($data['created_at'], FuelMatixDateTimeFormat::STANDARD_DATE_TIME);
+            $data['amount'] = number_format($data['amount'], 2);
+        }
+        return response()->json(['status' => 200, 'data' => $result]);
     }
 }

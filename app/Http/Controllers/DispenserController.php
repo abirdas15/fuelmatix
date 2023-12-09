@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Dispenser;
 use App\Models\DispenserReading;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -35,13 +36,18 @@ class DispenserController extends Controller
         }
         return response()->json(['status' => 500, 'error' => 'Cannot save dispenser.']);
     }
-    public function list(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function list(Request $request): JsonResponse
     {
         $inputData = $request->all();
-        $limit = isset($inputData['limit']) ? $inputData['limit'] : 10;
-        $keyword = isset($inputData['keyword']) ? $inputData['keyword'] : '';
-        $order_by = isset($inputData['order_by']) ? $inputData['order_by'] : 'dispensers.id';
-        $order_mode = isset($inputData['order_mode']) ? $inputData['order_mode'] : 'DESC';
+        $limit = $inputData['limit'] ?? 10;
+        $keyword = $inputData['keyword'] ?? '';
+        $order_by = $inputData['order_by'] ?? 'dispensers.id';
+        $order_mode = $inputData['order_mode'] ?? 'DESC';
+        $product_id = $inputData['product_id'] ?? '';
         $result = Dispenser::select('dispensers.*', 'products.name as product_name', 'tank.tank_name')
             ->leftJoin('products', 'products.id', '=', 'dispensers.product_id')
             ->leftJoin('tank', 'tank.id', '=', 'dispensers.tank_id')
@@ -51,6 +57,11 @@ class DispenserController extends Controller
                 $q->where('dispensers.dispenser_name', 'LIKE', '%'.$keyword.'%');
                 $q->orWhere('dispensers.brand', 'LIKE', '%'.$keyword.'%');
                 $q->orWhere('dispensers.serial', 'LIKE', '%'.$keyword.'%');
+            });
+        }
+        if (!empty($product_id)) {
+            $result->where(function($q) use ($product_id) {
+                $q->where('dispensers.product_id', $product_id);
             });
         }
         $result = $result->orderBy($order_by, $order_mode)

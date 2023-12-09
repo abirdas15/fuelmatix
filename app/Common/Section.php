@@ -46,6 +46,9 @@ class Section
     const UNAUTHORIZED_BILL = 'Unauthorized-Bill';
     const SALES_REPORT = 'Sales-Report';
     const COMPANY_BILL = 'Company-Bill';
+    const INVOICE_PAYMENT = 'Invoice-Payment';
+    const PURCHASE = 'Purchase';
+    const CAR = 'Car';
 
     /**
      * @return array
@@ -95,6 +98,9 @@ class Section
             'UNAUTHORIZED_BILL' => self::UNAUTHORIZED_BILL,
             'SALES_REPORT' => self::SALES_REPORT,
             'COMPANY_BILL' => self::COMPANY_BILL,
+            'INVOICE_PAYMENT' => self::INVOICE_PAYMENT,
+            'PURCHASE' => self::PURCHASE,
+            'CAR' => self::CAR,
         ];
     }
 }

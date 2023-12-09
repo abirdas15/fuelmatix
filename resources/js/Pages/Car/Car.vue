@@ -5,7 +5,7 @@
                 <ol class="breadcrumb align-items-center ">
                     <li class="breadcrumb-item active"><router-link :to="{name: 'Dashboard'}">Home</router-link></li>
                     <li class="breadcrumb-item"><a href="javascript:void(0)">Car</a></li>
-                    <li v-if="CheckPermission(Section.DRIVER + '-' + Action.CREATE)"  style="margin-left: auto;"><a href="javascript:void(0)" @click="openCarModal"><i class="fa-solid fa-plus"></i> Add Car</a></li>
+                    <li v-if="CheckPermission(Section.CAR + '-' + Action.CREATE)"  style="margin-left: auto;"><a href="javascript:void(0)" @click="openCarModal"><i class="fa-solid fa-plus"></i> Add Car</a></li>
                 </ol>
             </div>
             <div class="row">
@@ -47,10 +47,10 @@
                                                 <td >{{f.car_number}}</td>
                                                 <td >{{f.company_name}}</td>
                                                 <td>
-                                                    <a href="javascript:void(0)" @click="openCarEditModal(f.id)" class=" btn btn-primary shadow btn-xs sharp me-1">
+                                                    <a v-if="CheckPermission(Section.CAR + '-' + Action.EDIT)"  href="javascript:void(0)" @click="openCarEditModal(f.id)" class=" btn btn-primary shadow btn-xs sharp me-1">
                                                         <i class="fas fa-pencil-alt"></i>
                                                     </a>
-                                                    <a href="javascript:void(0)"  @click="openModalDelete(f.id)" class="btn btn-danger shadow btn-xs sharp">
+                                                    <a v-if="CheckPermission(Section.CAR + '-' + Action.EDIT)"  href="javascript:void(0)"  @click="openModalDelete(f.id)" class="btn btn-danger shadow btn-xs sharp">
                                                         <i class="fa fa-trash"></i>
                                                     </a>
                                                 </td>

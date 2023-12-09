@@ -28,6 +28,6 @@ class Module
 
     const PURCHASE = 'purchase';
     const PURCHASE_PAYMENT = 'purchase payment';
-    const PAYMENT = 'payment';
+    const INVOICE_PAYMENT = 'invoice payment';
 
 }

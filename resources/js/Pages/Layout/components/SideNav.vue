@@ -49,8 +49,9 @@
                         <li v-if="CheckPermission(Section.TRANSFER + '-' + Action.VIEW)"><router-link :to="{name:'balanceTransfer'}">Transfer</router-link></li>
                         <li v-if="CheckPermission(Section.EXPENSE + '-' + Action.VIEW)"><router-link :to="{name:'Expense'}">Expense</router-link></li>
                         <li v-if="CheckPermission(Section.BILL + '-' + Action.VIEW)"><router-link :to="{name: 'Invoices'}">Invoices </router-link></li>
+                        <li v-if="CheckPermission(Section.INVOICE_PAYMENT + '-' + Action.VIEW)"><router-link :to="{name: 'InvoicePayment'}">Invoice Payment </router-link></li>
                         <li v-if="CheckPermission(Section.COMPANY_BILL + '-' + Action.VIEW)"><router-link :to="{name: 'CompanyBills'}">Company Bills </router-link></li>
-                        <li  ><router-link :to="{name: 'purchase'}">Purchase</router-link></li>
+                        <li  v-if="CheckPermission(Section.PURCHASE + '-' + Action.VIEW)"><router-link :to="{name: 'purchase'}">Purchase</router-link></li>
                     </ul>
 
                 </li>
@@ -82,8 +83,8 @@
                         <li v-if="CheckPermission(Section.SYSTEM_SETTING + '-' + Action.VIEW)"><router-link :to="{name: 'system'}">System setting</router-link></li>
                         <li v-if="CheckPermission(Section.VOUCHER + '-' + Action.VIEW)"><router-link :to="{name: 'voucher'}">Voucher</router-link></li>
                         <li v-if="CheckPermission(Section.DRIVER + '-' + Action.VIEW)"><router-link :to="{name: 'driver'}">Driver</router-link></li>
-                        <li  v-if="CheckPermission(Section.FUEL_ADJUSTMENT + '-' + Action.VIEW)"><router-link :to="{name: 'adjustment'}">Fuel Adjustment</router-link></li>
-                        <li  ><router-link :to="{name: 'car'}">Car</router-link></li>
+                        <li v-if="CheckPermission(Section.FUEL_ADJUSTMENT + '-' + Action.VIEW)"><router-link :to="{name: 'adjustment'}">Fuel Adjustment</router-link></li>
+                        <li v-if="CheckPermission(Section.CAR + '-' + Action.VIEW)"><router-link :to="{name: 'car'}">Car</router-link></li>
                     </ul>
                 </li>
                 <li>

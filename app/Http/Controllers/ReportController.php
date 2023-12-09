@@ -74,6 +74,8 @@ class ReportController extends Controller
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
         $productId = $requestData['product_id'] ?? '';
+        $dispenserId = $requestData['dispenser_id'] ?? '';
+        $nozzleId = $requestData['nozzle_id'] ?? '';
         $sessionUser = SessionUser::getUser();
         $result = ShiftSale::select('shift_sale.date', DB::raw('SUM(shift_summary.consumption) as quantity'), 'shift_sale.product_id', 'products.name as product_name', 'shift_summary.nozzle_id', 'nozzles.name as nozzle_name', 'shift_summary.dispenser_id', 'dispensers.dispenser_name')
             ->leftJoin('shift_summary', 'shift_summary.shift_sale_id', '=', 'shift_sale.id')
@@ -88,15 +90,24 @@ class ReportController extends Controller
                 $q->where('shift_sale.product_id', $productId);
             });
         }
-        $result = $result->groupBy('nozzle_id')
+        if (!empty($dispenserId)) {
+            $result->where(function($q) use ($dispenserId){
+                $q->where('shift_summary.dispenser_id', $dispenserId);
+            });
+        }
+        if (!empty($nozzleId)) {
+            $result->where(function($q) use ($nozzleId){
+                $q->where('shift_summary.nozzle_id', $nozzleId);
+            });
+        }
+        $result = $result->orderBY('date', 'ASC')
             ->groupBy('date')
+            ->groupBy('shift_sale.product_id')
             ->get()
             ->toArray();
-        $resultArray = [];
         foreach ($result as &$data) {
             $data['date'] = Helpers::formatDate($data['date'], FuelMatixDateTimeFormat::STANDARD_DATE);
-            $resultArray[$data['product_name']][$data['dispenser_name']][$data['nozzle_name']][] = $data;
         }
-        return response()->json(['status' => 200, 'data' => $resultArray]);
+        return response()->json(['status' => 200, 'data' => $result]);
     }
 }

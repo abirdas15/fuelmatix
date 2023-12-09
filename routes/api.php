@@ -246,6 +246,7 @@ Route::group(['middleware' => 'AuthReqCheck'], function() {
         Route::post('delete', [InvoiceController::class, 'delete']);
         Route::post('single', [InvoiceController::class, 'single']);
         Route::post('download/pdf', [InvoiceController::class, 'downloadPdf']);
+        Route::post('payment/list', [InvoiceController::class, 'invoicePayment']);
     });
     Route::group(['prefix' => 'dashboard'], function() {
         Route::post('get', [DashboardController::class, 'get']);

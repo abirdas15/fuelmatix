@@ -41,6 +41,8 @@ const Section= {
     UNAUTHORIZED_BILL: 'Unauthorized-Bill',
     SALES_REPORT: 'Sales-Report',
     COMPANY_BILL: 'Company-Bill',
+    INVOICE_PAYMENT: 'Invoice-Payment',
+    PURCHASE: 'Purchase',
     CAR: 'Car',
 }
 export default Section;

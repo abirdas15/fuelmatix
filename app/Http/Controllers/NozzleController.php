@@ -51,6 +51,7 @@ class NozzleController extends Controller
         $order_by = $inputData['order_by'] ?? 'id';
         $order_mode = $inputData['order_mode'] ?? 'DESC';
         $product_id = $request['product_id'] ?? '';
+        $dispenser_id = $request['dispenser_id'] ?? '';
         $result = Nozzle::select('nozzles.id', 'nozzles.name', 'dispensers.dispenser_name')
             ->leftJoin('dispensers', 'dispensers.id', '=', 'nozzles.dispenser_id')
             ->where('nozzles.client_company_id', $inputData['session_user']['client_company_id']);
@@ -63,6 +64,11 @@ class NozzleController extends Controller
         if (!empty($product_id)) {
             $result->where(function($q) use ($product_id) {
                 $q->where('dispensers.product_id', $product_id);
+            });
+        }
+        if (!empty($dispenser_id)) {
+            $result->where(function($q) use ($dispenser_id) {
+                $q->where('nozzles.dispenser_id', $dispenser_id);
             });
         }
         $result = $result->orderBy($order_by, $order_mode)

@@ -102,6 +102,7 @@ import car from "../Pages/Car/Car.vue";
 import purchase from "../Pages/PurchaseBill/List.vue";
 import purchaseAdd from "../Pages/PurchaseBill/Add.vue";
 import purchaseEdit from "../Pages/PurchaseBill/Edit.vue";
+import InvoicePayment from "../Pages/InvoicePayment/InvoicePayment.vue"
 
 const ROOT_URL = "";
 const router = new VueRouter({
@@ -544,16 +545,29 @@ const router = new VueRouter({
                     },
                 },
                 {
-                    path: ROOT_URL + "/cars", name: "car", component: car,
+                    path: ROOT_URL + "/invoice/payment/list", name: "InvoicePayment", component: InvoicePayment,  beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.INVOICE_PAYMENT + '-' + Action.VIEW)
+                    },
                 },
                 {
-                    path: ROOT_URL + "/purchase", name: "purchase", component: purchase,
+                    path: ROOT_URL + "/cars", name: "car", component: car, beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.CAR + '-' + Action.VIEW)
+                    }
                 },
                 {
-                    path: ROOT_URL + "/purchase/add", name: "purchaseAdd", component: purchaseAdd,
+                    path: ROOT_URL + "/purchase", name: "purchase", component: purchase,  beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.PURCHASE + '-' + Action.VIEW)
+                    }
                 },
                 {
-                    path: ROOT_URL + "/purchase/edit", name: "purchaseEdit", component: purchaseEdit,
+                    path: ROOT_URL + "/purchase/add", name: "purchaseAdd", component: purchaseAdd, beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.PURCHASE + '-' + Action.CREATE)
+                    }
+                },
+                {
+                    path: ROOT_URL + "/purchase/edit", name: "purchaseEdit", component: purchaseEdit, beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.PURCHASE + '-' + Action.EDIT)
+                    }
                 }
             ],
         },

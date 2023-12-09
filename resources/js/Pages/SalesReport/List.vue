@@ -2,89 +2,84 @@
     <div class="content-body">
         <div class="container-fluid">
             <div class="row page-titles">
-                <ol class="breadcrumb align-items-center ">
-                    <li class="breadcrumb-item active"><router-link :to="{name: 'Dashboard'}">Home</router-link></li>
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item active"><a href="javascript:void(0)">Home</a></li>
                     <li class="breadcrumb-item"><a href="javascript:void(0)">Sales Report</a></li>
                 </ol>
             </div>
+            <!-- row -->
             <div class="row">
-                <div class="col-12">
-                    <div class="card">
+                <div class="col-xl-12">
+                    <div class="card ">
                         <div class="card-header bg-secondary">
-                            <h4 class="card-title">Fuel Adjustment List</h4>
+                            <h4 class="card-title">Sales Report</h4>
                         </div>
                         <div class="card-body">
                             <div class="row align-items-end">
-                                <div class="col-xl-3 mb-3">
-                                    <div class="example">
-                                        <p class="mb-1">Select Date Range </p>
-                                        <input type="text" class="date form-control bg-white">
-                                    </div>
-                                </div>
-                                <div class="col-xl-3 mb-3">
-                                    <div class="example">
-                                        <p class="mb-1">Select Product </p>
-                                        <select class="me-sm-2 form-control wide" id="inlineFormCustomSelect" v-model="Param.type_id">
-                                            <option value="">Select Type</option>
-                                            <option v-for="t of products" :value="t.id">{{t.name}}</option>
-                                        </select>
-                                    </div>
-                                </div>
 
-                                <div class="col-xl-3 mb-3">
-                                    <button type="button" class="btn btn-rounded btn-white border" @click="getSalesReport"><span
-                                        class="btn-icon-start text-info"><i class="fa fa-filter color-white"></i>
+                                <div class="row align-items-end">
+                                    <div class="col-xl-3 mb-3">
+                                        <div class="example">
+                                            <p class="mb-1">Select Date Range </p>
+                                            <input type="text" class="date form-control bg-white">
+                                        </div>
+                                    </div>
+                                    <div class="col-xl-3 mb-3">
+                                        <div class="example">
+                                            <p class="mb-1">Select Product </p>
+                                            <select class="me-sm-2 form-control wide" id="inlineFormCustomSelect" v-model="Param.product_id">
+                                                <option value="">Select Product</option>
+                                                <option v-for="t of products" :value="t.id">{{t.name}}</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-xl-2 mb-3">
+                                        <div class="example">
+                                            <p class="mb-1">Select Dispenser </p>
+                                            <select class="me-sm-2 form-control wide" id="inlineFormCustomSelect" v-model="Param.dispenser_id">
+                                                <option value="">Select Dispenser</option>
+                                                <option v-for="t of dispensers" :value="t.id">{{t.dispenser_name}}</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-xl-2 mb-3">
+                                        <div class="example">
+                                            <p class="mb-1">Select Nozzle </p>
+                                            <select class="me-sm-2 form-control wide" id="inlineFormCustomSelect" v-model="Param.nozzle_id">
+                                                <option value="">Select Type</option>
+                                                <option v-for="t of nozzles" :value="t.id">{{t.name}}</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xl-2 mb-3">
+                                        <button type="button" class="btn btn-rounded btn-white border" @click="getSalesReport"><span
+                                            class="btn-icon-start text-info"><i class="fa fa-filter color-white"></i>
 											</span>Filter</button>
 
+                                    </div>
                                 </div>
                             </div>
-                            <div class="row mt-4">
+                            <div class=" mt-4">
                                 <div class="table-responsive">
-                                    <div class="dataTables_wrapper no-footer">
-                                        <div class="dataTables_length">
-                                            <label class="d-flex align-items-center">Show
-                                                <select class="mx-2"  v-model="Param.limit" @change="getSalesReport">
-                                                    <option value="10">10</option>
-                                                    <option value="25">25</option>
-                                                    <option value="50">50</option>
-                                                    <option value="100">100</option>
-                                                </select>
-                                                entries
-                                            </label>
-                                        </div>
-                                        <div id="example3_filter" class="dataTables_filter">
-                                            <label>Search:
-                                                <input v-model="Param.keyword" type="search" class="" placeholder="">
-                                            </label>
-                                        </div>
-                                        <table class="display  dataTable no-footer" style="min-width: 845px">
-                                            <thead>
-                                            <tr class="text-white" style="background-color: #4886EE;color:#ffffff">
-                                                <th class="text-white" @click="sortData('name')" :class="sortClass('name')">Date</th>
-                                                <th class="text-white" @click="sortData('product_name')" :class="sortClass('product_name')">Product Name</th>
-                                                <th class="text-white" @click="sortData('quantity')" :class="sortClass('quantity')">Quantity</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody v-if="listData.length > 0 && TableLoading == false">
-                                            <tr v-for="f in listData">
-                                                <td >{{f.date}}</td>
-                                                <td >{{f.product_name}}</td>
-                                                <td >{{f.quantity}}</td>
-                                            </tr>
-                                            </tbody>
-                                            <tbody v-if="listData.length == 0 && TableLoading == false">
-                                            <tr>
-                                                <td colspan="10" class="text-center">No data found</td>
-                                            </tr>
-                                            </tbody>
-                                            <tbody v-if="TableLoading == true">
-                                            <tr>
-                                                <td colspan="10" class="text-center">Loading....</td>
-                                            </tr>
-                                            </tbody>
-                                        </table>
+                                    <table id="example3" class="display" style="min-width: 845px">
+                                        <thead>
+                                        <tr class="text-white" style="background-color: #20c997;color:#ffffff">
 
-                                    </div>
+                                            <th class="text-white">Date </th>
+                                            <th class="text-white">Product</th>
+                                            <th class="text-white">Quantity</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr v-for="each in listData">
+                                            <td v-text="each.date"></td>
+
+                                            <td v-text="each.product_name">Octane</td>
+                                            <td v-text="each.quantity"></td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                         </div>
@@ -117,17 +112,27 @@ export default {
                 page: 1,
                 start_date: '',
                 end_date: '',
-                product_id: ''
+                product_id: '',
+                dispenser_id: '',
+                nozzle_id: '',
             },
             Loading: false,
             TableLoading: false,
             listData: [],
             products: [],
+            dispensers: [],
+            nozzles: []
         };
     },
     watch: {
         'Param.keyword': function () {
             this.list()
+        },
+        'Param.product_id': function () {
+            this.fetchDispenser();
+        },
+        'Param.dispenser_id': function () {
+            this.fetchNozzle();
         },
     },
     created() {
@@ -145,6 +150,20 @@ export default {
         },
     },
     methods: {
+        fetchNozzle: function() {
+            ApiService.POST(ApiRoutes.NozzleList, {dispenser_id: this.Param.dispenser_id}, res => {
+                if (parseInt(res.status) === 200) {
+                    this.nozzles = res.data.data
+                }
+            })
+        },
+        fetchDispenser: function() {
+            ApiService.POST(ApiRoutes.DispenserList, {product_id: this.Param.product_id}, res => {
+                if (parseInt(res.status) === 200) {
+                    this.dispensers = res.data.data
+                }
+            })
+        },
         getProduct: function () {
             ApiService.POST(ApiRoutes.ProductList, this.listParam, res => {
                 if (parseInt(res.status) === 200) {
@@ -197,7 +216,7 @@ export default {
                 }
             })
         }, 1000)
-        $('#dashboard_bar').text('Bank List')
+        $('#dashboard_bar').text('Sales Report')
     }
 }
 </script>
