@@ -222,14 +222,16 @@ class TankController extends Controller
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
-        $data = [
+        $bstiChart = BstiChart::where('tank_id', $inputData['tank_id'])
+            ->where('height', '=', floor($inputData['height']))
+            ->first();
+        $tankReading = TankRepository::readingSave([
             'tank_id' => $inputData['tank_id'],
             'date' => $inputData['date'],
             'height' => $inputData['height'],
-            'water_height' => $inputData['water_height'],
+            'volume' => $bstiChart['volume'] ?? 0,
             'type' => $inputData['type'],
-        ];
-        $tankReading = TankRepository::readingSave($data);
+        ]);
         if (!$tankReading instanceof TankLog) {
             return response()->json($tankReading);
         }
@@ -476,13 +478,16 @@ class TankController extends Controller
         if (!$tankRefill->save()) {
             return response()->json(['status' => 400, 'message' => 'Cannot saved tank refill.']);
         }
-        $tankLogData = [
+        $bstiChart = BstiChart::where('tank_id', $tank['id'])
+            ->where('height', '=', floor($inputData['end_reading']))
+            ->first();
+        TankRepository::readingSave([
             'tank_id' => $inputData['tank_id'],
             'date' => date('Y-m-d'),
             'height' =>  $inputData['end_reading'] ?? 0,
+            'volume' =>  $bstiChart['volume'] ?? 0,
             'type' => 'tank refill',
-        ];
-        TankRepository::readingSave($tankLogData);
+        ]);
         $totalRefillAmount = $inputData['total_refill_volume'] * $payOrder['unit_price'];
         $transactionData['linked_id'] = $stockCategory['id'];
         $lossAmount = $payOrder['total'] - $totalRefillAmount;

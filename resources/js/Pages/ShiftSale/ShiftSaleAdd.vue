@@ -399,11 +399,13 @@ export default {
             this.listDispenser.dispensers.map((dispenser) => {
                 dispenser.nozzle.map((nozzle) => {
                     this.totalSale += nozzle.consumption
-                    this.totalAmount += nozzle.amount
+                    if (nozzle.end_reading > 0) {
+                        this.totalAmount += nozzle.amount
+                    }
                 })
             })
             this.totalSale < 0 ? this.totalSale = 0 : this.totalSale;
-            this.totalAmount < 0 ? this.totalAmount = 0 : this.totalAmount;
+            this.totalSale < 0 ? this.totalAmount = 0 : this.totalAmount;
         },
         disableInput: function (id) {
             $('#'+id).prop('readonly', true);
@@ -443,9 +445,15 @@ export default {
             ApiService.POST(ApiRoutes.ShiftSaleGetCategory, {}, res => {
                 if (parseInt(res.status) === 200) {
                     this.allAmountCategory = res.data;
+                    let category_id = '';
+                    res.data.map((v) => {
+                        if (v.selected == true) {
+                            category_id = v.id;
+                        }
+                    });
                     this.categories.push({
                         amount: '',
-                        category_id: this.allAmountCategory[0].id
+                        category_id: category_id
                     });
                 }
             });

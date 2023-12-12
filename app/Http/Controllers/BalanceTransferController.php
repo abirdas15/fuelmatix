@@ -8,9 +8,12 @@ use App\Common\Module;
 use App\Helpers\Helpers;
 use App\Helpers\SessionUser;
 use App\Models\BalanceTransfer;
+use App\Models\Category;
+use App\Models\Transaction;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class BalanceTransferController extends Controller
@@ -32,6 +35,21 @@ class BalanceTransferController extends Controller
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
         $sessionUser = SessionUser::getUser();
+
+        $category = Category::find($requestData['from_category_id']);
+        if (!$category instanceof Category) {
+            return response()->json(['status' => 400, 'message' => "Cannot find asset."]);
+        }
+
+        $transaction = Transaction::select(DB::raw('SUM(debit_amount) as debit_amount'), DB::raw('SUM(credit_amount) as credit_amount'))
+            ->where('linked_id', $requestData['from_category_id'])
+            ->where('client_company_id', $sessionUser['client_company_id'])
+            ->first();
+        $assetAmount = $transaction['debit_amount'] ?? 0 - $transaction['credit_amount'] ?? 0;
+        if ($assetAmount < $request['amount']) {
+            return response()->json(['status' => 300, 'message' => 'Not enough balance in '.$category['name'].'.']);
+        }
+
         $balanceTransfer = new BalanceTransfer();
         $balanceTransfer->date = $requestData['date'];
         $balanceTransfer->from_category_id = $requestData['from_category_id'];

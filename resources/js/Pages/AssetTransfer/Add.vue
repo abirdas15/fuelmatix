@@ -33,7 +33,7 @@
                                     </div>
                                     <div class="mb-3 form-group col-md-6">
                                         <label class="form-label">To:</label>
-                                        <select name="from_category_id" class="form-control form-select" v-model="param.to_category_id">
+                                        <select name="to_category_id" class="form-control form-select" v-model="param.to_category_id">
                                             <template v-for="c in categories">
                                                 <option v-if="c.id != param.from_category_id" :value="c.id">{{c.name}}</option>
                                             </template>
@@ -75,6 +75,7 @@
 import ApiService from "../../Services/ApiService";
 import ApiRoutes from "../../Services/ApiRoutes";
 import moment from "moment/moment";
+import Swal from 'sweetalert2/dist/sweetalert2.js'
 export default {
     data() {
         return {
@@ -99,6 +100,12 @@ export default {
                     this.$router.push({
                         name: 'balanceTransfer'
                     })
+                } else if (parseInt(res.status) === 300) {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Oops...",
+                        text: res.message
+                    });
                 } else {
                     ApiService.ErrorHandler(res.errors);
                 }

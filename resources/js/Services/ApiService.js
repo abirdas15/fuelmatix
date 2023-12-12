@@ -18,7 +18,7 @@ const ApiService = {
             }
         }).catch(err => {
             const error_code = parseInt(err.toLocaleString().replace(/\D/g, ""));
-            if (error_code != 200 && error_code != 500) {
+            if (error_code != 200 && error_code != 500 && error_code != 300) {
                 store.dispatch('Logout');
             }
         })
@@ -30,7 +30,7 @@ const ApiService = {
             }
         }).catch(err => {
             const error_code = parseInt(err.toLocaleString().replace(/\D/g, ""));
-            if (error_code != 200 && error_code != 500) {
+            if (error_code != 200 && error_code != 500 && error_code != 300) {
                 store.dispatch('Logout');
             }
         })
@@ -47,7 +47,7 @@ const ApiService = {
             }
         }).catch(err => {
             const error_code = parseInt(err.toLocaleString().replace(/\D/g, ""));
-            if (error_code != 200 && error_code != 500) {
+            if (error_code != 200 && error_code != 500 && error_code != 300) {
                 store.dispatch('Logout');
             }
         })
@@ -63,7 +63,7 @@ const ApiService = {
             }
         }).catch(err => {
             const error_code = parseInt(err.toLocaleString().replace(/\D/g, ""));
-            if (error_code != 200 && error_code != 500) {
+            if (error_code != 200 && error_code != 500 && error_code != 300) {
                 store.dispatch('Logout');
             }
         })

@@ -144,7 +144,7 @@ class ShiftSaleController extends Controller
                 $shiftSaleSummary->dispenser_id = $dispenser['id'];
                 $shiftSaleSummary->nozzle_id = $nozzle['id'];
                 $shiftSaleSummary->start_reading = $nozzle['start_reading'];
-                $shiftSaleSummary->end_reading = $nozzle['end_reading'];
+                $shiftSaleSummary->end_reading = $nozzle['end_reading'] != 0 ? $nozzle['end_reading'] : $nozzle['start_reading'];
                 $shiftSaleSummary->adjustment = $nozzle['adjustment'];
                 $shiftSaleSummary->consumption = $nozzle['consumption'];
                 $shiftSaleSummary->amount = $nozzle['amount'];
@@ -341,6 +341,12 @@ class ShiftSaleController extends Controller
             ->orderBy('parent_category', 'ASC')
             ->get()
             ->toArray();
+        foreach ($result as &$data) {
+            $data['selected'] = false;
+            if ($data['name'] == AccountCategory::CASH) {
+                $data['selected'] = true;
+            }
+        }
         return response()->json(['status' => 200, 'data' => $result]);
     }
 }

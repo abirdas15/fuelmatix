@@ -9,6 +9,7 @@ use App\Models\Category;
 use App\Models\PayOrder;
 use App\Models\PayOrderData;
 use App\Models\Tank;
+use App\Models\Transaction;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -52,8 +53,17 @@ class PayOrderController extends Controller
         if (!$bankCategory instanceof Category) {
             return response()->json(['status' => 400, 'message' => 'Cannot find [bank] category']);
         }
-        $amount = array_sum(array_column($inputData['products'], 'total'));
         $sessionUser = SessionUser::getUser();
+        $amount = array_sum(array_column($inputData['products'], 'total'));
+        $transaction = Transaction::select(DB::raw('SUM(debit_amount) as debit_amount'), DB::raw('SUM(credit_amount) as credit_amount'))
+            ->where('linked_id', $request['bank_id'])
+            ->where('client_company_id', $sessionUser['client_company_id'])
+            ->first();
+        $bankAmount = $transaction['debit_amount'] ?? 0 - $transaction['credit_amount'] ?? 0;
+        if ($bankAmount < $amount) {
+            return response()->json(['status' => 500, 'errors' => ['bank_id' => ['Not enough balance in your bank.']]]);
+        }
+
         $payOrder = new PayOrder();
         $payOrder->bank_id = $inputData['bank_id'];
         $payOrder->vendor_id = $inputData['vendor_id'];
@@ -120,7 +130,8 @@ class PayOrderController extends Controller
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
         $result = PayOrder::find($inputData['id']);
-        $result['products'] = PayOrderData::select('id', 'product_id', 'unit_price', 'quantity', 'total')
+        $result['products'] = PayOrderData::select('pay_order_data.id', 'pay_order_data.product_id', 'pay_order_data.unit_price', 'pay_order_data.quantity', 'pay_order_data.total', 'products.name as product_name')
+            ->leftJoin('products', 'products.id', '=', 'pay_order_data.product_id')
             ->where('pay_order_id', $inputData['id'])
             ->get()
             ->toArray();

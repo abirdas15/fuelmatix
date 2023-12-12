@@ -70,9 +70,9 @@
                                                 <td><a href="javascript:void(0);">{{f?.user_name}}</a></td>
                                                 <td>
                                                     <div class="d-flex justify-content-end">
-                                                        <router-link v-if="CheckPermission(Section.POS + '-' + Action.EDIT)" :to="{name: 'PosEdit', params: { id: f.id }}" class=" btn btn-primary shadow btn-xs sharp me-1">
-                                                            <i class="fas fa-pencil-alt"></i>
-                                                        </router-link>
+<!--                                                        <router-link v-if="CheckPermission(Section.POS + '-' + Action.EDIT)" :to="{name: 'PosEdit', params: { id: f.id }}" class=" btn btn-primary shadow btn-xs sharp me-1">-->
+<!--                                                            <i class="fas fa-pencil-alt"></i>-->
+<!--                                                        </router-link>-->
                                                         <a  v-if="CheckPermission(Section.POS + '-' + Action.DELETE)" href="javascript:void(0)"  @click="openModalDelete(f)" class="btn btn-danger shadow btn-xs sharp">
                                                             <i class="fa fa-trash"></i>
                                                         </a>

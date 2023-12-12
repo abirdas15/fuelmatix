@@ -310,15 +310,17 @@ export default {
         getDispenserSingle: function () {
             this.param.total_refill_volume = 0
             ApiService.POST(ApiRoutes.TankGetNozzle, {tank_id: this.param.tank_id},res => {
-                this.param.dispensers = res;
-                this.param.dispensers.forEach(v => {
-                    v.nozzle.forEach(nozzle => {
-                        nozzle.sale = nozzle.end_reading - nozzle.start_reading
-                        this.param.total_refill_volume += nozzle.sale;
+                if (parseInt(res.status) === 200) {
+                    this.param.dispensers = res;
+                    this.param.dispensers.forEach(v => {
+                        v.nozzle.forEach(nozzle => {
+                            nozzle.sale = nozzle.end_reading - nozzle.start_reading
+                            this.param.total_refill_volume += nozzle.sale;
+                        })
                     })
-                })
-                this.param.total_refill_volume += this.param.dip_sale
-                this.param.net_profit = this.param.total_refill_volume - this.param.quantity
+                    this.param.total_refill_volume += this.param.dip_sale
+                    this.param.net_profit = this.param.total_refill_volume - this.param.quantity
+                }
             });
         },
         getPayOrder: function () {

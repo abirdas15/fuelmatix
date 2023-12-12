@@ -49,16 +49,13 @@
                                                 <td >{{f.number}}</td>
                                                 <td >{{f.bank_name}}</td>
                                                 <td >{{f.vendor_name}}</td>
-                                                <td >{{f.amount}}</td>
+                                                <td >{{f.amount.toLocaleString()}}</td>
                                                 <td>
-<!--                                                    <div class="d-flex">-->
-<!--                                                        <router-link v-if="CheckPermission(Section.PAY_ORDER + '-' + Action.EDIT)" :to="{name: 'PayOrderEdit', params: { id: f.id }}" class=" btn btn-primary shadow btn-xs sharp me-1">-->
-<!--                                                            <i class="fas fa-pencil-alt"></i>-->
-<!--                                                        </router-link>-->
-<!--                                                        <a v-if="CheckPermission(Section.PAY_ORDER + '-' + Action.DELETE)"  href="javascript:void(0)"  @click="openModalDelete(f)" class="btn btn-danger shadow btn-xs sharp">-->
-<!--                                                            <i class="fa fa-trash"></i>-->
-<!--                                                        </a>-->
-<!--                                                    </div>-->
+                                                    <div class="d-flex">
+                                                        <a v-if="CheckPermission(Section.PAY_ORDER + '-' + Action.VIEW)"  href="javascript:void(0)"  @click="openPayOrderDetailsModal(f.id)" class="btn btn-primary shadow btn-xs sharp">
+                                                            <i class="fa fa-eye"></i>
+                                                        </a>
+                                                    </div>
                                                 </td>
                                             </tr>
                                             </tbody>
@@ -86,6 +83,31 @@
                         </div>
                     </div>
                 </div>
+            </div>
+            <div class="popup-wrapper-modal payOrderModal d-none">
+                <form  class="popup-box" style="max-width: 800px">
+                    <button type="button" class=" btn  closeBtn"><i class="fas fa-times"></i></button>
+                    <div class="row align-items-center">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Product Name</th>
+                                    <th>Quantity</th>
+                                    <th>Unit Price</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="each in products">
+                                    <td v-text="each.product_name"></td>
+                                    <td v-text="each.quantity"></td>
+                                    <td v-text="each.unit_price.toLocaleString()"></td>
+                                    <td v-text="each.total.toLocaleString()"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -115,6 +137,7 @@ export default {
             Loading: false,
             TableLoading: false,
             listData: [],
+            products: []
         };
     },
     watch: {
@@ -137,6 +160,14 @@ export default {
         },
     },
     methods: {
+        openPayOrderDetailsModal: function(id) {
+            $('.payOrderModal').removeClass('d-none');
+            ApiService.POST(ApiRoutes.PayOrderSingle, {id: id}, (res) => {
+                if (parseInt(res.status) === 200) {
+                    this.products = res.data?.products;
+                }
+            });
+        },
         openModalDelete(data) {
             Swal.fire({
                 title: 'Are you sure you want to delete?',

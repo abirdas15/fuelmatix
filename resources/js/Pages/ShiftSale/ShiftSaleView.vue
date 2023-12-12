@@ -184,7 +184,7 @@
 
                                 </div>
                                 <div class="mb-3 col-md-6">
-                                    <router-link :to="{name: 'ShiftSaleList'}" type="button" class="btn btn-danger">Cancel</router-link>
+                                    <router-link :to="{name: 'ShiftSaleListStart'}" type="button" class="btn btn-danger">Cancel</router-link>
                                 </div>
                             </div>
                         </div>
