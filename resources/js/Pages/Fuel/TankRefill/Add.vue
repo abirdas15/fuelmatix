@@ -337,6 +337,7 @@ export default {
             }
             ApiService.POST(ApiRoutes.PayOrderQuantity, {tank_id: this.param.tank_id, pay_order_id: this.param.pay_order_id},res => {
                 if (parseInt(res.status) === 200) {
+                    this.param.quantity = 0;
                     if (res.data != null) {
                         this.param.quantity = res.data.quantity;
                         this.param.amount = res.data.total
@@ -369,6 +370,8 @@ export default {
                     this.$router.push({
                         name: 'TankRefill'
                     })
+                } else if (parseInt(res.status) === 400) {
+                    this.$toast.warning(res.message);
                 } else {
                     ApiService.ErrorHandler(res.errors);
                 }
