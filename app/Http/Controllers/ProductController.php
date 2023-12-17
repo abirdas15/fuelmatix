@@ -69,6 +69,7 @@ class ProductController extends Controller
         $product->opening_stock = $inputData['opening_stock'] ?? null;
         $product->current_stock = $inputData['opening_stock'] ?? null;
         $product->client_company_id = $inputData['session_user']['client_company_id'];
+        $product->vendor_id = $inputData['vendor_id'] ?? null;
         if (!$product->save()) {
             return response()->json(['status' => 400, 'message' => 'Cannot save [product].']);
         }
@@ -204,6 +205,7 @@ class ProductController extends Controller
         $product->driver_selling_price = $inputData['driver_selling_price'] ?? 0;
         $product->opening_stock = $inputData['opening_stock'] ?? null;
         $product->current_stock = $current_stock;
+        $product->vendor_id = $inputData['vendor_id'] ?? null;
         if (!$product->save()) {
             return response()->json(['status' => 400, 'message' => 'Cannot updated [product].']);
         }

@@ -39,7 +39,7 @@ class ProductPriceRepository
     {
 
         $sessionUser = SessionUser::getUser();
-        $productPrices = ProductPrice::where('client_company_id', $sessionUser['client_company_id'])->where('product_id', $productId)->where('stock_quantity', '>', 0)->get();
+        $productPrices = ProductPrice::where('client_company_id', $sessionUser['client_company_id'])->where('product_id', $productId)->where('stock_quantity', '>', 0)->get()->toArray();
         $buyingPrice = 0;
         if (empty($productPrices)) {
             $productModel = Product::where('id', $productId)->first();

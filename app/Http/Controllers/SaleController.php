@@ -137,11 +137,16 @@ class SaleController extends Controller
             if (!$productModel instanceof Product) {
                 return response()->json(['status' => 400, 'message' => 'Cannot find product.']);
             }
+            $accountId = $product['stock_category_id'];
             $productType = ProductType::where('id', $productModel['type_id'])->first();
             if (!empty($productType['inventory']) && $productType['inventory'] == 1) {
                 $currentStock = !empty($productModel['current_stock']) ? $productModel['current_stock'] : 0;
                 $productModel->updateQuantity($currentStock - $product['quantity']);
             }
+            if ($productType['vendor'] == 1) {
+                $accountId = $productModel['vendor_id'];
+            }
+
             $buyingPrice = ProductPriceRepository::updateAndGetProductBuyingPrice($product['product_id'], $product['quantity']);
             $saleData = new SaleData();
             $saleData->sale_id = $sale->id;
@@ -161,7 +166,7 @@ class SaleController extends Controller
             $transactionData = [];
             $transactionData['linked_id'] = $product['expense_category_id'];
             $transactionData['transaction'] = [
-                ['date' => date('Y-m-d'), 'account_id' => $product['stock_category_id'], 'debit_amount' => $buyingPrice, 'credit_amount' => 0, 'module' => Module::POS_SALE, 'module_id' => $sale->id],
+                ['date' => date('Y-m-d'), 'account_id' => $accountId, 'debit_amount' => $buyingPrice, 'credit_amount' => 0, 'module' => Module::POS_SALE, 'module_id' => $sale->id],
             ];
             TransactionController::saveTransaction($transactionData);
         }

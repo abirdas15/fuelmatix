@@ -9,7 +9,7 @@ class ProductTypeController extends Controller
 {
     public function list(Request $request)
     {
-        $result = ProductType::select('id', 'name')
+        $result = ProductType::select('id', 'name', 'vendor')
             ->get()
             ->toArray();
         return response()->json(['status' => 200, 'data' => $result]);

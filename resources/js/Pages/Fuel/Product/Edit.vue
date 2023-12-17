@@ -26,9 +26,9 @@
                                     </div>
                                     <div class="mb-3 form-group col-md-6">
                                         <label class="form-label">Product Type:</label>
-                                        <select class="form-control wide" name="type_id" v-model="param.type_id">
+                                        <select class="form-control wide product-type" name="type_id" v-model="param.type_id">
                                             <option value="">Select Type</option>
-                                            <option v-for="t of productType" :value="t.id">{{t.name}}</option>
+                                            <option v-for="t of productType" :value="t.id" :data-id="t.vendor">{{t.name}}</option>
                                         </select>
                                         <div class="invalid-feedback"></div>
                                     </div>
@@ -51,6 +51,14 @@
                                     <div class="mb-3 form-group col-md-6">
                                         <label class="form-label">Opening Stock:</label>
                                         <input type="number" class="form-control" name="opening_stock" v-model="param.opening_stock">
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                    <div class="mb-3 form-group col-md-6" v-if="is_vendor">
+                                        <label class="form-label">Vendor:</label>
+                                        <select class="form-control wide" name="vendor_id" v-model="param.vendor_id">
+                                            <option value="">Select Type</option>
+                                            <option v-for="t of vendors" :value="t.id">{{t.name}}</option>
+                                        </select>
                                         <div class="invalid-feedback"></div>
                                     </div>
                                 </div>
@@ -83,13 +91,39 @@ export default {
             loading: false,
             productType: [],
             id: '',
+            is_vendor: false,
+            vendors: []
         }
     },
     methods: {
+        getAllVendor: function() {
+            ApiService.POST(ApiRoutes.VendorList, {limit: 500},res => {
+                if (parseInt(res.status) === 200) {
+                    this.vendors = res.data.data
+                }
+            });
+        },
         getSingle: function () {
             ApiService.POST(ApiRoutes.ProductSingle, {id: this.id},res => {
                 if (parseInt(res.status) === 200) {
                     this.param = res.data
+                    setTimeout(() => {
+                        let _this = this;
+                        let vendor = parseInt($('.product-type').find(':selected').attr('data-id'));
+                        if (vendor === 1) {
+                            _this.is_vendor = true;
+                        } else {
+                            _this.is_vendor = false;
+                        }
+                        $('.product-type').change(function() {
+                            let vendor = parseInt($(this).find(':selected').attr('data-id'));
+                            if (vendor === 1) {
+                                _this.is_vendor = true;
+                            } else {
+                                _this.is_vendor = false;
+                            }
+                        });
+                    }, 500)
                 }
             });
         },
@@ -113,12 +147,13 @@ export default {
                     this.productType = res.data
                 }
             });
-        }
+        },
     },
     created() {
         this.id = this.$route.params.id
         this.getProductType()
         this.getSingle()
+        this.getAllVendor();
     },
     mounted() {
         $('#dashboard_bar').text('Product Edit')
