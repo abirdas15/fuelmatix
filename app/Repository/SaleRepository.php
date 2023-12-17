@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Common\Module;
+use App\Common\PaymentMethod;
 use App\Http\Controllers\TransactionController;
 use Illuminate\Support\Facades\Validator;
 
@@ -49,7 +50,7 @@ class SaleRepository
             'date' => 'required|date',
             'payment_method' => 'required',
             'products' => 'required|array',
-            'company_id' => 'required_unless:payment_method,cash',
+            'company_id' => $inputData['payment_method'] == PaymentMethod::COMPANY ? 'required' : 'nullable',
             //'voucher_number' => empty($inputData['advance_sale']) ? 'required_if:payment_method,company|integer' : 'nullable',
             'driver_sale.driver_id' => 'required_if:is_driver_sale,true|integer',
             'driver_sale.price' => 'required_if:is_driver_sale,true|numeric',
