@@ -311,7 +311,7 @@ export default {
             this.param.total_refill_volume = 0
             ApiService.POST(ApiRoutes.TankGetNozzle, {tank_id: this.param.tank_id},res => {
                 if (parseInt(res.status) === 200) {
-                    this.param.dispensers = res;
+                    this.param.dispensers = res.data;
                     this.param.dispensers.forEach(v => {
                         v.nozzle.forEach(nozzle => {
                             nozzle.sale = nozzle.end_reading - nozzle.start_reading

@@ -401,7 +401,10 @@ class TankController extends Controller
                 $nozzle['sale'] = 0;
             }
         }
-        return $dispensers;
+        return response()->json([
+            'status' => 200,
+            'data' => $dispensers
+        ]);
     }
     /**
      * @param Request $request
