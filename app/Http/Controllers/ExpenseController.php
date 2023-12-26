@@ -183,7 +183,7 @@ class ExpenseController extends Controller
             return response()->json(['status' => 500, 'error' => 'Expense already have been approve.']);
         }
         $data['transaction'] = [
-            ['date' => date('Y-m-d'), 'description' => $expense['remarks'], 'account_id' => $expense['payment_id'], 'debit_amount' => $expense['amount'], 'credit_amount' => 0, 'module' => Module::EXPENSE, 'module_id' => $expense['id'], 'file' => $expense['file']]
+            ['date' => $expense['date'], 'description' => $expense['remarks'], 'account_id' => $expense['payment_id'], 'debit_amount' => $expense['amount'], 'credit_amount' => 0, 'module' => Module::EXPENSE, 'module_id' => $expense['id'], 'file' => $expense['file']]
         ];
         $data['linked_id'] = $expense['category_id'];
         TransactionController::saveTransaction($data);

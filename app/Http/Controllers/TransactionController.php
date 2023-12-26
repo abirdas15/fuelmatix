@@ -89,7 +89,7 @@ class TransactionController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-    public function single(Request $request)
+    public function single(Request $request): JsonResponse
     {
         $inputData = $request->all();
         $validator = Validator::make($inputData, [
@@ -101,6 +101,7 @@ class TransactionController extends Controller
         $category = Category::find($inputData['id']);
         $result = Transaction::select('id', 'created_at', 'account_id', 'debit_amount', 'credit_amount', 'description')
             ->where('linked_id', $inputData['id'])
+            ->orderBy('date', 'DESC')
             ->get()
             ->toArray();
         foreach ($result as $key => &$data) {

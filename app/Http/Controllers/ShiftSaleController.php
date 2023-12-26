@@ -150,7 +150,7 @@ class ShiftSaleController extends Controller
                 $shiftSaleSummary->amount = $nozzle['amount'];
                 $shiftSaleSummary->save();
                 $readingData = [
-                    'date' => date('Y-m-d'),
+                    'date' => $inputData['date'],
                     'nozzle_id' => $nozzle['id'],
                     'reading' => $nozzle['end_reading'],
                     'type' => 'shift sell',
