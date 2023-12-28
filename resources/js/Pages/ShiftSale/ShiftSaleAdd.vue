@@ -15,7 +15,7 @@
                         <div class="card-header">
                             <h4 class="card-title">Shift Sale Start</h4>
                         </div>
-                        <form @submit.prevent="save">
+                        <form @submit.prevent="submit">
                             <div class="card-body">
                                 <div class="process-wrapper">
                                     <div id="progress-bar-container" v-if="listData.length > 0">
@@ -154,7 +154,7 @@
                                                 </div>
                                                 <div class="card-body" v-if="d.nozzle.length > 0">
                                                     <div class="row align-items-center text-start" v-for="(n, nIndex) in d.nozzle">
-                                                        <div class=" col-md-4">
+                                                        <div class=" col-md-2">
                                                             <label class="form-label">
                                                                 <p class="m-0">{{ n.name }}</p>
                                                             </label>
@@ -198,7 +198,11 @@
 <!--                                                            <input class="form-control" value="0" v-if="listDispenser.status == 'start'" disabled>-->
                                                         </div>
 
-
+                                                        <div class="mb-3 col-md-2"  v-if="listDispenser.status == 'end' && n.pf != null && n.pf != ''">
+                                                            <label class="text-center">PF </label>
+                                                            <input type="text" disabled class="form-control" v-model="n.pf">
+                                                        </div>
+                                                        <div class="col-md-2 mb-3" v-else></div>
                                                         <div class="mb-3 col-md-2"  v-if="listDispenser.status == 'end'">
                                                             <label>Consumption </label>
                                                             <div class="input-group">
@@ -322,6 +326,7 @@
 <script>
 import ApiService from "../../Services/ApiService";
 import ApiRoutes from "../../Services/ApiRoutes";
+import Swal from 'sweetalert2/dist/sweetalert2.js'
 
 export default {
     data() {
@@ -424,7 +429,15 @@ export default {
         },
         calculateAmountNozzle: function (dIndex, nIndex) {
             if (this.isNumeric(this.listDispenser.dispensers[dIndex].nozzle[nIndex].end_reading)) {
-                this.listDispenser.dispensers[dIndex].nozzle[nIndex].consumption = parseFloat(this.listDispenser.dispensers[dIndex].nozzle[nIndex].end_reading) - parseFloat(this.listDispenser.dispensers[dIndex].nozzle[nIndex].start_reading)  - parseFloat(this.listDispenser.dispensers[dIndex].nozzle[nIndex].adjustment)
+                let pf = 1;
+                if (this.listDispenser.dispensers[dIndex].nozzle[nIndex].pf != null && this.listDispenser.dispensers[dIndex].nozzle[nIndex].pf != '') {
+                    pf = this.listDispenser.dispensers[dIndex].nozzle[nIndex].pf;
+                }
+                if (parseFloat(this.listDispenser.dispensers[dIndex].nozzle[nIndex].end_reading) < parseFloat(this.listDispenser.dispensers[dIndex].nozzle[nIndex].start_reading)) {
+                    this.listDispenser.dispensers[dIndex].nozzle[nIndex].consumption = (parseFloat(this.listDispenser.dispensers[dIndex].nozzle[nIndex].max_value) - parseFloat(this.listDispenser.dispensers[dIndex].nozzle[nIndex].start_reading) + parseFloat(this.listDispenser.dispensers[dIndex].nozzle[nIndex].end_reading) - parseFloat(this.listDispenser.dispensers[dIndex].nozzle[nIndex].adjustment)) * pf;
+                } else {
+                    this.listDispenser.dispensers[dIndex].nozzle[nIndex].consumption = (parseFloat(this.listDispenser.dispensers[dIndex].nozzle[nIndex].end_reading) - parseFloat(this.listDispenser.dispensers[dIndex].nozzle[nIndex].start_reading)  - parseFloat(this.listDispenser.dispensers[dIndex].nozzle[nIndex].adjustment)) * parseFloat(pf)
+                }
                 this.listDispenser.dispensers[dIndex].nozzle[nIndex].amount = parseFloat(this.listDispenser.dispensers[dIndex].nozzle[nIndex].consumption) * parseFloat(this.listDispenser.selling_price)
             } else {
                 this.listDispenser.dispensers[dIndex].nozzle[nIndex].consumption = 0
@@ -474,20 +487,23 @@ export default {
         totalShiftParcent: function (totalNozzleConsumption) {
            return ((totalNozzleConsumption - this.listDispenser.consumption) /this.listDispenser.consumption) * 100
         },
-        save: function () {
+        submit: function () {
             ApiService.ClearErrorHandler();
-            this.loading = true
             this.listDispenser.categories = this.categories;
+            let flag = false;
             if (this.listDispenser.status == 'end') {
                 let totalCategoryAmount = 0
                 let totalConsumption = 0
                 this.listDispenser.categories.map(v => {
                     totalCategoryAmount += parseFloat(v.amount)
-                })
+                });
                 // if ((this.totalAmount - this.totalPosSale()) != totalCategoryAmount) {
                 this.listDispenser.dispensers.map(dispenser => {
                     dispenser.nozzle.map(nozzle => {
                         totalConsumption += parseFloat(nozzle.consumption)
+                        if (nozzle.end_reading < nozzle.start_reading) {
+                            flag = true;
+                        }
                     })
                 })
                 // check if mismatch allow
@@ -505,6 +521,26 @@ export default {
                     return;
                 }
             }
+            if (flag == true) {
+                Swal.fire({
+                    title: "Are you sure?",
+                    text: "Your nozzle end reading is correct",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#3085d6",
+                    cancelButtonColor: "#d33",
+                    confirmButtonText: "Yes!"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        this.save();
+                    }
+                });
+            } else {
+                this.save();
+            }
+        },
+        save: function () {
+            this.loading = true
             ApiService.POST(ApiRoutes.ShiftSaleAdd, this.listDispenser, res => {
                 this.loading = false
                 if (parseInt(res.status) === 200) {
@@ -517,7 +553,7 @@ export default {
                         this.$router.push({
                             name: 'ShiftSaleView',
                             params: {
-                                    id: res.shift_sale_id
+                                id: res.shift_sale_id
                             }
                         })
                     }

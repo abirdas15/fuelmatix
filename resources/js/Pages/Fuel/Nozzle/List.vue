@@ -39,15 +39,19 @@
                                             <tr class="text-white" style="background-color: #4886EE;color:#ffffff">
                                                 <th class="text-white" @click="sortData('name')" :class="sortClass('name')">Nozzle Name</th>
                                                 <th class="text-white" @click="sortData('dispenser_name')" :class="sortClass('dispenser_name')">Dispenser Name</th>
-                                                <th class="text-white" >Action</th>
+                                                <th class="text-white" @click="sortData('pf')" :class="sortClass('pf')">PF</th>
+                                                <th class="text-white" @click="sortData('max_value')" :class="sortClass('max_value')">Max Value</th>
+                                                <th class="text-white">Action</th>
                                             </tr>
                                             </thead>
                                             <tbody v-if="listData.length > 0 && TableLoading == false">
                                             <tr v-for="f in listData">
                                                 <td >{{f.name}}</td>
                                                 <td><a href="javascript:void(0);">{{f.dispenser_name}}</a></td>
+                                                <td><a href="javascript:void(0);">{{f.pf}}</a></td>
+                                                <td><a href="javascript:void(0);">{{f.max_value}}</a></td>
                                                 <td>
-                                                    <div class="d-flex justify-content-end">
+                                                    <div class="d-flex">
                                                         <router-link v-if="CheckPermission(Section.NOZZLE + '-' + Action.EDIT)" :to="{name: 'NozzleEdit', params: { id: f.id }}" class=" btn btn-primary shadow btn-xs sharp me-1">
                                                             <i class="fas fa-pencil-alt"></i>
                                                         </router-link>

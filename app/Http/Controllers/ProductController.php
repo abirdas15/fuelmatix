@@ -364,7 +364,7 @@ class ProductController extends Controller
             ->where('product_id', $inputData['product_id'])
             ->where('client_company_id', $sessionUser['client_company_id'])
             ->with(['nozzle' => function($q) {
-                $q->select('nozzles.id', 'nozzles.dispenser_id', 'nozzles.name', 'nozzles.opening_stock');
+                $q->select('nozzles.id', 'nozzles.dispenser_id', 'nozzles.name', 'nozzles.opening_stock', 'pf', 'max_value');
             }])
             ->get()
             ->toArray();

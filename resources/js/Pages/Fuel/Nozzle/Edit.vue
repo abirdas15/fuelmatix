@@ -32,9 +32,19 @@
                                         </select>
                                         <div class="invalid-feedback"></div>
                                     </div>
-                                    <div class="mb-3 form-group col-md-6">
+                                    <div class="mb-3 form-group col-md-4">
                                         <label class="form-label">Opening Stock:</label>
                                         <input type="text" class="form-control" name="opening_stock" v-model="param.opening_stock">
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                    <div class="mb-3 form-group col-md-4">
+                                        <label class="form-label">PF:</label>
+                                        <input type="text" class="form-control" name="pf" v-model="param.pf">
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                    <div class="mb-3 form-group col-md-4">
+                                        <label class="form-label">Max Value:</label>
+                                        <input type="text" class="form-control" name="max_value" v-model="param.max_value">
                                         <div class="invalid-feedback"></div>
                                     </div>
                                 </div>

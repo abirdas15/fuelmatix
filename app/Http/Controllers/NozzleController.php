@@ -22,7 +22,9 @@ class NozzleController extends Controller
         $inputData = $request->all();
         $validator = Validator::make($inputData, [
             'name' => 'required',
-            'dispenser_id' => 'required'
+            'dispenser_id' => 'required',
+            'pf' => 'nullable|numeric',
+            'max_value' => 'required|numeric',
         ],[
             'dispenser_id.required' => 'The dispenser field is required',
         ]);
@@ -33,6 +35,8 @@ class NozzleController extends Controller
         $nozzle->name = $inputData['name'];
         $nozzle->dispenser_id = $inputData['dispenser_id'];
         $nozzle->opening_stock = $inputData['opening_stock'] ?? null;
+        $nozzle->pf = $inputData['pf'] ?? null;
+        $nozzle->max_value = $inputData['max_value'] ?? null;
         $nozzle->client_company_id = $inputData['session_user']['client_company_id'];
         if ($nozzle->save()) {
             return response()->json(['status' => 200, 'message' => 'Successfully saved nozzle.']);
@@ -52,7 +56,7 @@ class NozzleController extends Controller
         $order_mode = $inputData['order_mode'] ?? 'DESC';
         $product_id = $request['product_id'] ?? '';
         $dispenser_id = $request['dispenser_id'] ?? '';
-        $result = Nozzle::select('nozzles.id', 'nozzles.name', 'dispensers.dispenser_name')
+        $result = Nozzle::select('nozzles.id', 'nozzles.name', 'dispensers.dispenser_name', 'nozzles.pf', 'nozzles.max_value')
             ->leftJoin('dispensers', 'dispensers.id', '=', 'nozzles.dispenser_id')
             ->where('nozzles.client_company_id', $inputData['session_user']['client_company_id']);
         if (!empty($keyword)) {
@@ -101,7 +105,9 @@ class NozzleController extends Controller
         $validator = Validator::make($inputData, [
             'id' => 'required',
             'name' => 'required',
-            'dispenser_id' => 'required'
+            'dispenser_id' => 'required',
+            'pf' => 'nullable|numeric',
+            'max_value' => 'required|numeric',
         ],[
             'dispenser_id.required' => 'The dispenser field is required',
         ]);
@@ -114,6 +120,8 @@ class NozzleController extends Controller
         }
         $nozzle->name = $inputData['name'];
         $nozzle->dispenser_id = $inputData['dispenser_id'];
+        $nozzle->pf = $inputData['pf'] ?? null;
+        $nozzle->max_value = $inputData['max_value'] ?? null;
         $nozzle->opening_stock = $inputData['opening_stock'] ?? null;
         if ($nozzle->save()) {
             return response()->json(['status' => 200, 'message' => 'Successfully updated nozzle.']);
