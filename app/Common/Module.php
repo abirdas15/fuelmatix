@@ -29,5 +29,6 @@ class Module
     const PURCHASE = 'purchase';
     const PURCHASE_PAYMENT = 'purchase payment';
     const INVOICE_PAYMENT = 'invoice payment';
+    const VENDOR_PAYMENT = 'vendor payment';
 
 }

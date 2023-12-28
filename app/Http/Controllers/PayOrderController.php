@@ -26,7 +26,7 @@ class PayOrderController extends Controller
     {
         $inputData = $request->all();
         $validator = Validator::make($inputData, [
-            'bank_id' => 'required|integer',
+            'bank_id' => 'nullable|integer',
             'vendor_id' => 'required|integer',
             'number' => 'required|string',
             'products' => 'required|array',
@@ -49,9 +49,11 @@ class PayOrderController extends Controller
         if (!$vendorCategory instanceof Category) {
             return response()->json(['status' => 400, 'message' => 'Cannot find [vendor] category']);
         }
-        $bankCategory = Category::find($request['bank_id']);
-        if (!$bankCategory instanceof Category) {
-            return response()->json(['status' => 400, 'message' => 'Cannot find [bank] category']);
+        if (!empty($request['bank_id'])) {
+            $bankCategory = Category::find($request['bank_id']);
+            if (!$bankCategory instanceof Category) {
+                return response()->json(['status' => 400, 'message' => 'Cannot find [bank] category']);
+            }
         }
         $sessionUser = SessionUser::getUser();
         $amount = array_sum(array_column($inputData['products'], 'total'));
@@ -59,13 +61,18 @@ class PayOrderController extends Controller
             ->where('linked_id', $request['bank_id'])
             ->where('client_company_id', $sessionUser['client_company_id'])
             ->first();
-        $bankAmount = $transaction['debit_amount'] ?? 0 - $transaction['credit_amount'] ?? 0;
-        if ($bankAmount < $amount) {
-            return response()->json(['status' => 500, 'errors' => ['bank_id' => ['Not enough balance in your bank.']]]);
+        if (!empty($request['bank_id'])) {
+            $bankAmount = $transaction['debit_amount'] ?? 0 - $transaction['credit_amount'] ?? 0;
+            if ($bankAmount < $amount) {
+                return response()->json(['status' => 500, 'errors' => ['bank_id' => ['Not enough balance in your bank.']]]);
+            }
         }
-
+        $account_id = $inputData['bank_id'];
+        if (empty($inputData['bank_id'])) {
+            $account_id = $inputData['vendor_id'];
+        }
         $payOrder = new PayOrder();
-        $payOrder->bank_id = $inputData['bank_id'];
+        $payOrder->bank_id = $inputData['bank_id'] ?? null;
         $payOrder->vendor_id = $inputData['vendor_id'];
         $payOrder->amount = $amount;
         $payOrder->number = $inputData['number'];
@@ -84,7 +91,7 @@ class PayOrderController extends Controller
             ];
             $transactionData['linked_id'] = $product['expense_category_id'];
             $transactionData['transaction'] = [
-                ['date' => date('Y-m-d'), 'account_id' => $inputData['bank_id'], 'debit_amount' => $product['total'], 'credit_amount' => 0, 'module' => Module::PAY_ORDER, 'module_id' => $payOrder->id],
+                ['date' => date('Y-m-d'), 'account_id' => $account_id, 'debit_amount' => $product['total'], 'credit_amount' => 0, 'module' => Module::PAY_ORDER, 'module_id' => $payOrder->id],
             ];
             TransactionController::saveTransaction($transactionData);
         }

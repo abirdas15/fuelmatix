@@ -3,11 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Common\AccountCategory;
+use App\Common\Module;
 use App\Models\Category;
 use App\Models\Transaction;
 use App\Repository\CategoryRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class VendorController extends Controller
@@ -54,16 +56,20 @@ class VendorController extends Controller
         if (!$accountPayable instanceof Category) {
             return response()->json(['status' => 400, 'message' => 'Cannot find [account payable] category.']);
         }
-        $result = Category::select('id', 'name')
-            ->where('client_company_id', $inputData['session_user']['client_company_id'])
+        $result = Category::select('categories.id', 'categories.name', DB::raw('SUM(debit_amount - credit_amount) as amount'))
+            ->leftJoin('transactions', 'transactions.account_id', '=', 'categories.id')
+            ->where('categories.client_company_id', $inputData['session_user']['client_company_id'])
             ->where('parent_category', $accountPayable['id']);
         if (!empty($keyword)) {
             $result->where(function($q) use ($keyword) {
-                $q->where('name', 'LIKE', '%'.$keyword.'%');
+                $q->where('categories.name', 'LIKE', '%'.$keyword.'%');
             });
         }
-        $result = $result->orderBy($order_by, $order_mode)
+        $result = $result->groupBy('categories.id')->orderBy($order_by, $order_mode)
             ->paginate($limit);
+        foreach ($result as &$data) {
+            $data['amount_format'] = !empty($data['amount']) ? number_format($data['amount'], 2) : null;
+        }
         return response()->json(['status' => 200, 'data' => $result]);
     }
     /**
@@ -129,5 +135,27 @@ class VendorController extends Controller
         }
         Category::where('id', $inputData['id'])->delete();
         return response()->json(['status' => 200, 'message' => 'Successfully deleted vendor.']);
+    }
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function payment(Request $request): JsonResponse
+    {
+        $requestData = $request->all();
+        $validator = Validator::make($requestData, [
+            'vendor_id' => 'required|integer',
+            'payment_id' => 'required|integer',
+            'amount' => 'required|numeric'
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['status' => 500, 'errors' => $validator->errors()]);
+        }
+        $transaction['linked_id'] = $requestData['vendor_id'];
+        $transaction['transaction'] = [
+            ['date' => date('Y-m-d'), 'account_id' => $requestData['payment_id'], 'debit_amount' => $requestData['amount'], 'credit_amount' => 0, 'module' => Module::INVOICE_PAYMENT, 'module_id' => $requestData['vendor_id']]
+        ];
+        TransactionController::saveTransaction($transaction);
+        return response()->json(['status' => 200, 'message' => 'Successfully save payment.']);
     }
 }

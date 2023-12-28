@@ -347,7 +347,7 @@ const router = new VueRouter({
                     },
                 },
                 {
-                    path: ROOT_URL + "/vendor", name: "Vendor", component: Vendor, beforeEnter: (to, from, next) => {
+                    path: ROOT_URL + "/vendors", name: "Vendor", component: Vendor, beforeEnter: (to, from, next) => {
                         CheckPermission(to, from, next, Section.VENDOR + '-' + Action.VIEW)
                     },
                 },

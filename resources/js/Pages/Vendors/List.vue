@@ -38,14 +38,17 @@
                                             <thead>
                                             <tr class="text-white" style="background-color: #4886EE;color:#ffffff">
                                                 <th class="text-white" @click="sortData('name')" :class="sortClass('name')">Vendor Name</th>
-                                                <th class="text-white" >Action</th>
+                                                <th class="text-white" @click="sortData('amount')" :class="sortClass('amount')">Amount</th>
+                                                <th class="text-white">Action</th>
                                             </tr>
                                             </thead>
                                             <tbody v-if="listData.length > 0 && TableLoading == false">
                                             <tr v-for="f in listData">
                                                 <td >{{f.name}}</td>
+                                                <td >{{f.amount_format}}</td>
                                                 <td>
-                                                    <div class="d-flex justify-content-end">
+                                                    <div class="d-flex">
+                                                        <button v-if="CheckPermission(Section.VENDOR + '-' + Action.CREATE) && f.amount != null && f.amount != ''"  class="btn btn-sm btn-primary me-2" @click="paymentModal(f)">Payment</button>
                                                         <router-link v-if="CheckPermission(Section.VENDOR + '-' + Action.EDIT)" :to="{name: 'VendorEdit', params: { id: f.id }}" class=" btn btn-primary shadow btn-xs sharp me-1">
                                                             <i class="fas fa-pencil-alt"></i>
                                                         </router-link>
@@ -82,6 +85,33 @@
                 </div>
             </div>
         </div>
+        <div class="popup-wrapper-modal paymentModal d-none">
+            <form @submit.prevent="savePayment" class="popup-box" style="max-width: 800px">
+                <button type="button" class=" btn  closeBtn"><i class="fas fa-times"></i></button>
+                <div class="row align-items-center">
+                    <div class="col-sm-12">
+                        <div class="input-wrapper form-group mb-3">
+                            <label for="amount">Amount</label>
+                            <input type="text" class="w-100 form-control bg-white" name="amount" id="amount"
+                                   v-model="paymentParam.amount" placeholder="Amount here">
+                            <small class="invalid-feedback"></small>
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <div class="input-wrapper form-group mb-3">
+                            <label for="description">Payment Method</label>
+                            <select class="form-control form-select" v-model="paymentParam.payment_id" name="payment_id">
+                                <option value="">Select Method</option>
+                                <option v-for="m in allAmountCategory" :value="m.id">{{m.name}}</option>
+                            </select>
+                            <small class="invalid-feedback"></small>
+                        </div>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary " v-if="!Loading">Submit</button>
+                <button type="button" class="btn btn-primary " disabled v-if="Loading">Submitting...</button>
+            </form>
+        </div>
     </div>
 </template>
 
@@ -109,6 +139,12 @@ export default {
             Loading: false,
             TableLoading: false,
             listData: [],
+            paymentParam: {
+                vendor_id: '',
+                amount: '',
+                payment_id: ''
+            },
+            allAmountCategory: []
         };
     },
     watch: {
@@ -118,6 +154,7 @@ export default {
     },
     created() {
         this.list();
+        this.getCategory();
     },
     computed: {
         Action() {
@@ -131,6 +168,32 @@ export default {
         },
     },
     methods: {
+        savePayment: function() {
+            this.Loading = true;
+            ApiService.POST(ApiRoutes.VendorPayment, this.paymentParam, res => {
+                this.Loading = false;
+                if (parseInt(res.status) === 200) {
+                    this.$toast.success(res.message);
+                    this.list(this.Param.page);
+                    $('.paymentModal').addClass('d-none');
+                } else {
+                    ApiService.ErrorHandler(res.errors);
+                }
+            });
+        },
+        getCategory: function () {
+            this.categories = []
+            ApiService.POST(ApiRoutes.salaryGetCategory, {}, res => {
+                if (parseInt(res.status) === 200) {
+                    this.allAmountCategory = res.data;
+                }
+            });
+        },
+        paymentModal: function (f) {
+            this.paymentParam.vendor_id = f.id
+            this.paymentParam.amount = f.amount
+            $('.paymentModal').removeClass('d-none');
+        },
         openModalDelete(data) {
             Swal.fire({
                 title: 'Are you sure you want to delete?',

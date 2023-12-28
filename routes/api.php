@@ -185,6 +185,7 @@ Route::group(['middleware' => 'AuthReqCheck'], function() {
         Route::post('single', [VendorController::class, 'single']);
         Route::post('update', [VendorController::class, 'update']);
         Route::post('delete', [VendorController::class, 'delete']);
+        Route::post('payment', [VendorController::class, 'payment']);
     });
     Route::group(['prefix' => 'pay/order'], function() {
         Route::post('save', [PayOrderController::class, 'save']);
