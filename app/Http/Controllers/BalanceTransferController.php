@@ -13,6 +13,7 @@ use App\Models\Transaction;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
@@ -71,14 +72,16 @@ class BalanceTransferController extends Controller
         $sessionUser = SessionUser::getUser();
         $requestData = $request->all();
         $limit = $requestData['limit'] ?? 10;
-        $result = BalanceTransfer::select('balance_transfer.id', 'balance_transfer.date', 'balance_transfer.amount', 'balance_transfer.status', 'c1.name as from_category_name', 'c2.name as to_category_name')
+        $result = BalanceTransfer::select('balance_transfer.id', 'balance_transfer.date', 'balance_transfer.amount', 'balance_transfer.status', 'c1.name as from_category_name', 'c2.name as to_category_name', 'users.name as approve_by')
             ->leftJoin('categories as c1', 'c1.id', '=', 'balance_transfer.from_category_id')
             ->leftJoin('categories as c2', 'c2.id', '=', 'balance_transfer.to_category_id')
+            ->leftJoin('users', 'users.id', '=', 'balance_transfer.approve_by')
             ->where('balance_transfer.client_company_id', $sessionUser['client_company_id']);
         $result = $result->orderBy('balance_transfer.id', 'DESC')
             ->paginate($limit);
         foreach ($result as &$data) {
-            $data['date'] = Helpers::formatDate($data['date'], FuelMatixDateTimeFormat::STANDARD_DATE);
+            $data['date'] = Helpers::formatDate($data['date'], FuelMatixDateTimeFormat::STANDARD_DATE_TIME);
+            $data['amount_format'] = number_format($data['amount'], 2);
         }
         return response()->json(['status' => 200, 'data' => $result]);
     }
@@ -159,6 +162,7 @@ class BalanceTransferController extends Controller
         $response = TransactionController::saveTransaction($transactionData);
         if ($response) {
             $balanceTransfer->status = FuelMatixStatus::APPROVE;
+            $balanceTransfer->approve_by = Auth::user()->id;
             $balanceTransfer->save();
             return response()->json(['status' => 200, 'message' => 'Successfully approved balance transfer.']);
         }

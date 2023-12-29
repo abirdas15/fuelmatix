@@ -10,6 +10,7 @@ use App\Helpers\SessionUser;
 use App\Models\Expense;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class ExpenseController extends Controller
@@ -64,9 +65,10 @@ class ExpenseController extends Controller
         $keyword = $inputData['keyword'] ?? '';
         $sessionUser = SessionUser::getUser();
 
-        $result = Expense::select('expense.id', 'expense.date', 'expense.amount',  'c.name as expense', 'c1.name as payment', 'expense.status')
+        $result = Expense::select('expense.id', 'expense.date', 'expense.amount',  'c.name as expense', 'c1.name as payment', 'expense.status', 'users.name as approve_by')
             ->leftJoin('categories as c', 'c.id', 'expense.category_id')
             ->leftJoin('categories as c1', 'c1.id', 'expense.payment_id')
+            ->leftJoin('users', 'users.id', '=', 'expense.approve_by')
             ->where('expense.client_company_id', $sessionUser['client_company_id']);
         if (!empty($keyword)) {
             $result->where(function($q) use ($keyword) {
@@ -74,9 +76,10 @@ class ExpenseController extends Controller
                 $q->orWhere('c1.name', 'LIKE', '%'.$keyword.'%');
             });
         }
-        $result = $result->orderBy('status', 'DESC')
+        $result = $result->orderBy('id', 'DESC')
             ->paginate($limit);
         foreach ($result as &$data) {
+            $data['amount_format'] = number_format($data['amount'], 2);
             $data['date'] = Helpers::formatDate($data['date'], FuelMatixDateTimeFormat::STANDARD_DATE);
         }
         return response()->json(['status' => 200, 'data' => $result]);
@@ -188,6 +191,7 @@ class ExpenseController extends Controller
         $data['linked_id'] = $expense['category_id'];
         TransactionController::saveTransaction($data);
         $expense->status = FuelMatixStatus::APPROVE;
+        $expense->approve_by = Auth::user()->id;
         $expense->save();
         return response()->json(['status' => 200, 'message' => 'Successfully approve expense.']);
     }

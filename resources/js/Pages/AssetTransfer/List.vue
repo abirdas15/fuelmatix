@@ -38,10 +38,11 @@
                                             <thead>
                                             <tr class="text-white" style="background-color: #4886EE;color:#ffffff">
                                                 <th class="text-white" @click="sortData('date')" :class="sortClass('date')">Date</th>
-                                                <th class="text-white" @click="sortData('type')" :class="sortClass('type')">Type</th>
                                                 <th class="text-white" @click="sortData('from_category_name')" :class="sortClass('from_category_name')">From</th>
                                                 <th class="text-white" @click="sortData('to_category_name')" :class="sortClass('to_category_name')">To</th>
-                                                <th class="text-white" @click="sortData('remarks')" :class="sortClass('remarks')">Note</th>
+                                                <th class="text-white" @click="sortData('amount')" :class="sortClass('amount')">Amount</th>
+                                                <th class="text-white" @click="sortData('remarks')" :class="sortClass('remarks')">Remarks</th>
+                                                <th class="text-white" @click="sortData('approve_by')" :class="sortClass('approve_by')">Approve By</th>
                                                 <th class="text-white" @click="sortData('status')" :class="sortClass('status')">Status</th>
                                                 <th class="text-white" >Action</th>
                                             </tr>
@@ -49,10 +50,11 @@
                                             <tbody v-if="listData.length > 0 && TableLoading == false">
                                             <tr v-for="f in listData">
                                                 <td >{{f.date}}</td>
-                                                <td >{{f.email}}</td>
                                                 <td >{{f.from_category_name}}</td>
                                                 <td >{{f.to_category_name}}</td>
+                                                <td >{{f.amount_format}}</td>
                                                 <td >{{f.remarks}}</td>
+                                                <td >{{f.approve_by}}</td>
                                                 <td >
                                                     <select v-if="f.status == 'pending'" class="form-select" v-model="f.status" @change="approve(f)">
                                                         <option value="pending">Pending</option>
