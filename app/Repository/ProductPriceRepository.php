@@ -48,16 +48,17 @@ class ProductPriceRepository
             }
         }
         foreach ($productPrices as $key => $productPrice) {
+            $productPriceModel = ProductPrice::find($productPrice['id']);
             if ($productPrice['stock_quantity'] > $quantity) {
-                $productPrice['stock_quantity'] = $productPrice['stock_quantity'] - $quantity;
+                $productPriceModel->stock_quantity = $productPrice['stock_quantity'] - $quantity;
                 $buyingPrice += $productPrice['unit_price'] * $quantity;
-                $productPrice->save();
+                $productPriceModel->save();
                 break;
             } else {
-                $quantity = $quantity - $productPrice['stock_quantity'];
-                $buyingPrice += $productPrice['unit_price'] * $productPrice['stock_quantity'];
-                $productPrice['stock_quantity'] = 0;
-                $productPrice->save();
+                $quantity = $quantity - $productPrice->stock_quantity;
+                $buyingPrice += $productPrice->unit_price * $productPrice->stock_quantity;
+                $productPriceModel->stock_quantity = 0;
+                $productPriceModel->save();
             }
         }
         return $buyingPrice;
