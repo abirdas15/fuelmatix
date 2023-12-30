@@ -103,6 +103,7 @@ import purchase from "../Pages/PurchaseBill/List.vue";
 import purchaseAdd from "../Pages/PurchaseBill/Add.vue";
 import purchaseEdit from "../Pages/PurchaseBill/Edit.vue";
 import InvoicePayment from "../Pages/InvoicePayment/InvoicePayment.vue"
+import VendorReport from "../Pages/VendorReport/VendorReport.vue";
 
 const ROOT_URL = "";
 const router = new VueRouter({
@@ -568,6 +569,9 @@ const router = new VueRouter({
                     path: ROOT_URL + "/purchase/edit", name: "purchaseEdit", component: purchaseEdit, beforeEnter: (to, from, next) => {
                         CheckPermission(to, from, next, Section.PURCHASE + '-' + Action.EDIT)
                     }
+                },
+                {
+                    path: ROOT_URL + "/report/vendor", name: "VendorReport", component: VendorReport
                 }
             ],
         },

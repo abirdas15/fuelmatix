@@ -138,6 +138,10 @@
                             <router-link :to="{name: 'salesReport'}" >Sales Report
                             </router-link>
                         </li>
+                        <li>
+                            <router-link :to="{name: 'VendorReport'}" >Vendor Report
+                            </router-link>
+                        </li>
                     </ul>
                 </li>
                 <li v-if="CheckPermission(Section.ROLE + '-' + Action.VIEW)">

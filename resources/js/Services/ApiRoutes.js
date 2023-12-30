@@ -113,6 +113,7 @@ const ApiRoutes = {
     VendorList: ApiVersion + '/vendor/list',
     VendorSingle: ApiVersion + '/vendor/single',
     VendorPayment: ApiVersion + '/vendor/payment',
+    VendorReport: ApiVersion + '/vendor/report',
     //Pay order
     PayOrderAdd: ApiVersion + '/pay/order/save',
     PayOrderEdit: ApiVersion + '/pay/order/update',

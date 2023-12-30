@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Common\AccountCategory;
+use App\Common\FuelMatixDateTimeFormat;
 use App\Common\Module;
+use App\Helpers\Helpers;
 use App\Models\Category;
 use App\Models\Transaction;
 use App\Repository\CategoryRepository;
@@ -157,5 +159,44 @@ class VendorController extends Controller
         ];
         TransactionController::saveTransaction($transaction);
         return response()->json(['status' => 200, 'message' => 'Successfully save payment.']);
+    }
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     * */
+    public static function report(Request $request): JsonResponse
+    {
+        $requestData = $request->all();
+        $validator = Validator::make($requestData, [
+            'start_date' => 'required',
+            'end_date' => 'required',
+            'vendor_id' => 'required'
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['status' => 500, 'errors' => $validator->errors()]);
+        }
+        $result = Transaction::select('date', DB::raw('SUM(credit_amount) as bill'), DB::raw('SUM(debit_amount) as paid'), DB::raw('SUM(credit_amount - debit_amount) as balance'), 'categories.name as product')
+            ->leftJoin('categories', 'categories.id', '=', 'transactions.account_id')
+            ->whereBetween('date', [$requestData['start_date'], $requestData['end_date']])
+            ->where('linked_id', $requestData['vendor_id'])
+            ->groupBy('account_id')
+            ->get()
+            ->toArray();
+        $total['bill'] = 0;
+        $total['paid'] = 0;
+        $total['balance'] = 0;
+        foreach ($result as &$data) {
+            $total['bill'] += $data['bill'];
+            $total['paid'] += $data['paid'];
+            $total['balance'] += $data['balance'];
+            $data['date'] = Helpers::formatDate($data['date'], FuelMatixDateTimeFormat::STANDARD_DATE);
+            $data['bill'] = number_format($data['bill'], 2);
+            $data['paid'] = number_format($data['paid'], 2);
+            $data['balance'] = number_format($data['balance'], 2);
+        }
+        $total['bill'] = number_format($total['bill'], 2);
+        $total['paid'] = number_format($total['paid'], 2);
+        $total['balance'] = number_format($total['balance'], 2);
+        return response()->json(['status' => 200, 'data' => $result, 'total' => $total]);
     }
 }
