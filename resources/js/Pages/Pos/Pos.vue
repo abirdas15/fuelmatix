@@ -192,7 +192,7 @@
                                     <div class="alert alert-danger" v-if="errorText">{{errorText}}</div>
                                 </div>
                                 <div class="btn-section text-center mt-3">
-                                    <button class="btn btn-warning me-2 width-fixed" v-if="!loading" :disabled="company_id != null"  @click="payment_method = 'cash';order('cash')">Cash </button>
+                                    <button class="btn btn-warning me-2 width-fixed" id="cashBtn" v-if="!loading" :disabled="company_id != null"  @click="payment_method = 'cash';order('cash')">Cash </button>
                                     <button class="btn btn-warning width-fixed" v-if="loading">Paying....
                                         <i class="fa fa-spinner fa-spin"></i></button>
 
@@ -869,6 +869,9 @@ export default {
                             let product = this.products[8]
                             this.cartProduct(product)
                         }
+                        if (event.key == 'Enter') {
+                            $('#cashBtn').click();
+                        }
                     });
                 }
             });
@@ -951,7 +954,11 @@ export default {
                     this.date = dateStr
                 }
             })
-        }, 1000)
+            document.addEventListener('DOMContentLoaded', function() {
+                // Trigger the click event on the submit button
+                document.getElementById('submitButton').click();
+            });
+        }, 1000);
     }
 }
 </script>

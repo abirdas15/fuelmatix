@@ -145,6 +145,7 @@ Route::group(['middleware' => 'AuthReqCheck'], function() {
         Route::post('update', [ExpenseController::class, 'update']);
         Route::post('delete', [ExpenseController::class, 'delete']);
         Route::post('approve', [ExpenseController::class, 'approve']);
+        Route::post('report', [ExpenseController::class, 'report']);
     });
     Route::group(['prefix' => 'tank'], function() {
         Route::post('save', [TankController::class, 'save']);

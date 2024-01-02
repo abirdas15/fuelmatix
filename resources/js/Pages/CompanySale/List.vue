@@ -96,31 +96,56 @@
         <div class="popup-wrapper-modal createExpand d-none">
             <form @submit.prevent="expand" class="popup-box" style="max-width: 800px">
                 <button type="button" class=" btn  closeBtn"><i class="fas fa-times"></i></button>
+                <div class="row align-items-center">
+                    <div class="col-sm-3">
+                        <div class="input-wrapper form-group">
+                            <label for="description"><strong>Car Number</strong></label>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="input-wrapper form-group">
+                            <label for="description"><strong>Voucher Number</strong></label>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="input-wrapper form-group">
+                            <label for="description"><strong>Amount</strong></label>
+                        </div>
+                    </div>
+                    <div class="col-sm-2">
+                        <div class="input-wrapper form-group">
+                            <label for="description"><strong>Action</strong></label>
+                        </div>
+                    </div>
+                </div>
                 <div class="row align-items-center" v-for="(e, i) in expandParam.data">
-                    <div class="col-sm-5">
+                    <div class="col-sm-3">
                         <div class="input-wrapper form-group mb-3">
-                            <label for="description">Car Number</label>
                             <input type="text" class="w-100 form-control" name="description" id="description"
                                    v-model="e.description" placeholder="Car Number">
                             <small class="invalid-feedback"></small>
                         </div>
                     </div>
-                    <div class="col-sm-5">
+                    <div class="col-sm-3">
                         <div class="input-wrapper form-group mb-3">
-                            <label for="amount">Amount</label>
+                            <input type="text" class="w-100 form-control" name="description" id="description"
+                                   v-model="e.voucher_no" placeholder="Car Number">
+                            <small class="invalid-feedback"></small>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="input-wrapper form-group mb-3">
                             <input type="text" class="w-100 form-control" name="amount" id="amount"
                                    v-model="e.amount" placeholder="Amount here">
                             <small class="invalid-feedback"></small>
                         </div>
                     </div>
                     <div class="col-sm-2">
-                        <button class="btn btn-danger"  style="height: 54px" type="button" @click="spliceData(i)">
+                        <button type="button" v-if="i == 0" class="btn btn-primary" @click="addMore">+</button>
+                        <button v-else class="btn btn-danger"  style="height: 54px" type="button" @click="spliceData(i)">
                             <i class="fa-solid fa-xmark"></i>
                         </button>
                     </div>
-                </div>
-                <div class="text-end">
-                    <button type="button" class="btn btn-primary" @click="addMore">Add More</button>
                 </div>
 
                 <button type="submit" class="btn btn-primary " v-if="!Loading">Submit</button>
@@ -159,7 +184,13 @@ export default {
             selectedData: null,
             expandParam: {
                 id: '',
-                data: []
+                data: [
+                    {
+                        description: '',
+                        voucher_number: '',
+                        amount: ''
+                    }
+                ]
             },
             selectedIDs: []
         };

@@ -492,13 +492,13 @@ class TankController extends Controller
             'type' => 'tank refill',
         ]);
         $totalRefillAmount = $inputData['total_refill_volume'] * $payOrder['unit_price'];
-        $transactionData['linked_id'] = $stockCategory['id'];
-        $lossAmount = $payOrder['total'] - $totalRefillAmount;
-        $transactionData['transaction'] = [
-            ['date' => $inputData['date'], 'account_id' => $costOfGoodSoldCategory['id'], 'debit_amount' => $totalRefillAmount, 'credit_amount' => 0, 'module' => 'tank refill', 'module_id' => $tankRefill->id],
-            ['date' => $inputData['date'], 'account_id' => $lossCategory['id'], 'debit_amount' => $lossAmount > 0 ? abs($lossAmount) : 0, 'credit_amount' => $lossAmount < 0 ? abs($lossAmount) : 0 , 'module' => 'tank refill', 'module_id' => $tankRefill->id],
-        ];
-        TransactionController::saveTransaction($transactionData);
+       // $transactionData['linked_id'] = $stockCategory['id'];
+     //   $lossAmount = $payOrder['total'] - $totalRefillAmount;
+//        $transactionData['transaction'] = [
+//            ['date' => $inputData['date'], 'account_id' => $costOfGoodSoldCategory['id'], 'debit_amount' => $totalRefillAmount, 'credit_amount' => 0, 'module' => 'tank refill', 'module_id' => $tankRefill->id],
+//            ['date' => $inputData['date'], 'account_id' => $lossCategory['id'], 'debit_amount' => $lossAmount > 0 ? abs($lossAmount) : 0, 'credit_amount' => $lossAmount < 0 ? abs($lossAmount) : 0 , 'module' => 'tank refill', 'module_id' => $tankRefill->id],
+//        ];
+       // TransactionController::saveTransaction($transactionData);
 
         $productPrice = new ProductPrice();
         $productPrice->date = $inputData['date'];

@@ -10,6 +10,7 @@ use App\Helpers\SessionUser;
 use App\Models\Expense;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
@@ -49,6 +50,7 @@ class ExpenseController extends Controller
         $expense->file = $file_path;
         $expense->status = FuelMatixStatus::PENDING;
         $expense->client_company_id = $sessionUser['client_company_id'];
+        $expense->user_id = Auth::user()->id;
         if (!$expense->save()) {
             return response()->json(['status' => 500, 'message' => 'Cannot save expense.']);
         }
@@ -192,7 +194,66 @@ class ExpenseController extends Controller
         TransactionController::saveTransaction($data);
         $expense->status = FuelMatixStatus::APPROVE;
         $expense->approve_by = Auth::user()->id;
+        $expense->approve_date = Carbon::now('UTC');
         $expense->save();
         return response()->json(['status' => 200, 'message' => 'Successfully approve expense.']);
+    }
+
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function report(Request $request): JsonResponse
+    {
+        $requestData = $request->all();
+        $validator = Validator::make($requestData, [
+            'start_date' => 'required|date',
+            'end_date' => 'required|date',
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['status' => 500, 'errors' => $validator->errors()]);
+        }
+        $category_id = $requestData['category_id'] ?? '';
+        $request_by = $requestData['request_by'] ?? '';
+        $approve_by = $requestData['approve_by'] ?? '';
+        $payment_category_id = $requestData['payment_category_id'] ?? '';
+        $result = Expense::select('expense.id', 'expense.date', 'c1.name as expense_type', 'c2.name as payment_method', 'expense.amount', 'expense.remarks', 'expense.approve_date', 'u1.name as approve_by', 'u2.name as request_by')
+            ->leftJoin('categories as c1', 'c1.id', '=', 'expense.category_id')
+            ->leftJoin('categories as c2', 'c2.id', '=', 'expense.payment_id')
+            ->leftJoin('users as u1', 'u1.id', '=', 'expense.approve_by')
+            ->leftJoin('users as u2', 'u2.id', '=', 'expense.user_id')
+            ->whereBetween('date', [$requestData['start_date'], $requestData['end_date']])
+            ->where('expense.client_company_id', $requestData['session_user']['client_company_id']);
+        if (!empty($category_id)) {
+            $result->where(function($q) use ($category_id) {
+                $q->where('expense.category_id', $category_id);
+            });
+        }
+        if (!empty($request_by)) {
+            $result->where(function($q) use ($request_by) {
+                $q->where('expense.user_id', $request_by);
+            });
+        }
+        if (!empty($approve_by)) {
+            $result->where(function($q) use ($approve_by) {
+                $q->where('expense.approve_by', $approve_by);
+            });
+        }
+        if (!empty($payment_category_id)) {
+            $result->where(function($q) use ($payment_category_id) {
+                $q->where('expense.payment_id', $payment_category_id);
+            });
+        }
+        $result = $result->orderBy('date', 'ASC')
+            ->get()
+            ->toArray();
+        $total = 0;
+        foreach ($result as &$data) {
+            $total += $data['amount'];
+            $data['date'] = Helpers::formatDate($data['date'], FuelMatixDateTimeFormat::STANDARD_DATE);
+            $data['approve_date'] = Helpers::formatDate($data['approve_date'], FuelMatixDateTimeFormat::STANDARD_DATE_TIME);
+            $data['amount'] = number_format($data['amount'], 2);
+        }
+        return response()->json(['status' => 200, 'data' => $result, 'total' => number_format($total, 2)]);
     }
 }

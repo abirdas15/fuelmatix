@@ -77,6 +77,7 @@ const ApiRoutes = {
     ExpenseList: ApiVersion + '/expense/list',
     ExpenseSingle: ApiVersion + '/expense/single',
     ExpenseApprove: ApiVersion + '/expense/approve',
+    ExpenseReport: ApiVersion + '/expense/report',
     //Tank
     TankAdd: ApiVersion + '/tank/save',
     TankEdit: ApiVersion + '/tank/update',

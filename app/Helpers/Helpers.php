@@ -8,6 +8,9 @@ class Helpers
 {
     public static function formatDate($date, $format = 'd/m/Y')
     {
+        if (empty($date)) {
+            return null;
+        }
         $date = date('Y-m-d H:i:s', strtotime($date));
         $timestamp = Carbon::createFromFormat('Y-m-d H:i:s', $date, 'UTC')
             ->setTimezone('Asia/Dhaka');

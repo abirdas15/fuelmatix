@@ -128,7 +128,8 @@ export default {
                         quantity: '',
                         unit_price: '',
                         total: '',
-                        expense_category_id: ''
+                        expense_category_id: '',
+                        stock_category_id: ''
                     }
                 ]
             },
@@ -171,6 +172,7 @@ export default {
             });
             this.param.products[index].unit_price = this.products[selectedProductIndex].buying_price;
             this.param.products[index].expense_category_id = this.products[selectedProductIndex].expense_category_id;
+            this.param.products[index].stock_category_id = this.products[selectedProductIndex].stock_category_id;
             this.calculatePrice(index);
         },
         removeProduct: function(index) {

@@ -61,12 +61,12 @@ class PayOrderController extends Controller
             ->where('linked_id', $request['bank_id'])
             ->where('client_company_id', $sessionUser['client_company_id'])
             ->first();
-        if (!empty($request['bank_id'])) {
-            $bankAmount = $transaction['debit_amount'] ?? 0 - $transaction['credit_amount'] ?? 0;
-            if ($bankAmount < $amount) {
-                return response()->json(['status' => 500, 'errors' => ['bank_id' => ['Not enough balance in your bank.']]]);
-            }
-        }
+//        if (!empty($request['bank_id'])) {
+//            $bankAmount = $transaction['debit_amount'] ?? 0 - $transaction['credit_amount'] ?? 0;
+//            if ($bankAmount < $amount) {
+//                return response()->json(['status' => 500, 'errors' => ['bank_id' => ['Not enough balance in your bank.']]]);
+//            }
+//        }
         $account_id = $inputData['bank_id'];
         if (empty($inputData['bank_id'])) {
             $account_id = $inputData['vendor_id'];
@@ -89,11 +89,19 @@ class PayOrderController extends Controller
                 'quantity' => $product['quantity'],
                 'total' => $product['total']
             ];
-            $transactionData['linked_id'] = $product['expense_category_id'];
+            $transactionData['linked_id'] =  $product['stock_category_id'];
             $transactionData['transaction'] = [
-                ['date' => date('Y-m-d'), 'account_id' => $account_id, 'debit_amount' => $product['total'], 'credit_amount' => 0, 'module' => Module::PAY_ORDER, 'module_id' => $payOrder->id],
+                ['date' => date('Y-m-d'), 'account_id' => $request['vendor_id'], 'debit_amount' => $product['total'], 'credit_amount' => 0, 'module' => Module::PAY_ORDER, 'module_id' => $payOrder->id],
             ];
             TransactionController::saveTransaction($transactionData);
+            if (!empty($inputData['bank_id'])) {
+                $transactionData = [];
+                $transactionData['linked_id'] = $request['vendor_id'];
+                $transactionData['transaction'] = [
+                    ['date' => date('Y-m-d'), 'account_id' => $request['bank_id'], 'debit_amount' => $product['total'], 'credit_amount' => 0, 'module' => Module::PAY_ORDER, 'module_id' => $payOrder->id],
+                ];
+                TransactionController::saveTransaction($transactionData);
+            }
         }
         PayOrderData::insert($payOrderData);
         return response()->json(['status' => 200, 'message' => 'Successfully saved pay order.']);

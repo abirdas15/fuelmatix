@@ -23,9 +23,6 @@ import ProductEdit from "../Pages/Fuel/Product/Edit";
 import Dispenser from "../Pages/Fuel/Dispenser/List";
 import DispenserAdd from "../Pages/Fuel/Dispenser/Add";
 import DispenserEdit from "../Pages/Fuel/Dispenser/Edit";
-import DispenserReading from "../Pages/Fuel/DispenserReading/List";
-import DispenserReadingAdd from "../Pages/Fuel/DispenserReading/Add";
-import DispenserReadingEdit from "../Pages/Fuel/DispenserReading/Edit";
 import Nozzle from "../Pages/Fuel/Nozzle/List";
 import NozzleAdd from "../Pages/Fuel/Nozzle/Add";
 import NozzleEdit from "../Pages/Fuel/Nozzle/Edit";
@@ -104,6 +101,7 @@ import purchaseAdd from "../Pages/PurchaseBill/Add.vue";
 import purchaseEdit from "../Pages/PurchaseBill/Edit.vue";
 import InvoicePayment from "../Pages/InvoicePayment/InvoicePayment.vue"
 import VendorReport from "../Pages/VendorReport/VendorReport.vue";
+import ExpenseReport from "../Pages/ExpenseReport/ExpenseReport.vue";
 
 const ROOT_URL = "";
 const router = new VueRouter({
@@ -572,6 +570,9 @@ const router = new VueRouter({
                 },
                 {
                     path: ROOT_URL + "/report/vendor", name: "VendorReport", component: VendorReport
+                },
+                {
+                    path: ROOT_URL + "/report/expense", name: "ExpenseReport", component: ExpenseReport
                 }
             ],
         },
