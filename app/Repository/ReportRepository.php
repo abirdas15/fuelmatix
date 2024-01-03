@@ -31,7 +31,9 @@ class ReportRepository
         $result['pos_sale'] = $posSale['data'];
         $result['tank_refill'] = self::getTankRefill($filter['date']);
         $result['stock'] = self::getStock($filter['date']);
-        $result['expense'] = self::getAllExpense($filter['date']);
+        $result['expense'] = self::getAllExpense([
+            'data' => $filter['date']
+        ]);
         $result['due_payments'] = self::getDuePayments($filter['date']);
         $result['due_invoice'] = self::getDueInvoice($filter['date']);
         $result['asset_balance']['cash'] = self::getAssetBalance($filter['date'], AccountCategory::CASH_IM_HAND);
@@ -157,22 +159,32 @@ class ReportRepository
     }
 
     /**
-     * @param string $date
+     * @param array $filter
      * @return array
      */
-    public static function getAllExpense(string $date): array
+    public static function getAllExpense(array $filter): array
     {
         $sessionUser = SessionUser::getUser();
         $transaction = Transaction::select(DB::raw('SUM(debit_amount) as amount'), 'categories.name as category_name')
             ->where('transactions.client_company_id', $sessionUser['client_company_id'])
             ->leftJoin('categories', 'categories.id', 'transactions.linked_id')
-            ->where('categories.type', FuelMatixCategoryType::EXPENSE)
-            ->where('date', $date)
-            ->having('amount', '>', 0)
+            ->where('categories.type', FuelMatixCategoryType::EXPENSE);
+        if (!empty($filter['date'])) {
+            $transaction->where(function($q) use ($filter) {
+                $q->where('date', $filter['date']);
+            });
+        }
+        if (!empty($filter['start_date']) && !empty($filter['end_date'])) {
+            $transaction->where(function($q) use ($filter) {
+                $q->whereBetween('date', [$filter['start_date'], $filter['end_date']]);
+            });
+        }
+        $transaction = $transaction->having('amount', '>', 0)
             ->groupBy('linked_id')
             ->get()
             ->toArray();
-        foreach ($transaction as $data) {
+        foreach ($transaction as &$data) {
+            $data['_amount'] = $data['amount'];
             $data['amount'] = number_format($data['amount'], 2);
         }
         return $transaction;

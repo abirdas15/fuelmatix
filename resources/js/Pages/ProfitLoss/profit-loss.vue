@@ -11,82 +11,19 @@
                 </div>
                 <div class="w-35 balance-sheet" v-if="!loading">
                     <div class="d-flex align-items-center justify-content-between line">
-                        <div>Total Revenue</div>
+                        <div><strong>Total Revenue</strong></div>
                         <div>
-                            <span v-if="balance.total_revenue < 0" class="text-danger">({{formatPrice(Math.abs(balance.total_revenue))}})</span>
-                            <span v-else>{{formatPrice(balance.total_revenue)}}</span>
-                        </div>
-                    </div>
-                    <div class="d-flex align-items-center justify-content-between line">
-                        <div>Cost of Goods Sold</div>
-                        <div>
-                            <span v-if="balance.cost_of_good_sold < 0" class="text-danger">({{formatPrice(Math.abs(balance.cost_of_good_sold))}})</span>
-                            <span v-else>{{formatPrice(balance.cost_of_good_sold)}}</span>
-                        </div>
-                    </div>
-                    <div class="d-flex align-items-center justify-content-between line">
-                        <div>Gross Profit</div>
-                        <div>
-                            <span v-if="balance.gross_profit < 0" class="text-danger">({{formatPrice(Math.abs(balance.gross_profit))}})</span>
-                            <span v-else>{{formatPrice(balance.gross_profit)}}</span>
+                            <span v-if="balance.total_revenue < 0" class="text-danger"><strong>({{formatPrice(Math.abs(balance.total_revenue))}})</strong></span>
+                            <span v-else><strong>{{formatPrice(balance.total_revenue)}}</strong></span>
                         </div>
                     </div>
                     <br>
-                    <strong class="text-success">Operating Expenses</strong>
-                    <div class="d-flex align-items-center justify-content-between line" v-for="expense in balance.operating_expenses">
-                        <div>{{ expense.name }}</div>
+                    <strong class="text-success">Expenses</strong>
+                    <div class="d-flex align-items-center justify-content-between line" v-for="expense in balance.expenses">
+                        <div>{{ expense.category_name }}</div>
                         <div>
-                            <span v-if="expense.balance < 0" class="text-danger">({{formatPrice(Math.abs(expense.balance))}})</span>
-                            <span v-else>{{formatPrice(expense.balance)}}</span>
-                        </div>
-                    </div>
-                    <div class="d-flex align-items-center justify-content-between line">
-                        <div>Total Operating Expenses</div>
-                        <div>
-                            <span v-if="balance.total_operating_expenses < 0" class="text-danger">({{formatPrice(Math.abs(balance.total_operating_expenses))}})</span>
-                            <span v-else>{{formatPrice(balance.total_operating_expenses)}}</span>
-                        </div>
-                    </div>
-                    <div class="d-flex align-items-center justify-content-between line">
-                        <div>Operating Profit</div>
-                        <div>
-                            <span v-if="balance.operating_profit < 0" class="text-danger">({{formatPrice(Math.abs(balance.operating_profit))}})</span>
-                            <span v-else>{{formatPrice(balance.operating_profit)}}</span>
-                        </div>
-                    </div>
-                    <div class="d-flex align-items-center justify-content-between line">
-                        <div>Interest Expense</div>
-                        <div>
-                            <span v-if="balance.interest_expense < 0" class="text-danger">({{formatPrice(Math.abs(balance.interest_expense))}})</span>
-                            <span v-else>{{formatPrice(balance.interest_expense)}}</span>
-                        </div>
-                    </div>
-                    <div class="d-flex align-items-center justify-content-between line">
-                        <div>Evaporative Expense</div>
-                        <div>
-                            <span v-if="balance.evaporative_expense < 0" class="text-danger">({{formatPrice(Math.abs(balance.evaporative_expense))}})</span>
-                            <span v-else>{{formatPrice(balance.evaporative_expense)}}</span>
-                        </div>
-                    </div>
-                    <div class="d-flex align-items-center justify-content-between line">
-                        <div>Driver Sale Expense</div>
-                        <div>
-                            <span v-if="balance.driver_sale < 0" class="text-danger">({{formatPrice(Math.abs(balance.driver_sale))}})</span>
-                            <span v-else>{{formatPrice(balance.driver_sale)}}</span>
-                        </div>
-                    </div>
-                    <div class="d-flex align-items-center justify-content-between line">
-                        <div>Income Before Taxes</div>
-                        <div>
-                            <span v-if="balance.income_before_tax < 0" class="text-danger">({{formatPrice(Math.abs(balance.income_before_tax))}})</span>
-                            <span v-else>{{formatPrice(balance.income_before_tax)}}</span>
-                        </div>
-                    </div>
-                    <div class="d-flex align-items-center justify-content-between line">
-                        <div>Taxes</div>
-                        <div>
-                            <span v-if="balance.tax < 0" class="text-danger">({{formatPrice(Math.abs(balance.tax))}})</span>
-                            <span v-else>{{formatPrice(balance.tax)}}</span>
+                            <span v-if="expense._amount < 0" class="text-danger">({{formatPrice(Math.abs(expense._amount))}})</span>
+                            <span v-else>{{formatPrice(expense._amount)}}</span>
                         </div>
                     </div>
                     <hr>

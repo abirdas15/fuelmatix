@@ -6,6 +6,7 @@ use App\Common\AccountCategory;
 use App\Helpers\SessionUser;
 use App\Models\Category;
 use App\Models\Transaction;
+use App\Repository\ReportRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -28,29 +29,17 @@ class ProfitLossController extends Controller
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
         $total_revenue = self::getTotalRevenue($inputData['start_date'], $inputData['end_date']);
-        $cost_of_good_sold = self::getTotalCostOfGoodSold($inputData['start_date'], $inputData['end_date']);
-        $operating_expenses = self::getOperatingExpense($inputData['start_date'], $inputData['end_date']);
-        $total_operating_expenses = self::getTotalOperatingExpense($operating_expenses);
-        $gross_profit = $total_revenue - $cost_of_good_sold;
-        $operating_profit = $gross_profit - $total_operating_expenses;
-        $interest_expense = self::getCategoryExpense($inputData['start_date'], $inputData['end_date'],  AccountCategory::TAX);
-        $evaporative_expense = self::getCategoryExpense($inputData['start_date'], $inputData['end_date'],  AccountCategory::EVAPORATIVE);
-        $driver_sale = self::getCategoryExpense($inputData['start_date'], $inputData['end_date'],  AccountCategory::DRIVER_SALE);
-        $income_before_text = $operating_profit - $interest_expense - $evaporative_expense - $driver_sale;
-        $tax = self::getCategoryExpense($inputData['start_date'], $inputData['end_date'], AccountCategory::INTEREST_EXPENSE);
-        $net_income = $income_before_text - $tax;
+
+        $expenses = ReportRepository::getAllExpense([
+            'start_date' => $inputData['start_date'],
+            'end_date' => $inputData['end_date'],
+        ]);
+        $totalExpense = array_sum(array_column($expenses, '_amount'));
+        $net_income = $total_revenue - $totalExpense;
         $result = [
             'total_revenue' => $total_revenue,
-            'cost_of_good_sold' => $cost_of_good_sold,
-            'gross_profit' => $gross_profit,
-            'operating_expenses' => $operating_expenses,
-            'total_operating_expenses' => $total_operating_expenses,
-            'operating_profit' => $operating_profit,
-            'interest_expense' => $interest_expense,
-            'evaporative_expense' => $evaporative_expense,
-            'driver_sale' => $driver_sale,
-            'income_before_tax' => $income_before_text,
-            'tax' => $tax,
+            'expenses' => $expenses,
+            'total_expense' => number_format($totalExpense, 2),
             'net_income' => $net_income
         ];
         return response()->json(['status' => 200, 'data' => $result]);
