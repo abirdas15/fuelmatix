@@ -37,6 +37,7 @@ import ShiftSaleView from "../Pages/ShiftSale/ShiftSaleView.vue";
 import Pos from "../Pages/Pos/Pos";
 import PosList from "../Pages/Pos/List.vue";
 import PosEdit from "../Pages/Pos/Edit.vue";
+import PosView from "../Pages/Pos/View.vue";
 import Expense from "../Pages/Expenses/List";
 import ExpenseAdd from "../Pages/Expenses/Add";
 import ExpenseEdit from "../Pages/Expenses/Edit";
@@ -264,6 +265,9 @@ const router = new VueRouter({
                     path: ROOT_URL + "/pos/edit/:id", name: "PosEdit", component: PosEdit, beforeEnter: (to, from, next) => {
                         CheckPermission(to, from, next, Section.POS + '-' + Action.EDIT)
                     },
+                },
+                {
+                    path: ROOT_URL + "/pos/view/:id", name: "PosView", component: PosView
                 },
                 {
                     path: ROOT_URL + "/expense", name: "Expense", component: Expense, beforeEnter: (to, from, next) => {
