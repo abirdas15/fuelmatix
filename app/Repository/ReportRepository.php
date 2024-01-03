@@ -42,11 +42,13 @@ class ReportRepository
      */
     public static function getPosSale(string $date): array
     {
+        $sessionUser = SessionUser::getUser();
         $result =  Sale::select('products.name as product_name', DB::raw('SUM(quantity) as quantity'), DB::raw('SUM(subtotal) as amount'), 'date', 'product_types.unit')
             ->leftJoin('sale_data', 'sale_data.sale_id', '=', 'sale.id')
             ->leftJoin('products', 'products.id', '=', 'sale_data.product_id')
             ->leftJoin('product_types', 'product_types.id', '=', 'products.type_id')
             ->where(DB::raw('DATE(date)'), $date)
+            ->where('sale.client_company_id', $sessionUser['client_company_id'])
             ->where('product_types.shift_sale', '0')
             ->groupBy('sale_data.product_id')
             ->get()

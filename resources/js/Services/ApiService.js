@@ -18,7 +18,7 @@ const ApiService = {
             }
         }).catch(err => {
             const error_code = parseInt(err.toLocaleString().replace(/\D/g, ""));
-            if (error_code != 200 && error_code != 500 && error_code != 300) {
+            if (error_code === 422) {
                 store.dispatch('Logout');
             }
         })
@@ -30,7 +30,7 @@ const ApiService = {
             }
         }).catch(err => {
             const error_code = parseInt(err.toLocaleString().replace(/\D/g, ""));
-            if (error_code != 200 && error_code != 500 && error_code != 300) {
+            if (error_code === 422) {
                 store.dispatch('Logout');
             }
         })
@@ -42,12 +42,12 @@ const ApiService = {
                 'x-api-key': '_@@jbbrd2023fuelmatix@@_'
             },
             responseType: 'blob' }).then((response) => {
-            if (response.status === 200) {
-                callback(response.data);
+            if (error_code === 422) {
+                store.dispatch('Logout');
             }
         }).catch(err => {
             const error_code = parseInt(err.toLocaleString().replace(/\D/g, ""));
-            if (error_code != 200 && error_code != 500 && error_code != 300) {
+            if (error_code === 422) {
                 store.dispatch('Logout');
             }
         })
@@ -63,7 +63,7 @@ const ApiService = {
             }
         }).catch(err => {
             const error_code = parseInt(err.toLocaleString().replace(/\D/g, ""));
-            if (error_code != 200 && error_code != 500 && error_code != 300) {
+            if (error_code === 422) {
                 store.dispatch('Logout');
             }
         })
