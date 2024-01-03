@@ -11,6 +11,7 @@ use App\Helpers\Helpers;
 use App\Helpers\SessionUser;
 use App\Models\Car;
 use App\Models\Category;
+use App\Models\ClientCompany;
 use App\Models\Driver;
 use App\Models\Product;
 use App\Models\ProductType;
@@ -238,8 +239,12 @@ class SaleController extends Controller
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
+        $sessionUser = SessionUser::getUser();
+        if (!$sessionUser instanceof User) {
+            return response()->json(['status' => 400, 'message' => 'Cannot find user.']);
+        }
         $result = Sale::find($inputData['id']);
-        $result['date'] = Helpers::formatDate($result['date'], 'd/m/Y h:iA');
+        $result['date'] = Helpers::formatDate($result['date'], FuelMatixDateTimeFormat::STANDARD_DATE_TIME);
         $result['customer_name'] = 'Walk in Customer';
         $result['payment_method'] = ucfirst($result['payment_method']);
         if (!empty($result['customer_id'])) {
@@ -261,6 +266,7 @@ class SaleController extends Controller
         }
         $result['products'] = $products;
         $result['total_amount'] = number_format($result['total_amount'], 2);
+        $result['company'] = ClientCompany::select('id', 'name', 'address', 'email', 'phone_number')->find($sessionUser['client_company_id']);
         return response()->json(['status' => 200, 'data' => $result]);
     }
     /**
