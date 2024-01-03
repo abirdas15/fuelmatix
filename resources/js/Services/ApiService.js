@@ -42,8 +42,8 @@ const ApiService = {
                 'x-api-key': '_@@jbbrd2023fuelmatix@@_'
             },
             responseType: 'blob' }).then((response) => {
-            if (error_code === 422) {
-                store.dispatch('Logout');
+            if (response.status === 200) {
+                callback(response.data);
             }
         }).catch(err => {
             const error_code = parseInt(err.toLocaleString().replace(/\D/g, ""));

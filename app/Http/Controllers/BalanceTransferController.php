@@ -72,12 +72,14 @@ class BalanceTransferController extends Controller
         $sessionUser = SessionUser::getUser();
         $requestData = $request->all();
         $limit = $requestData['limit'] ?? 10;
+        $orderBy = $requestData['order_by'] ?? 'balance_transfer.id';
+        $orderMode = $requestData['order_mode'] ?? 'DESC';
         $result = BalanceTransfer::select('balance_transfer.id', 'balance_transfer.date', 'balance_transfer.amount', 'balance_transfer.status', 'c1.name as from_category_name', 'c2.name as to_category_name', 'users.name as approve_by')
             ->leftJoin('categories as c1', 'c1.id', '=', 'balance_transfer.from_category_id')
             ->leftJoin('categories as c2', 'c2.id', '=', 'balance_transfer.to_category_id')
             ->leftJoin('users', 'users.id', '=', 'balance_transfer.approve_by')
             ->where('balance_transfer.client_company_id', $sessionUser['client_company_id']);
-        $result = $result->orderBy('balance_transfer.id', 'DESC')
+        $result = $result->orderBy($orderBy, $orderMode)
             ->paginate($limit);
         foreach ($result as &$data) {
             $data['date'] = Helpers::formatDate($data['date'], FuelMatixDateTimeFormat::STANDARD_DATE_TIME);

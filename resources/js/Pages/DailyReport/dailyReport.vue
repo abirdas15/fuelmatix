@@ -76,6 +76,12 @@
                                                 </tr>
                                                 </tbody>
                                             </template>
+                                            <tfoot>
+                                            <tr>
+                                                <th colspan="2" class="text-end">Total</th>
+                                                <th class="text-end" v-text="data.total.sale"></th>
+                                            </tr>
+                                            </tfoot>
                                         </table>
                                     </div>
                                 </div>
@@ -356,7 +362,8 @@ export default {
         },
         downloadPdf: function () {
             this.loadingFile = true
-            ApiService.DOWNLOAD(ApiRoutes.dailyLogPdf, this.param,'',res => {
+            ApiService.DOWNLOAD(ApiRoutes.dailyLogPdf, this.param,'',(res) => {
+                console.log(res);
                 this.loadingFile = false
                 let blob = new Blob([res], {type: 'pdf'});
                 const link = document.createElement('a');

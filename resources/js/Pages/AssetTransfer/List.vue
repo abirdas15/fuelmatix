@@ -38,11 +38,11 @@
                                             <thead>
                                             <tr class="text-white" style="background-color: #4886EE;color:#ffffff">
                                                 <th class="text-white" @click="sortData('date')" :class="sortClass('date')">Date</th>
-                                                <th class="text-white" @click="sortData('from_category_name')" :class="sortClass('from_category_name')">From</th>
-                                                <th class="text-white" @click="sortData('to_category_name')" :class="sortClass('to_category_name')">To</th>
+                                                <th class="text-white" @click="sortData('c1.name')" :class="sortClass('c1.name')">From</th>
+                                                <th class="text-white" @click="sortData('c2.name')" :class="sortClass('c2.name')">To</th>
                                                 <th class="text-white" @click="sortData('amount')" :class="sortClass('amount')">Amount</th>
                                                 <th class="text-white" @click="sortData('remarks')" :class="sortClass('remarks')">Remarks</th>
-                                                <th class="text-white" @click="sortData('approve_by')" :class="sortClass('approve_by')">Approve By</th>
+                                                <th class="text-white" @click="sortData('users.name')" :class="sortClass('users.name')">Approve By</th>
                                                 <th class="text-white" @click="sortData('status')" :class="sortClass('status')">Status</th>
                                                 <th class="text-white" >Action</th>
                                             </tr>

@@ -25,8 +25,10 @@ class ReportRepository
      */
     public static function dailyLog(array $filter): array
     {
-        $result['shift_sale'] = self::getShiftSale($filter['date']);
-        $result['pos_sale'] = self::getPosSale($filter['date']);
+        $shiftSale = self::getShiftSale($filter['date']);
+        $posSale =  self::getPosSale($filter['date']);
+        $result['shift_sale'] = $shiftSale['data'];
+        $result['pos_sale'] = $posSale['data'];
         $result['tank_refill'] = self::getTankRefill($filter['date']);
         $result['stock'] = self::getStock($filter['date']);
         $result['expense'] = self::getAllExpense($filter['date']);
@@ -34,6 +36,7 @@ class ReportRepository
         $result['due_invoice'] = self::getDueInvoice($filter['date']);
         $result['asset_balance']['cash'] = self::getAssetBalance($filter['date'], AccountCategory::CASH_IM_HAND);
         $result['asset_balance']['bank'] = self::getAssetBalance($filter['date'], AccountCategory::BANK);
+        $result['total']['sale'] = number_format($shiftSale['total'] + $posSale['total'], 2);
         return $result;
     }
     /**
@@ -53,11 +56,16 @@ class ReportRepository
             ->groupBy('sale_data.product_id')
             ->get()
             ->toArray();
+        $total = 0;
         foreach ($result as &$data) {
+            $total += $data['amount'];
             $data['time'] = Helpers::formatDate($data['date'], FuelMatixDateTimeFormat::STANDARD_DATE_TIME);
             $data['amount'] = number_format($data['amount'], 2);
         }
-        return $result;
+        return [
+            'data' => $result,
+            'total' => $total
+        ];
     }
     /**
      * @param string $date
@@ -235,8 +243,10 @@ class ReportRepository
             ->where('status', 'end')
             ->get()
             ->toArray();
+        $total = 0;
         $resultArray = [];
         foreach ($result as $data) {
+            $total += $data['amount'];
             $resultArray[$data['product_name']][] = [
                 'time' => 'Shift('.Helpers::formatDate($data['start_time'], FuelMatixDateTimeFormat::STANDARD_TIME).' - '.Helpers::formatDate($data['end_time'], FuelMatixDateTimeFormat::STANDARD_TIME).')',
                 'quantity' => $data['consumption'],
@@ -251,6 +261,9 @@ class ReportRepository
                 'data' => $row
             ];
         }
-        return $finalResult;
+        return [
+            'data' => $finalResult,
+            'total' => $total,
+        ];
     }
 }

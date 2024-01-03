@@ -80,6 +80,12 @@
             </tr>
             </tbody>
         @endforeach
+        <tfoot>
+            <tr>
+                <th colspan="2" style="text-align: right">Total</th>
+                <th style="text-align: right">{{ $data['total']['sale'] }}</th>
+            </tr>
+        </tfoot>
     </table>
     <table class="table" style="width: 95%; margin-bottom: 30px">
         <thead>
