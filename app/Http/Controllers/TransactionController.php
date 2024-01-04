@@ -101,7 +101,7 @@ class TransactionController extends Controller
         $category = Category::find($inputData['id']);
         $result = Transaction::select('id', 'created_at', 'account_id', 'debit_amount', 'credit_amount', 'description')
             ->where('linked_id', $inputData['id'])
-            ->orderBy('date', 'DESC')
+            ->orderBy('created_at', 'ASC')
             ->get()
             ->toArray();
         foreach ($result as $key => &$data) {

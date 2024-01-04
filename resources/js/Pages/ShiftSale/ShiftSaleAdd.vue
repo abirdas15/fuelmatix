@@ -514,6 +514,7 @@ export default {
                         return
                     }
                 }
+                this.listDispenser.net_profit = this.listDispenser.consumption - this.totalSale;
                 this.listDispenser.amount = totalCategoryAmount;
                 this.listDispenser.consumption = totalConsumption;
                 if (this.listDispenser.consumption == 0) {

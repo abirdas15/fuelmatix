@@ -435,6 +435,10 @@ class TankController extends Controller
         if (!$shiftSale instanceof ShiftSale) {
             return response()->json(['status' => 400, 'message' => 'Please start shift sale first.']);
         }
+        $product = Product::find($tank['product_id']);
+        if (!$product instanceof Product) {
+            return response()->json(['status' => 400, 'message' => 'Can not find [product].']);
+        }
 
         $payOrder = PayOrderData::where('product_id', $tank['product_id'])->where('pay_order_id', $inputData['pay_order_id'])->where('status', FuelMatixStatus::PENDING)->first();
         if (!$payOrder instanceof PayOrderData) {
@@ -458,12 +462,6 @@ class TankController extends Controller
             ->first();
         if (!$costOfGoodSoldCategory instanceof Category) {
             return response()->json(['status' => 400, 'message' => 'Cannot find [cost of good sold] category.']);
-        }
-        $lossCategory = Category::where('slug', strtolower(AccountCategory::EVAPORATIVE))
-            ->where('client_company_id', $inputData['session_user']['client_company_id'])
-            ->first();
-        if (!$lossCategory instanceof Category) {
-            return response()->json(['status' => 400, 'message' => 'Cannot find [evaporative loss] category.']);
         }
         $tankRefill = new TankRefill();
         $tankRefill->date = $inputData['date'];
@@ -492,13 +490,37 @@ class TankController extends Controller
             'type' => 'tank refill',
         ]);
         $totalRefillAmount = $inputData['total_refill_volume'] * $payOrder['unit_price'];
-        $transactionData['linked_id'] = $stockCategory['id'];
         $lossAmount = $payOrder['total'] - $totalRefillAmount;
-        $transactionData['transaction'] = [
-            ['date' => $inputData['date'], 'account_id' => $costOfGoodSoldCategory['id'], 'debit_amount' => $totalRefillAmount, 'credit_amount' => 0, 'module' => 'tank refill', 'module_id' => $tankRefill->id],
-            ['date' => $inputData['date'], 'account_id' => $lossCategory['id'], 'debit_amount' => $lossAmount > 0 ? abs($lossAmount) : 0, 'credit_amount' => $lossAmount < 0 ? abs($lossAmount) : 0 , 'module' => 'tank refill', 'module_id' => $tankRefill->id],
-        ];
-        TransactionController::saveTransaction($transactionData);
+        if ($tankRefill['net_profit'] < 0) {
+            // Loss amount transaction after tank refill
+            $lossCategory = Category::where('slug', strtolower(AccountCategory::EVAPORATIVE))
+                ->where('client_company_id', $inputData['session_user']['client_company_id'])
+                ->first();
+            if ($lossCategory instanceof Category) {
+                $description = 'Shift ID: '.$shiftSale['id'].', Product: '.$product['name'].', Loss: '.abs($tankRefill['net_profit']);
+                $transactionData['linked_id'] = $lossCategory['id'];
+                $transactionData['transaction'] = [
+                    ['date' => $inputData['date'], 'description' => $description, 'account_id' => $stockCategory['id'], 'debit_amount' => abs($lossAmount), 'credit_amount' => 0, 'module' => 'tank refill', 'module_id' => $tankRefill->id],
+                ];
+                TransactionController::saveTransaction($transactionData);
+            }
+        } else if ($tankRefill['net_profit'] > 0) {
+            // Profit amount transaction after tank refill
+            $category = Category::where('slug', strtolower(AccountCategory::DIRECT_INCOME))->where('client_company_id', $inputData['session_user']['client_company_id'])->first();
+            $incomeCategory = Category::where('parent_category', $category['id'])
+                ->where('module', 'product')
+                ->where('module_id', $tank['product_id'])
+                ->where('client_company_id', $inputData['session_user']['client_company_id'])
+                ->first();
+            if ($incomeCategory instanceof Category) {
+                $description = 'Shift ID: '.$shiftSale['id'].', Product: '.$product['name'].', Windfall: '.abs($tankRefill['net_profit']);
+                $transactionData['linked_id'] = $stockCategory['id'];
+                $transactionData['transaction'] = [
+                    ['date' => $inputData['date'], 'description' => $description, 'account_id' => $incomeCategory['id'], 'debit_amount' => abs($lossAmount), 'credit_amount' => 0, 'module' => 'tank refill', 'module_id' => $tankRefill->id],
+                ];
+                TransactionController::saveTransaction($transactionData);
+            }
+        }
 
         $productPrice = new ProductPrice();
         $productPrice->date = $inputData['date'];

@@ -113,6 +113,7 @@ class ShiftSaleController extends Controller
         $shiftSale->adjustment = $inputData['adjustment'];
         $shiftSale->consumption = $inputData['consumption'];
         $shiftSale->amount = $inputData['amount'];
+        $shiftSale->net_profit = $inputData['net_profit'] ?? null;
         $shiftSale->status = 'end';
         if (!$shiftSale->save()) {
             return response()->json(['status' => 500, 'error' => 'Cannot ended shift sale.']);
@@ -191,6 +192,31 @@ class ShiftSaleController extends Controller
             ['date' => $inputData['date'], 'account_id' => $costOfGoodSoldCategory['id'], 'debit_amount' => 0, 'credit_amount' => $buyingPrice, 'module' => 'shift sale', 'module_id' => $shiftSale->id]
         ];
         TransactionController::saveTransaction($transactionData);
+
+        $lossAmount = abs($inputData['net_profit']) * $buyingPrice;
+        if ($inputData['net_profit'] < 0) {
+            // Loss amount transaction after tank refill
+            $lossCategory = Category::where('slug', strtolower(AccountCategory::EVAPORATIVE))
+                ->where('client_company_id', $inputData['session_user']['client_company_id'])
+                ->first();
+            if ($lossCategory instanceof Category) {
+                $description = 'Shift ID: '.$shiftSale['id'].', Product: '.$product['name'].', Loss: '.abs($inputData['net_profit']);
+                $transactionData['linked_id'] = $lossCategory['id'];
+                $transactionData['transaction'] = [
+                    ['date' => $inputData['date'], 'description' => $description, 'account_id' => $stockCategory['id'], 'debit_amount' => abs($lossAmount), 'credit_amount' => 0, 'module' => 'tank refill', 'module_id' => $tankRefill->id],
+                ];
+                TransactionController::saveTransaction($transactionData);
+            }
+        } else if ($inputData['net_profit'] > 0) {
+            // Profit amount transaction after tank refill
+            $description = 'Shift ID: '.$shiftSale['id'].', Product: '.$product['name'].', Windfall: '.abs($inputData['net_profit']);
+            $transactionData['linked_id'] = $stockCategory['id'];
+            $transactionData['transaction'] = [
+                ['date' => $inputData['date'], 'description' => $description, 'account_id' => $incomeCategory['id'], 'debit_amount' => abs($lossAmount), 'credit_amount' => 0, 'module' => 'tank refill', 'module_id' => $tankRefill->id],
+            ];
+            TransactionController::saveTransaction($transactionData);
+        }
+
         ShiftSaleTransaction::insert($shiftSaleTransaction);
         return response()->json(['status' => 200, 'message' => 'Successfully ended shift sale.', 'shift_sale_id' => $shiftSale->id]);
     }

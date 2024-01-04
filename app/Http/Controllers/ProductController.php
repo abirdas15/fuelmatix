@@ -358,7 +358,8 @@ class ProductController extends Controller
             'selling_price' => $product->selling_price,
             'tank_height' => $tank['height'] ?? 0,
             'unit' => $productType['unit'],
-            'tank' => $productType['tank']
+            'tank' => $productType['tank'],
+            'net_profit' => 0
         ];
         $dispensers = Dispenser::select('id', 'dispenser_name')
             ->where('product_id', $inputData['product_id'])
