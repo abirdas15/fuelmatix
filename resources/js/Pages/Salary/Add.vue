@@ -62,6 +62,7 @@
                                        <table class="table table-bordered">
                                            <thead>
                                            <tr>
+                                               <th></th>
                                                <th>RFID</th>
                                                <th>Name</th>
                                                <th>Position</th>
@@ -71,6 +72,9 @@
                                            </thead>
                                            <tbody v-if="employee.length > 0">
                                            <tr v-for="(e, index) in employee">
+                                               <td>
+                                                   <input type="checkbox" v-model="e.checked">
+                                               </td>
                                                <td>{{e.rfid}}</td>
                                                <td>{{e.name}}</td>
                                                <td>{{e.position}}</td>

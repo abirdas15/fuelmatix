@@ -47,6 +47,7 @@ class SalaryController extends Controller
         foreach ($employees as &$employee) {
             $employee['salary'] = isset($transaction[$employee['id']]) ? $transaction[$employee['id']]['amount'] : $employee['salary'];
             $employee['category_id'] = isset($transaction[$employee['id']]) ? $transaction[$employee['id']]['category_id'] : '';
+            $employee['checked'] = true;
         }
         return response()->json(['status' => 200, 'data' => $employees]);
     }
@@ -69,7 +70,7 @@ class SalaryController extends Controller
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
         $sessionUser = SessionUser::getUser();
-        $date = $requestData['year'].'-'.$requestData['month'].'-01 h:i:s';
+        $date = $requestData['year'].'-'.$requestData['month'].'-01';
         $employeeIds = array_column($requestData['employees'], 'id');
         Transaction::where('client_company_id', $sessionUser['client_company_id'])
             ->where('date', $date)
@@ -80,12 +81,14 @@ class SalaryController extends Controller
             })
             ->delete();
         foreach ($requestData['employees'] as $employee) {
-            $transactions  = [];
-            $transactions['linked_id'] = $employee['id'];
-            $transactions['transaction'] = [
-                ['date' => $date, 'account_id' => $employee['category_id'], 'debit_amount' => $employee['salary'], 'credit_amount' => 0, 'module' => Module::SALARY]
-            ];
-            TransactionController::saveTransaction($transactions);
+            if ($employee['checked']) {
+                $transactions  = [];
+                $transactions['linked_id'] = $employee['id'];
+                $transactions['transaction'] = [
+                    ['date' => $date, 'account_id' => $employee['category_id'], 'debit_amount' => $employee['salary'], 'credit_amount' => 0, 'module' => Module::SALARY]
+                ];
+                TransactionController::saveTransaction($transactions);
+            }
         }
         return response()->json(['status' => 200, 'message' => 'Successfully saved salary.']);
     }

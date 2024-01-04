@@ -175,7 +175,7 @@ class VendorController extends Controller
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
-        $result = Transaction::select('date', DB::raw('SUM(credit_amount) as bill'), DB::raw('SUM(debit_amount) as paid'), DB::raw('SUM(credit_amount - debit_amount) as balance'), 'categories.name as product')
+        $result = Transaction::select('transactions.id','date', DB::raw('SUM(credit_amount) as bill'), DB::raw('SUM(debit_amount) as paid'), 'categories.name as product')
             ->leftJoin('categories', 'categories.id', '=', 'transactions.account_id')
             ->whereBetween('date', [$requestData['start_date'], $requestData['end_date']])
             ->where('linked_id', $requestData['vendor_id'])
@@ -185,7 +185,17 @@ class VendorController extends Controller
         $total['bill'] = 0;
         $total['paid'] = 0;
         $total['balance'] = 0;
-        foreach ($result as &$data) {
+        $balance  = 0;
+        foreach ($result as $key => &$data) {
+            $data['product_name'] = '';
+            $data['payment_method'] = '';
+            if ($data['bill'] > 0) {
+                $data['product_name'] = $data['product'];
+            } else if ($data['paid'] > 0) {
+                $data['payment_method'] = $data['product'];
+            }
+            $balance =  $balance + $data['bill'] - $data['paid'];
+            $data['balance'] = $balance;
             $total['bill'] += $data['bill'];
             $total['paid'] += $data['paid'];
             $total['balance'] += $data['balance'];
@@ -196,7 +206,7 @@ class VendorController extends Controller
         }
         $total['bill'] = number_format($total['bill'], 2);
         $total['paid'] = number_format($total['paid'], 2);
-        $total['balance'] = number_format($total['balance'], 2);
+        $total['balance'] = number_format($balance, 2);
         return response()->json(['status' => 200, 'data' => $result, 'total' => $total]);
     }
 }

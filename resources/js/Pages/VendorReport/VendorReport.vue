@@ -48,6 +48,7 @@
                                         <tr>
                                             <th>Date</th>
                                             <th>Product</th>
+                                            <th>Payment Method</th>
                                             <th>Billed</th>
                                             <th>Paid</th>
                                             <th>Balance</th>
@@ -57,12 +58,14 @@
                                         <template v-if="vendorReport.length > 0">
                                             <tr v-for="each in vendorReport">
                                                 <th v-text="each.date"></th>
-                                                <td v-text="each.product"></td>
+                                                <td v-text="each.product_name"></td>
+                                                <td v-text="each.payment_method"></td>
                                                 <td><span class="badge badge-success" v-text="each.bill"></span></td>
                                                 <td v-text="each.paid"></td>
                                                 <td class="color-primary" v-text="each.balance"></td>
                                             </tr>
                                             <tr>
+                                                <td></td>
                                                 <td></td>
                                                 <th class="w-800"><h3>Total</h3></th>
                                                 <th v-text="total.bill"></th>
@@ -71,7 +74,7 @@
                                             </tr>
                                         </template>
                                         <tr v-if="vendorReport.length == 0">
-                                            <td colspan="5" class="text-center">No data found</td>
+                                            <td colspan="6" class="text-center">No data found</td>
                                         </tr>
                                     </tbody>
                                 </table>

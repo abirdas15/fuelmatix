@@ -62,13 +62,14 @@
                             </div>
                             <div class=" mt-4">
                                 <div class="table-responsive">
-                                    <table id="example3" class="display" style="min-width: 845px">
+                                    <table class="table table-striped table-responsive-sm">
                                         <thead>
                                         <tr class="text-white" style="background-color: #20c997;color:#ffffff">
 
                                             <th class="text-white">Date </th>
                                             <th class="text-white">Product</th>
                                             <th class="text-white">Quantity</th>
+                                            <th class="text-white">Amount</th>
                                         </tr>
                                         </thead>
                                         <tbody>
@@ -77,8 +78,15 @@
 
                                             <td v-text="each.product_name">Octane</td>
                                             <td v-text="each.quantity"></td>
+                                            <td v-text="formatPrice(each.amount)"></td>
                                         </tr>
                                         </tbody>
+                                        <tfoot v-if="total > 0">
+                                            <tr>
+                                                <th colspan="3" class="text-end">Total</th>
+                                                <th>{{ formatPrice(total) }}</th>
+                                            </tr>
+                                        </tfoot>
                                     </table>
                                 </div>
                             </div>
@@ -147,6 +155,13 @@ export default {
         },
         Auth: function () {
             return this.$store.getters.GetAuth;
+        },
+        total: function() {
+            let total = 0;
+            this.listData.map((v) => {
+                total += parseFloat(v.amount);
+            });
+            return total;
         },
     },
     methods: {

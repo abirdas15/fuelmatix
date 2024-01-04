@@ -77,7 +77,7 @@ class ReportController extends Controller
         $dispenserId = $requestData['dispenser_id'] ?? '';
         $nozzleId = $requestData['nozzle_id'] ?? '';
         $sessionUser = SessionUser::getUser();
-        $result = ShiftSale::select('shift_sale.date', DB::raw('SUM(shift_summary.consumption) as quantity'), 'shift_sale.product_id', 'products.name as product_name', 'shift_summary.nozzle_id', 'nozzles.name as nozzle_name', 'shift_summary.dispenser_id', 'dispensers.dispenser_name')
+        $result = ShiftSale::select('shift_sale.date', DB::raw('SUM(shift_summary.consumption) as quantity'),DB::raw('SUM(shift_summary.amount) as amount'),  'shift_sale.product_id', 'products.name as product_name', 'shift_summary.nozzle_id', 'nozzles.name as nozzle_name', 'shift_summary.dispenser_id', 'dispensers.dispenser_name')
             ->leftJoin('shift_summary', 'shift_summary.shift_sale_id', '=', 'shift_sale.id')
             ->leftJoin('products', 'products.id', '=', 'shift_sale.product_id')
             ->leftJoin('nozzles', 'nozzles.id', '=', 'shift_summary.nozzle_id')
