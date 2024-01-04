@@ -11,6 +11,7 @@ use App\Models\BstiChart;
 use App\Models\Category;
 use App\Models\Dispenser;
 use App\Models\Product;
+use App\Models\ProductType;
 use App\Models\ShiftSale;
 use App\Models\ShiftSaleTransaction;
 use App\Models\ShiftSummary;
@@ -177,8 +178,15 @@ class ShiftSaleController extends Controller
                 'amount' => $category['amount']
             ];
         }
+        $linkedId = $stockCategory['id'];
+        if (!empty($product['vendor_id'])) {
+            $productType = ProductType::find($product['type_id']);
+            if ($productType instanceof ProductType && $productType['vendor'] == 1) {
+                $linkedId = $product['vendor_id'];
+            }
+        }
         $transactionData = [];
-        $transactionData['linked_id'] = $stockCategory['id'];
+        $transactionData['linked_id'] = $linkedId;
         $transactionData['transaction'] = [
             ['date' => $inputData['date'], 'account_id' => $costOfGoodSoldCategory['id'], 'debit_amount' => 0, 'credit_amount' => $buyingPrice, 'module' => 'shift sale', 'module_id' => $shiftSale->id]
         ];
