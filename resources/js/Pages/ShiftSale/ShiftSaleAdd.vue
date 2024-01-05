@@ -33,12 +33,22 @@
                                     <div class="text-center" v-else>No Product Found</div>
 
                                     <div id="progress-content-section" v-if="listDispenser">
+                                        <div class="row">
+                                            <div class="col-sm-12 text-end">
+                                                <div class="form-check d-flex justify-content-end">
+                                                    <input class="form-check-input" type="checkbox" v-model="noDIPShow" value="" id="flexCheckChecked" :checked="noDIPShow">
+                                                    <label class="form-check-label" for="flexCheckChecked">
+                                                        No DIP Reading
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
                                         <div class="section-content discovery active">
-                                            <template v-if="listDispenser.tank == 1">
+                                            <template v-if="listDispenser.tank == 1 && !noDIPShow">
                                                 <div class="card">
                                                 <div class="card-header">
                                                     <h5 class="card-title">
-                                                        {{ listDispenser.product_name }}</h5>
+                                                        {{ listDispenser?.product_name }}</h5>
                                                 </div>
                                                 <div class="card-body">
                                                     <div class="row align-items-center text-start">
@@ -342,6 +352,7 @@ export default {
             categories: [],
             totalPaid: 0,
             oilStock: false,
+            noDIPShow: true,
             mismatchAllow: null,
             bstiChart: []
         }
@@ -489,6 +500,9 @@ export default {
         },
         submit: function () {
             ApiService.ClearErrorHandler();
+            if (this.noDIPShow) {
+                this.listDispenser.end_reading = this.listDispenser.consumption > 0 ?  (parseFloat(this.listDispenser.consumption) - parseFloat(this.totalSale)) : this.totalSale ;
+            }
             this.listDispenser.categories = this.categories;
             let flag = false;
             if (this.listDispenser.status == 'end') {
