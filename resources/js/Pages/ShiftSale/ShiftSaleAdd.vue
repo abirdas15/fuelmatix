@@ -500,9 +500,6 @@ export default {
         },
         submit: function () {
             ApiService.ClearErrorHandler();
-            if (this.noDIPShow) {
-                this.listDispenser.end_reading = this.listDispenser.consumption > 0 ?  (parseFloat(this.listDispenser.consumption) - parseFloat(this.totalSale)) : this.totalSale ;
-            }
             this.listDispenser.categories = this.categories;
             let flag = false;
             if (this.listDispenser.status == 'end') {
@@ -527,6 +524,9 @@ export default {
                         this.$toast.error('The mismatch is grater than allowed consumption')
                         return
                     }
+                }
+                if (this.noDIPShow) {
+                    this.listDispenser.end_reading = this.listDispenser.end_reading == 0 ? parseFloat(this.listDispenser.consumption) - parseFloat(this.totalSale) : this.listDispenser.end_reading;
                 }
                 this.listDispenser.net_profit = this.listDispenser.consumption - this.totalSale;
                 this.listDispenser.amount = totalCategoryAmount;

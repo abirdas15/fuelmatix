@@ -8,6 +8,7 @@ use App\Common\FuelMatixDateTimeFormat;
 use App\Helpers\Helpers;
 use App\Helpers\SessionUser;
 use App\Models\Category;
+use App\Models\Expense;
 use App\Models\Invoice;
 use App\Models\Product;
 use App\Models\Sale;
@@ -25,15 +26,13 @@ class ReportRepository
      */
     public static function dailyLog(array $filter): array
     {
-        $shiftSale = self::getShiftSale($filter['date']);
-        $posSale =  self::getPosSale($filter['date']);
+        $shiftSale = self::getShiftSale($filter);
+        $posSale =  self::getPosSale($filter);
         $result['shift_sale'] = $shiftSale['data'];
         $result['pos_sale'] = $posSale['data'];
-        $result['tank_refill'] = self::getTankRefill($filter['date']);
+        $result['tank_refill'] = self::getTankRefill($filter);
         $result['stock'] = self::getStock($filter['date']);
-        $result['expense'] = self::getAllExpense([
-            'data' => $filter['date']
-        ]);
+        $result['expense'] = self::getAllExpense($filter);
         $result['due_payments'] = self::getDuePayments($filter['date']);
         $result['due_invoice'] = self::getDueInvoice($filter['date']);
         $result['asset_balance']['cash'] = self::getAssetBalance($filter['date'], AccountCategory::CASH_IM_HAND);
@@ -42,20 +41,25 @@ class ReportRepository
         return $result;
     }
     /**
-     * @param string $date
+     * @param array $filter
      * @return array
      */
-    public static function getPosSale(string $date): array
+    public static function getPosSale(array $filter): array
     {
         $sessionUser = SessionUser::getUser();
         $result =  Sale::select('products.name as product_name', DB::raw('SUM(quantity) as quantity'), DB::raw('SUM(subtotal) as amount'), 'date', 'product_types.unit')
             ->leftJoin('sale_data', 'sale_data.sale_id', '=', 'sale.id')
             ->leftJoin('products', 'products.id', '=', 'sale_data.product_id')
             ->leftJoin('product_types', 'product_types.id', '=', 'products.type_id')
-            ->where(DB::raw('DATE(date)'), $date)
+            ->where(DB::raw('DATE(date)'), $filter['date'])
             ->where('sale.client_company_id', $sessionUser['client_company_id'])
-            ->where('product_types.shift_sale', '0')
-            ->groupBy('sale_data.product_id')
+            ->where('product_types.shift_sale', '0');
+        if (!empty($filter['shift_sale_id'])) {
+            $result->where(function($q) use ($filter) {
+                $q->where('sale_data.shift_sale_id', $filter['shift_sale_id']);
+            });
+        }
+        $result = $result->groupBy('sale_data.product_id')
             ->get()
             ->toArray();
         $total = 0;
@@ -165,22 +169,26 @@ class ReportRepository
     public static function getAllExpense(array $filter): array
     {
         $sessionUser = SessionUser::getUser();
-        $transaction = Transaction::select(DB::raw('SUM(debit_amount) as amount'), 'categories.name as category_name')
-            ->where('transactions.client_company_id', $sessionUser['client_company_id'])
-            ->leftJoin('categories', 'categories.id', 'transactions.linked_id')
-            ->where('categories.type', FuelMatixCategoryType::EXPENSE);
+        $transaction = Expense::select('categories.name as category_name', DB::raw('SUM(amount) as amount'))
+            ->leftJoin('categories', 'categories.id', 'expense.category_id')
+            ->where('expense.client_company_id', $sessionUser['client_company_id'])
+            ->where('expense.status', 'approve');
         if (!empty($filter['date'])) {
             $transaction->where(function($q) use ($filter) {
-                $q->where('date', $filter['date']);
+                $q->where(DB::raw('DATE(date)'), $filter['date']);
             });
         }
         if (!empty($filter['start_date']) && !empty($filter['end_date'])) {
             $transaction->where(function($q) use ($filter) {
-                $q->whereBetween('date', [$filter['start_date'], $filter['end_date']]);
+                $q->whereBetween(DB::raw('DATE(date)'), [$filter['start_date'], $filter['end_date']]);
             });
         }
-        $transaction = $transaction->having('amount', '>', 0)
-            ->groupBy('linked_id')
+        if (!empty($filter['shift_sale_id'])) {
+            $transaction->where(function($q) use ($filter) {
+                $q->where('shift_sale_id', $filter['shift_sale_id']);
+            });
+        }
+        $transaction = $transaction->groupBy('category_id')
             ->get()
             ->toArray();
         foreach ($transaction as &$data) {
@@ -221,19 +229,24 @@ class ReportRepository
     }
 
     /**
-     * @param string $date
+     * @param array $filter
      * @return mixed
      */
-    public static function getTankRefill(string $date)
+    public static function getTankRefill(array  $filter)
     {
         $sessionUser = SessionUser::getUser();
         $result = TankRefill::select('tank_refill.id', 'tank_refill.date', 'tank_refill.time', 'tank_refill.total_refill_volume as quantity', 'tank_refill.net_profit', 'products.name as product_name', 'product_types.unit')
             ->leftJoin('tank', 'tank.id', 'tank_refill.tank_id')
             ->leftJoin('products', 'products.id', 'tank.product_id')
             ->leftJoin('product_types', 'product_types.id', 'products.type_id')
-            ->where('tank_refill.date', $date)
-            ->where('tank_refill.client_company_id', $sessionUser['client_company_id'])
-            ->get()
+            ->where('tank_refill.date', $filter['date'])
+            ->where('tank_refill.client_company_id', $sessionUser['client_company_id']);
+        if (!empty($filter['shift_sale_id'])) {
+            $result->where(function($q) use ($filter) {
+                $q->where('tank_refill.shift_sale_id', $filter['shift_sale_id']);
+            });
+        }
+        $result = $result->get()
             ->toArray();
         foreach ($result as &$data) {
             $data['date'] = Helpers::formatDate($data['date']. ' '.$data['time'], FuelMatixDateTimeFormat::STANDARD_DATE_TIME);
@@ -241,19 +254,24 @@ class ReportRepository
         return $result;
     }
     /**
-     * @param string $date
+     * @param array $filter
      * @return array
      */
-    public static function getShiftSale(string $date): array
+    public static function getShiftSale(array $filter): array
     {
         $sessionUser = SessionUser::getUser();
         $result = ShiftSale::select('consumption', 'amount', 'product_id', 'start_time', 'end_time', 'products.name as product_name', 'product_types.unit')
             ->leftJoin('products', 'products.id', '=', 'shift_sale.product_id')
             ->leftJoin('product_types', 'product_types.id', '=', 'products.type_id')
-            ->where('date', $date)
+            ->where('date', $filter['date'])
             ->where('shift_sale.client_company_id', $sessionUser['client_company_id'])
-            ->where('status', 'end')
-            ->get()
+            ->where('status', 'end');
+        if (!empty($filter['shift_sale_id'])) {
+            $result->where(function($q) use ($filter) {
+                $q->where('shift_sale.id', $filter['shift_sale_id']);
+            });
+        }
+        $result = $result->get()
             ->toArray();
         $total = 0;
         $resultArray = [];

@@ -42,6 +42,7 @@
                                                 <th class="text-white" @click="sortData('dispenser_name')" :class="sortClass('amount')">Amount</th>
                                                 <th class="text-white" @click="sortData('dispenser_name')" :class="sortClass('payment')">Payment Method</th>
                                                 <th class="text-white" @click="sortData('approve_by')" :class="sortClass('approve_by')">Approve By</th>
+                                                <th class="text-white">File</th>
                                                 <th class="text-white">Status</th>
                                                 <th class="text-white" >Action</th>
                                             </tr>
@@ -53,6 +54,9 @@
                                                 <td>{{f.amount_format}}</td>
                                                 <td>{{f.payment}}</td>
                                                 <td>{{f.approve_by}}</td>
+                                                <td>
+                                                    <a v-if="f.file != null" target="_blank"  :href="f.file_path"><i style="font-size: 30px" class="fa-regular fa-file"></i></a>
+                                                </td>
                                                 <td>
                                                     <select v-if="f.status == 'pending'" class="form-select" v-model="f.status" @change="approveExpense(f.id)">
                                                         <option value="pending">Pending</option>

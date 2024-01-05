@@ -49,6 +49,14 @@
                                         </select>
                                         <div class="invalid-feedback"></div>
                                     </div>
+                                    <div class="mb-3 form-group col-md-6">
+                                        <label class="form-label">Shift:</label>
+                                        <select class="form-control" name="shift_id" id="payment_id"  v-model="param.shift_sale_id">
+                                            <option value="">Select Shift</option>
+                                            <option v-for="d in shifts" :value="d.id">{{d.name}}</option>
+                                        </select>
+                                        <div class="invalid-feedback"></div>
+                                    </div>
 
                                     <div class="mb-3 form-group col-md-6">
                                         <div class="input-group">
@@ -91,9 +99,22 @@ export default {
             id: '',
             expenseData: [],
             paymentData: [],
+            shifts: []
+        }
+    },
+    watch:{
+      'param.date': function() {
+          this.fetchShift();
         }
     },
     methods: {
+        fetchShift: function() {
+            ApiService.POST(ApiRoutes.GetShiftByDate, {date: this.param.date}, (res) => {
+                if (parseInt(res.status) === 200) {
+                    this.shifts = res.data;
+                }
+            });
+        },
         getExpenseCategory: function () {
             ApiService.POST(ApiRoutes.CategoryParent, {type: 'expenses'},res => {
                 if (parseInt(res.status) === 200) {
@@ -131,7 +152,6 @@ export default {
                             altInput: true,
                             altFormat: "d/m/Y",
                             dateFormat: "Y-m-d",
-                            defaultDate: 'today',
                             onChange: (date, dateStr) => {
                                 this.param.date = dateStr
                             }

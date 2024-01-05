@@ -20,6 +20,14 @@
                             <div class="invalid-feedback"></div>
                         </div>
                         <div class="col-sm-3">
+                            <label class="form-label">Shift:</label>
+                            <select class="form-control" name="shift_id" id="payment_id"  v-model="param.shift_sale_id">
+                                <option value="">Select Shift</option>
+                                <option v-for="d in shifts" :value="d.id">{{d.name}}</option>
+                            </select>
+                            <div class="invalid-feedback"></div>
+                        </div>
+                        <div class="col-sm-3">
                             <button class="btn btn-primary" v-if="!loading" @click="getReport">Filter</button>
                             <button class="btn btn-primary" v-if="loading">Filtering....</button>
                         </div>
@@ -320,19 +328,34 @@
 <script>
 import ApiService from "../../Services/ApiService";
 import ApiRoutes from "../../Services/ApiRoutes";
+import moment from "moment/moment";
 
 export default {
     data() {
         return {
             param: {
-                date: ''
+                date: moment().format('YYYY-MM-DD'),
+                shift_sale_id: ''
             },
             data: null,
             loadingFile: false,
             loading: false,
+            shifts: [],
+        }
+    },
+    watch:{
+        'param.date': function() {
+            this.fetchShift();
         }
     },
     methods: {
+        fetchShift: function() {
+            ApiService.POST(ApiRoutes.GetShiftByDate, {date: this.param.date}, (res) => {
+                if (parseInt(res.status) === 200) {
+                    this.shifts = res.data;
+                }
+            });
+        },
         getClass: function (text) {
             if (text[0] == '-') {
                 return `fa-circle-down text-danger`
@@ -374,7 +397,7 @@ export default {
         }
     },
     created() {
-
+        this.fetchShift();
     },
     mounted() {
         setTimeout(() => {

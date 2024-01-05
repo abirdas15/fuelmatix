@@ -31,7 +31,8 @@ class ReportController extends Controller
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
         $filter = [
-            'date' => $requestData['date']
+            'date' => $requestData['date'],
+            'shift_sale_id' => $requestData['shift_sale_id'] ?? ''
         ];
         $result = ReportRepository::dailyLog($filter);
         return response()->json(['status' => 200, 'data' => $result]);

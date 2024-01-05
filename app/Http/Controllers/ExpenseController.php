@@ -8,6 +8,7 @@ use App\Common\Module;
 use App\Helpers\Helpers;
 use App\Helpers\SessionUser;
 use App\Models\Expense;
+use App\Models\ShiftSale;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -27,7 +28,8 @@ class ExpenseController extends Controller
             'date' => 'required|date',
             'category_id' => 'required',
             'amount' => 'required',
-            'payment_id' => 'required'
+            'payment_id' => 'required',
+            'shift_sale_id' => 'nullable|integer',
         ]);
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
@@ -42,11 +44,12 @@ class ExpenseController extends Controller
         }
         $sessionUser = SessionUser::getUser();
         $expense = new Expense();
-        $expense->date = $inputData['date'];
+        $expense->date = \Carbon\Carbon::parse($inputData['date'].' '.date('H:i:s'))->format('Y-m-d H:i:s');
         $expense->category_id = $inputData['category_id'];
         $expense->amount = $inputData['amount'];
         $expense->payment_id = $inputData['payment_id'];
         $expense->remarks = $inputData['remarks'] ?? null;
+        $expense->shift_sale_id = $inputData['shift_sale_id'] ?? null;
         $expense->file = $file_path;
         $expense->status = FuelMatixStatus::PENDING;
         $expense->client_company_id = $sessionUser['client_company_id'];
@@ -67,7 +70,7 @@ class ExpenseController extends Controller
         $keyword = $inputData['keyword'] ?? '';
         $sessionUser = SessionUser::getUser();
 
-        $result = Expense::select('expense.id', 'expense.date', 'expense.amount',  'c.name as expense', 'c1.name as payment', 'expense.status', 'users.name as approve_by')
+        $result = Expense::select('expense.id', 'expense.date', 'expense.amount',  'c.name as expense', 'c1.name as payment', 'expense.status', 'users.name as approve_by', 'expense.file')
             ->leftJoin('categories as c', 'c.id', 'expense.category_id')
             ->leftJoin('categories as c1', 'c1.id', 'expense.payment_id')
             ->leftJoin('users', 'users.id', '=', 'expense.approve_by')
@@ -99,9 +102,10 @@ class ExpenseController extends Controller
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
-        $result = Expense::select('id', 'category_id', 'payment_id', 'amount', 'file', 'remarks', 'date')
+        $result = Expense::select('id', 'category_id', 'payment_id', 'amount', 'file', 'remarks', 'date', 'shift_sale_id')
             ->where('id', $inputData['id'])
             ->first();
+        $result['date'] = Helpers::formatDate($result['date'], FuelMatixDateTimeFormat::ONLY_DATE);
         return response()->json(['status' => 200, 'data' => $result]);
     }
     /**
@@ -117,6 +121,7 @@ class ExpenseController extends Controller
             'category_id' => 'required',
             'amount' => 'required',
             'payment_id' => 'required',
+            'shift_sale_id' => 'nullable|integer',
         ]);
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
@@ -133,11 +138,12 @@ class ExpenseController extends Controller
             $file_path = $request->file('file')->getClientOriginalName();
             move_uploaded_file($file["tmp_name"], $destinationPath.'/'.$file_path);
         }
-        $expense->date = $inputData['date'];
+        $expense->date = \Carbon\Carbon::parse($inputData['date'].' '.date('H:i:s'))->format('Y-m-d H:i:s');
         $expense->category_id = $inputData['category_id'];
         $expense->amount = $inputData['amount'];
         $expense->payment_id = $inputData['payment_id'];
         $expense->remarks = $inputData['remarks'] ?? null;
+        $expense->shift_sale_id = $inputData['shift_sale_id'] ?? null;
         $expense->file = $file_path;
         if (!$expense->save()) {
             return response()->json(['status' => 500, 'error' => 'Cannot save expense.']);

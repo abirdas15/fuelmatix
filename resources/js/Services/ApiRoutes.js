@@ -70,6 +70,7 @@ const ApiRoutes = {
     ShiftSaleList: ApiVersion + '/shift/sale/list',
     ShiftSaleSingle: ApiVersion + '/shift/sale/single',
     ShiftSaleGetCategory: ApiVersion + '/shift/sale/getCategory',
+    GetShiftByDate: ApiVersion + '/shift/sale/getShiftByDate',
     //expense
     ExpenseAdd: ApiVersion + '/expense/save',
     ExpenseEdit: ApiVersion + '/expense/update',

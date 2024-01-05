@@ -203,7 +203,7 @@ class ShiftSaleController extends Controller
                 $description = 'Shift ID: '.$shiftSale['id'].', Product: '.$product['name'].', Loss: '.abs($inputData['net_profit']);
                 $transactionData['linked_id'] = $lossCategory['id'];
                 $transactionData['transaction'] = [
-                    ['date' => $inputData['date'], 'description' => $description, 'account_id' => $stockCategory['id'], 'debit_amount' => abs($lossAmount), 'credit_amount' => 0, 'module' => 'tank refill', 'module_id' => $tankRefill->id],
+                    ['date' => $inputData['date'], 'description' => $description, 'account_id' => $stockCategory['id'], 'debit_amount' => abs($lossAmount), 'credit_amount' => 0],
                 ];
                 TransactionController::saveTransaction($transactionData);
             }
@@ -212,7 +212,7 @@ class ShiftSaleController extends Controller
             $description = 'Shift ID: '.$shiftSale['id'].', Product: '.$product['name'].', Windfall: '.abs($inputData['net_profit']);
             $transactionData['linked_id'] = $stockCategory['id'];
             $transactionData['transaction'] = [
-                ['date' => $inputData['date'], 'description' => $description, 'account_id' => $incomeCategory['id'], 'debit_amount' => abs($lossAmount), 'credit_amount' => 0, 'module' => 'tank refill', 'module_id' => $tankRefill->id],
+                ['date' => $inputData['date'], 'description' => $description, 'account_id' => $incomeCategory['id'], 'debit_amount' => abs($lossAmount), 'credit_amount' => 0],
             ];
             TransactionController::saveTransaction($transactionData);
         }
@@ -379,6 +379,33 @@ class ShiftSaleController extends Controller
             $data['selected'] = false;
             if ($data['name'] == AccountCategory::CASH) {
                 $data['selected'] = true;
+            }
+        }
+        return response()->json(['status' => 200, 'data' => $result]);
+    }
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function getShiftByDate(Request $request): JsonResponse
+    {
+        $requestData = $request->all();
+        $validator = Validator::make($requestData, [
+            'date' => 'required|date'
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['status' => 500, 'errors' => $validator->errors()]);
+        }
+        $result = ShiftSale::select('shift_sale.id', 'shift_sale.start_time', 'shift_sale.end_time', 'products.name as product_name')
+            ->leftJoin('products', 'products.id', '=', 'shift_sale.product_id')
+            ->where('date', $requestData['date'])
+            ->get()
+            ->toArray();
+        foreach ($result as &$data) {
+            if (!empty($data['start_time']) && !empty($data['end_time'])) {
+                $data['name'] = $data['product_name']. ' ('.Helpers::formatDate($data['start_time'], FuelMatixDateTimeFormat::STANDARD_TIME).' - '.Helpers::formatDate($data['end_time'], FuelMatixDateTimeFormat::STANDARD_TIME).')';
+            } else {
+                $data['name'] = $data['product_name']. ' ('.Helpers::formatDate($data['start_time'], FuelMatixDateTimeFormat::STANDARD_TIME).' - Running)';
             }
         }
         return response()->json(['status' => 200, 'data' => $result]);
