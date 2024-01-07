@@ -10,15 +10,16 @@ use Illuminate\Support\Facades\Validator;
 
 class DispenserController extends Controller
 {
-    public function save(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function save(Request $request): JsonResponse
     {
         $inputData = $request->all();
         $validator = Validator::make($inputData, [
             'product_id' => 'required',
-//            'tank_id' => 'required',
             'dispenser_name' => 'required',
-            'brand' => 'required',
-            'serial' => 'required'
         ]);
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
@@ -68,7 +69,11 @@ class DispenserController extends Controller
             ->paginate($limit);
         return response()->json(['status' => 200, 'data' => $result]);
     }
-    public function single(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function single(Request $request): JsonResponse
     {
         $inputData = $request->all();
         $validator = Validator::make($inputData, [
@@ -80,16 +85,17 @@ class DispenserController extends Controller
         $result = Dispenser::find($inputData['id']);
         return response()->json(['status' => 200, 'data' => $result]);
     }
-    public function update(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function update(Request $request): JsonResponse
     {
         $inputData = $request->all();
         $validator = Validator::make($inputData, [
             'id' => 'required',
             'product_id' => 'required',
-//            'tank_id' => 'required',
             'dispenser_name' => 'required',
-            'brand' => 'required',
-            'serial' => 'required'
         ]);
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
@@ -109,7 +115,11 @@ class DispenserController extends Controller
         }
         return response()->json(['status' => 500, 'error' => 'Cannot update dispenser.']);
     }
-    public function delete(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function delete(Request $request): JsonResponse
     {
         $inputData = $request->all();
         $validator = Validator::make($inputData, [
@@ -125,7 +135,11 @@ class DispenserController extends Controller
         Dispenser::where('id', $inputData['id'])->delete();
         return response()->json(['status' => 200, 'message' => 'Successfully delete dispenser.']);
     }
-    public function readingSave(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function readingSave(Request $request): JsonResponse
     {
         $inputData = $request->all();
         $validator = Validator::make($inputData, [
@@ -149,13 +163,17 @@ class DispenserController extends Controller
         }
         return response()->json(['status' => 500, 'error' => 'Cannot saved dispense reading.']);
     }
-    public function readingList(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function readingList(Request $request): JsonResponse
     {
         $inputData = $request->all();
-        $limit = isset($inputData['limit']) ? $inputData['limit'] : 10;
-        $keyword = isset($inputData['keyword']) ? $inputData['keyword'] : '';
-        $order_by = isset($inputData['order_by']) ? $inputData['order_by'] : 'id';
-        $order_mode = isset($inputData['order_mode']) ? $inputData['order_mode'] : 'DESC';
+        $limit = $inputData['limit'] ?? 10;
+        $keyword = $inputData['keyword'] ?? '';
+        $order_by = $inputData['order_by'] ?? 'id';
+        $order_mode = $inputData['order_mode'] ?? 'DESC';
         $result = DispenserReading::select('dispenser_reading.id', 'dispenser_reading.date', 'dispenser_reading.reading', 'dispensers.dispenser_name')
             ->leftJoin('dispensers', 'dispensers.id', '=', 'dispenser_reading.dispenser_id')
             ->where('dispenser_reading.client_company_id', $inputData['session_user']['client_company_id']);
@@ -182,7 +200,11 @@ class DispenserController extends Controller
         }
         return response()->json(['status' => 200, 'data' => $result]);
     }
-    public function readingSingle(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function readingSingle(Request $request): JsonResponse
     {
         $inputData = $request->all();
         $validator = Validator::make($inputData, [
@@ -194,7 +216,11 @@ class DispenserController extends Controller
         $result = DispenserReading::find($inputData['id']);
         return response()->json(['status' => 200, 'data' => $result]);
     }
-    public function readingUpdate(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function readingUpdate(Request $request): JsonResponse
     {
         $inputData = $request->all();
         $validator = Validator::make($inputData, [
@@ -221,7 +247,11 @@ class DispenserController extends Controller
         }
         return response()->json(['status' => 500, 'error' => 'Cannot updated dispense reading.']);
     }
-    public function readingDelete(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function readingDelete(Request $request): JsonResponse
     {
         $inputData = $request->all();
         $validator = Validator::make($inputData, [

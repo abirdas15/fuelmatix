@@ -18,7 +18,7 @@ const ApiService = {
             }
         }).catch(err => {
             const error_code = parseInt(err.toLocaleString().replace(/\D/g, ""));
-            if (error_code === 422) {
+            if (error_code === 422 || error_code === 401 || error_code === 403 || error_code === 404) {
                 store.dispatch('Logout');
             }
         })
@@ -30,7 +30,7 @@ const ApiService = {
             }
         }).catch(err => {
             const error_code = parseInt(err.toLocaleString().replace(/\D/g, ""));
-            if (error_code === 422) {
+            if (error_code === 422 || error_code === 401 || error_code === 403 || error_code === 404) {
                 store.dispatch('Logout');
             }
         })
@@ -47,7 +47,7 @@ const ApiService = {
             }
         }).catch(err => {
             const error_code = parseInt(err.toLocaleString().replace(/\D/g, ""));
-            if (error_code === 422) {
+            if (error_code === 422 || error_code === 401 || error_code === 403 || error_code === 404) {
                 store.dispatch('Logout');
             }
         })
@@ -63,7 +63,7 @@ const ApiService = {
             }
         }).catch(err => {
             const error_code = parseInt(err.toLocaleString().replace(/\D/g, ""));
-            if (error_code === 422) {
+            if (error_code === 422 || error_code === 401 || error_code === 403 || error_code === 404) {
                 store.dispatch('Logout');
             }
         })

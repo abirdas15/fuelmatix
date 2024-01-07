@@ -50,11 +50,27 @@ class UserController extends Controller
             }
             $categoryData = [
                 'name' => $requestData['name'],
+                'opening_balance' => $requestData['opening_balance']
             ];
             $cashInHandCategory = CategoryRepository::saveCategory($categoryData, $cashInHandCategory['id'], null);
             if ($cashInHandCategory instanceof Category) {
                 $user->category_id = $cashInHandCategory->id;
                 $user->save();
+            }
+            if (!empty($request['opening_balance'])) {
+                $deleteResponse = $cashInHandCategory->deleteOpeningBalance();
+                if ($deleteResponse) {
+                    if (!empty($request['opening_balance'])) {
+                        $retainEarning = Category::where('client_company_id', $request['session_user']['client_company_id'])->where('slug', strtolower(AccountCategory::RETAIN_EARNING))->first();
+                        if ($retainEarning instanceof Category) {
+                            $transactionData['linked_id'] = $cashInHandCategory['id'];
+                            $transactionData['transaction'] = [
+                                ['date' => "1970-01-01",  'account_id' => $retainEarning['id'], 'debit_amount' => $requestData['opening_balance'], 'credit_amount' => 0, 'opening_balance' => 1],
+                            ];
+                            TransactionController::saveTransaction($transactionData);
+                        }
+                    }
+                }
             }
         }
         return response()->json(['status' => 200, 'message' => 'Successfully saved user.']);
@@ -71,8 +87,9 @@ class UserController extends Controller
         $orderBy = $requestData['order_by'] ?? 'id';
         $orderMode = $requestData['order_mode'] ?? 'DESC';
         $keyword = $requestData['keyword'] ?? '';
-        $result = User::select('users.id', 'users.name', 'users.email', 'users.phone', 'users.category_id', 'users.address', 'roles.name as role')
+        $result = User::select('users.id', 'users.name', 'users.email', 'users.phone', 'users.category_id', 'users.address', 'roles.name as role', 'categories.opening_balance')
             ->leftJoin('roles', 'roles.id', '=', 'users.role_id')
+            ->leftJoin('categories', 'categories.id', '=', 'users.category_id')
             ->where('users.client_company_id', $sessionUser['client_company_id']);
         if (!empty($keyword)) {
             $result->where(function($q) use ($keyword) {
@@ -97,9 +114,16 @@ class UserController extends Controller
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
-        $result = User::select('id', 'name', 'email', 'phone', 'address', 'cashier_balance', 'role_id')
+        $result = User::select('id', 'name', 'email', 'phone', 'address', 'cashier_balance', 'role_id', 'category_id')
             ->where('id', $requestData['id'])
             ->first();
+        $result['opening_balance'] = null;
+        if (!empty($result['category_id'])) {
+            $category = Category::find($result['category_id']);
+            if ($category instanceof Category) {
+                $result['opening_balance'] = $category['opening_balance'];
+            }
+        }
         return response()->json(['status' => 200, 'data' => $result]);
     }
 
@@ -115,7 +139,8 @@ class UserController extends Controller
             'name' => 'required|string',
             'role_id' => 'required|integer',
             'email' => 'required|email',
-            'password' => 'sometimes|min:8'
+            'password' => 'sometimes|min:8',
+            'opening_balance' => 'nullable|numeric'
         ]);
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
@@ -145,7 +170,9 @@ class UserController extends Controller
         }
         $categoryData = [
             'name' => $requestData['name'],
+            'opening_balance' => $requestData['opening_balance'],
         ];
+        $cashInHandCategory = null;
         if (!empty($requestData['cashier_balance']) && empty($user['category_id'])) {
             $cashInHandCategory = Category::where('client_company_id', $sessionUser['client_company_id'])->where('slug', strtolower(AccountCategory::CASH_IM_HAND))->first();
             if (!$cashInHandCategory instanceof Category) {
@@ -161,7 +188,22 @@ class UserController extends Controller
             if (!$category instanceof Category) {
                 return response()->json(['status' => 400, 'message' => 'Cannot find [cash in hand] category']);
             }
-            CategoryRepository::updateCategory($category, $categoryData);
+            $cashInHandCategory = CategoryRepository::updateCategory($category, $categoryData);
+        }
+        if ($cashInHandCategory instanceof Category && !empty($request['opening_balance'])) {
+            $deleteResponse = $cashInHandCategory->deleteOpeningBalance();
+            if ($deleteResponse) {
+                if (!empty($request['opening_balance'])) {
+                    $retainEarning = Category::where('client_company_id', $request['session_user']['client_company_id'])->where('slug', strtolower(AccountCategory::RETAIN_EARNING))->first();
+                    if ($retainEarning instanceof Category) {
+                        $transactionData['linked_id'] = $cashInHandCategory['id'];
+                        $transactionData['transaction'] = [
+                            ['date' => "1970-01-01",  'account_id' => $retainEarning['id'], 'debit_amount' => $request['opening_balance'], 'credit_amount' => 0, 'opening_balance' => 1],
+                        ];
+                        TransactionController::saveTransaction($transactionData);
+                    }
+                }
+            }
         }
         return response()->json(['status' => 200, 'message' => 'Successfully updated user.']);
     }

@@ -26,4 +26,5 @@ class Product extends Model
         }
         return true;
     }
+
 }

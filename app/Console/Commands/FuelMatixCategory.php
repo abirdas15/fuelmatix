@@ -435,6 +435,19 @@ class FuelMatixCategory extends Command
         }
         $this->info('Successfully Save '. AccountCategory::DRIVER_SALE);
 
+
+        $this->info('Category: '. AccountCategory::RETAIN_EARNING);
+        $retainEarning = $this->saveCategory([
+            'name' => AccountCategory::RETAIN_EARNING,
+            'parent_category' => $expenseCategory['id'],
+            'type' => FuelMatixCategoryType::EQUITY,
+            'client_company_id' => $clientCompany->id,
+        ]);
+        if (!$retainEarning instanceof Category) {
+            $this->warn('Cannot save category ['.AccountCategory::RETAIN_EARNING.']...');
+        }
+        $this->info('Successfully Save '. AccountCategory::RETAIN_EARNING);
+
         print_r('Successfully save category.'. PHP_EOL);
     }
 }

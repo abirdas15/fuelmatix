@@ -371,6 +371,7 @@ class ShiftSaleController extends Controller
             ->pluck('id')
             ->toArray();
         $result = Category::select('id', 'name')
+            ->with('product_price')
             ->whereIn('parent_category', $categoryId)
             ->orderBy('parent_category', 'ASC')
             ->get()

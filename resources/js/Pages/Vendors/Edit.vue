@@ -24,9 +24,14 @@
                                         <input type="text" class="form-control" name="name" v-model="param.name">
                                         <div class="invalid-feedback"></div>
                                     </div>
+                                    <div class="mb-3 form-group col-md-4">
+                                        <label class="form-label">Opening Balance:</label>
+                                        <input type="text" class="form-control" name="opening_balance" v-model="param.opening_balance">
+                                        <div class="invalid-feedback"></div>
+                                    </div>
                                 </div>
-                                <div class="row" style="text-align: right;">
-                                    <div class="mb-3 col-md-6">
+                                <div class="row">
+                                    <div class="mb-3">
                                         <button type="submit" class="btn btn-primary" v-if="!loading">Submit</button>
                                         <button type="button" class="btn btn-primary" v-if="loading">Submitting...</button>
                                         <router-link :to="{name: 'Vendor'}" type="button" class="btn btn-danger">Cancel</router-link>

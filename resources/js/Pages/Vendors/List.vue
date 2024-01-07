@@ -39,6 +39,7 @@
                                             <tr class="text-white" style="background-color: #4886EE;color:#ffffff">
                                                 <th class="text-white" @click="sortData('name')" :class="sortClass('name')">Vendor Name</th>
                                                 <th class="text-white" @click="sortData('amount')" :class="sortClass('amount')">Amount</th>
+                                                <th class="text-white" @click="sortData('opening_balance')" :class="sortClass('opening_balance')">Opening Balance</th>
                                                 <th class="text-white">Action</th>
                                             </tr>
                                             </thead>
@@ -46,6 +47,7 @@
                                             <tr v-for="f in listData">
                                                 <td >{{f.name}}</td>
                                                 <td >{{f.amount_format}}</td>
+                                                <td >{{f.opening_balance != null ? f.opening_balance.toLocaleString() : ''}}</td>
                                                 <td>
                                                     <div class="d-flex">
                                                         <button v-if="CheckPermission(Section.VENDOR + '-' + Action.CREATE) && f.amount != null && f.amount != ''"  class="btn btn-sm btn-primary me-2" @click="paymentModal(f)">Payment</button>

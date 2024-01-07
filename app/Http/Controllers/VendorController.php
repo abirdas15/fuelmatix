@@ -25,7 +25,8 @@ class VendorController extends Controller
     {
         $inputData = $request->all();
         $validator = Validator::make($inputData, [
-            'name' => 'required|string'
+            'name' => 'required|string',
+            'opening_balance' => 'nullable|numeric'
         ]);
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
@@ -36,10 +37,24 @@ class VendorController extends Controller
         }
         $categoryData = [
             'name' => $inputData['name'],
+            'opening_balance' => $inputData['opening_balance']
         ];
         $newCategory = CategoryRepository::saveCategory($categoryData, $accountPayable['id']);
         if (!$newCategory instanceof Category) {
             return response()->json(['status' => 400, 'message' => 'Cannot saved [vendor].']);
+        }
+        $deleteResponse = $newCategory->deleteOpeningBalance();
+        if ($deleteResponse) {
+            if (!empty($request['opening_balance'])) {
+                $retainEarning = Category::where('client_company_id', $inputData['session_user']['client_company_id'])->where('slug', strtolower(AccountCategory::RETAIN_EARNING))->first();
+                if ($retainEarning instanceof Category) {
+                    $transactionData['linked_id'] = $newCategory['id'];
+                    $transactionData['transaction'] = [
+                        ['date' => "1970-01-01",  'account_id' => $retainEarning['id'], 'debit_amount' => 0, 'credit_amount' => $request['opening_balance'], 'opening_balance' => 1],
+                    ];
+                    TransactionController::saveTransaction($transactionData);
+                }
+            }
         }
         return response()->json(['status' => 200, 'message' => 'Successfully saved vendor.']);
     }
@@ -58,7 +73,7 @@ class VendorController extends Controller
         if (!$accountPayable instanceof Category) {
             return response()->json(['status' => 400, 'message' => 'Cannot find [account payable] category.']);
         }
-        $result = Category::select('categories.id', 'categories.name', DB::raw('SUM(debit_amount - credit_amount) as amount'))
+        $result = Category::select('categories.id', 'categories.name', DB::raw('SUM(debit_amount - credit_amount) as amount'), 'categories.opening_balance')
             ->leftJoin('transactions', 'transactions.account_id', '=', 'categories.id')
             ->where('categories.client_company_id', $inputData['session_user']['client_company_id'])
             ->where('parent_category', $accountPayable['id']);
@@ -87,7 +102,7 @@ class VendorController extends Controller
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
-        $result = Category::select('id', 'name')->find($inputData['id']);
+        $result = Category::select('id', 'name', 'opening_balance')->find($inputData['id']);
         return response()->json(['status' => 200, 'data' => $result]);
     }
     /**
@@ -99,7 +114,8 @@ class VendorController extends Controller
         $inputData = $request->all();
         $validator = Validator::make($inputData, [
             'id' => 'required',
-            'name' => 'required'
+            'name' => 'required',
+            'opening_balance' => 'nullable|numeric'
         ]);
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
@@ -111,10 +127,24 @@ class VendorController extends Controller
         $category->name = $inputData['name'];
         $categoryData = [
             'name' => $inputData['name'],
+            'opening_balance' => $inputData['opening_balance']
         ];
         $updateCategory = CategoryRepository::updateCategory($category, $categoryData);
         if (!$updateCategory instanceof Category) {
             return response()->json(['status' => 400, 'message' => 'Cannot updated [vendor].']);
+        }
+        $deleteResponse = $updateCategory->deleteOpeningBalance();
+        if ($deleteResponse) {
+            if (!empty($request['opening_balance'])) {
+                $retainEarning = Category::where('client_company_id', $inputData['session_user']['client_company_id'])->where('slug', strtolower(AccountCategory::RETAIN_EARNING))->first();
+                if ($retainEarning instanceof Category) {
+                    $transactionData['linked_id'] = $updateCategory['id'];
+                    $transactionData['transaction'] = [
+                        ['date' => "1970-01-01",  'account_id' => $retainEarning['id'], 'debit_amount' => 0, 'credit_amount' => $request['opening_balance'], 'opening_balance' => 1],
+                    ];
+                    TransactionController::saveTransaction($transactionData);
+                }
+            }
         }
         return response()->json(['status' => 200, 'message' => 'Successfully updated vendor.']);
     }
@@ -131,10 +161,15 @@ class VendorController extends Controller
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
+        $category = Category::find($inputData['id']);
+        if (!$category instanceof Category) {
+            return response()->json(['status' => 400, 'message' => 'Cannot find bank.']);
+        }
         $transaction = Transaction::where('account_id', $inputData['id'])->orWhere('linked_id', $inputData['id'])->first();
         if ($transaction instanceof Transaction) {
             return response()->json(['status' => 400, 'message' => 'Cannot deleted [vendor].']);
         }
+        $category->deleteOpeningBalance();
         Category::where('id', $inputData['id'])->delete();
         return response()->json(['status' => 200, 'message' => 'Successfully deleted vendor.']);
     }

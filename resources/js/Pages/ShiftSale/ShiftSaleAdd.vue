@@ -237,10 +237,10 @@
                                                                 <td style="font-size: 18px;padding: 0px;" class="">Total sale:</td>
                                                                 <td style="font-size: 18px;padding: 0px;" class="text-end ">{{totalSale}} {{ listDispenser.unit }}</td>
                                                             </tr>
-                                                            <tr>
-                                                                <td style="font-size: 18px;padding: 0px;" class="">Total amount:</td>
-                                                                <td style="font-size: 18px;padding: 0px;" class="text-end ">{{totalAmount}} Tk</td>
-                                                            </tr>
+<!--                                                            <tr>-->
+<!--                                                                <td style="font-size: 18px;padding: 0px;" class="">Total amount:</td>-->
+<!--                                                                <td style="font-size: 18px;padding: 0px;" class="text-end ">{{totalAmount}} Tk</td>-->
+<!--                                                            </tr>-->
                                                         </table>
                                                     </div>
                                                 </div>
@@ -276,38 +276,48 @@
                                                 </div>
 
                                                 <div class="row">
-                                                    <div class="col-sm-6"></div>
-                                                    <div class="col-sm-6 text-end">
-                                                        <div class="d-flex mb-3 justify-content-end"  v-for="(category,index) in categories">
-                                                            <select class="form-control me-3" style="max-width: 210px" v-model="category.category_id"
-                                                                    @change="isDataExist(category.category_id, 'category_id', index, categories)" >
-                                                                <option v-for="c in allAmountCategory" :value="c.id">{{c.name}}</option>
-                                                            </select>
-                                                            <div class="form-group">
-                                                                <input class="form-control me-3 text-end"  style="max-width: 210px" type="number" step="any" v-model="category.amount" :id="'categories.'+index+'.amount'"
-                                                                       @input="calculateValue(category.amount)"
-                                                                       :name="'categories.'+index+'.amount'">
+                                                    <div class="col-sm-4"></div>
+                                                    <div class="col-sm-8 text-end">
+                                                        <div class="row"  v-for="(category,index) in categories">
+                                                            <div class="col-sm-4 mb-3">
+                                                                <select class="form-control me-3" style="max-width: 210px" v-model="category.category_id"
+                                                                        @change="isDataExist(category.category_id, 'category_id', index, categories); filterProductPrice(index)" >
+                                                                    <option v-for="c in allAmountCategory" :value="c.id">{{c.name}}</option>
+                                                                </select>
+                                                            </div>
+                                                            <div class="form-group col-sm-3 mb-3">
+                                                                <div class="input-group" style="width: 95%">
+                                                                    <input type="text" class="form-control text-end" v-model="category.liter" disabled>
+                                                                    <div class="input-group-append">
+                                                                        <span class="input-group-text" >{{ listDispenser.unit }}</span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group col-sm-4 mb-3">
+                                                                <input class="form-control me-3 text-end"  style="width: 95%" type="number" step="any" v-model="category.amount" :id="'categories.'+index+'.amount'"
+                                                                       @input="calculateValue(category.amount, index); filterProductPrice(index)"
+                                                                       :name="'categories.'+index+'.amount'" placeholder="Amount here">
                                                                 <div class="invalid-feedback"></div>
                                                             </div>
-
-                                                            <button class="btn btn-primary"  style="height: 54px" v-if="index == 0" type="button" @click="addCategory">+</button>
-                                                            <button class="btn btn-danger"  style="height: 54px"   v-else  type="button" @click="removeCategory(index)">
-                                                                <i class="fa-solid fa-xmark"></i>
-                                                            </button>
+                                                            <div class="col-sm-1 mb-3">
+                                                                <button class="btn btn-primary"  style="height: 54px" v-if="index == 0" type="button" @click="addCategory">+</button>
+                                                                <button class="btn btn-danger"  style="height: 54px"   v-else  type="button" @click="removeCategory(index)">
+                                                                    <i class="fa-solid fa-xmark"></i>
+                                                                </button>
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                    <div class="col-sm-8"></div>
-                                                    <div class="col-sm-4">
-                                                        <table class="table">
-                                                            <tr>
-                                                                <td style="font-size: 18px;padding: 0px;" class="">Amount:</td>
-                                                                <td style="font-size: 18px;padding: 0px;" class="text-end ">{{isNaN(totalPaid) ? 0 : totalPaid}} Tk</td>
-                                                            </tr>
-                                                        </table>
+                                                        <div class="row">
+                                                            <div class="col-sm-4"></div>
+                                                            <div class="col-sm-3 text-center">
+                                                                <span><strong>Total: {{ totalLiter }} {{ listDispenser.unit }}</strong></span>
+                                                            </div>
+                                                            <div class="col-sm-4 text-center">
+                                                                <span><strong>Amount: {{isNaN(totalPaid) ? 0 : totalPaid}} Tk</strong></span>
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </template>
-
                                         </div>
                                     </div>
                                     <div class="text-center" v-else>Please Select any product</div>
@@ -357,6 +367,17 @@ export default {
             bstiChart: []
         }
     },
+    computed: {
+        totalLiter: function() {
+            let total = 0;
+            this.categories.map((v) => {
+                if (v.liter != '') {
+                    total += parseFloat(v.liter);
+                }
+            });
+            return total;
+        }
+    },
     watch: {
         'listDispenser.end_reading_mm': function() {
             if (parseFloat(this.listDispenser.end_reading_mm) > parseFloat(this.listDispenser.tank_height)) {
@@ -394,11 +415,32 @@ export default {
             })
             return total
         },
+        filterProductPrice: function(index) {
+            this.categories[index]['liter'] = '';
+            let category_id = this.categories[index]['category_id'];
+            let product_price = [];
+            this.allAmountCategory.map((v) => {
+                if (v.id == category_id) {
+                    product_price = v.product_price;
+                }
+            });
+            let selling_price = this.listDispenser.selling_price;
+            if (product_price.length > 0) {
+                product_price.map((v) => {
+                    if (v.product_id == this.product_id) {
+                        selling_price = v.price;
+                    }
+                });
+            }
+            console.log(this.totalSale / selling_price);
+            console.log(this.totalSale / selling_price);
+            this.categories[index]['liter'] = parseFloat(this.categories[index]['amount'] / selling_price).toFixed(2);
+        },
         calculateValue: function (amount) {
             this.totalPaid = 0
             this.categories.map(v => {
                 this.totalPaid += parseFloat(v.amount)
-            })
+            });
         },
         removeCategory: function(index) {
             this.categories.splice(index, 1);
@@ -406,7 +448,8 @@ export default {
         addCategory: function() {
             this.categories.push({
                 amount: '',
-                category_id: ''
+                category_id: '',
+                liter: ''
             });
         },
         getTotalSale: function () {
@@ -477,7 +520,8 @@ export default {
                     });
                     this.categories.push({
                         amount: '',
-                        category_id: category_id
+                        category_id: category_id,
+                        liter: ''
                     });
                 }
             });

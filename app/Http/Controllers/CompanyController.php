@@ -42,6 +42,7 @@ class CompanyController extends Controller
         $company->email = $requestData['email'] ?? null;
         $company->phone_number = $requestData['phone_number'] ?? null;
         $company->sale_mismatch_allow = $requestData['sale_mismatch_allow'] ?? null;
+        $company->voucher_check = $requestData['voucher_check'] ?? 0;
         $company->header_text = $requestData['header_text'] ?? 0;
         $company->footer_text = $requestData['footer_text'] ?? 0;
         $company->expense_approve = $requestData['expense_approve'] ?? null;

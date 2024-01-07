@@ -58,7 +58,7 @@
                                                 <td >{{f.created_at}}</td>
                                                 <td><a href="javascript:void(0);">{{f.name}}</a></td>
                                                 <td><a href="javascript:void(0);">{{f.description}}</a></td>
-                                                <td><a href="javascript:void(0);">{{f?.amount}}</a></td>
+                                                <td><a href="javascript:void(0);">{{f?.amount_format}}</a></td>
                                                 <td>
                                                     <template v-if="f.module == 'shift sale' && CheckPermission(Section.COMPANY_SALE + '-' + Action.CREATE)">
                                                         <button class="btn btn-sm btn-primary" v-if="!f.invoice_id"  @click="tableAction('expand', f)">Expand</button>
@@ -121,21 +121,23 @@
                 <div class="row align-items-center" v-for="(e, i) in expandParam.data">
                     <div class="col-sm-3">
                         <div class="input-wrapper form-group mb-3">
-                            <input type="text" class="w-100 form-control" name="description" id="description"
-                                   v-model="e.description" placeholder="Car Number">
+                            <select class="form-control" v-model="e.description" :name="'description.' + i">
+                                <option value="">Select Car</option>
+                                <option v-for="each in cars" :value="each.car_number" v-text="each.car_number"></option>
+                            </select>
                             <small class="invalid-feedback"></small>
                         </div>
                     </div>
                     <div class="col-sm-3">
                         <div class="input-wrapper form-group mb-3">
-                            <input type="text" class="w-100 form-control" name="description" id="description"
-                                   v-model="e.voucher_no" placeholder="Car Number">
+                            <input type="text" class="w-100 form-control" :name="'data.' + i + '.voucher_number'" id="description"
+                                   v-model="e.voucher_number" placeholder="Voucher Number">
                             <small class="invalid-feedback"></small>
                         </div>
                     </div>
                     <div class="col-sm-3">
                         <div class="input-wrapper form-group mb-3">
-                            <input type="text" class="w-100 form-control" name="amount" id="amount"
+                            <input type="text" class="w-100 form-control" :name="'data.' + i + '.amount'" id="amount"
                                    v-model="e.amount" placeholder="Amount here">
                             <small class="invalid-feedback"></small>
                         </div>
@@ -146,6 +148,12 @@
                             <i class="fa-solid fa-xmark"></i>
                         </button>
                     </div>
+                </div>
+                <div class="align-items-center offset-6 col-sm-3">
+                    <label class="mb-0"><strong>Total: {{ totalAmount.toLocaleString() }}</strong></label>
+                </div>
+                <div class="align-items-center offset-6 col-sm-3">
+                    <label class="text-danger"><strong>Mission: {{ missingAmount.toLocaleString() }}</strong></label>
                 </div>
 
                 <button type="submit" class="btn btn-primary " v-if="!Loading">Submit</button>
@@ -192,7 +200,9 @@ export default {
                     }
                 ]
             },
-            selectedIDs: []
+            selectedIDs: [],
+            cars: []
+
         };
     },
     watch: {
@@ -213,8 +223,30 @@ export default {
         Auth: function () {
             return this.$store.getters.GetAuth;
         },
+        missingAmount: function() {
+            if (this.selectedData != null) {
+                return parseFloat(this.selectedData.amount) - parseFloat(this.totalAmount)
+            }
+            return 0;
+        },
+        totalAmount: function() {
+            let total = 0;
+            this.expandParam.data.map((v) => {
+                if (v.amount != '') {
+                    total += parseFloat(v.amount);
+                }
+            });
+            return total;
+        },
     },
     methods: {
+        fetchCar: function() {
+            ApiService.POST(ApiRoutes.CarList, {company_id:  this.selectedData.category_id, limit: 500}, (res) => {
+                if (parseInt(res.status) === 200) {
+                    this.cars = res.data.data;
+                }
+            });
+        },
         generateInvoice: function () {
             this.generateLoading = true
             ApiService.POST(ApiRoutes.invoiceGenerate, {ids: this.selectedIDs},res => {
@@ -256,9 +288,10 @@ export default {
                     this.$toast.success(res.message);
                     $('.createExpand').addClass('d-none')
                     this.list()
+                } else if (parseInt(res.status) === 300) {
+                    this.$toast.error(res.message)
                 } else {
-                    this.$toast.error(res.error)
-                    ApiService.ErrorHandler(res.error);
+                    ApiService.ErrorHandler(res.errors);
                 }
             });
         },
@@ -267,8 +300,9 @@ export default {
                 this.selectedData = data
                 this.expandParam.id = data.id
                 this.expandParam.data = []
-                this.expandParam.data.push({amount: 0, description: ''})
+                this.expandParam.data.push({amount: '', description: '', voucher_number: ''})
                 $('.createExpand').removeClass('d-none')
+                this.fetchCar();
             } else if (e == 'generate') {
                 if (data.is_invoice) {
                     this.$toast.success('Invoice already Created');
@@ -288,7 +322,7 @@ export default {
             }
         },
         addMore: function () {
-            this.expandParam.data.push({amount: 0, description: ''})
+            this.expandParam.data.push({amount: '', description: '', voucher_number: ''})
         },
         spliceData: function (i) {
             this.expandParam.data.splice(i, 1)

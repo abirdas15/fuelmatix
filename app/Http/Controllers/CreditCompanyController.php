@@ -6,6 +6,7 @@ use App\Common\AccountCategory;
 use App\Common\Module;
 use App\Helpers\SessionUser;
 use App\Models\Category;
+use App\Models\CompanyProductPrice;
 use App\Repository\CategoryRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -24,11 +25,11 @@ class CreditCompanyController extends Controller
             'name' => 'required',
             'email' => 'required',
             'phone' => 'required',
+            'opening_balance' => 'nullable|numeric',
         ]);
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
-
         $others = [
             'email' => $inputData['email'] ?? null,
             'phone' => $inputData['phone'] ?? null,
@@ -38,6 +39,7 @@ class CreditCompanyController extends Controller
         $data = [
             'name' => $inputData['name'],
             'credit_limit' => $inputData['credit_limit'] ?? null,
+            'opening_balance' => $inputData['opening_balance'] ?? null,
             'others' => json_encode($others)
         ];
 
@@ -50,6 +52,21 @@ class CreditCompanyController extends Controller
         if (!$accountReceivableCategory instanceof Category) {
             return response()->json(['status' => 400, 'message' => 'Cannot saved credit company.']);
         }
+
+        $deleteResponse = $accountReceivableCategory->deleteOpeningBalance();
+        if ($deleteResponse) {
+            if (!empty($request['opening_balance'])) {
+                $retainEarning = Category::where('client_company_id', $inputData['session_user']['client_company_id'])->where('slug', strtolower(AccountCategory::RETAIN_EARNING))->first();
+                if ($retainEarning instanceof Category) {
+                    $transactionData['linked_id'] = $accountReceivableCategory['id'];
+                    $transactionData['transaction'] = [
+                        ['date' => "1970-01-01",  'account_id' => $retainEarning['id'], 'debit_amount' => $inputData['opening_balance'], 'credit_amount' => 0, 'opening_balance' => 1],
+                    ];
+                    TransactionController::saveTransaction($transactionData);
+                }
+            }
+        }
+
         $data = [
             'name' => $request['name'],
             'module_id' => $accountReceivableCategory['id']
@@ -80,6 +97,7 @@ class CreditCompanyController extends Controller
         if (!$unAuthorizedBillCategory instanceof Category) {
             return response()->json(['status' => 400, 'message' => 'Cannot saved [un authorized bill] category.']);
         }
+        $category->saveProductPrice($inputData['product_price']);
         return response()->json(['status' => 200, 'message' => 'Successfully saved credit company.']);
     }
     /**
@@ -97,7 +115,7 @@ class CreditCompanyController extends Controller
         if (!$accountReceivable instanceof Category) {
             return response()->json(['status' => 400, 'message' => 'Cannot find [account receivable] category.']);
         }
-        $result = Category::select('id', 'name', 'credit_limit', 'others')
+        $result = Category::select('id', 'name', 'credit_limit', 'others', 'opening_balance')
             ->where('client_company_id', $inputData['session_user']['client_company_id'])
             ->where('parent_category', $accountReceivable->id);
         if (!empty($keyword)) {
@@ -130,13 +148,14 @@ class CreditCompanyController extends Controller
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
-        $result = Category::select('id', 'name', 'others', 'credit_limit')->find($inputData['id']);
+        $result = Category::select('id', 'name', 'others', 'credit_limit', 'opening_balance')->find($inputData['id']);
         $others = json_decode($result['others']);
         $result['email'] = $others != null ? $others->email : null;
         $result['phone'] = $others != null ? $others->phone : null;
         $result['contact_person'] = $others != null ? $others->contact_person : null;
         $result['address'] = $others != null ? $others->address : null;
         unset($result['others']);
+        $result['product_price'] = CompanyProductPrice::select('product_id', 'price')->where('company_id', $inputData['id'])->get()->toArray();
         return response()->json(['status' => 200, 'data' => $result]);
     }
     /**
@@ -151,6 +170,7 @@ class CreditCompanyController extends Controller
             'name' => 'required',
             'email' => 'required',
             'phone' => 'required',
+            'opening_balance' => 'nullable|numeric'
         ]);
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
@@ -180,12 +200,29 @@ class CreditCompanyController extends Controller
         $data = [
             'name' => $inputData['name'],
             'credit_limit' => $inputData['credit_limit'] ?? null,
+            'opening_balance' => $inputData['opening_balance'] ?? null,
             'others' => json_encode($others),
         ];
         $updateCategory = CategoryRepository::updateCategory($category, $data);
         if (!$updateCategory instanceof Category) {
             return response()->json(['status' => 500, 'errors' => 'Cannot updated credit company.']);
         }
+        $updateCategory->saveProductPrice($inputData['product_price']);
+
+        $deleteResponse = $updateCategory->deleteOpeningBalance();
+        if ($deleteResponse) {
+            if (!empty($request['opening_balance'])) {
+                $retainEarning = Category::where('client_company_id', $inputData['session_user']['client_company_id'])->where('slug', strtolower(AccountCategory::RETAIN_EARNING))->first();
+                if ($retainEarning instanceof Category) {
+                    $transactionData['linked_id'] = $updateCategory['id'];
+                    $transactionData['transaction'] = [
+                        ['date' => "1970-01-01",  'account_id' => $retainEarning['id'], 'debit_amount' => $inputData['opening_balance'], 'credit_amount' => 0, 'opening_balance' => 1],
+                    ];
+                    TransactionController::saveTransaction($transactionData);
+                }
+            }
+        }
+
         $data = [
             'name' => $inputData['name']
         ];

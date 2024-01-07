@@ -52,12 +52,17 @@
                                         <input type="text" class="form-control" name="address" v-model="param.address">
                                         <div class="invalid-feedback"></div>
                                     </div>
-                                    <div class="mb-3 form-group col-md-6">
+                                    <div class="mb-3 form-group col-md-12">
                                         <div class="form-check custom-checkbox ms-1">
                                             <input type="checkbox" class="form-check-input"
                                                    id="basic_checkbox_1" v-model="param.cashier_balance">
                                             <label class="form-check-label" for="basic_checkbox_1">Cashier balance</label>
                                         </div>
+                                    </div>
+                                    <div class="mb-3 form-group col-md-6" v-if="param.cashier_balance">
+                                        <label class="form-label">Opening Balance:</label>
+                                        <input type="text" class="form-control" name="address" v-model="param.opening_balance">
+                                        <div class="invalid-feedback"></div>
                                     </div>
                                 </div>
                                 <div class="row" style="text-align: right;">

@@ -42,6 +42,7 @@
                                                 <th class="text-white" @click="sortData('email')" :class="sortClass('email')">Email</th>
                                                 <th class="text-white" @click="sortData('phone')" :class="sortClass('phone')">Phone</th>
                                                 <th class="text-white" @click="sortData('credit_limit')" :class="sortClass('credit_limit')">Credit Limit</th>
+                                                <th class="text-white" @click="sortData('opening_balance')" :class="sortClass('opening_balance')">Opening Balance</th>
                                                 <th class="text-white" >Action</th>
                                             </tr>
                                             </thead>
@@ -52,8 +53,9 @@
                                                 <td><a href="javascript:void(0);">{{f.email}}</a></td>
                                                 <td><a href="javascript:void(0);">{{f.phone}}</a></td>
                                                 <td><a href="javascript:void(0);">{{f.credit_limit}}</a></td>
+                                                <td><a href="javascript:void(0);">{{f.opening_balance != null ? f.opening_balance.toLocaleString() : ''}}</a></td>
                                                 <td>
-                                                    <div class="d-flex justify-content-end">
+                                                    <div class="d-flex">
                                                         <router-link v-if="CheckPermission(Section.CREDIT_COMPANY + '-' + Action.EDIT)" :to="{name: 'CreditCompanyEdit', params: { id: f.id }}" class=" btn btn-primary shadow btn-xs sharp me-1">
                                                             <i class="fas fa-pencil-alt"></i>
                                                         </router-link>

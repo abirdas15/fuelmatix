@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use App\Helpers\MybosTime;
-use App\Helpers\SessionUser;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -33,6 +32,39 @@ class Category extends Model
         }
         return false;
     }
+    public function deleteOpeningBalance(): bool
+    {
+        $categoryId = $this['id'];
+        Transaction::where('opening_balance', 1)
+            ->where(function($q) use ($categoryId) {
+                $q->where('linked_id', $categoryId)
+                    ->orWhere('account_id', $categoryId);
+            })->delete();
+        return true;
+    }
+    /**
+     * @param array $productPrices
+     * @return bool
+     */
+    public function saveProductPrice(array $productPrices): bool
+    {
+        CompanyProductPrice::where('company_id', $this['id'])->delete();
+        $productPriceData = [];
+        foreach ($productPrices as $product) {
+            if (!empty($product['product_id']) && !empty($product['price'])) {
+                $productPriceData[] = [
+                    'product_id' => $product['product_id'],
+                    'price' => $product['price'],
+                    'company_id' => $this['id'],
+                    'client_company_id' => $this['client_company_id']
+                ];
+            }
+        }
+        if (count($productPriceData) > 0) {
+            CompanyProductPrice::insert($productPriceData);
+        }
+        return true;
+    }
 
 
 
@@ -57,5 +89,9 @@ class Category extends Model
     public function transaction()
     {
         return $this->hasMany(Transaction::class, 'account_id', 'id');
+    }
+    public function product_price()
+    {
+        return $this->hasMany(CompanyProductPrice::class, 'company_id', 'id');
     }
 }

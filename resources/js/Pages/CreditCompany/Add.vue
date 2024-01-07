@@ -49,6 +49,35 @@
                                         <input type="text" class="form-control" name="credit_limit" v-model="param.credit_limit">
                                         <div class="invalid-feedback"></div>
                                     </div>
+                                    <div class="mb-3 form-group col-md-6">
+                                        <label class="form-label">Opening Balance:</label>
+                                        <input type="text" class="form-control" name="opening_balance" v-model="param.opening_balance">
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                    <table class="table" width="50%">
+                                        <thead>
+                                            <tr>
+                                                <th>Product Name</th>
+                                                <th>Selling Price</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr v-for="(each,index) in param.product_price">
+                                                <td width="20%">
+                                                    <select class="form-control" v-model="each.product_id">
+                                                        <option>Select Product</option>
+                                                        <option v-for="product in products" :value="product.id" v-text="product.name"></option>
+                                                    </select>
+                                                </td>
+                                                <td width="20%"><input v-model="each.price" type="text" class="form-control"></td>
+                                                <td>
+                                                    <button @click="addProductPrice" v-if="index == 0" type="button" class="btn btn-primary">+</button>
+                                                    <button @click="removeProductPrice(index)" v-if="index != 0" type="button" class="btn btn-danger">x</button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
                                 </div>
                                 <div class="row" style="text-align: right;">
                                     <div class="mb-3 col-md-6">
@@ -82,6 +111,10 @@ export default {
                 address: '',
                 credit_limit: '',
                 contact_person: '',
+                opening_balance: '',
+                product_price: [
+                    {product_id: '', price: ''}
+                ]
             },
             listParam: {
                 limit: 5000,
@@ -89,9 +122,26 @@ export default {
             },
             loading: false,
             listData: [],
+            products: []
         }
     },
     methods: {
+        fetchProduct: function() {
+            ApiService.POST(ApiRoutes.ProductList, {limit: 500}, (res) => {
+                if (parseInt(res.status) === 200) {
+                    this.products = res.data.data;
+                }
+            });
+        },
+        removeProductPrice: function(index) {
+            this.param.product_price.splice(index, 1);
+        },
+        addProductPrice: function() {
+            this.param.product_price.push({
+                product_id: '',
+                price: ''
+            })
+        },
         save: function () {
             ApiService.ClearErrorHandler();
             this.loading = true
@@ -108,6 +158,7 @@ export default {
         },
     },
     created() {
+        this.fetchProduct();
     },
     mounted() {
         $('#dashboard_bar').text('Credit Company Add')

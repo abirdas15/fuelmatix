@@ -355,7 +355,7 @@ class SaleController extends Controller
         $result = $result->orderBy($orderBy, $orderMode)
             ->paginate($limit);
         foreach ($result as &$data) {
-            $data['amount'] = number_format($data['amount'], 2);
+            $data['amount_format'] = number_format($data['amount'], 2);
             $data['created_at'] = Helpers::formatDate($data['created_at'], FuelMatixDateTimeFormat::STANDARD_DATE_TIME);
         }
         return response()->json(['status' => 200, 'data' => $result]);

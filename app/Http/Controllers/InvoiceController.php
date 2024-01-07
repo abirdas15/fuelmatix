@@ -80,7 +80,7 @@ class InvoiceController extends Controller
             $invoice->invoice_number = Invoice::getInvoiceNumber();
             $invoice->date = Carbon::now();
             $invoice->category_id = $key;
-            $invoice->amount = array_sum(array_column($invoiceItem, 'subtotal'));
+            $invoice->amount = array_sum(array_column($transaction, 'amount'));
             $invoice->status = 'due';
             $invoice->due_date = Carbon::now()->add('30D');
             $invoice->client_company_id = $sessionUser['client_company_id'];

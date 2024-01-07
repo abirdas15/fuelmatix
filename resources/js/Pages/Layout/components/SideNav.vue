@@ -84,7 +84,7 @@
                         <li v-if="CheckPermission(Section.VOUCHER + '-' + Action.VIEW)"><router-link :to="{name: 'voucher'}">Voucher</router-link></li>
                         <li v-if="CheckPermission(Section.DRIVER + '-' + Action.VIEW)"><router-link :to="{name: 'driver'}">Driver</router-link></li>
                         <li v-if="CheckPermission(Section.FUEL_ADJUSTMENT + '-' + Action.VIEW)"><router-link :to="{name: 'adjustment'}">Fuel Adjustment</router-link></li>
-                        <li v-if="CheckPermission(Section.CAR + '-' + Action.VIEW)"><router-link :to="{name: 'car'}">Car</router-link></li>
+                        <li><router-link :to="{name: 'car'}">Car</router-link></li>
                     </ul>
                 </li>
                 <li>

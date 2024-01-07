@@ -4,22 +4,17 @@ namespace App\Http\Controllers;
 
 use App\Common\AccountCategory;
 use App\Common\Module;
-use App\Helpers\Helpers;
 use App\Helpers\SessionUser;
-use App\Models\BstiChart;
 use App\Models\Category;
 use App\Models\Dispenser;
 use App\Models\FuelAdjustment;
 use App\Models\FuelAdjustmentData;
-use App\Models\NozzleReading;
 use App\Models\Product;
 use App\Models\ProductType;
 use App\Models\SaleData;
 use App\Models\ShiftSale;
 use App\Models\ShiftSummary;
-use App\Models\Stock;
 use App\Models\Tank;
-use App\Models\TankLog;
 use App\Models\TankRefill;
 use App\Models\Transaction;
 use App\Repository\CategoryRepository;
@@ -41,6 +36,7 @@ class ProductController extends Controller
         $validator = Validator::make($inputData, [
             'name' => 'required|string',
             'selling_price' => 'required|numeric',
+            'buying_price' => 'required|numeric',
             'type_id' => 'required|integer',
         ]);
         if ($validator->fails()) {
@@ -75,6 +71,7 @@ class ProductController extends Controller
         }
         $categoryData = [
             'name' => $inputData['name'],
+            'opening_balance' => $inputData['opening_stock'] ?? null,
             'module_id' => $product->id
         ];
         $directIncomeCategory = CategoryRepository::saveCategory($categoryData, $directIncomeCategory['id'], Module::PRODUCT);
@@ -88,6 +85,19 @@ class ProductController extends Controller
         $stockCategory = CategoryRepository::saveCategory($categoryData, $stockCategory['id'], Module::PRODUCT);
         if (!$stockCategory instanceof Category) {
             return response()->json(['status' => 400, 'message' => 'Cannot save [stock] category.']);
+        }
+        $deleteResponse = $stockCategory->deleteOpeningBalance();
+        if ($deleteResponse) {
+            if (!empty($request['opening_stock'])) {
+                $retainEarning = Category::where('client_company_id', $inputData['session_user']['client_company_id'])->where('slug', strtolower(AccountCategory::RETAIN_EARNING))->first();
+                if ($retainEarning instanceof Category) {
+                    $transactionData['linked_id'] = $stockCategory['id'];
+                    $transactionData['transaction'] = [
+                        ['date' => "1970-01-01",  'account_id' => $retainEarning['id'], 'debit_amount' => $request['opening_stock'], 'credit_amount' => 0, 'opening_balance' => 1],
+                    ];
+                    TransactionController::saveTransaction($transactionData);
+                }
+            }
         }
         return response()->json(['status' => 200, 'message' => 'Successfully save product.']);
     }
@@ -232,6 +242,19 @@ class ProductController extends Controller
             CategoryRepository::saveCategory($categoryData, $stockCategory['id'], Module::PRODUCT);
         } else {
             CategoryRepository::updateCategory($stockCategoryModel, $categoryData);
+        }
+        $deleteResponse = $stockCategoryModel->deleteOpeningBalance();
+        if ($deleteResponse) {
+            if (!empty($request['opening_stock'])) {
+                $retainEarning = Category::where('client_company_id', $inputData['session_user']['client_company_id'])->where('slug', strtolower(AccountCategory::RETAIN_EARNING))->first();
+                if ($retainEarning instanceof Category) {
+                    $transactionData['linked_id'] = $stockCategoryModel['id'];
+                    $transactionData['transaction'] = [
+                        ['date' => "1970-01-01",  'account_id' => $retainEarning['id'], 'debit_amount' => $request['opening_stock'], 'credit_amount' => 0, 'opening_balance' => 1],
+                    ];
+                    TransactionController::saveTransaction($transactionData);
+                }
+            }
         }
         return response()->json(['status' => 200, 'message' => 'Successfully updated product.']);
     }

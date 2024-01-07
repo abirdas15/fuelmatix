@@ -41,6 +41,7 @@
                                                 <th class="text-white" @click="sortData('role')" :class="sortClass('role')">Role</th>
                                                 <th class="text-white" @click="sortData('email')" :class="sortClass('email')">Email</th>
                                                 <th class="text-white" @click="sortData('address')" :class="sortClass('address')">Address</th>
+                                                <th class="text-white" @click="sortData('opening_balance')" :class="sortClass('opening_balance')">Opening Balance</th>
                                                 <th class="text-white" >Action</th>
                                             </tr>
                                             </thead>
@@ -50,6 +51,7 @@
                                                 <td >{{f.role}}</td>
                                                 <td >{{f.email}}</td>
                                                 <td >{{f.address}}</td>
+                                                <td >{{f.opening_balance != null ? f.opening_balance.toLocaleString() : ''}}</td>
                                                 <td>
                                                     <div class="d-flex justify-content-end">
                                                         <router-link v-if="CheckPermission(Section.USER + '-' + Action.EDIT)" :to="{name: 'userEdit', params: { id: f.id }}" class=" btn btn-primary shadow btn-xs sharp me-1">

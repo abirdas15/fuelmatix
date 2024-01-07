@@ -52,6 +52,11 @@
                                     <div class="mb-3 form-group col-md-6">
                                         <div class="form-check custom-checkbox ms-1" style="margin-top: 3rem;">
                                             <input type="checkbox" class="form-check-input"
+                                                   id="header_text" v-model="param.voucher_check">
+                                            <label class="form-check-label" for="header_text">Voucher Check</label>
+                                        </div>
+                                        <div class="form-check custom-checkbox ms-1" style="margin-top: 1rem;">
+                                            <input type="checkbox" class="form-check-input"
                                                    id="header_text" v-model="param.header_text">
                                             <label class="form-check-label" for="header_text">Header Text</label>
                                         </div>

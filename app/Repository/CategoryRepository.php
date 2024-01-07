@@ -39,6 +39,7 @@ class CategoryRepository
         $categoryModel->type = $category['type'];
         $categoryModel->module = $module;
         $categoryModel->module_id = $data['module_id'] ?? null;
+        $categoryModel->opening_balance = $data['opening_balance'] ?? null;
         $categoryModel->others = $data['others'] ?? null;
         $categoryModel->rfid = $data['rfid'] ?? null;
         $categoryModel->credit_limit = $data['credit_limit'] ?? null;
@@ -61,6 +62,7 @@ class CategoryRepository
         $category->others = $data['others'] ?? null;
         $category->credit_limit = $data['credit_limit'] ?? null;
         $category->module_id = $data['module_id'] ?? $category['module_id'];
+        $category->opening_balance = $data['opening_balance'] ?? null;
         if (!$category->save()) {
             return false;
         }

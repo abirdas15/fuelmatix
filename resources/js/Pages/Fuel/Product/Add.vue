@@ -35,17 +35,17 @@
 
                                     <div class="mb-3 form-group col-md-6">
                                         <label class="form-label">Buying Price: </label>
-                                        <input type="number" class="form-control" name="buying_price" v-model="param.buying_price">
+                                        <input type="text" class="form-control" name="buying_price" v-model="param.buying_price">
                                         <div class="invalid-feedback"></div>
                                     </div>
                                     <div class="mb-3 form-group col-md-6">
                                         <label class="form-label">Selling Price: </label>
-                                        <input type="number" class="form-control" name="selling_price" v-model="param.selling_price">
+                                        <input type="text" class="form-control" name="selling_price" v-model="param.selling_price">
                                         <div class="invalid-feedback"></div>
                                     </div>
                                     <div class="mb-3 form-group col-md-6">
                                         <label class="form-label">Driver Selling Price: </label>
-                                        <input type="number" class="form-control" name="selling_price" v-model="param.driver_selling_price">
+                                        <input type="text" class="form-control" name="selling_price" v-model="param.driver_selling_price">
                                         <div class="invalid-feedback"></div>
                                     </div>
                                     <div class="mb-3 form-group col-md-6">

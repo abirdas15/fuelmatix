@@ -53,6 +53,7 @@ class User extends Authenticatable
             'name' => $userInfo->name,
             'email' => $userInfo->email,
             'client_company_id' => $userInfo->client_company_id,
+            'voucher_check' => $clientCompany['voucher_check'] ?? 0,
             'company_name' => $clientCompany->name ?? '',
             'permission' => $permission
         ];

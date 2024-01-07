@@ -553,9 +553,7 @@ const router = new VueRouter({
                     },
                 },
                 {
-                    path: ROOT_URL + "/cars", name: "car", component: car, beforeEnter: (to, from, next) => {
-                        CheckPermission(to, from, next, Section.CAR + '-' + Action.VIEW)
-                    }
+                    path: ROOT_URL + "/cars", name: "car", component: car
                 },
                 {
                     path: ROOT_URL + "/purchase", name: "purchase", component: purchase,  beforeEnter: (to, from, next) => {

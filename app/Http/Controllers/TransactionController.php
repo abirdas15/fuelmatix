@@ -6,8 +6,10 @@ use App\Common\FuelMatixDateTimeFormat;
 use App\Helpers\Helpers;
 use App\Helpers\SessionUser;
 use App\Models\Category;
+use App\Models\ClientCompany;
 use App\Models\Stock;
 use App\Models\Transaction;
+use App\Models\Voucher;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -48,6 +50,7 @@ class TransactionController extends Controller
             $newTransaction->linked_id = $inputData['linked_id'];
             $newTransaction->module = $transaction['module'] ?? 'accounting';
             $newTransaction->module_id = $transaction['module_id'] ?? null;
+            $newTransaction->opening_balance = $transaction['opening_balance'] ?? 0;
             $newTransaction->client_company_id = $sessionUser['client_company_id'];
             $newTransaction->user_id = $sessionUser['id'];
             $newTransaction->created_at = Carbon::parse($transaction['date'].' '.date('H:i:s'))->format(FuelMatixDateTimeFormat::DATABASE_DATE_TIME);
@@ -62,6 +65,7 @@ class TransactionController extends Controller
                 $newTransaction->linked_id = $transaction['account_id'];
                 $newTransaction->module = $transaction['module'] ?? 'accounting';
                 $newTransaction->module_id = $transaction['module_id'] ?? null;
+                $newTransaction->opening_balance = $transaction['opening_balance'] ?? 0;
                 $newTransaction->client_company_id = $sessionUser['client_company_id'];
                 $newTransaction->user_id = $sessionUser['id'];
                 $newTransaction->created_at = Carbon::parse($transaction['date'].' '.date('H:i:s'))->format(FuelMatixDateTimeFormat::DATABASE_DATE_TIME);
@@ -229,25 +233,46 @@ class TransactionController extends Controller
         $stockModel->client_company_id = $stockData['client_company_id'];
         $stockModel->save();
     }
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     * */
     public function split(Request $request)
     {
         $requestData = $request->all();
+        $company = ClientCompany::find($requestData['session_user']['client_company_id']);
         $validator = Validator::make($requestData, [
             'id' => 'required',
             'data' => 'required|array',
+            'data.*.voucher_number' => $company['voucher_check'] == 1 ? 'required' : 'nullable',
             'data.*.amount' => 'required'
+        ],[
+            'data.*.amount.required' => 'Amount is required.',
+            'data.*.voucher_number.required' => 'Voucher is required.'
         ]);
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
         $transaction = Transaction::where('id', $requestData['id'])->first();
         if (!$transaction instanceof Transaction) {
-            return response()->json(['status' => 500, 'error' => 'Cannot find transaction.']);
+            return response()->json(['status' => 500, 'message' => 'Cannot find transaction.']);
         }
         $totalAmount = array_sum(array_column($requestData['data'], 'amount'));
         $amountColumn = $transaction['debit_amount'] == 0 ? 'credit_amount' : 'debit_amount';
         if ($totalAmount != $transaction[$amountColumn]) {
-            return response()->json(['status' => 500, 'error' => 'Your transaction amount are not same.']);
+            return response()->json(['status' => 300, 'error' => 'Your transaction amount are not same.']);
+        }
+        if ($company['voucher_check'] == 1) {
+            $voucherError = [];
+            foreach ($requestData['data'] as $key => $data) {
+                $voucher = Voucher::where('voucher_number', $data['voucher_number'])->where('company_id', $transaction['linked_id'])->where('status', 'pending')->first();
+                if (!$voucher instanceof Voucher) {
+                    $voucherError['data.'. $key . '.voucher_number'][0] = 'Voucher is not valid.';
+                }
+            }
+            if (count($voucherError) > 0) {
+                return response()->json(['status' => 500, 'errors' => $voucherError]);
+            }
         }
         $transactionData = [];
         foreach ($requestData['data'] as $data) {
@@ -268,6 +293,13 @@ class TransactionController extends Controller
         }
         Transaction::insert($transactionData);
         Transaction::where('id', $requestData['id'])->delete();
+        if ($company['voucher_check'] == 1) {
+            foreach ($requestData['data'] as  $data) {
+                $voucher = Voucher::where('voucher_number', $data['voucher_number'])->where('company_id', $transaction['linked_id'])->where('status', 'pending')->first();
+                $voucher->status = 'done';
+                $voucher->save();
+            }
+        }
         return response()->json(['status' => 200, 'message' => 'Successfully split transaction.']);
     }
 }

@@ -36,4 +36,5 @@ class AccountCategory
     const DIRECT_EXPENSE = 'Direct Expense';
     const IN_DIRECT_EXPENSE = 'Indirect Expense';
     const ADVANCE_PAYABLE = 'Advance Payable';
+    const RETAIN_EARNING = 'Retained earnings';
 }

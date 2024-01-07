@@ -38,14 +38,16 @@
                                             <thead>
                                             <tr class="text-white" style="background-color: #4886EE;color:#ffffff">
                                                 <th class="text-white" @click="sortData('name')" :class="sortClass('name')">Bank Name</th>
+                                                <th class="text-white" @click="sortData('name')" :class="sortClass('name')">Opening Balance</th>
                                                 <th class="text-white" >Action</th>
                                             </tr>
                                             </thead>
                                             <tbody v-if="listData.length > 0 && TableLoading == false">
                                             <tr v-for="f in listData">
                                                 <td >{{f.name}}</td>
+                                                <td >{{ f.opening_balance != null ? f.opening_balance.toLocaleString() : ''}}</td>
                                                 <td>
-                                                    <div class="d-flex justify-content-end">
+                                                    <div class="d-flex">
                                                         <router-link v-if="CheckPermission(Section.BANK + '-' + Action.EDIT)" :to="{name: 'BankEdit', params: { id: f.id }}" class=" btn btn-primary shadow btn-xs sharp me-1">
                                                             <i class="fas fa-pencil-alt"></i>
                                                         </router-link>

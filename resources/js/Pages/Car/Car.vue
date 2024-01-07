@@ -5,7 +5,7 @@
                 <ol class="breadcrumb align-items-center ">
                     <li class="breadcrumb-item active"><router-link :to="{name: 'Dashboard'}">Home</router-link></li>
                     <li class="breadcrumb-item"><a href="javascript:void(0)">Car</a></li>
-                    <li v-if="CheckPermission(Section.CAR + '-' + Action.CREATE)"  style="margin-left: auto;"><a href="javascript:void(0)" @click="openCarModal"><i class="fa-solid fa-plus"></i> Add Car</a></li>
+                    <li  style="margin-left: auto;"><a href="javascript:void(0)" @click="openCarModal"><i class="fa-solid fa-plus"></i> Add Car</a></li>
                 </ol>
             </div>
             <div class="row">
@@ -37,7 +37,7 @@
                                         <table class="display  dataTable no-footer" style="min-width: 845px">
                                             <thead>
                                             <tr class="text-white" style="background-color: #4886EE;color:#ffffff">
-                                                <th class="text-white" @click="sortData('driver_name')" :class="sortClass('car_name')">Car Number</th>
+                                                <th class="text-white" @click="sortData('car_name')" :class="sortClass('car_name')">Car Number</th>
                                                 <th class="text-white" @click="sortData('company_name')" :class="sortClass('company_name')">Company Name</th>
                                                 <th class="text-white">Action</th>
                                             </tr>
@@ -47,10 +47,10 @@
                                                 <td >{{f.car_number}}</td>
                                                 <td >{{f.company_name}}</td>
                                                 <td>
-                                                    <a v-if="CheckPermission(Section.CAR + '-' + Action.EDIT)"  href="javascript:void(0)" @click="openCarEditModal(f.id)" class=" btn btn-primary shadow btn-xs sharp me-1">
+                                                    <a  href="javascript:void(0)" @click="openCarEditModal(f.id)" class=" btn btn-primary shadow btn-xs sharp me-1">
                                                         <i class="fas fa-pencil-alt"></i>
                                                     </a>
-                                                    <a v-if="CheckPermission(Section.CAR + '-' + Action.EDIT)"  href="javascript:void(0)"  @click="openModalDelete(f.id)" class="btn btn-danger shadow btn-xs sharp">
+                                                    <a  href="javascript:void(0)"  @click="openModalDelete(f.id)" class="btn btn-danger shadow btn-xs sharp">
                                                         <i class="fa fa-trash"></i>
                                                     </a>
                                                 </td>
