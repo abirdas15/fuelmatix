@@ -23,6 +23,6 @@ class AuthReqCheck
             $request->request->add(['session_user' => $auth]);
             return $next($request);
         }
-        return response()->json(['status' => 401, 'error' => ['error' => ['Unauthorized Request']]]);
+        return response()->json(['message' => 'Unauthorized Request'], 422);
     }
 }

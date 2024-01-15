@@ -215,6 +215,7 @@ class VendorController extends Controller
             ->whereBetween('date', [$requestData['start_date'], $requestData['end_date']])
             ->where('linked_id', $requestData['vendor_id'])
             ->groupBy('account_id')
+            ->orderBy('transactions.id', 'ASC')
             ->get()
             ->toArray();
         $total['bill'] = 0;
