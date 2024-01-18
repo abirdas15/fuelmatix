@@ -572,7 +572,7 @@ export default {
                 if (this.noDIPShow) {
                     this.listDispenser.end_reading = this.listDispenser.end_reading == 0 ? parseFloat(this.listDispenser.consumption) - parseFloat(this.totalSale) : this.listDispenser.end_reading;
                 }
-                if (this.listDispenser.tank == 1) {
+                if (this.listDispenser.tank == 1 && !this.noDIPShow) {
                     this.listDispenser.net_profit = this.listDispenser.consumption - this.totalSale;
                 }
                 this.listDispenser.amount = totalCategoryAmount;
