@@ -35,12 +35,22 @@
 
                                 <div class="process-wrapper">
                                     <div id="progress-content-section" v-if="listDispenser">
+                                        <div class="row">
+                                            <div class="col-sm-12 text-end">
+                                                <div class="form-check d-flex justify-content-end">
+                                                    <input class="form-check-input" type="checkbox" v-model="noDIPShow" value="" id="flexCheckChecked" :checked="noDIPShow">
+                                                    <label class="form-check-label" for="flexCheckChecked">
+                                                        No DIP Reading
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
                                         <div class="section-content discovery active">
-                                            <template v-if="listDispenser.tank == 1">
+                                            <template v-if="listDispenser.tank == 1 && !noDIPShow">
                                                 <div class="card">
                                                     <div class="card-header">
                                                         <h5 class="card-title">
-                                                            {{ listDispenser.product_name }}</h5>
+                                                            {{ listDispenser?.product_name }}</h5>
                                                     </div>
                                                     <div class="card-body">
                                                         <div class="row align-items-center text-start">
@@ -115,7 +125,7 @@
                                                                            type="text" class="form-control"
                                                                            v-model="listDispenser.end_reading">
                                                                     <div class="input-group-append">
-                                                                        <span class="input-group-text" >{{ listDispenser.unit }}</span>
+                                                                        <span class="input-group-text" >Liter</span>
                                                                     </div>
                                                                 </div>
 
@@ -140,7 +150,7 @@
                                                                     <input type="text" class="form-control" id="consumption" disabled  v-if="listDispenser.status == 'end'"
                                                                            v-model="listDispenser.consumption">
                                                                     <div class="input-group-append">
-                                                                        <span class="input-group-text" >{{ listDispenser.unit }}</span>
+                                                                        <span class="input-group-text" >Liter</span>
                                                                     </div>
                                                                 </div>
                                                                 <!--                                                            <input class="form-control" value="0" v-if="listDispenser.status == 'start'" disabled>-->
@@ -156,7 +166,7 @@
                                                 </div>
                                                 <div class="card-body" v-if="d.nozzle.length > 0">
                                                     <div class="row align-items-center text-start" v-for="(n, nIndex) in d.nozzle">
-                                                        <div class=" col-md-4">
+                                                        <div class=" col-md-2">
                                                             <label class="form-label">
                                                                 <p class="m-0">{{ n.name }}</p>
                                                             </label>
@@ -200,7 +210,11 @@
                                                             <!--                                                            <input class="form-control" value="0" v-if="listDispenser.status == 'start'" disabled>-->
                                                         </div>
 
-
+                                                        <div class="mb-3 col-md-2"  v-if="listDispenser.status == 'end' && n.pf != null && n.pf != ''">
+                                                            <label class="text-center">PF </label>
+                                                            <input type="text" disabled class="form-control" v-model="n.pf">
+                                                        </div>
+                                                        <div class="col-md-2 mb-3" v-else></div>
                                                         <div class="mb-3 col-md-2"  v-if="listDispenser.status == 'end'">
                                                             <label>Consumption </label>
                                                             <div class="input-group">
@@ -223,12 +237,12 @@
                                                         <table class="table">
                                                             <tr>
                                                                 <td style="font-size: 18px;padding: 0px;" class="">Total sale:</td>
-                                                                <td style="font-size: 18px;padding: 0px;" class="text-end ">{{parseFloat(totalSale).toFixed(3)}} {{ listDispenser.unit }}</td>
+                                                                <td style="font-size: 18px;padding: 0px;" class="text-end ">{{totalSale}} {{ listDispenser.unit }}</td>
                                                             </tr>
-                                                            <tr>
-                                                                <td style="font-size: 18px;padding: 0px;" class="">Total amount:</td>
-                                                                <td style="font-size: 18px;padding: 0px;" class="text-end ">{{ parseFloat(totalAmount).toFixed(3) }} Tk</td>
-                                                            </tr>
+                                                            <!--                                                            <tr>-->
+                                                            <!--                                                                <td style="font-size: 18px;padding: 0px;" class="">Total amount:</td>-->
+                                                            <!--                                                                <td style="font-size: 18px;padding: 0px;" class="text-end ">{{totalAmount}} Tk</td>-->
+                                                            <!--                                                            </tr>-->
                                                         </table>
                                                     </div>
                                                 </div>
@@ -264,41 +278,50 @@
                                                 </div>
 
                                                 <div class="row">
-                                                    <div class="col-sm-6"></div>
-                                                    <div class="col-sm-6 text-end">
-                                                        <div class="d-flex mb-3 justify-content-end"  v-for="(category,index) in categories">
-                                                            <select class="form-control me-3" style="max-width: 210px" v-model="category.category_id"
-                                                                    @change="isDataExist(category.category_id, 'category_id', index, categories)" >
-                                                                <option v-for="c in allAmountCategory" :value="c.id">{{c.name}}</option>
-                                                            </select>
-                                                            <div class="form-group">
-                                                                <input class="form-control me-3 text-end"  style="max-width: 210px" type="number" step="any" v-model="category.amount" :id="'categories.'+index+'.amount'"
-                                                                       @input="calculateValue(category.amount)"
-                                                                       :name="'categories.'+index+'.amount'">
+                                                    <div class="col-sm-4"></div>
+                                                    <div class="col-sm-8 text-end">
+                                                        <div class="row"  v-for="(category,index) in categories">
+                                                            <div class="col-sm-4 mb-3">
+                                                                <select class="form-control me-3" style="max-width: 210px" v-model="category.category_id"
+                                                                        @change="isDataExist(category.category_id, 'category_id', index, categories); filterProductPrice(index)" >
+                                                                    <option v-for="c in allAmountCategory" :value="c.id">{{c.name}}</option>
+                                                                </select>
+                                                            </div>
+                                                            <div class="form-group col-sm-3 mb-3">
+                                                                <div class="input-group" style="width: 95%">
+                                                                    <input type="text" class="form-control text-end" v-model="category.liter" disabled>
+                                                                    <div class="input-group-append">
+                                                                        <span class="input-group-text" >{{ listDispenser.unit }}</span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group col-sm-4 mb-3">
+                                                                <input class="form-control me-3 text-end"  style="width: 95%" type="number" step="any" v-model="category.amount" :id="'categories.'+index+'.amount'"
+                                                                       @input="calculateValue(category.amount, index); filterProductPrice(index)"
+                                                                       :name="'categories.'+index+'.amount'" placeholder="Amount here">
                                                                 <div class="invalid-feedback"></div>
                                                             </div>
-
-                                                            <button class="btn btn-primary"  style="height: 54px" v-if="index == 0" type="button" @click="addCategory">+</button>
-                                                            <button class="btn btn-danger"  style="height: 54px"   v-else  type="button" @click="removeCategory(index)">
-                                                                <i class="fa-solid fa-xmark"></i>
-                                                            </button>
+                                                            <div class="col-sm-1 mb-3">
+                                                                <button class="btn btn-primary"  style="height: 54px" v-if="index == 0" type="button" @click="addCategory">+</button>
+                                                                <button class="btn btn-danger"  style="height: 54px"   v-else  type="button" @click="removeCategory(index)">
+                                                                    <i class="fa-solid fa-xmark"></i>
+                                                                </button>
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                    <div class="col-sm-8"></div>
-                                                    <div class="col-sm-4">
-                                                        <table class="table">
-                                                            <tr>
-                                                                <td style="font-size: 18px;padding: 0px;" class="">Amount:</td>
-                                                                <td style="font-size: 18px;padding: 0px;" class="text-end ">{{isNaN(totalPaid) ? 0 : totalPaid}} Tk</td>
-                                                            </tr>
-                                                        </table>
+                                                        <div class="row">
+                                                            <div class="col-sm-4"></div>
+                                                            <div class="col-sm-3 text-center">
+                                                                <span><strong>Total: {{ totalLiter }} {{ listDispenser.unit }}</strong></span>
+                                                            </div>
+                                                            <div class="col-sm-4 text-center">
+                                                                <span><strong>Amount: {{isNaN(totalPaid) ? 0 : totalPaid}} Tk</strong></span>
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </template>
-
                                         </div>
                                     </div>
-<!--                                    <div class="" v-else>Please Select Date and Product</div>-->
                                 </div>
                                 <div class="row" style="text-align: right;" v-if="product_id">
                                     <div class="mb-3 col-md-6">
@@ -338,23 +361,35 @@ export default {
             categories: [],
             totalPaid: 0,
             oilStock: false,
+            noDIPShow: true,
             mismatchAllow: null,
             bstiChart: [],
             date: ''
         }
     },
+    computed: {
+        totalLiter: function() {
+            let total = 0;
+            this.categories.map((v) => {
+                if (v.liter != '') {
+                    total += parseFloat(v.liter);
+                }
+            });
+            return total;
+        }
+    },
     watch: {
         'listDispenser.end_reading_mm': function() {
-            if (this.listDispenser) {
-                this.listDispenser.end_reading = this.filterBstiChart(this.bstiChart, this.listDispenser.end_reading_mm, 'height', 'volume');
+            if (parseFloat(this.listDispenser.end_reading_mm) > parseFloat(this.listDispenser.tank_height)) {
+                this.listDispenser.end_reading_mm = '';
+                this.listDispenser.end_reading = 0;
+            } else {
+                this.getBstiChart(this.listDispenser.end_reading_mm);
             }
-
         },
         'listDispenser.end_reading': function() {
-            if (this.listDispenser) {
-                this.calculateAmount();
-            }
-        },
+            this.calculateAmount();
+        }
     },
     methods: {
         getDispenser: function () {
@@ -363,20 +398,19 @@ export default {
                 this.getBstiChart();
             }
         },
-        getBstiChart: function() {
-            ApiService.POST(ApiRoutes.TankBstiChart, {product_id: this.product_id}, res => {
-                this.TableLoading = false
+        getBstiChart: function(height) {
+            ApiService.POST(ApiRoutes.TankGetVolume, {product_id: this.product_id, height: height}, res => {
                 if (parseInt(res.status) === 200) {
-                    this.bstiChart = res.data;
+                    this.listDispenser.end_reading =  res.data;
                 }
             });
         },
         updateOilStock: function() {
             if (this.listData.length > 0) {
-                if (this.listData[this.productIndex].product_type == 'Octane' || this.listData[this.productIndex].product_type == 'Diesel' || this.listData[this.productIndex].product_type == 'Petrol' || this.listData[this.productIndex].product_type == 'LPG') {
-                    this.oilStock = true;
+                if ( this.listData[this.productIndex].tank == 1) {
+                    return true;
                 } else {
-                    this.oilStock = false;
+                    return false;
                 }
             }
         },
@@ -387,11 +421,32 @@ export default {
             })
             return total
         },
+        filterProductPrice: function(index) {
+            this.categories[index]['liter'] = '';
+            let category_id = this.categories[index]['category_id'];
+            let product_price = [];
+            this.allAmountCategory.map((v) => {
+                if (v.id == category_id) {
+                    product_price = v.product_price;
+                }
+            });
+            let selling_price = this.listDispenser.selling_price;
+            if (product_price.length > 0) {
+                product_price.map((v) => {
+                    if (v.product_id == this.product_id) {
+                        selling_price = v.price;
+                    }
+                });
+            }
+            console.log(this.totalSale / selling_price);
+            console.log(this.totalSale / selling_price);
+            this.categories[index]['liter'] = parseFloat(this.categories[index]['amount'] / selling_price).toFixed(2);
+        },
         calculateValue: function (amount) {
             this.totalPaid = 0
             this.categories.map(v => {
                 this.totalPaid += parseFloat(v.amount)
-            })
+            });
         },
         removeCategory: function(index) {
             this.categories.splice(index, 1);
@@ -399,7 +454,8 @@ export default {
         addCategory: function() {
             this.categories.push({
                 amount: '',
-                category_id: ''
+                category_id: '',
+                liter: ''
             });
         },
         getTotalSale: function () {
@@ -408,11 +464,13 @@ export default {
             this.listDispenser.dispensers.map((dispenser) => {
                 dispenser.nozzle.map((nozzle) => {
                     this.totalSale += nozzle.consumption
-                    this.totalAmount += nozzle.amount
+                    if (nozzle.end_reading > 0) {
+                        this.totalAmount += nozzle.amount
+                    }
                 })
             })
             this.totalSale < 0 ? this.totalSale = 0 : this.totalSale;
-            this.totalAmount < 0 ? this.totalAmount = 0 : this.totalAmount;
+            this.totalSale < 0 ? this.totalAmount = 0 : this.totalAmount;
         },
         disableInput: function (id) {
             $('#'+id).prop('readonly', true);
@@ -426,12 +484,20 @@ export default {
             return (eachProgress * this.productIndex)
         },
         calculateAmount: function () {
-            this.listDispenser.consumption = parseFloat(this.listDispenser.start_reading) - parseFloat(this.listDispenser.end_reading) + parseFloat(this.listDispenser.adjustment)
+            this.listDispenser.consumption = parseFloat(this.listDispenser.start_reading) + parseFloat(this.listDispenser.tank_refill) - parseFloat(this.listDispenser.end_reading) + parseFloat(this.listDispenser.adjustment)
             this.listDispenser.amount = parseFloat(this.listDispenser.consumption ) * parseFloat(this.listDispenser.selling_price)
         },
         calculateAmountNozzle: function (dIndex, nIndex) {
             if (this.isNumeric(this.listDispenser.dispensers[dIndex].nozzle[nIndex].end_reading)) {
-                this.listDispenser.dispensers[dIndex].nozzle[nIndex].consumption = parseFloat(this.listDispenser.dispensers[dIndex].nozzle[nIndex].end_reading) - parseFloat(this.listDispenser.dispensers[dIndex].nozzle[nIndex].start_reading)  - parseFloat(this.listDispenser.dispensers[dIndex].nozzle[nIndex].adjustment)
+                let pf = 1;
+                if (this.listDispenser.dispensers[dIndex].nozzle[nIndex].pf != null && this.listDispenser.dispensers[dIndex].nozzle[nIndex].pf != '') {
+                    pf = this.listDispenser.dispensers[dIndex].nozzle[nIndex].pf;
+                }
+                if (parseFloat(this.listDispenser.dispensers[dIndex].nozzle[nIndex].end_reading) < parseFloat(this.listDispenser.dispensers[dIndex].nozzle[nIndex].start_reading)) {
+                    this.listDispenser.dispensers[dIndex].nozzle[nIndex].consumption = (parseFloat(this.listDispenser.dispensers[dIndex].nozzle[nIndex].max_value) - parseFloat(this.listDispenser.dispensers[dIndex].nozzle[nIndex].start_reading) + parseFloat(this.listDispenser.dispensers[dIndex].nozzle[nIndex].end_reading) - parseFloat(this.listDispenser.dispensers[dIndex].nozzle[nIndex].adjustment)) * pf;
+                } else {
+                    this.listDispenser.dispensers[dIndex].nozzle[nIndex].consumption = (parseFloat(this.listDispenser.dispensers[dIndex].nozzle[nIndex].end_reading) - parseFloat(this.listDispenser.dispensers[dIndex].nozzle[nIndex].start_reading)  - parseFloat(this.listDispenser.dispensers[dIndex].nozzle[nIndex].adjustment)) * parseFloat(pf)
+                }
                 this.listDispenser.dispensers[dIndex].nozzle[nIndex].amount = parseFloat(this.listDispenser.dispensers[dIndex].nozzle[nIndex].consumption) * parseFloat(this.listDispenser.selling_price)
             } else {
                 this.listDispenser.dispensers[dIndex].nozzle[nIndex].consumption = 0
@@ -440,7 +506,7 @@ export default {
             this.getTotalSale()
         },
         getProduct: function () {
-            ApiService.POST(ApiRoutes.ProductList, {limit: 5000, page: 1, order_mode: 'ASC'}, res => {
+            ApiService.POST(ApiRoutes.ProductList, {limit: 5000, page: 1, order_mode: 'ASC', shift_sale: 1}, res => {
                 this.TableLoading = false
                 if (parseInt(res.status) === 200) {
                     this.listData = res.data.data;
@@ -452,9 +518,16 @@ export default {
             ApiService.POST(ApiRoutes.ShiftSaleGetCategory, {}, res => {
                 if (parseInt(res.status) === 200) {
                     this.allAmountCategory = res.data;
+                    let category_id = '';
+                    res.data.map((v) => {
+                        if (v.selected == true) {
+                            category_id = v.id;
+                        }
+                    });
                     this.categories.push({
                         amount: '',
-                        category_id: this.allAmountCategory[0].id
+                        category_id: category_id,
+                        liter: ''
                     });
                 }
             });
@@ -462,7 +535,7 @@ export default {
         getProductDispenser: function () {
             this.totalSale = 0
             this.totalAmount = 0
-            ApiService.POST(ApiRoutes.ProductDispenser, {product_id: this.product_id, date: this.date}, res => {
+            ApiService.POST(ApiRoutes.ProductDispenser, {product_id: this.product_id}, res => {
                 this.TableLoading = false
                 if (parseInt(res.status) === 200) {
                     this.listDispenser = res.data;
@@ -473,27 +546,25 @@ export default {
             });
         },
         totalShiftParcent: function (totalNozzleConsumption) {
-           return ((totalNozzleConsumption - this.listDispenser.consumption) /this.listDispenser.consumption) * 100
+            return ((totalNozzleConsumption - this.listDispenser.consumption) /this.listDispenser.consumption) * 100
         },
-        save: function () {
+        submit: function () {
             ApiService.ClearErrorHandler();
-            this.loading = true
             this.listDispenser.categories = this.categories;
+            let flag = false;
             if (this.listDispenser.status == 'end') {
                 let totalCategoryAmount = 0
                 let totalConsumption = 0
                 this.listDispenser.categories.map(v => {
                     totalCategoryAmount += parseFloat(v.amount)
-                })
+                });
                 // if ((this.totalAmount - this.totalPosSale()) != totalCategoryAmount) {
-                //     this.loading = false
-                //     this.$toast.error('Please match the total amount and category list')
-                //     return
-                // }
-
                 this.listDispenser.dispensers.map(dispenser => {
                     dispenser.nozzle.map(nozzle => {
                         totalConsumption += parseFloat(nozzle.consumption)
+                        if (nozzle.end_reading < nozzle.start_reading) {
+                            flag = true;
+                        }
                     })
                 })
                 // check if mismatch allow
@@ -504,6 +575,12 @@ export default {
                         return
                     }
                 }
+                if (this.noDIPShow) {
+                    this.listDispenser.end_reading = this.listDispenser.end_reading == 0 ? parseFloat(this.listDispenser.consumption) - parseFloat(this.totalSale) : this.listDispenser.end_reading;
+                }
+                if (this.listDispenser.tank == 1 && !this.noDIPShow) {
+                    this.listDispenser.net_profit = this.listDispenser.consumption - this.totalSale;
+                }
                 this.listDispenser.amount = totalCategoryAmount;
                 this.listDispenser.consumption = totalConsumption;
                 if (this.listDispenser.consumption == 0) {
@@ -511,18 +588,45 @@ export default {
                     return;
                 }
             }
+            if (flag == true) {
+                Swal.fire({
+                    title: "Are you sure?",
+                    text: "Your nozzle end reading is correct",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#3085d6",
+                    cancelButtonColor: "#d33",
+                    confirmButtonText: "Yes!"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        this.save();
+                    }
+                });
+            } else {
+                this.save();
+            }
+        },
+        save: function () {
+            this.loading = true
             this.listDispenser.date = this.date
             ApiService.POST(ApiRoutes.ShiftSaleAdd, this.listDispenser, res => {
                 this.loading = false
                 if (parseInt(res.status) === 200) {
                     this.$toast.success(res.message);
                     if (this.listDispenser.status == 'start') {
-                        this.getDispenser()
+                        this.$router.push({
+                            name: 'ShiftSaleListStart'
+                        })
                     } else {
-                        this.listDispenser = null
-                        this.date = ''
-                        this.product_id = ''
+                        this.$router.push({
+                            name: 'ShiftSaleView',
+                            params: {
+                                id: res.shift_sale_id
+                            }
+                        })
                     }
+                } else if (parseInt(res.status) === 200) {
+                    this.$toast.warning(res.message);
                 } else {
                     ApiService.ErrorHandler(res.errors);
                 }
