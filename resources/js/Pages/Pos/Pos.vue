@@ -74,44 +74,49 @@
                                         </tr>
                                         </thead>
                                         <tbody v-if="sale.length > 0">
-                                            <tr v-for="(s, i) in sale" class="position-relative">
-                                                <td>
-                                                    <div class="fw-bold">{{ s.name }}</div>
-                                                    <div>
-                                                        <span class="badge badge-primary">{{ s.type }}</span>
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                    <div class="d-flex align-items-center justify-content-between">
-                                                        <div class="btn-cart-plus cursor-pointer"
-                                                             @click="updateProduct('minus', i)">-
+                                            <template v-for="(s, i) in sale">
+                                                <tr class="position-relative">
+                                                    <td>
+                                                        <div class="fw-bold">{{ s.name }}</div>
+                                                        <div>
+                                                            <span class="badge badge-primary">{{ s.type }}</span>
                                                         </div>
-                                                        <input class="form-control control-sm" step='0.01' type="number"
-                                                               v-model="s.quantity" @input="updateSubtotal(i)">
-                                                        <div class="btn-cart-plus cursor-pointer"
-                                                             @click="updateProduct('plus', i)">+
+                                                    </td>
+                                                    <td>
+                                                        <div class="d-flex align-items-center justify-content-between">
+                                                            <div class="btn-cart-plus cursor-pointer"
+                                                                 @click="updateProduct('minus', i)">-
+                                                            </div>
+                                                            <input class="form-control control-sm" step='0.01' type="number"
+                                                                   v-model="s.quantity" @input="updateSubtotal(i)">
+                                                            <div class="btn-cart-plus cursor-pointer"
+                                                                 @click="updateProduct('plus', i)">+
+                                                            </div>
                                                         </div>
+                                                    </td>
+                                                    <td class="text-end" style="width: 130px;">
+                                                        ৳ {{ s.price }}
+                                                    </td>
+                                                    <td class="text-end">
+                                                        <input class="form-control w-100 control-sm text-end" step="any"
+                                                               type="number" v-model="s.subtotal" @input="updateQuantity(i)">
+                                                    </td>
+                                                    <td class="text-end">
+                                                        <i class="fa-regular text-danger fa-trash-can cursor-pointer"
+                                                           @click="removeProduct(i)"></i>
+                                                    </td>
+                                                    <div class="form-group error-text">
+                                                        <input type="hidden" :name="'products.'+i+'.expense_category_id'">
+                                                        <input type="hidden" :name="'products.'+i+'.income_category_id'">
+                                                        <input type="hidden" :name="'products.'+i+'.shift_sale_id'">
+                                                        <input type="hidden" :name="'products.'+i+'.stock_category_id'">
+                                                        <span class="invalid-feedback d-block"></span>
                                                     </div>
-                                                </td>
-                                                <td class="text-end" style="width: 130px;">
-                                                    ৳ {{ s.price }}
-                                                </td>
-                                                <td class="text-end">
-                                                    <input class="form-control w-100 control-sm text-end" step="any"
-                                                           type="number" v-model="s.subtotal" @input="updateQuantity(i)">
-                                                </td>
-                                                <td class="text-end">
-                                                    <i class="fa-regular text-danger fa-trash-can cursor-pointer"
-                                                       @click="removeProduct(i)"></i>
-                                                </td>
-                                                <div class="form-group error-text">
-                                                    <input type="hidden" :name="'products.'+i+'.expense_category_id'">
-                                                    <input type="hidden" :name="'products.'+i+'.income_category_id'">
-                                                    <input type="hidden" :name="'products.'+i+'.shift_sale_id'">
-                                                    <input type="hidden" :name="'products.'+i+'.stock_category_id'">
-                                                    <span class="invalid-feedback d-block"></span>
-                                                </div>
-                                            </tr>
+                                                </tr>
+                                                <tr v-if="errorsMessage[s.name] != null">
+                                                    <td colspan="4" class="pt-0 text-danger">{{ errorsMessage[s.name][0] }}</td>
+                                                </tr>
+                                            </template>
                                             <tr v-if="enableDriverTip">
                                                 <td colspan="3">Driver Tip</td>
                                                 <td > <input class="form-control w-100 control-sm text-end" step="any"
@@ -546,7 +551,8 @@ export default {
             driver_amount: 0.00,
             car_number: '',
             date: '',
-            carList: []
+            carList: [],
+            errorsMessage: []
         }
     },
     computed: {
@@ -694,9 +700,12 @@ export default {
                     if (this.saleId != null) {
                         this.singleOrder()
                     }
+                    this.errorsMessage = [];
                     this.closeModal()
                 } else if (parseInt(res.status) == 400) {
                     this.$toast.warning(res.message);
+                } else if (parseInt(res.status) == 600) {
+                    this.errorsMessage = res.errors;
                 } else {
                     if (res.message != undefined) {
                         this.errorText = res.message

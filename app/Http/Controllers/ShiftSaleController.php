@@ -16,6 +16,7 @@ use App\Models\ShiftSale;
 use App\Models\ShiftSaleTransaction;
 use App\Models\ShiftSummary;
 use App\Models\Tank;
+use App\Models\TankLog;
 use App\Repository\NozzleRepository;
 use App\Repository\TankRepository;
 use Carbon\Carbon;
@@ -71,6 +72,13 @@ class ShiftSaleController extends Controller
             if (!$tank instanceof Tank) {
                 return response()->json(['status' => 400, 'message' => 'Cannot find tank.']);
             }
+            $tankLog = TankLog::select('id', 'tank_id', 'height', 'water_height', 'volume')
+                ->where('tank_id', $tank['id'])
+                ->orderBy('id', 'DESC')
+                ->first();
+            if ($tankLog instanceof TankLog && $tankLog['volume'] < $request['consumption']) {
+                return response()->json(['status' => 400, 'message' => 'Your tank has not enough fuel. Please refill your tank.']);
+            }
         }
         $category = Category::where('slug', strtolower(AccountCategory::DIRECT_INCOME))->where('client_company_id', $inputData['session_user']['client_company_id'])->first();
         $incomeCategory = Category::where('parent_category', $category['id'])
@@ -107,9 +115,9 @@ class ShiftSaleController extends Controller
             return response()->json(['status' => 400, 'message' => 'Cannot find shift sale.']);
         }
         $shiftSale->end_time = Carbon::now('UTC')->format(FuelMatixDateTimeFormat::ONLY_TIME);
-        $shiftSale->start_reading = $inputData['start_reading'];
+        $shiftSale->start_reading =  $inputData['tank'] == 1 ? $inputData['start_reading'] : null;
         $shiftSale->tank_refill = $inputData['tank_refill'];
-        $shiftSale->end_reading = $inputData['end_reading'];
+        $shiftSale->end_reading = $inputData['tank'] == 1 ? $inputData['end_reading'] : null;
         $shiftSale->adjustment = $inputData['adjustment'];
         $shiftSale->consumption = $inputData['consumption'];
         $shiftSale->amount = $inputData['amount'];
@@ -231,8 +239,9 @@ class ShiftSaleController extends Controller
         $keyword = $inputData['keyword'] ?? '';
         $order_by = $inputData['order_by'] ?? 'shift_sale.id';
         $order_mode = $inputData['order_mode'] ?? 'DESC';
-        $result = ShiftSale::select('shift_sale.*', 'products.name as product_name', 'users.name as user_name')
+        $result = ShiftSale::select('shift_sale.*', 'products.name as product_name', 'users.name as user_name', 'product_types.tank')
             ->leftJoin('products', 'products.id', 'shift_sale.product_id')
+            ->leftJoin('product_types', 'product_types.id', 'products.type_id')
             ->leftJoin('users', 'users.id','=', 'shift_sale.user_id')
             ->where('shift_sale.client_company_id', $inputData['session_user']['client_company_id']);
         if (!empty($keyword)) {
@@ -244,6 +253,10 @@ class ShiftSaleController extends Controller
         $result = $result->orderBy($order_by, $order_mode)
             ->paginate($limit);
         foreach ($result as &$data) {
+            if ($data['tank'] == 0) {
+                $data['start_reading'] = '';
+                $data['end_reading'] = '';
+            }
             $data['date'] = Helpers::formatDate($data['date'].' '.$data['start_time'], FuelMatixDateTimeFormat::STANDARD_DATE_TIME);
         }
         return response()->json(['status' => 200, 'data' => $result]);

@@ -235,7 +235,7 @@
                                                         <table class="table">
                                                             <tr>
                                                                 <td style="font-size: 18px;padding: 0px;" class="">Total sale:</td>
-                                                                <td style="font-size: 18px;padding: 0px;" class="text-end ">{{totalSale}} {{ listDispenser.unit }}</td>
+                                                                <td style="font-size: 18px;padding: 0px;" class="text-end ">{{totalSale.toFixed(2)}} {{ listDispenser.unit }}</td>
                                                             </tr>
 <!--                                                            <tr>-->
 <!--                                                                <td style="font-size: 18px;padding: 0px;" class="">Total amount:</td>-->
@@ -561,14 +561,20 @@ export default {
                         }
                     })
                 })
-                // check if mismatch allow
-                if (this.mismatchAllow != null && this.listDispenser.tank == 1) {
-                    if (this.totalShiftParcent(totalConsumption) > this.mismatchAllow) {
-                        this.loading = false
-                        this.$toast.error('The mismatch is grater than allowed consumption')
-                        return
-                    }
+
+                if (this.totalSale != this.totalLiter) {
+                    this.$toast.error('Total sale and total liter does not match');
+                    return;
                 }
+
+                // check if mismatch allow
+                // if (this.mismatchAllow != null && this.listDispenser.tank == 1) {
+                //     if (this.totalShiftParcent(totalConsumption) > this.mismatchAllow) {
+                //         this.loading = false
+                //         this.$toast.error('The mismatch is grater than allowed consumption')
+                //         return
+                //     }
+                // }
                 if (this.noDIPShow) {
                     this.listDispenser.end_reading = this.listDispenser.end_reading == 0 ? parseFloat(this.listDispenser.consumption) - parseFloat(this.totalSale) : this.listDispenser.end_reading;
                 }
@@ -620,6 +626,12 @@ export default {
                     }
                 } else if (parseInt(res.status) === 200) {
                     this.$toast.warning(res.message);
+                } else if (parseInt(res.status) === 400) {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Oops...",
+                        text: res.message,
+                    });
                 } else {
                     ApiService.ErrorHandler(res.errors);
                 }

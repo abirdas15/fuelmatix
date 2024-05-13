@@ -61,12 +61,12 @@ class PayOrderController extends Controller
             ->where('linked_id', $request['bank_id'])
             ->where('client_company_id', $sessionUser['client_company_id'])
             ->first();
-//        if (!empty($request['bank_id'])) {
-//            $bankAmount = $transaction['debit_amount'] ?? 0 - $transaction['credit_amount'] ?? 0;
-//            if ($bankAmount < $amount) {
-//                return response()->json(['status' => 500, 'errors' => ['bank_id' => ['Not enough balance in your bank.']]]);
-//            }
-//        }
+        if (!empty($request['bank_id'])) {
+            $bankAmount = $transaction['debit_amount'] ?? 0 - $transaction['credit_amount'] ?? 0;
+            if ($bankAmount < $amount) {
+                return response()->json(['status' => 500, 'errors' => ['bank_id' => ['Not enough balance in your bank.']]]);
+            }
+        }
         $account_id = $inputData['bank_id'];
         if (empty($inputData['bank_id'])) {
             $account_id = $inputData['vendor_id'];

@@ -412,6 +412,7 @@ class ProductController extends Controller
         $result['status'] = 'start';
         $result['pos_sale'] = [];
         if ($shiftSale instanceof ShiftSale) {
+            $result['date'] = $shiftSale['date'];
             if ($shiftSale['status'] == 'end') {
                 $result['status'] = 'start';
             } else {

@@ -46,6 +46,20 @@ class SaleController extends Controller
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
+
+        $errorsMessage = [];
+        foreach ($requestData['products'] as $key => $product) {
+            $productModel = Product::where('products.id', $product['product_id'])
+                ->leftJoin('product_types', 'product_types.id', '=', 'products.type_id')
+                ->first();
+            if ($productModel['inventory'] == 1) {
+                if ($product['quantity'] > $productModel['current_stock']) {
+                    $errorsMessage[$product['name']][] = $product['name'].' has not enough stock. Available quantity: '.$productModel['current_stock'];
+                    return response()->json(['status' => 600, 'errors' => $errorsMessage]);
+                }
+            }
+        }
+
         $driverId = null;
         $voucher = null;
         $driverLiabilityId = null;

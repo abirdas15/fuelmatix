@@ -9,10 +9,12 @@ use App\Helpers\Helpers;
 use App\Helpers\SessionUser;
 use App\Models\Expense;
 use App\Models\ShiftSale;
+use App\Models\Transaction;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class ExpenseController extends Controller
@@ -34,6 +36,15 @@ class ExpenseController extends Controller
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
+        $transaction = Transaction::select(DB::raw('SUM(debit_amount) as debit_amount'), DB::raw('SUM(credit_amount) as credit_amount'))
+            ->where('linked_id', $inputData['payment_id'])
+            ->where('client_company_id', $inputData['session_user']['client_company_id'])
+            ->first();
+        $assetAmount = $transaction['debit_amount'] ?? 0 - $transaction['credit_amount'] ?? 0;
+        if ($assetAmount < $request['amount']) {
+            return response()->json(['payment_id' => 500, 'errors' => ['payment_id' => ['Not enough balance.']]]);
+        }
+
         $file_path = null;
         if ($request->file('file')) {
             $file = $_FILES;
@@ -194,7 +205,7 @@ class ExpenseController extends Controller
             return response()->json(['status' => 500, 'error' => 'Expense already have been approve.']);
         }
         $data['transaction'] = [
-            ['date' => $expense['date'], 'description' => $expense['remarks'], 'account_id' => $expense['payment_id'], 'debit_amount' => $expense['amount'], 'credit_amount' => 0, 'module' => Module::EXPENSE, 'module_id' => $expense['id'], 'file' => $expense['file']]
+            ['date' => date('Y-m-d', strtotime($expense['date'])), 'description' => $expense['remarks'], 'account_id' => $expense['payment_id'], 'debit_amount' => $expense['amount'], 'credit_amount' => 0, 'module' => Module::EXPENSE, 'module_id' => $expense['id'], 'file' => $expense['file']]
         ];
         $data['linked_id'] = $expense['category_id'];
         TransactionController::saveTransaction($data);
