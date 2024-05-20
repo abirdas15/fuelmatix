@@ -42,7 +42,8 @@ class TankController extends Controller
         $validator = Validator::make($inputData, [
             'product_id' => 'required',
             'tank_name' => 'required',
-            'file' => 'required|file'
+            'file' => 'required|file',
+            'tank_mac' => 'nullable|string'
         ]);
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
@@ -53,6 +54,7 @@ class TankController extends Controller
         $tank->tank_name = $inputData['tank_name'];
         $tank->opening_stock = $inputData['opening_stock'] ?? 0;
         $tank->client_company_id = $sessionUser['client_company_id'];
+        $tank->tank_mac = $inputData['tank_mac'] ?? '';
         if (!$tank->save()) {
             return response()->json(['status' => 400, 'message' => 'Cannot saved tank.']);
         }
@@ -138,7 +140,7 @@ class TankController extends Controller
     public function single(Request $request): JsonResponse
     {
         $inputData = $request->all();
-        $result = Tank::select('id', 'tank_name', 'height', 'capacity', 'product_id', 'opening_stock')->find($inputData['id']);
+        $result = Tank::select('id', 'tank_name', 'height', 'capacity', 'product_id', 'opening_stock', 'tank_mac')->find($inputData['id']);
         return response()->json(['status' => 200, 'data' => $result]);
     }
     /**
@@ -152,6 +154,7 @@ class TankController extends Controller
             'id' => 'required',
             'tank_name' => 'required',
             'product_id' => 'required',
+            'tank_mac' => 'nullable|string'
         ]);
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
@@ -164,6 +167,7 @@ class TankController extends Controller
         $tank->product_id = $inputData['product_id'];
         $tank->tank_name = $inputData['tank_name'];
         $tank->opening_stock = $inputData['opening_stock'] ?? 0;
+        $tank->tank_mac = $inputData['tank_mac'] ?? '';
         if (!$tank->save()) {
             return response()->json(['status' => 400, 'message' => 'Cannot updated [tank].']);
         }

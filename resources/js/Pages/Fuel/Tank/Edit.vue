@@ -38,6 +38,11 @@
                                         <div class="invalid-feedback"></div>
                                     </div>
                                     <div class="mb-3 form-group col-md-6">
+                                        <label class="form-label">Tank Mac:</label>
+                                        <input type="number" class="form-control" name="tank_mac" v-model="param.tank_mac">
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                    <div class="mb-3 form-group col-md-6">
                                         <label class="form-label">BSTI Chart:</label>
                                         <input id="fileInput" type="file" class="form-file-input form-control"  @change="onFileChange" name="mediaFile">
                                         <div class="invalid-feedback"></div>
@@ -102,6 +107,7 @@ export default {
             formData.append('product_id', this.param.product_id)
             formData.append('opening_stock', this.param.opening_stock)
             formData.append('file', this.param.file)
+            formData.append('tank_mac', this.param.tank_mac)
             ApiService.POST(ApiRoutes.TankEdit, formData,res => {
                 this.loading = false
                 if (parseInt(res.status) === 200) {
