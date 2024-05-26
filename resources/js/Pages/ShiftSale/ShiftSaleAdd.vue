@@ -562,7 +562,7 @@ export default {
                     })
                 })
 
-                if (this.totalSale != this.totalLiter) {
+                if (parseFloat(this.totalSale).toFixed(2) != parseFloat(this.totalLiter).toFixed(2)) {
                     this.$toast.error('Total sale and total liter does not match');
                     return;
                 }
