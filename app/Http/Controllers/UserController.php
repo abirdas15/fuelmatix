@@ -172,12 +172,11 @@ class UserController extends Controller
             'name' => $requestData['name'],
             'opening_balance' => $requestData['opening_balance'],
         ];
-        $cashInHandCategory = null;
+        $cashInHandCategory = Category::where('client_company_id', $sessionUser['client_company_id'])->where('slug', strtolower(AccountCategory::CASH_IM_HAND))->first();
+        if (!$cashInHandCategory instanceof Category) {
+            return response()->json(['status' => 400, 'message' => 'Cannot find [cash in hand] category']);
+        }
         if (!empty($requestData['cashier_balance']) && empty($user['category_id'])) {
-            $cashInHandCategory = Category::where('client_company_id', $sessionUser['client_company_id'])->where('slug', strtolower(AccountCategory::CASH_IM_HAND))->first();
-            if (!$cashInHandCategory instanceof Category) {
-                return response()->json(['status' => 400, 'message' => 'Cannot find [cash in hand] category']);
-            }
             $cashInHandCategory = CategoryRepository::saveCategory($categoryData, $cashInHandCategory['id'], null);
             if ($cashInHandCategory instanceof Category) {
                 $user->category_id = $cashInHandCategory->id;
@@ -186,9 +185,12 @@ class UserController extends Controller
         } else if (!empty($requestData['cashier_balance']) && !empty($user['category_id'])) {
             $category = Category::find($user->category_id);
             if (!$category instanceof Category) {
-                return response()->json(['status' => 400, 'message' => 'Cannot find [cash in hand] category']);
+                $cashInHandCategory = CategoryRepository::saveCategory($categoryData, $cashInHandCategory['id'], null);
+                $user->category_id = $cashInHandCategory->id;
+                $user->save();
+            } else {
+                $cashInHandCategory = CategoryRepository::updateCategory($category, $categoryData);
             }
-            $cashInHandCategory = CategoryRepository::updateCategory($category, $categoryData);
         }
         if ($cashInHandCategory instanceof Category && !empty($request['opening_balance'])) {
             $deleteResponse = $cashInHandCategory->deleteOpeningBalance();
