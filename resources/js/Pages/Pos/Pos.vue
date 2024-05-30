@@ -60,7 +60,7 @@
                                 </div>
                                 <div class="col-sm-6 mb-3">
                                     <div class="form-group">
-                                        <input type="text" name="billed_to" class="form-control form-control-sm" placeholder="Billed To" v-model="billed_to">
+                                        <input type="text" name="billed_to" class="form-control form-control-sm" placeholder="Vehicle No" v-model="billed_to">
                                         <span class="invalid-feedback d-block"></span>
                                     </div>
                                 </div>
@@ -348,7 +348,7 @@
                     <td>Date : <span>{{ singleSaleData.date }}</span></td>
                 </tr>
                 <tr>
-                    <td><strong>Billed To: {{ singleSaleData.customer_name }}</strong></td>
+                    <td><strong>Vehicle No: {{ singleSaleData.customer_name }}</strong></td>
                 </tr>
                 </tbody>
             </table>
