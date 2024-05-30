@@ -141,6 +141,7 @@ class SaleController extends Controller
         $sale->user_id = $requestData['session_user']['id'];
         $sale->customer_id = $requestData['payment_method'] == PaymentMethod::COMPANY ? $payment_category_id : null;
         $sale->payment_method = $requestData['payment_method'] ?? null;
+        $sale->billed_to = $requestData['billed_to'] ?? null;
         $sale->payment_category_id = $payment_category_id;
         $sale->client_company_id = $requestData['session_user']['client_company_id'];
         if (!$sale->save()) {
@@ -259,7 +260,7 @@ class SaleController extends Controller
         }
         $result = Sale::find($inputData['id']);
         $result['date'] = Helpers::formatDate($result['date'], FuelMatixDateTimeFormat::STANDARD_DATE_TIME);
-        $result['customer_name'] = 'Walk in Customer';
+        $result['customer_name'] = $result['billed_to'] ?? 'Walk in Customer';
         $result['payment_method'] = ucfirst($result['payment_method']);
         if (!empty($result['customer_id'])) {
             $category = Category::where('id', $result['customer_id'])->first();

@@ -28,13 +28,11 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-sm-6">
-                                    <template v-if="company_id">
-                                        <div class="form-group">
-                                            <input type="text" name="voucher_number" class="form-control form-control-sm" placeholder="Voucher No" v-model="voucher_number">
-                                            <span class="invalid-feedback d-block"></span>
-                                        </div>
-                                    </template>
+                                <div class="col-sm-6" v-if="company_id">
+                                    <div class="form-group">
+                                        <input type="text" name="voucher_number" class="form-control form-control-sm" placeholder="Voucher No" v-model="voucher_number">
+                                        <span class="invalid-feedback d-block"></span>
+                                    </div>
                                 </div>
                                 <div class="col-sm-6" v-if="company_id">
                                     <div class="user-search">
@@ -57,6 +55,12 @@
                                     <div class="user-search form-group position-relative">
                                         <v-select class="form-control form-control-sm" name="car_number" placeholder="Choose Car" :options="carList" label="car_number" v-model="car_number"
                                                   :reduce="(option) => option.car_number"></v-select>
+                                        <span class="invalid-feedback d-block"></span>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 mb-3">
+                                    <div class="form-group">
+                                        <input type="text" name="billed_to" class="form-control form-control-sm" placeholder="Billed To" v-model="billed_to">
                                         <span class="invalid-feedback d-block"></span>
                                     </div>
                                 </div>
@@ -344,7 +348,7 @@
                     <td>Date : <span>{{ singleSaleData.date }}</span></td>
                 </tr>
                 <tr>
-                    <td>Billed To: <span>{{ singleSaleData.customer_name }}</span></td>
+                    <td><strong>Billed To: {{ singleSaleData.customer_name }}</strong></td>
                 </tr>
                 </tbody>
             </table>
@@ -413,6 +417,7 @@ export default {
             companyLoading: false,
             cardLoading: false,
             singleSaleData: null,
+            billed_to: '',
             printD: null,
             value: null,
             errorText: '',
@@ -666,7 +671,8 @@ export default {
                 payment_method: this.payment_method,
                 products: this.sale,
                 car_number: this.car_number,
-                date: this.date != '' ? this.date : moment().format('YYYY-MM-DD')
+                date: this.date != '' ? this.date : moment().format('YYYY-MM-DD'),
+                billed_to: this.billed_to
             }
             if (type == 'company') {
                 param.driver_tip = this.driver_tip
@@ -697,6 +703,7 @@ export default {
                     this.enableDriverSale = false
                     this.payment_method = ''
                     this.company_id = null
+                    this.billed_to = ''
                     this.voucher_number = '';
                     this.advance_amount = '';
                     this.advance_pay = false;
