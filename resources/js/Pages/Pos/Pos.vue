@@ -327,7 +327,11 @@
         </div>
         <div id="print" v-if="singleSaleData">
             <header class="text-center">
-                {{ Auth.company_name }}
+                <strong>{{ singleSaleData.company?.name }}</strong>
+                </br>
+                <small>
+                    {{ singleSaleData.company?.address }}
+                </small>
             </header>
             <p>Invoice Number : {{ singleSaleData.invoice_number }}</p>
             <table class="bill-details">
