@@ -328,9 +328,13 @@
         <div id="print" v-if="singleSaleData">
             <header class="text-center">
                 <strong>{{ singleSaleData.company?.name }}</strong>
-                </br>
+                <br>
                 <small>
                     {{ singleSaleData.company?.address }}
+                </small>
+                <br>
+                <small>
+                    Phone: {{ singleSaleData.company?.phone_number }}
                 </small>
             </header>
             <p>Invoice Number : {{ singleSaleData.invoice_number }}</p>
