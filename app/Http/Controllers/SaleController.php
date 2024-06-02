@@ -142,12 +142,12 @@ class SaleController extends Controller
             }
         }
         if ($requestData['payment_method'] == PaymentMethod::CASH) {
-            $payment_category_id = $category['id'];
             $category = Category::where('id', $sessionUser['category_id'])->first();
             if (!$category instanceof Category) {
                 return response()->json(['status' => 500, 'message' => 'You are not a cashier user.']);
             }
             $cash_in_hand_category_id = $category['id'];
+            $payment_category_id = $category['id'];
         }
         $sale = new Sale();
         $sale->date = Carbon::parse($requestData['date']. date('H:i:s'))->format('Y-m-d H:i:s');
