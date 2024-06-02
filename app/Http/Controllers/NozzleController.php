@@ -25,6 +25,7 @@ class NozzleController extends Controller
             'dispenser_id' => 'required',
             'pf' => 'nullable|numeric',
             'max_value' => 'required|numeric',
+            'nozzle_id' => 'nullable|string'
         ],[
             'dispenser_id.required' => 'The dispenser field is required',
         ]);
@@ -37,6 +38,7 @@ class NozzleController extends Controller
         $nozzle->opening_stock = $inputData['opening_stock'] ?? null;
         $nozzle->pf = $inputData['pf'] ?? null;
         $nozzle->max_value = $inputData['max_value'] ?? null;
+        $nozzle->nozzle_id = $inputData['nozzle_id'] ?? null;
         $nozzle->client_company_id = $inputData['session_user']['client_company_id'];
         if ($nozzle->save()) {
             return response()->json(['status' => 200, 'message' => 'Successfully saved nozzle.']);
@@ -108,6 +110,7 @@ class NozzleController extends Controller
             'dispenser_id' => 'required',
             'pf' => 'nullable|numeric',
             'max_value' => 'required|numeric',
+            'nozzle_id' => 'nullable|string'
         ],[
             'dispenser_id.required' => 'The dispenser field is required',
         ]);
@@ -123,6 +126,7 @@ class NozzleController extends Controller
         $nozzle->pf = $inputData['pf'] ?? null;
         $nozzle->max_value = $inputData['max_value'] ?? null;
         $nozzle->opening_stock = $inputData['opening_stock'] ?? null;
+        $nozzle->nozzle_id = $inputData['nozzle_id'] ?? null;
         if ($nozzle->save()) {
             return response()->json(['status' => 200, 'message' => 'Successfully updated nozzle.']);
         }

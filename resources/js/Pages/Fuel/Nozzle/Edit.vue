@@ -19,12 +19,17 @@
                         <div class="basic-form">
                             <form @submit.prevent="save">
                                 <div class="row">
-                                    <div class="mb-3 form-group col-md-6">
+                                    <div class="mb-3 form-group col-md-4">
                                         <label class="form-label">Nozzle Name:</label>
                                         <input type="text" class="form-control" name="dispenser_name" v-model="param.name">
                                         <div class="invalid-feedback"></div>
                                     </div>
-                                    <div class="mb-3 form-group col-md-6">
+                                    <div class="mb-3 form-group col-md-4">
+                                        <label class="form-label">Nozzle ID:</label>
+                                        <input type="text" class="form-control" name="nozzle_id" v-model="param.nozzle_id">
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                    <div class="mb-3 form-group col-md-4">
                                         <label class="form-label">Dispenser:</label>
                                         <select class="form-control" name="dispenser_id" id="dispenser_id"  v-model="param.dispenser_id">
                                             <option value="">Select Dispenser</option>

@@ -20,6 +20,7 @@ class DispenserController extends Controller
         $validator = Validator::make($inputData, [
             'product_id' => 'required',
             'dispenser_name' => 'required',
+            'mac' => 'nullable|string'
         ]);
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
@@ -31,6 +32,7 @@ class DispenserController extends Controller
         $dispenser->brand = $inputData['brand'];
         $dispenser->serial = $inputData['serial'];
         $dispenser->opening_stock = $inputData['opening_stock'] ?? null;
+        $dispenser->mac = $inputData['mac'] ?? null;
         $dispenser->client_company_id = $inputData['session_user']['client_company_id'];
         if ($dispenser->save()) {
             return response()->json(['status' => 200, 'message' => 'Successfully save dispenser.']);
@@ -96,6 +98,7 @@ class DispenserController extends Controller
             'id' => 'required',
             'product_id' => 'required',
             'dispenser_name' => 'required',
+            'mac' => 'nullable|string'
         ]);
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
@@ -109,6 +112,7 @@ class DispenserController extends Controller
         $dispenser->dispenser_name = $inputData['dispenser_name'];
         $dispenser->brand = $inputData['brand'];
         $dispenser->serial = $inputData['serial'];
+        $dispenser->mac = $inputData['mac'] ?? null;
         $dispenser->opening_stock = $inputData['opening_stock'] ?? null;
         if ($dispenser->save()) {
             return response()->json(['status' => 200, 'message' => 'Successfully update dispenser.']);

@@ -52,6 +52,11 @@
                                         <input type="text" class="form-control" name="serial" v-model="param.serial">
                                         <div class="invalid-feedback"></div>
                                     </div>
+                                    <div class="mb-3 form-group col-md-6">
+                                        <label class="form-label">Mac:</label>
+                                        <input type="text" class="form-control" name="mac" v-model="param.mac">
+                                        <div class="invalid-feedback"></div>
+                                    </div>
 <!--                                    <div class="mb-3 form-group col-md-6">-->
 <!--                                        <label class="form-label">Opening Stock:</label>-->
 <!--                                        <input type="number" class="form-control" name="opening_stock" v-model="param.opening_stock">-->
@@ -89,7 +94,8 @@ export default {
                 serial: '',
                 product_id: '',
                 tank_id: '',
-                opening_stock: ''
+                opening_stock: '',
+                mac: ''
             },
             loading: false,
             listData: [],
