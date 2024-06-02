@@ -65,6 +65,12 @@ class SaleController extends Controller
         $driverLiabilityId = null;
         $total_amount = array_sum(array_column($requestData['products'], 'subtotal'));
         $payment_category_id = $requestData['company_id'] ?? '';
+
+        $sessionUser = SessionUser::getUser();
+        if (!$sessionUser instanceof User) {
+            return response()->json(['status' => 500, 'message' => 'Cannot find session [user].']);
+        }
+
         if ($requestData['payment_method'] == PaymentMethod::COMPANY) {
             $company = Category::find($requestData['company_id']);
             if (!$company instanceof Category) {
@@ -119,18 +125,28 @@ class SaleController extends Controller
                     return response()->json(['status' => 400, 'message' => 'Cannot find [driver expense category].']);
                 }
                 $driverId = $driverExpense['id'];
+                $category = Category::where('id', $sessionUser['category_id'])->first();
+                if (!$category instanceof Category) {
+                    return response()->json(['status' => 500, 'message' => 'You are not a cashier user.']);
+                }
+                $cash_in_hand_category_id = $category['id'];
+                $transaction = Transaction::select(DB::raw('SUM(debit_amount) as total_debit_amount'), DB::raw('SUM(credit_amount) as total_credit_amount'))
+                                    ->where('linked_id', $cash_in_hand_category_id)
+                                    ->first();
+                if (!$transaction instanceof Transaction) {
+                    return response()->json(['status' => 400, 'message' => $sessionUser['name']. ' has not enough balance.']);
+                }
+                if (($transaction['total_debit_amount'] - $transaction['total_credit_amount']) < $request['driver_sale']['price']) {
+                    return response()->json(['status' => 400, 'message' => $sessionUser['name']. ' has not enough balance. Minimum blalance is '. $request['driver_sale']['price']]);
+                }
             }
         }
         if ($requestData['payment_method'] == PaymentMethod::CASH) {
-            $sessionUser = SessionUser::getUser();
-            if (!$sessionUser instanceof User) {
-                return response()->json(['status' => 500, 'message' => 'Cannot find session [user].']);
-            }
+            $payment_category_id = $category['id'];
             $category = Category::where('id', $sessionUser['category_id'])->first();
             if (!$category instanceof Category) {
                 return response()->json(['status' => 500, 'message' => 'You are not a cashier user.']);
             }
-            $payment_category_id = $category['id'];
             $cash_in_hand_category_id = $category['id'];
         }
         $sale = new Sale();

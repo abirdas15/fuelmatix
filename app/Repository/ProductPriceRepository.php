@@ -41,24 +41,28 @@ class ProductPriceRepository
         $sessionUser = SessionUser::getUser();
         $productPrices = ProductPrice::where('client_company_id', $sessionUser['client_company_id'])->where('product_id', $productId)->where('stock_quantity', '>', 0)->get()->toArray();
         $buyingPrice = 0;
-        if (empty($productPrices)) {
+        if (count($productPrices) == 0) {
             $productModel = Product::where('id', $productId)->first();
             if (!empty($productModel['buying_price'])) {
                 $buyingPrice = $productModel['buying_price'] * $quantity;
             }
+            return $buyingPrice;
         }
         foreach ($productPrices as $key => $productPrice) {
             $productPriceModel = ProductPrice::find($productPrice['id']);
-            if ($productPrice['stock_quantity'] > $quantity) {
-                $productPriceModel->stock_quantity = $productPrice['stock_quantity'] - $quantity;
-                $buyingPrice += $productPrice['unit_price'] * $quantity;
-                $productPriceModel->save();
-                break;
-            } else {
-                $quantity = $quantity - $productPrice->stock_quantity;
-                $buyingPrice += $productPrice->unit_price * $productPrice->stock_quantity;
-                $productPriceModel->stock_quantity = 0;
-                $productPriceModel->save();
+            if ($productPriceModel instanceof ProductPrice) {
+                if ($productPrice['stock_quantity'] > $quantity) {
+                    $productPriceModel->stock_quantity = $productPrice['stock_quantity'] - $quantity;
+                    $buyingPrice += $productPrice['unit_price'] * $quantity;
+                    $productPriceModel->save();
+                    break;
+                } else {
+                    $stockQunity = $productPrice->stock_quantity ?? 0;
+                    $quantity = $quantity - $stockQunity;
+                    $buyingPrice += $productPrice['unit_price'] * $stockQunity;
+                    $productPriceModel->stock_quantity = 0;
+                    $productPriceModel->save();
+                }
             }
         }
         return $buyingPrice;
