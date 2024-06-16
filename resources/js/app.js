@@ -23,7 +23,7 @@ Vue.use(VueRouter, axios, Vuex);
 Vue.use(VuePageTransition);
 Vue.component("v-select", vSelect);
 Vue.use(VueToast, { position: "top-right" });
-    Vue.mixin({
+Vue.mixin({
         computed: {
             Auth: function () {
                 return this.$store.getters.GetAuth;
