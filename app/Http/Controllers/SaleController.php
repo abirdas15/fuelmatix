@@ -253,7 +253,7 @@ class SaleController extends Controller
         $result = $result->orderBy($order_by, $order_mode)
             ->paginate($limit);
         foreach ($result as &$data) {
-            $data['date'] = date('d/m/Y', strtotime($data['date']));
+            $data['date'] = date(FuelMatixDateTimeFormat::STANDARD_DATE_TIME, strtotime($data['date']));
         }
         return response()->json(['status' => 200, 'data' => $result]);
     }
@@ -275,7 +275,7 @@ class SaleController extends Controller
             return response()->json(['status' => 400, 'message' => 'Cannot find user.']);
         }
         $result = Sale::find($inputData['id']);
-        $result['date'] = Helpers::formatDate($result['date'], FuelMatixDateTimeFormat::STANDARD_DATE_TIME);
+        $result['date'] = date(FuelMatixDateTimeFormat::STANDARD_DATE_TIME, strtotime($result['date']));
         $result['customer_name'] = $result['billed_to'] ?? 'Walk in Customer';
         $result['payment_method'] = ucfirst($result['payment_method']);
         if (!empty($result['customer_id'])) {
