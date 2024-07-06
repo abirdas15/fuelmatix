@@ -737,7 +737,8 @@ export default {
         singleOrder: function () {
             ApiService.POST(ApiRoutes.SaleSingle, {id: this.saleId}, res => {
                 if (parseInt(res.status) === 200) {
-                    this.singleSaleData = res.data
+                    this.singleSaleData = res.data;
+                    this.printD = new Printd();
                     this.value = "https://fuel.informatix.asia?billId=" + res.data.invoice_number;
                     setTimeout(() => {
                         this.loading = false
@@ -761,7 +762,7 @@ export default {
             });
         },
         print () {
-            this.printD.print( document.getElementById('print'), [this.cssText])
+            this.printD.print(document.getElementById('print'), [this.cssText])
         },
 
         getProductTotalPrice: function () {
