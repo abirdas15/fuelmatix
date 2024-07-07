@@ -411,20 +411,22 @@ class ProductController extends Controller
             ->first();
         $result['status'] = 'start';
         $result['pos_sale'] = [];
+        $result['total_pos_sale_liter'] = 0;
         if ($shiftSale instanceof ShiftSale) {
-            $result['date'] = $shiftSale['date'];
             if ($shiftSale['status'] == 'end') {
                 $result['status'] = 'start';
             } else {
+                $result['date'] = $shiftSale['date'];
                 $result['status'] = 'end';
             }
-            $posSale = SaleData::select('sale_data.sale_id', 'sale_data.id', DB::raw('SUM(sale_data.subtotal) as amount'), 'sale.payment_category_id as category_id')
+            $posSale = SaleData::select('sale_data.sale_id', 'sale_data.id', 'sale_data.quantity', DB::raw('SUM(sale_data.subtotal) as amount'), 'sale.payment_category_id as category_id')
                 ->leftJoin('sale', 'sale.id', '=', 'sale_data.sale_id')
                 ->where('shift_sale_id', $shiftSale->id)
                 ->groupBy('sale.payment_category_id')
                 ->get()
                 ->toArray();
             $result['pos_sale'] = $posSale;
+            $result['total_pos_sale_liter'] = array_sum(array_column($posSale, 'quantity'));
         }
         return response()->json(['status' => 200, 'data' => $result]);
     }
