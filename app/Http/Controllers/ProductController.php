@@ -419,7 +419,7 @@ class ProductController extends Controller
                 $result['date'] = $shiftSale['date'];
                 $result['status'] = 'end';
             }
-            $posSale = SaleData::select('sale_data.sale_id', 'sale_data.id', 'sale_data.quantity', DB::raw('SUM(sale_data.subtotal) as amount'), 'sale.payment_category_id as category_id')
+            $posSale = SaleData::select('sale_data.sale_id', 'sale_data.id', DB::raw('SUM(sale_data.quantity) as quantity'), DB::raw('SUM(sale_data.subtotal) as amount'), 'sale.payment_category_id as category_id')
                 ->leftJoin('sale', 'sale.id', '=', 'sale_data.sale_id')
                 ->where('shift_sale_id', $shiftSale->id)
                 ->groupBy('sale.payment_category_id')
