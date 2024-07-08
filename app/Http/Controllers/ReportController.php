@@ -85,7 +85,7 @@ class ReportController extends Controller
             ->leftJoin('dispensers', 'dispensers.id', '=', 'shift_summary.dispenser_id')
             ->whereBetween('date', [$requestData['start_date'], $requestData['end_date']])
             ->where('shift_sale.client_company_id', $sessionUser['client_company_id'])
-            ->where('status', FuelMatixStatus::END);
+            ->where('shift_sale.status', FuelMatixStatus::END);
         if (!empty($productId)) {
             $result->where(function($q) use ($productId){
                 $q->where('shift_sale.product_id', $productId);
