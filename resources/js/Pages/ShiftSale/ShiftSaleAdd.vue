@@ -546,7 +546,7 @@ export default {
             ApiService.ClearErrorHandler();
             this.listDispenser.categories = this.categories;
             let flag = false;
-            if (this.listDispenser.status == 'end') {
+            if (this.listDispenser.status === 'end') {
                 let totalCategoryAmount = 0
                 let totalConsumption = 0
                 this.listDispenser.categories.map(v => {
@@ -563,7 +563,7 @@ export default {
                 })
 
                 let totalSale = parseFloat(this.listDispenser.total_pos_sale_liter) + parseFloat(this.totalLiter);
-                if (parseFloat(this.totalSale).toFixed(2) != parseFloat(totalSale).toFixed(2)) {
+                if (parseFloat(this.totalSale).toFixed(2) !== parseFloat(totalSale).toFixed(2)) {
                     this.$toast.error('Total sale and total liter does not match');
                     return;
                 }
@@ -577,19 +577,15 @@ export default {
                 //     }
                 // }
                 if (this.noDIPShow) {
-                    this.listDispenser.end_reading = this.listDispenser.end_reading == 0 ? parseFloat(this.listDispenser.consumption) - parseFloat(this.totalSale) : this.listDispenser.end_reading;
-                }
-                if (this.listDispenser.tank == 1 && !this.noDIPShow) {
-                    this.listDispenser.net_profit = this.listDispenser.consumption - this.totalSale;
+                    this.listDispenser.end_reading = this.listDispenser.end_reading === 0 ? parseFloat(this.listDispenser.consumption) - parseFloat(this.totalSale) : this.listDispenser.end_reading;
                 }
                 this.listDispenser.amount = totalCategoryAmount;
-                this.listDispenser.consumption = totalConsumption;
-                if (this.listDispenser.consumption == 0) {
+                if (totalConsumption === 0) {
                     this.$toast.error('The consumption amount is 0');
                     return;
                 }
             }
-            if (flag == true) {
+            if (flag === true) {
                 Swal.fire({
                     title: "Are you sure?",
                     text: "Your nozzle end reading is correct",

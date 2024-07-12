@@ -149,6 +149,13 @@ class SaleController extends Controller
             $cash_in_hand_category_id = $category['id'];
             $payment_category_id = $category['id'];
         }
+        if ($requestData['payment_method'] == PaymentMethod::CARD) {
+            $category = Category::where('id', $requestData['pos_machine_id'])->first();
+            if (!$category instanceof Category) {
+                return response()->json(['status' => 500, 'message' => 'Pos machine cannot be found.']);
+            }
+            $payment_category_id = $category['id'];
+        }
         $sale = new Sale();
         $sale->date = Carbon::parse($requestData['date']. date('H:i:s'))->format('Y-m-d H:i:s');
         $sale->invoice_number = Sale::getInvoiceNumber();

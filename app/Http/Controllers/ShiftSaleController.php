@@ -114,6 +114,13 @@ class ShiftSaleController extends Controller
         if (!$shiftSale instanceof ShiftSale) {
             return response()->json(['status' => 400, 'message' => 'Cannot find shift sale.']);
         }
+        $nozzleConsumption = 0;
+        foreach ($inputData['dispensers'] as $dispenser) {
+            foreach ($dispenser['nozzle'] as $nozzle) {
+                $nozzleConsumption += $nozzle['consumption'];
+            }
+        }
+        $inputData['net_profit'] = $nozzleConsumption  - $inputData['consumption'];
         $shiftSale->end_time = Carbon::now('UTC')->format(FuelMatixDateTimeFormat::ONLY_TIME);
         $shiftSale->start_reading =  $inputData['tank'] == 1 ? $inputData['start_reading'] : null;
         $shiftSale->tank_refill = $inputData['tank_refill'];
