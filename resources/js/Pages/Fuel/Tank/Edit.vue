@@ -39,7 +39,7 @@
                                     </div>
                                     <div class="mb-3 form-group col-md-6">
                                         <label class="form-label">Tank Mac:</label>
-                                        <input type="number" class="form-control" name="tank_mac" v-model="param.tank_mac">
+                                        <input type="text" class="form-control" name="tank_mac" v-model="param.tank_mac">
                                         <div class="invalid-feedback"></div>
                                     </div>
                                     <div class="mb-3 form-group col-md-6">

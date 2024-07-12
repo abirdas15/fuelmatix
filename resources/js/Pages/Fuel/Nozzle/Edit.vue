@@ -52,6 +52,11 @@
                                         <input type="text" class="form-control" name="max_value" v-model="param.max_value">
                                         <div class="invalid-feedback"></div>
                                     </div>
+                                    <div class="mb-3 form-group col-md-4">
+                                        <label class="form-label">Mac:</label>
+                                        <input type="text" class="form-control" name="mac" v-model="param.mac">
+                                        <div class="invalid-feedback"></div>
+                                    </div>
                                 </div>
                                 <div class="row" style="text-align: right;">
                                     <div class="mb-3 col-md-6">
