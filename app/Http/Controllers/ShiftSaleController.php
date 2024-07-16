@@ -208,8 +208,8 @@ class ShiftSaleController extends Controller
         ];
         TransactionController::saveTransaction($transactionData);
 
-        $lossAmount = abs($inputData['net_profit']) * $buyingPrice;
-        if ($inputData['net_profit'] < 0) {
+        $lossAmount = $inputData['net_profit'] * $product['buying_price'];
+        if ($lossAmount < 0) {
             // Loss amount transaction after tank refill
             $lossCategory = Category::where('slug', strtolower(AccountCategory::EVAPORATIVE))
                 ->where('client_company_id', $inputData['session_user']['client_company_id'])
@@ -222,7 +222,7 @@ class ShiftSaleController extends Controller
                 ];
                 TransactionController::saveTransaction($transactionData);
             }
-        } else if ($inputData['net_profit'] > 0) {
+        } else if ($lossAmount > 0) {
             // Profit amount transaction after tank refill
             $description = 'Shift ID: '.$shiftSale['id'].', Product: '.$product['name'].', Windfall: '.abs($inputData['net_profit']);
             $transactionData['linked_id'] = $stockCategory['id'];

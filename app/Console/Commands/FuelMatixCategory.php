@@ -439,7 +439,7 @@ class FuelMatixCategory extends Command
         $this->info('Category: '. AccountCategory::RETAIN_EARNING);
         $retainEarning = $this->saveCategory([
             'name' => AccountCategory::RETAIN_EARNING,
-            'parent_category' => $expenseCategory['id'],
+            'parent_category' => $equityCategory['id'],
             'type' => FuelMatixCategoryType::EQUITY,
             'client_company_id' => $clientCompany->id,
         ]);
