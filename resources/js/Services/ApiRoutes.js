@@ -249,7 +249,8 @@ const ApiRoutes = {
     PurchaseUpdate: ApiVersion + '/purchase/update',
     PurchaseDelete: ApiVersion + '/purchase/delete',
     PurchaseAmount: ApiVersion + '/purchase/amount',
-    InvoicePayment: ApiVersion + '/invoice/payment/list'
+    InvoicePayment: ApiVersion + '/invoice/payment/list',
+    Report: ApiVersion + '/report'
 };
 
 export default ApiRoutes;

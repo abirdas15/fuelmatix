@@ -120,7 +120,9 @@ class ShiftSaleController extends Controller
                 $nozzleConsumption += $nozzle['consumption'];
             }
         }
+        $product = Product::where('id', $inputData['product_id'])->first();
         $inputData['net_profit'] = $nozzleConsumption  - $inputData['consumption'];
+        $lossAmount = $inputData['net_profit'] * $product['buying_price'];
         $shiftSale->end_time = Carbon::now('UTC')->format(FuelMatixDateTimeFormat::ONLY_TIME);
         $shiftSale->start_reading =  $inputData['tank'] == 1 ? $inputData['start_reading'] : null;
         $shiftSale->tank_refill = $inputData['tank_refill'];
@@ -129,6 +131,7 @@ class ShiftSaleController extends Controller
         $shiftSale->consumption = $inputData['consumption'];
         $shiftSale->amount = $inputData['amount'];
         $shiftSale->net_profit = $inputData['net_profit'] ?? null;
+        $shiftSale->net_profit_amount = $lossAmount ?? 0;
         $shiftSale->status = 'end';
         if (!$shiftSale->save()) {
             return response()->json(['status' => 500, 'error' => 'Cannot ended shift sale.']);
@@ -176,7 +179,6 @@ class ShiftSaleController extends Controller
             }
         }
         $buyingPrice = 0;
-        $product = Product::where('id', $inputData['product_id'])->first();
         $totalNozzleConsumption = $inputData['amount'] / $product['selling_price'];
         if (!empty($product['buying_price'])) {
             $buyingPrice = $product['buying_price'] * $totalNozzleConsumption;
@@ -208,7 +210,6 @@ class ShiftSaleController extends Controller
         ];
         TransactionController::saveTransaction($transactionData);
 
-        $lossAmount = $inputData['net_profit'] * $product['buying_price'];
         if ($lossAmount < 0) {
             // Loss amount transaction after tank refill
             $lossCategory = Category::where('slug', strtolower(AccountCategory::EVAPORATIVE))

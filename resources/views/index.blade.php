@@ -21,6 +21,7 @@
     <link href="{{ asset('vendor/owl-carousel/owl.carousel.css') }}" rel="stylesheet" />
     <link href="{{ asset('vendor/datatables/css/jquery.dataTables.min.css') }}" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link href="https://fonts.cdnfonts.com/css/digital-numbers" rel="stylesheet">
 
     <!-- Style css -->
 

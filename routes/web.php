@@ -13,5 +13,22 @@ use App\Http\Controllers\SpaController;
 | contains the "web" middleware group. Now create something great!
 |
 */
-Route::middleware('LoginCheck')->get('/auth/{any}', [SpaController::class, 'index'])->where('any', '.*')->name('Spa.Auth');
-Route::middleware('LoginCheck')->get('/{any}', [SpaController::class, 'index'])->where('any', '.*')->name('Spa.Dashboard');
+Route::get('/admin/auth/{any}', [\App\Http\Controllers\Admin\SpaController::class, 'index'])
+    ->where('any', '.*')
+    ->name('admin.auth')
+    ->middleware('login.check');
+
+Route::get('/admin/{any}', [\App\Http\Controllers\Admin\SpaController::class, 'index'])
+    ->where('any', '.*')
+    ->name('admin.dashboard')
+    ->middleware('login.check');
+
+Route::get('/auth/{any}', [SpaController::class, 'index'])
+    ->where('any', '.*')
+    ->name('spa.auth')
+    ->middleware('login.check');
+
+Route::get('/{any}', [SpaController::class, 'index'])
+    ->where('any', '.*')
+    ->name('spa.dashboard')
+    ->middleware('login.check');

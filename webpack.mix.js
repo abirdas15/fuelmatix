@@ -12,3 +12,4 @@ mix.disableNotifications()
  */
 
 mix.js('resources/js/app.js', 'public/js');
+mix.js('resources/js/admin/app.js', 'public/admin/js');

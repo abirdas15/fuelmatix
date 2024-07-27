@@ -103,6 +103,9 @@ import purchaseEdit from "../Pages/PurchaseBill/Edit.vue";
 import InvoicePayment from "../Pages/InvoicePayment/InvoicePayment.vue"
 import VendorReport from "../Pages/VendorReport/VendorReport.vue";
 import ExpenseReport from "../Pages/ExpenseReport/ExpenseReport.vue";
+import NozzleStatus from "../Pages/NozzleStatus/NozzleStatus.vue";
+import WindfallReport from "../Pages/Report/Windfall.vue";
+import CreditCompanyReport from "../Pages/Report/CreditCompany.vue";
 
 const ROOT_URL = "";
 const router = new VueRouter({
@@ -118,6 +121,7 @@ const router = new VueRouter({
             component: Layout,
             children: [
                 { path: ROOT_URL + "/dashboard", name: "Dashboard", component: Dashboard},
+                { path: ROOT_URL + "/nozzle/status", name: "NozzleStatus", component: NozzleStatus},
                 {
                     path: ROOT_URL + "/accounts", name: "Accounts", component: Category,  beforeEnter: (to, from, next) => {
                         CheckPermission(to, from, next, Section.ACCOUNTING + '-' + Action.VIEW)
@@ -575,6 +579,12 @@ const router = new VueRouter({
                 },
                 {
                     path: ROOT_URL + "/report/expense", name: "ExpenseReport", component: ExpenseReport
+                },
+                {
+                    path: ROOT_URL + "/report/windfall", name: "WindfallReport", component: WindfallReport
+                },
+                {
+                    path: ROOT_URL + "/report/creditCompany", name: "CreditCompanyReport", component: CreditCompanyReport
                 }
             ],
         },

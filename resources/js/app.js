@@ -18,6 +18,13 @@ import App from "./App.vue";
 import router from "./Router/router";
 import store from "./Store/store";
 
+// import VueMqtt from 'vue-mqtt';
+// Vue.use(VueMqtt, 'mqtt://magic.infrmtx.com:1883', {
+//     clientId: '1b3089ee-92f5-495d-9bdb-b8405ab5ba5b', // Replace with your client ID
+//     connectTimeout: 3000, // Timeout for connection in milliseconds
+//     reconnectPeriod: 3000, // Reconnect period in milliseconds
+// });
+
 
 Vue.use(VueRouter, axios, Vuex);
 Vue.use(VuePageTransition);

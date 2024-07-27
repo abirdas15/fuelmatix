@@ -467,6 +467,7 @@ class TankController extends Controller
         if (!$costOfGoodSoldCategory instanceof Category) {
             return response()->json(['status' => 400, 'message' => 'Cannot find [cost of good sold] category.']);
         }
+        $lossAmount = $inputData['net_profit']  * $payOrder['unit_price'];
         $tankRefill = new TankRefill();
         $tankRefill->date = $inputData['date'];
         $tankRefill->time = Carbon::now('UTC')->format(FuelMatixDateTimeFormat::ONLY_TIME);
@@ -478,6 +479,7 @@ class TankController extends Controller
         $tankRefill->dip_sale = $inputData['dip_sale'] ?? 0;
         $tankRefill->total_refill_volume = $inputData['total_refill_volume'] ?? 0;
         $tankRefill->net_profit = $inputData['net_profit'] ?? 0;
+        $tankRefill->net_profit_amount = $lossAmount ?? 0;
         $tankRefill->shift_sale_id = $shiftSale['id'];
         $tankRefill->client_company_id = $inputData['session_user']['client_company_id'];
         if (!$tankRefill->save()) {
@@ -493,8 +495,6 @@ class TankController extends Controller
             'volume' =>  $bstiChart['volume'] ?? 0,
             'type' => 'tank refill',
         ]);
-        $totalRefillAmount = $inputData['total_refill_volume'] * $payOrder['unit_price'];
-        $lossAmount = $payOrder['total'] - $totalRefillAmount;
         if ($tankRefill['net_profit'] < 0) {
             // Loss amount transaction after tank refill
             $lossCategory = Category::where('slug', strtolower(AccountCategory::EVAPORATIVE))

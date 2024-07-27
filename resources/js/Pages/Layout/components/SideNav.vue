@@ -8,6 +8,12 @@
                         <span class="nav-text">Dashboard</span>
                     </router-link>
                 </li>
+                <li>
+                    <router-link :to="{name: 'NozzleStatus'}" aria-expanded="false"  @click.native="LoadLoader()">
+                        <i class="fas fa-home"></i>
+                        <span class="nav-text">Nozzle Status</span>
+                    </router-link>
+                </li>
 
                 <li><a class="has-arrow " href="javascript:void(0)" aria-expanded="false">
                     <i class="fa-solid fa-cart-shopping icon-style" aria-hidden="true"></i>
@@ -144,6 +150,14 @@
                         </li>
                         <li>
                             <router-link :to="{name: 'ExpenseReport'}" >Expense Report
+                            </router-link>
+                        </li>
+                        <li>
+                            <router-link :to="{name: 'WindfallReport'}" >WindFall Report
+                            </router-link>
+                        </li>
+                        <li>
+                            <router-link :to="{name: 'CreditCompanyReport'}" >Credit Company Report
                             </router-link>
                         </li>
                     </ul>
