@@ -106,6 +106,7 @@ import ExpenseReport from "../Pages/ExpenseReport/ExpenseReport.vue";
 import NozzleStatus from "../Pages/NozzleStatus/NozzleStatus.vue";
 import WindfallReport from "../Pages/Report/Windfall.vue";
 import CreditCompanyReport from "../Pages/Report/CreditCompany.vue";
+import DriverReport from "../Pages/Report/Driver.vue";
 
 const ROOT_URL = "";
 const router = new VueRouter({
@@ -585,6 +586,9 @@ const router = new VueRouter({
                 },
                 {
                     path: ROOT_URL + "/report/creditCompany", name: "CreditCompanyReport", component: CreditCompanyReport
+                },
+                {
+                    path: ROOT_URL + "/report/driver", name: "DriverReport", component: DriverReport
                 }
             ],
         },

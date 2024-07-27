@@ -62,9 +62,11 @@ class SaleController extends Controller
 
         $driverId = null;
         $voucher = null;
+        $voucherNo = null;
         $driverLiabilityId = null;
         $total_amount = array_sum(array_column($requestData['products'], 'subtotal'));
         $payment_category_id = $requestData['company_id'] ?? '';
+        $carId = null;
 
         $sessionUser = SessionUser::getUser();
         if (!$sessionUser instanceof User) {
@@ -88,6 +90,15 @@ class SaleController extends Controller
                     ->first();
                 if (!$voucher instanceof Voucher) {
                     return response()->json(['status' => 500, 'errors' => ['voucher_number' => ['The voucher number is not valid.']]]);
+                }
+                $voucherNo = $voucher->voucher_number;
+            }
+            if (!empty($request['car_number'])) {
+                $car = Car::where('car_number', $request['car_number'])
+                    ->where('client_company_id', $sessionUser['client_company_id'])
+                    ->first();
+                if ($car instanceof Car) {
+                    $carId = $car->id;
                 }
             }
             if (empty($requestData['voucher_number'])) {
@@ -198,7 +209,18 @@ class SaleController extends Controller
             $transactionData = [];
             $transactionData['linked_id'] = $payment_category_id;
             $transactionData['transaction'] = [
-                ['date' => date('Y-m-d'), 'description' => $requestData['car_number'] ?? null,  'account_id' => $product['income_category_id'], 'debit_amount' => $product['subtotal'], 'credit_amount' => 0, 'module' => Module::POS_SALE, 'module_id' => $sale->id],
+                [
+                    'date' => date('Y-m-d'),
+                    'description' => $requestData['car_number'] ?? null,
+                    'account_id' => $product['income_category_id'],
+                    'debit_amount' => $product['subtotal'],
+                    'credit_amount' => 0,
+                    'module' => Module::POS_SALE,
+                    'module_id' => $sale->id,
+                    'car_id' => $carId,
+                    'voucher_no' => $voucherNo,
+                    'quantity' => $product['quantity']
+                ],
             ];
             TransactionController::saveTransaction($transactionData);
 

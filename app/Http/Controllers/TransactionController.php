@@ -54,6 +54,9 @@ class TransactionController extends Controller
             $newTransaction->client_company_id = $sessionUser['client_company_id'];
             $newTransaction->user_id = $sessionUser['id'];
             $newTransaction->created_at = Carbon::parse($transaction['date'].' '.date('H:i:s'))->format(FuelMatixDateTimeFormat::DATABASE_DATE_TIME);
+            $newTransaction->car_id = $transaction['car_id'] ?? null;
+            $newTransaction->voucher_no = $transaction['voucher_no'] ?? null;
+            $newTransaction->quantity = $transaction['quantity'] ?? 0;
             if ($newTransaction->save()) {
                 $id = $newTransaction->id;
                 $newTransaction = new Transaction();

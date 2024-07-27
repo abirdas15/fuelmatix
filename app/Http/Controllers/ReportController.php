@@ -253,4 +253,56 @@ class ReportController extends Controller
             ]
         ]);
     }
+    public function driverReport(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'start_date' => 'required|date|string',
+            'end_date' => 'required|date|string',
+        ],[
+            'start_date.required' => 'The date field is required.',
+        ]);
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 500,
+                'errors' => $validator->errors()
+            ]);
+        }
+        $companyId = $request->input('company_id', '');
+        $sessionUser = SessionUser::getUser();
+        $result = Transaction::select('transactions.id', 'categories.name as company_name', 'transactions.date', 'car.car_number', 'transactions.voucher_no', DB::raw('SUM(transactions.debit_amount) as bill'), DB::raw('SUM(transactions.quantity) as quantity'))
+            ->leftJoin('car', 'car.id', '=', 'transactions.car_id')
+            ->leftJoin('categories', 'categories.id', '=', 'transactions.linked_id')
+            ->whereBetween('transactions.date', [$request['start_date'], $request['end_date']])
+            ->where('transactions.client_company_id', $sessionUser['client_company_id'])
+            ->whereNotNull('transactions.car_id');
+
+        if (!empty($companyId)) {
+            $result->where(function($q) use ($companyId){
+                $q->where('transactions.linked_id', $companyId);
+            });
+        }
+        $result = $result->groupBy('transactions.date')
+            ->groupBy('transactions.car_id')
+            ->orderBy('transactions.date', 'ASC')
+            ->get()
+            ->toArray();
+        $totalBill = 0;
+        $totalQuantity = 0;
+        foreach ($result as &$item) {
+            $totalBill += $item['bill'];
+            $totalQuantity += $item['quantity'];
+            $item['date'] = date('d/m/Y', strtotime($item['date']));
+            $item['bill'] = !empty($item['bill']) ? number_format($item['bill'], 2) : '';
+            $item['quantity'] = !empty($item['quantity']) ? number_format($item['quantity'], 2) : '';
+        }
+        return response()->json([
+            'status' => 200,
+            'data' => $result,
+            'total'=> [
+                'bill' => number_format($totalBill, 2),
+                'quantity' => number_format($totalQuantity, 2),
+            ]
+        ]);
+
+    }
 }
