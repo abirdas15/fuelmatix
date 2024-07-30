@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Common\FuelMatixDateTimeFormat;
 use App\Helpers\Helpers;
 use App\Helpers\SessionUser;
+use App\Models\Car;
 use App\Models\Category;
 use App\Models\ClientCompany;
 use App\Models\Stock;
@@ -279,6 +280,11 @@ class TransactionController extends Controller
         }
         $transactionData = [];
         foreach ($requestData['data'] as $data) {
+            $carId = null;
+            $car = Car::where('car_number', $data['description'])->first();
+            if ($car instanceof Car) {
+                $carId = $car->id;
+            }
             $transactionData[] = [
                 'date' => $transaction['date'],
                 'account_id' => $transaction['account_id'],
@@ -292,6 +298,8 @@ class TransactionController extends Controller
                 'module_id' => $transaction['module_id'],
                 'client_company_id' => $transaction['client_company_id'],
                 'parent_id' => $transaction['parent_id'],
+                'car_id' => $carId,
+                'voucher_no' => $data['voucher_number'],
             ];
         }
         Transaction::insert($transactionData);

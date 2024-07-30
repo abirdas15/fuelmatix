@@ -485,14 +485,11 @@ class TankController extends Controller
         if (!$tankRefill->save()) {
             return response()->json(['status' => 400, 'message' => 'Cannot saved tank refill.']);
         }
-        $bstiChart = BstiChart::where('tank_id', $tank['id'])
-            ->where('height', '=', floor($inputData['end_reading']))
-            ->first();
         TankRepository::readingSave([
             'tank_id' => $inputData['tank_id'],
             'date' => date('Y-m-d'),
-            'height' =>  $inputData['end_reading'] ?? 0,
-            'volume' =>  $bstiChart['volume'] ?? 0,
+            'height' =>  $inputData['end_reading_mm'] ?? 0,
+            'volume' =>  $inputData['end_reading'] ?? 0,
             'type' => 'tank refill',
         ]);
         if ($tankRefill['net_profit'] < 0) {

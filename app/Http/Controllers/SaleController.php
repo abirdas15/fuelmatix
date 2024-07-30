@@ -400,9 +400,10 @@ class SaleController extends Controller
         $orderBy = $requestData['order_by'] ?? 'transactions.id';
         $orderMode = $requestData['order_mode'] ?? 'DESC';
         $keyword = $requestData['keyword'] ?? '';
-        $result = Transaction::select('transactions.id', 'invoice_item.invoice_id',  DB::raw("SUM(transactions.debit_amount) as amount"), 'transactions.created_at', 'transactions.description', 'categories.name', 'transactions.module', 'transactions.module_id', 'transactions.linked_id as category_id')
+        $result = Transaction::select('transactions.id', 'invoice_item.invoice_id',  DB::raw("SUM(transactions.debit_amount) as amount"), 'transactions.created_at', 'invoice_item.date as invoice_created_at', 'transactions.description', 'car.car_number', 'transactions.voucher_no', 'categories.name', 'transactions.module', 'transactions.module_id', 'transactions.linked_id as category_id')
             ->leftJoin('categories', 'categories.id', '=', 'transactions.linked_id')
             ->leftJoin('invoice_item', 'invoice_item.transaction_id', 'transactions.id')
+            ->leftJoin('car', 'car.id', 'transactions.car_id')
             ->where('categories.parent_category', $accountReceivable->id)
             ->where('transactions.debit_amount', '>', 0)
             ->where('transactions.client_company_id', $sessionUser['client_company_id'])
@@ -415,8 +416,14 @@ class SaleController extends Controller
         $result = $result->orderBy($orderBy, $orderMode)
             ->paginate($limit);
         foreach ($result as &$data) {
+            if (!empty($data['invoice_id'])) {
+                $data['created_at'] = Helpers::formatDate($data['invoice_created_at'], FuelMatixDateTimeFormat::STANDARD_DATE_TIME);
+                $data['car_number'] = '';
+                $data['voucher_no'] = '';
+            } else {
+                $data['created_at'] = Helpers::formatDate($data['created_at'], FuelMatixDateTimeFormat::STANDARD_DATE_TIME);
+            }
             $data['amount_format'] = number_format($data['amount'], 2);
-            $data['created_at'] = Helpers::formatDate($data['created_at'], FuelMatixDateTimeFormat::STANDARD_DATE_TIME);
         }
         return response()->json(['status' => 200, 'data' => $result]);
     }

@@ -203,6 +203,16 @@ class InvoiceController extends Controller
         if (!$invoice instanceof Invoice) {
             return response()->json(['status' => 500, 'error' => 'Cannot find invoice.']);
         }
+        $invoice = self::getSingleInvoice($invoice);
+        return response()->json(['status' => 200, 'data' => $invoice]);
+    }
+
+    /**
+     * @param Invoice $invoice
+     * @return Invoice
+     */
+    public static function getSingleInvoice(Invoice $invoice): Invoice
+    {
         $sessionUser = SessionUser::getUser();
         $company = null;
         if (!empty($sessionUser['client_company_id'])) {
@@ -216,9 +226,11 @@ class InvoiceController extends Controller
         $invoice['customer_company'] = $category;
         $invoice['company'] = $company;
         $invoice['amount'] = number_format($invoice['amount'], 2);
-        $invoiceItem = InvoiceItem::select('invoice_item.id', 'invoice_item.date', 'invoice_item.car_number', 'invoice_item.quantity', 'invoice_item.price', 'invoice_item.subtotal', 'products.name as product_name')
+        $invoiceItem = InvoiceItem::select('invoice_item.id', 'invoice_item.date', 'car.car_number', 'transactions.voucher_no', 'invoice_item.quantity', 'invoice_item.price', 'invoice_item.subtotal', 'products.name as product_name')
+            ->leftJoin('transactions', 'transactions.id', 'invoice_item.transaction_id')
+            ->leftJoin('car', 'car.id', 'transactions.car_id')
             ->leftJoin('products', 'products.id', 'invoice_item.product_id')
-            ->where('invoice_item.invoice_id', $requestData['id'])
+            ->where('invoice_item.invoice_id', $invoice['id'])
             ->get()
             ->toArray();
         foreach ($invoiceItem as &$item) {
@@ -228,7 +240,7 @@ class InvoiceController extends Controller
             $item['date'] = !empty($item['date']) ? Helpers::formatDate($item['date'], FuelMatixDateTimeFormat::STANDARD_DATE) : '';
         }
         $invoice['invoice_item'] = $invoiceItem;
-        return response()->json(['status' => 200, 'data' => $invoice]);
+        return $invoice;
     }
     public function downloadPdf(Request $request)
     {
@@ -243,31 +255,7 @@ class InvoiceController extends Controller
         if (!$invoice instanceof Invoice) {
             return response()->json(['status' => 500, 'error' => 'Cannot find invoice.']);
         }
-        $sessionUser = SessionUser::getUser();
-        $company = null;
-        if (!empty($sessionUser['client_company_id'])) {
-            $company = ClientCompany::find($sessionUser['client_company_id']);
-        }
-        $category = Category::select('others', 'name')->find($invoice['category_id']);
-        $others = json_decode($category['others']);
-        $category['email'] = $others->email ?? '';
-        $category['phone'] = $others->phone ?? '';
-        $category['address'] = $others->address ?? '';
-        $invoice['customer_company'] = $category;
-        $invoice['company'] = $company;
-        $invoice['amount'] = number_format($invoice['amount'], 2);
-        $invoiceItem = InvoiceItem::select('invoice_item.id', 'invoice_item.date', 'invoice_item.car_number', 'invoice_item.quantity', 'invoice_item.price', 'invoice_item.subtotal', 'products.name as product_name')
-            ->leftJoin('products', 'products.id', 'invoice_item.product_id')
-            ->where('invoice_item.invoice_id', $requestData['id'])
-            ->get()
-            ->toArray();
-        foreach ($invoiceItem as &$item) {
-            $item['price'] = number_format($item['price'], 2);
-            $item['subtotal'] = number_format($item['subtotal'], 2);
-            $item['quantity'] = number_format($item['quantity'], 2);
-            $item['date'] = !empty($item['date']) ? Helpers::formatDate($item['date'], FuelMatixDateTimeFormat::STANDARD_DATE) : '';
-        }
-        $invoice['invoice_item'] = $invoiceItem;
+        $invoice = self::getSingleInvoice($invoice);
         $pdf = Pdf::loadView('pdf.invoice', ['data' => $invoice]);
         return $pdf->output();
     }

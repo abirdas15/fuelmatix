@@ -45,7 +45,8 @@
                                                 </th>
                                                 <th class="text-white" @click="sortData('created_at')" :class="sortClass('created_at')">Date</th>
                                                 <th class="text-white" @click="sortData('name')" :class="sortClass('name')">Company</th>
-                                                <th class="text-white" @click="sortData('description')" :class="sortClass('description')">Car Number</th>
+                                                <th class="text-white" @click="sortData('car_number')" :class="sortClass('car_number')">Car Number</th>
+                                                <th class="text-white" @click="sortData('voucher_no')" :class="sortClass('voucher_no')">Voucher No</th>
                                                 <th class="text-white" @click="sortData('amount')" :class="sortClass('amount')">Amount</th>
                                                 <th class="text-white" style="width: 375px">Action</th>
                                             </tr>
@@ -57,7 +58,8 @@
                                                 </td>
                                                 <td >{{f.created_at}}</td>
                                                 <td><a href="javascript:void(0);">{{f.name}}</a></td>
-                                                <td><a href="javascript:void(0);">{{f.description}}</a></td>
+                                                <td><a href="javascript:void(0);">{{f.car_number}}</a></td>
+                                                <td><a href="javascript:void(0);">{{f.voucher_no}}</a></td>
                                                 <td><a href="javascript:void(0);">{{f?.amount_format}}</a></td>
                                                 <td>
                                                     <template v-if="f.module == 'shift sale' && CheckPermission(Section.COMPANY_SALE + '-' + Action.CREATE)">
@@ -153,7 +155,7 @@
                     <label class="mb-0"><strong>Total: {{ totalAmount.toLocaleString() }}</strong></label>
                 </div>
                 <div class="align-items-center offset-6 col-sm-3">
-                    <label class="text-danger"><strong>Mission: {{ missingAmount.toLocaleString() }}</strong></label>
+                    <label class="text-danger"><strong>Missing: {{ missingAmount.toLocaleString() }}</strong></label>
                 </div>
 
                 <button type="submit" class="btn btn-primary " v-if="!Loading">Submit</button>

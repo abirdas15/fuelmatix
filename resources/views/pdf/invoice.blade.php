@@ -76,6 +76,7 @@
             <th>Date</th>
             <th>Product</th>
             <th>Car Number</th>
+            <th>Voucher No</th>
             <th style="text-align: center">Quantity</th>
             <th style="text-align: right">Unit Price</th>
             <th style="text-align: right">Subtotal</th>
@@ -87,6 +88,7 @@
                 <td>{{ $item['date'] }}</td>
                 <td>{{ $item['product_name'] }}</td>
                 <td>{{ $item['car_number'] }}</td>
+                <td>{{ $item['voucher_no'] }}</td>
                 <td style="text-align: center">{{ $item['quantity'] }}</td>
                 <td style="text-align: right">{{ $item['price'] }}</td>
                 <td style="text-align: right">{{ $item['subtotal'] }}</td>
@@ -95,7 +97,7 @@
         </tbody>
         <tfoot>
         <tr>
-            <th colspan="5" style="text-align: right">Total</th>
+            <th colspan="6" style="text-align: right">Total</th>
             <th style="text-align: right">{{ $data['amount'] }}</th>
         </tr>
         </tfoot>

@@ -15,6 +15,7 @@ use App\Models\SaleData;
 use App\Models\ShiftSale;
 use App\Models\ShiftSummary;
 use App\Models\Tank;
+use App\Models\TankLog;
 use App\Models\TankRefill;
 use App\Models\Transaction;
 use App\Repository\CategoryRepository;
@@ -316,10 +317,19 @@ class ProductController extends Controller
             ->where('status', 'end')
             ->orderBy('id', 'DESC')
             ->first();
+
+        $tankLog = TankLog::where('client_company_id', $sessionUser['client_company_id'])
+            ->where('tank_id', $tank['id'])
+            ->orderBy('id', 'DESC')
+            ->first();
+        $start_reading_mm = 0;
         $start_reading = $tank['opening_stock'] ?? 0;
+        if ($tankLog instanceof TankLog) {
+            $start_reading = $tankLog['volume'];
+            $start_reading_mm = $tankLog['height'];
+        }
         $shiftSaleId = 0;
         if ($shiftSale instanceof ShiftSale) {
-            $start_reading = $shiftSale['end_reading'];
             $shiftSaleId = $shiftSale['id'];
         }
         $end_reading = 0;
@@ -358,7 +368,6 @@ class ProductController extends Controller
         $consumption = $start_reading + $tank_refill + $adjustment - $end_reading;
         $amount = $consumption * $product['selling_price'];
 
-        $start_reading_mm = TankRepository::getHeight(['tank_id' => $tank['id'] ?? 0, 'volume' => $start_reading]);
         $tank_refill_mm = 0;
         $adjustment_mm = 0;
         $end_reading_mm = TankRepository::getHeight(['tank_id' => $tank['id'] ?? 0, 'volume' => $end_reading]);
