@@ -76,7 +76,7 @@ class ShiftSaleController extends Controller
                 ->where('tank_id', $tank['id'])
                 ->orderBy('id', 'DESC')
                 ->first();
-            if ($tankLog instanceof TankLog && $tankLog['volume'] < $request['consumption']) {
+            if ($tankLog instanceof TankLog && $tankLog['volume'] > $request['consumption']) {
                 return response()->json(['status' => 400, 'message' => 'Your tank has not enough fuel. Please refill your tank.']);
             }
         }
