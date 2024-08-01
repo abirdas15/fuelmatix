@@ -3,8 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Common\AccountCategory;
+use App\Common\FuelMatixCategoryType;
 use App\Common\FuelMatixDateTimeFormat;
 use App\Common\FuelMatixStatus;
+use App\Common\Module;
+use App\Console\Commands\FuelMatixCategory;
 use App\Helpers\Helpers;
 use App\Helpers\SessionUser;
 use App\Imports\BstiChartImport;
@@ -17,10 +20,13 @@ use App\Models\PayOrderData;
 use App\Models\Product;
 use App\Models\ProductPrice;
 use App\Models\ShiftSale;
+use App\Models\ShiftTotal;
 use App\Models\Tank;
 use App\Models\TankLog;
 use App\Models\TankRefill;
 use App\Models\TankRefillHistory;
+use App\Models\User;
+use App\Repository\CategoryRepository;
 use App\Repository\NozzleRepository;
 use App\Repository\TankRepository;
 use Carbon\Carbon;
@@ -33,53 +39,96 @@ use Maatwebsite\Excel\Facades\Excel;
 class TankController extends Controller
 {
     /**
+     * Save a new tank entry and optionally import data from a file.
+     *
      * @param Request $request
      * @return JsonResponse
      */
     public function save(Request $request): JsonResponse
     {
+        // Retrieve all input data from the request
         $inputData = $request->all();
+
+        // Validate the input data
         $validator = Validator::make($inputData, [
-            'product_id' => 'required',
-            'tank_name' => 'required',
-            'file' => 'required|file',
-            'tank_mac' => 'nullable|string'
+            'product_id' => 'required',  // Product ID is required
+            'tank_name' => 'required',   // Tank name is required
+            'file' => 'required|file',   // File is required and must be a file
+            'tank_mac' => 'nullable|string' // Tank MAC is optional and must be a string
         ]);
+
+        // Return validation errors if validation fails
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
+
+        // Get the session user
         $sessionUser = SessionUser::getUser();
+        if (!$sessionUser instanceof User) {
+            return response()->json([
+                'status' => 400,
+                'message' => 'Session user cannot be found.'
+            ]);
+        }
+
+        // Retrieve the asset category based on the product ID and other parameters
+        $assetCategory = Category::where('module', Module::PRODUCT)
+            ->where('module_id', $inputData['product_id'])
+            ->where('client_company_id', $sessionUser['client_company_id'])
+            ->where('type', FuelMatixCategoryType::ASSET)
+            ->first();
+
+        // If no category is found, return an error response
+        if (!$assetCategory instanceof Category) {
+            return response()->json([
+                'status' => 200,
+                'message' => 'Cannot find category.'
+            ]);
+        }
+
+        // Create a new Tank object
         $tank = new Tank();
         $tank->product_id = $inputData['product_id'];
         $tank->tank_name = $inputData['tank_name'];
-        $tank->opening_stock = $inputData['opening_stock'] ?? 0;
+        $tank->opening_stock = $inputData['opening_stock'] ?? 0; // Set opening stock, default to 0 if not provided
         $tank->client_company_id = $sessionUser['client_company_id'];
-        $tank->tank_mac = $inputData['tank_mac'] ?? '';
+        $tank->tank_mac = $inputData['tank_mac'] ?? ''; // Set tank MAC, default to an empty string if not provided
+
+        // Save the Tank object to the database
         if (!$tank->save()) {
-            return response()->json(['status' => 400, 'message' => 'Cannot saved tank.']);
+            return response()->json(['status' => 400, 'message' => 'Cannot save tank.']);
         }
+
+        // Import data from the uploaded file if provided
         if ($request->file('file')) {
             Excel::import(new BstiChartImport($tank['id']), $request->file('file'));
         }
-        $bstiChart = BstiChart::select('volume', 'height')->where('tank_id', $tank['id']) ->orderBy('id', 'DESC')
+
+        // Retrieve the most recent BstiChart for the tank
+        $bstiChart = BstiChart::select('volume', 'height')
+            ->where('tank_id', $tank['id'])
+            ->orderBy('id', 'DESC')
             ->first();
-        $tank->capacity =  $bstiChart['volume'] ?? 0;
-        $tank->height =  $bstiChart['height'] ?? 0;
-        $tank->save();
-        if (!empty($inputData['opening_stock'])) {
-            $bstiChart = BstiChart::where('tank_id', $tank['id'])
-                ->where('volume', '=', floor($inputData['opening_stock']))
-                ->first();
-            TankRepository::readingSave([
-                'tank_id' => $tank['id'],
-                'date' => Carbon::now('UTC'),
-                'height' => $bstiChart->height ?? 0,
-                'type' => 'tank refill',
-                'volume' => $inputData['opening_stock']
+
+        // Update tank capacity and height based on BstiChart data
+        $tank->capacity = $bstiChart['volume'] ?? 0; // Set capacity, default to 0 if not available
+        $tank->height = $bstiChart['height'] ?? 0; // Set height, default to 0 if not available
+
+        // Save the updated Tank object to the database
+        if (!$tank->save()) {
+            return response()->json([
+                'status' => 300,
+                'message' => 'Cannot save tank.'
             ]);
         }
+
+        // Add opening stock to the tank using the asset category
+        $tank->addOpeningStock($assetCategory);
+
+        // Return a success response
         return response()->json(['status' => 200, 'message' => 'Successfully saved tank.']);
     }
+
     /**
      * @param Request $request
      * @return JsonResponse
@@ -91,6 +140,7 @@ class TankController extends Controller
         $keyword = $inputData['keyword'] ?? '';
         $order_by = $inputData['order_by'] ?? 'id';
         $order_mode = $inputData['order_mode'] ?? 'DESC';
+        $productId = $request->input('product_id', '');
         $sessionUser = SessionUser::getUser();
         $result = Tank::select('tank.id' ,'tank.tank_name', 'tank.height', 'tank.capacity', 'products.name as product_name', 'product_types.name as product_type_name', 'tank.opening_stock')
             ->leftJoin('products', 'products.id', 'tank.product_id')
@@ -100,6 +150,11 @@ class TankController extends Controller
         if (!empty($keyword)) {
             $result->where(function($q) use ($keyword) {
                 $q->where('tank.tank_name', 'LIKE', '%'.$keyword.'%');
+            });
+        }
+        if (!empty($productId)) {
+            $result->where(function($q) use ($productId) {
+               $q->where('tank.product_id', $productId);
             });
         }
         $result = $result->orderBy($order_by, $order_mode)
@@ -164,6 +219,17 @@ class TankController extends Controller
             return response()->json(['status' => 400, 'message' => 'Cannot find [tank].']);
         }
         $sessionUser = SessionUser::getUser();
+        $assetCategory = Category::where('module', Module::PRODUCT)
+            ->where('module_id', $inputData['product_id'])
+            ->where('client_company_id', $sessionUser['client_company_id'])
+            ->where('type', FuelMatixCategoryType::ASSET)
+            ->first();
+        if (!$assetCategory instanceof Category) {
+            return response()->json([
+                'status' => 200,
+                'message' => 'Cannot find category.'
+            ]);
+        }
         $tank->product_id = $inputData['product_id'];
         $tank->tank_name = $inputData['tank_name'];
         $tank->opening_stock = $inputData['opening_stock'] ?? 0;
@@ -179,21 +245,16 @@ class TankController extends Controller
             ->first();
         $tank->capacity =  $bstiChart['volume'] ?? 0;
         $tank->height =  $bstiChart['height'] ?? 0;
-        $tank->save();
-        if (!empty($inputData['opening_stock']) && empty($tank->opening_stock)) {
-            $bstiChart = BstiChart::where('tank_id', $tank['id'])
-                ->where('volume', '=', floor($inputData['opening_stock']))
-                ->first();
-            TankRepository::readingSave([
-                'tank_id' => $tank['id'],
-                'date' => Carbon::now('UTC'),
-                'height' => $bstiChart->height ?? 0,
-                'type' => 'tank refill',
-                'volume' => $inputData['opening_stock']
+        if (!$tank->save()) {
+            return response()->json([
+                'status' => 300,
+                'message' => 'Cannot update tank.'
             ]);
         }
+        $tank->addOpeningStock($assetCategory);
         return response()->json(['status' => 200, 'message' => 'Successfully updated tank.']);
     }
+
     /**
      * @param Request $request
      * @return JsonResponse
@@ -435,8 +496,8 @@ class TankController extends Controller
         if (empty($tank['product_id'])) {
             return response()->json(['status' => 400, 'message' => 'Tank has no product. Please assign product.']);
         }
-        $shiftSale = ShiftSale::where('client_company_id', $sessionUser['client_company_id'])->where('product_id', $tank['product_id'])->where('status', 'start')->first();
-        if (!$shiftSale instanceof ShiftSale) {
+        $shiftSale = ShiftTotal::where('client_company_id', $sessionUser['client_company_id'])->where('product_id', $tank['product_id'])->where('status', 'start')->first();
+        if (!$shiftSale instanceof ShiftTotal) {
             return response()->json(['status' => 400, 'message' => 'Please start shift sale first.']);
         }
         $product = Product::find($tank['product_id']);
@@ -449,11 +510,10 @@ class TankController extends Controller
             return response()->json(['status' => 400, 'message' => 'Cannot find [pay order].']);
         }
 
-        $category = Category::where('slug', strtolower(AccountCategory::STOCK_IN_HAND))->where('client_company_id', $inputData['session_user']['client_company_id'])->first();
-        $stockCategory = Category::where('parent_category', $category['id'])
-            ->where('module', 'product')
-            ->where('module_id', $tank['product_id'])
-            ->where('client_company_id', $inputData['session_user']['client_company_id'])
+        // Fetch stock category for the tank
+        $stockCategory = Category::where('module', Module::TANK)
+            ->where('module_id', $inputData['tank_id'])
+            ->where('client_company_id', $sessionUser['client_company_id'])
             ->first();
         if (!$stockCategory instanceof Category) {
             return response()->json(['status' => 400, 'message' => 'Cannot find [stock] category.']);
@@ -470,7 +530,7 @@ class TankController extends Controller
         $lossAmount = $inputData['net_profit']  * $payOrder['unit_price'];
         $tankRefill = new TankRefill();
         $tankRefill->date = $inputData['date'];
-        $tankRefill->time = Carbon::now('UTC')->format(FuelMatixDateTimeFormat::ONLY_TIME);
+        $tankRefill->time = Carbon::now(SessionUser::TIMEZONE)->format(FuelMatixDateTimeFormat::ONLY_TIME);
         $tankRefill->tank_id = $inputData['tank_id'];
         $tankRefill->pay_order_id = $inputData['pay_order_id'];
         $tankRefill->quantity = $inputData['quantity'];
@@ -537,7 +597,6 @@ class TankController extends Controller
         if (isset($inputData['dispensers'])) {
             foreach ($inputData['dispensers'] as $dispenser) {
                 foreach ($dispenser['nozzle'] as $nozzle) {
-
                     $tankRefillHistory = new TankRefillHistory();
                     $tankRefillHistory->tank_refill_id = $tankRefill->id;
                     $tankRefillHistory->nozzle_id = $nozzle['id'];

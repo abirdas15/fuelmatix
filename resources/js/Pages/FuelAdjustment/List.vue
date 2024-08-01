@@ -39,6 +39,7 @@
                                             <tr class="text-white" style="background-color: #4886EE;color:#ffffff">
                                                 <th class="text-white" @click="sortData('name')" :class="sortClass('name')">Date</th>
                                                 <th class="text-white" @click="sortData('name')" :class="sortClass('name')">Product Name</th>
+                                                <th class="text-white" @click="sortData('tank_name')" :class="sortClass('tank_name')">Tank Name</th>
                                                 <th class="text-white" @click="sortData('name')" :class="sortClass('purpose')">Purpose</th>
                                                 <th class="text-white" @click="sortData('name')" :class="sortClass('loss_amount')">Loss Amount</th>
                                                 <th class="text-white" @click="sortData('name')" :class="sortClass('loss_quantity')">Loss Quantity</th>
@@ -50,6 +51,7 @@
                                             <tr v-for="f in listData">
                                                 <td >{{f.date}}</td>
                                                 <td >{{f.name}}</td>
+                                                <td >{{f.tank_name}}</td>
                                                 <td >{{f.purpose}}</td>
                                                 <td >{{f.loss_amount}}</td>
                                                 <td >{{f.loss_quantity}}</td>

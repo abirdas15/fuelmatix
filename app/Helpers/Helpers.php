@@ -6,16 +6,29 @@ use Carbon\Carbon;
 
 class Helpers
 {
-    public static function formatDate($date, $format = 'd/m/Y')
+    /**
+     * Formats a given date string into a specified format.
+     *
+     * This method takes a date string, converts it into a standardized
+     * 'Y-m-d H:i:s' format, then creates a Carbon instance from this date
+     * with the specified timezone from SessionUser::TIMEZONE. It then converts
+     * the timezone to 'Asia/Dhaka' and returns the date in the desired format.
+     *
+     * @param string $date The date string to be formatted. Expected in a parseable format.
+     * @param string $format The desired output format for the date string. Default is 'd/m/Y'.
+     * @return string|null The formatted date string, or null if the input date is empty.
+     */
+    public static function formatDate(string $date, string $format = 'd/m/Y'): ?string
     {
         if (empty($date)) {
             return null;
         }
         $date = date('Y-m-d H:i:s', strtotime($date));
-        $timestamp = Carbon::createFromFormat('Y-m-d H:i:s', $date, 'UTC')
+        $timestamp = Carbon::createFromFormat('Y-m-d H:i:s', $date, SessionUser::TIMEZONE)
             ->setTimezone('Asia/Dhaka');
         return $timestamp->format($format);
     }
+
 
 
     public static function convertNumberToWord($num = false)

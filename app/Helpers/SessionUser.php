@@ -6,6 +6,7 @@ use App\Models\User;
 
 class SessionUser
 {
+    const TIMEZONE = 'Asia/Dhaka';
     public static function getUser()
     {
         $requestData = request()->all();

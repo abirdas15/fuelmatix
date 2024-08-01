@@ -17,7 +17,7 @@
                         <div class="basic-form">
                             <form @submit.prevent="save">
                                 <div class="row">
-                                    <div class="col-sm-6">
+                                    <div class="col-sm-4">
                                         <div class="form-group mb-3">
                                             <label class="">Purpose</label>
                                             <input type="text" class="form-control" name="purpose" v-model="param.purpose">
@@ -25,11 +25,20 @@
                                         </div>
 
                                     </div>
-                                    <div class="col-sm-6">
+                                    <div class="col-sm-4">
                                         <div class="row form-group mb-3">
                                             <label >Product</label>
                                             <select class="form-control form-select" name="product_id" v-model="param.product_id">
                                                 <option v-for="p in products" :value="p.id">{{p.name}}</option>
+                                            </select>
+                                            <div class="invalid-feedback"></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="row form-group mb-3">
+                                            <label>Tank</label>
+                                            <select class="form-control form-select" name="product_id" v-model="param.tank_id">
+                                                <option v-for="each in tanks" :value="each.id">{{each.tank_name}}</option>
                                             </select>
                                             <div class="invalid-feedback"></div>
                                         </div>
@@ -97,6 +106,7 @@ export default {
             param: {
                 purpose: '',
                 product_id: '',
+                tank_id: '',
                 loss_quantity: '',
                 nozzles: [],
                 tank: {
@@ -111,13 +121,16 @@ export default {
             },
             loading: false,
             products: [],
+            tanks: []
         }
     },
     watch: {
         'param.product_id': function () {
-            this.getNozzle()
             this.getTank()
-        }
+        },
+        'param.tank_id': function() {
+            this.getNozzle();
+        },
     },
     methods: {
         calculateLoss: function () {
@@ -139,21 +152,22 @@ export default {
             })
         },
         getNozzle: function () {
-            ApiService.POST(ApiRoutes.NozzleList, { limit: 5000, page: 1, product_id: this.param.product_id}, res => {
+            this.param.nozzles = [];
+            ApiService.POST(ApiRoutes.NozzleList, { limit: 5000, page: 1, tank_id: this.param.tank_id}, res => {
                 if (parseInt(res.status) === 200) {
                     res.data.data.map(v => {
                         this.param.nozzles.push({id: v.id, quantity: 0, name: v.name})
-                    })
-
+                    });
+                    let tankIndex = this.tanks.findIndex(tank => tank.id === this.param.tank_id);
+                    this.param.tank.id = this.tanks[tankIndex]['id'];
+                    this.param.tank.name = this.tanks[tankIndex]['tank_name'];
                 }
             })
         },
         getTank: function () {
-            ApiService.POST(ApiRoutes.TankByProduct, {product_id: this.param.product_id}, res => {
+            ApiService.POST(ApiRoutes.TankList, {product_id: this.param.product_id, limit: 20}, res => {
                 if (parseInt(res.status) === 200) {
-                    this.param.tank.id = res.data.id;
-                    this.param.tank.quantity = 0;
-                    this.param.tank.name = res.data.tank_name;
+                    this.tanks = res.data.data;
                 }
             })
         },

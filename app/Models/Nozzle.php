@@ -14,4 +14,8 @@ class Nozzle extends Model
     protected $hidden = [
         'client_company_id'
     ];
+    public function latestShiftSummary()
+    {
+        return $this->hasOne(ShiftSummary::class)->latestOfMany();
+    }
 }

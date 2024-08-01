@@ -13,13 +13,12 @@ use App\Models\Product;
 use App\Models\ProductType;
 use App\Models\SaleData;
 use App\Models\ShiftSale;
-use App\Models\ShiftSummary;
+use App\Models\ShiftTotal;
 use App\Models\Tank;
-use App\Models\TankLog;
 use App\Models\TankRefill;
 use App\Models\Transaction;
 use App\Repository\CategoryRepository;
-use App\Repository\TankRepository;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -42,6 +41,16 @@ class ProductController extends Controller
         ]);
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
+        }
+        $productType = ProductType::where('id', $inputData['type_id'])->first();
+        if (!$productType instanceof ProductType) {
+            return response()->json([
+                'status' => 300,
+                'message' => 'Cannot find product type'
+            ]);
+        }
+        if ($productType['tank'] == 1) {
+            $inputData['opening_stock'] = 0;
         }
 
         $directIncomeCategory = Category::where('slug', strtolower(AccountCategory::DIRECT_INCOME))->where('client_company_id', $inputData['session_user']['client_company_id'])->first();
@@ -137,11 +146,9 @@ class ProductController extends Controller
         }
         $result = $result->orderBy($order_by, $order_mode)
             ->paginate($limit);
-        $shiftSale = ShiftSale::select('product_id', 'id')->where('client_company_id', $inputData['session_user']['client_company_id'])->orderBy('id', 'DESC')->where('status', 'start')->get()->keyBy('product_id')->toArray();
         $productId = [];
         foreach ($result as &$data) {
             $productId[] = $data['id'];
-            $data['shift_sale_id'] = isset($shiftSale[$data['id']]) ? $shiftSale[$data['id']]['id']: '';
         }
         $incomeCategory = Category::select('id', 'module_id')->where('client_company_id', $inputData['session_user']['client_company_id'])->whereIn('module_id', $productId)->where('type', 'income')->where('module', Module::PRODUCT)->get()->keyBy('module_id')->toArray();
         $stockCategory = Category::select('id', 'module_id')->where('client_company_id', $inputData['session_user']['client_company_id'])->whereIn('module_id', $productId)->where('type', 'assets')->where('module', Module::PRODUCT)->get()->keyBy('module_id')->toArray();
@@ -187,6 +194,16 @@ class ProductController extends Controller
         ]);
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
+        }
+        $productType = ProductType::where('id', $inputData['type_id'])->first();
+        if (!$productType instanceof ProductType) {
+            return response()->json([
+                'status' => 300,
+                'message' => 'Cannot find product type'
+            ]);
+        }
+        if ($productType['tank'] == 1) {
+            $inputData['opening_stock'] = 0;
         }
 
         $directIncomeCategory = Category::where('slug', strtolower(AccountCategory::DIRECT_INCOME))->where('client_company_id', $inputData['session_user']['client_company_id'])->first();
@@ -298,7 +315,6 @@ class ProductController extends Controller
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
-        $date = $inputData['date'] ?? date('Y-m-d');
         $sessionUser = SessionUser::getUser();
         $product = Product::where('id', $inputData['product_id'])
             ->where('client_company_id', $sessionUser['client_company_id'])
@@ -310,122 +326,142 @@ class ProductController extends Controller
         if (!$productType instanceof ProductType) {
             return response()->json(['status' => 500, 'error' => 'Cannot find product type.']);
         }
-        $tank = Tank::where('product_id', $product['id'])->first();
-        $shiftSale = ShiftSale::select('id', 'end_reading')->where('client_company_id', $sessionUser['client_company_id'])
-            ->where('status', 'end')->where('product_id', $request['product_id'])
-            ->where('date', '<=', $date)
-            ->where('status', 'end')
-            ->orderBy('id', 'DESC')
-            ->first();
 
-        $tankLog = TankLog::where('client_company_id', $sessionUser['client_company_id'])
-            ->where('tank_id', $tank['id'])
-            ->orderBy('id', 'DESC')
+        $shiftSaleId = $inputData['shift_id'] ?? 0;
+        $shiftSale = ShiftTotal::where('product_id', $request->input('product_id'))
+            ->where('start_date', '<=', Carbon::now(SessionUser::TIMEZONE))
+            ->where('status', 'start')
             ->first();
-        $start_reading_mm = 0;
-        $start_reading = $tank['opening_stock'] ?? 0;
-        if ($tankLog instanceof TankLog) {
-            $start_reading = $tankLog['volume'];
-            $start_reading_mm = $tankLog['height'];
+        if ($shiftSale instanceof ShiftTotal) {
+            $shiftSaleId = $shiftSale->id;
         }
-        $shiftSaleId = 0;
-        if ($shiftSale instanceof ShiftSale) {
-            $shiftSaleId = $shiftSale['id'];
-        }
-        $end_reading = 0;
-        $tank_refill = 0;
-        $shiftSale = ShiftSale::select('id', 'end_reading')->where('client_company_id', $sessionUser['client_company_id'])
-            ->where('status', 'start')->where('product_id', $request['product_id'])
-            ->where('date', '<=', $date)
-            ->orderBy('date', 'DESC')
-            ->orderBy('id', 'DESC')
-            ->first();
-        $fuelAdjustment = FuelAdjustment::select('id', 'loss_quantity')
-            ->where('shift_sale_id', $shiftSale['id'] ?? 0)
+        $tanks = Tank::select('tank.id', 'tank.tank_name', 'shift_sale.start_reading', 'shift_sale.end_reading', 'tank.opening_stock')
+            ->leftJoin('shift_sale', function ($join) {
+                $join->on('tank.id', '=', 'shift_sale.tank_id')
+                    ->whereRaw('shift_sale.id = (SELECT MAX(id) FROM shift_sale WHERE tank_id = tank.id)');
+            })
+            ->where('tank.product_id', $request['product_id'])
             ->get()
             ->toArray();
-        $adjustment = 0;
-        $nozzleAdjustment = [];
-        if (!empty($fuelAdjustment)) {
-            $fuelAdjustmentId = array_column($fuelAdjustment, 'id');
-            $fuelAdjustmentData = FuelAdjustmentData::whereIn('fuel_adjustment_id', $fuelAdjustmentId)->get()->toArray();
-            foreach ($fuelAdjustmentData as $adjustmentData) {
-                if (!empty($adjustmentData['tank_id'])) {
-                    if ($adjustmentData['tank_id'] == $tank['id']) {
-                        $adjustment += $adjustmentData['quantity'];
+        $dispensers = Dispenser::select('id', 'dispenser_name', 'tank_id')
+            ->where('product_id', $inputData['product_id'])
+            ->where('client_company_id', $sessionUser['client_company_id'])
+            ->with(['nozzle' => function ($query) {
+                $query->select('id', 'dispenser_id', 'name', 'opening_stock', 'pf', 'max_value')
+                    ->with(['latestShiftSummary' => function ($subQuery) {
+                        $subQuery->select('shift_summary.id', 'shift_summary.nozzle_id', 'shift_summary.start_reading', 'shift_summary.end_reading');
+                    }]);
+            }])
+            ->get()
+            ->toArray();
+        $fuelAdjustment = FuelAdjustment::select('id', 'loss_quantity')
+            ->where('shift_sale_id', $shiftSaleId)
+            ->get()
+            ->toArray();
+        $fuelAdjustmentId = array_column($fuelAdjustment, 'id');
+        $fuelAdjustmentData = FuelAdjustmentData::whereIn('fuel_adjustment_id', $fuelAdjustmentId)->get()->toArray();
+        $dispenserArray = [];
+        foreach ($dispensers as &$dispenser) {
+            foreach ($dispenser['nozzle'] as &$nozzle) {
+                $adjustment = 0;
+                if (!empty($fuelAdjustment)) {
+                    foreach ($fuelAdjustmentData as $adjustmentData) {
+                        if (!empty($adjustmentData['nozzle_id'])) {
+                            if ($adjustmentData['nozzle_id'] == $nozzle['id']) {
+                                $adjustment = $adjustmentData['quantity'];
+                            }
+                        }
                     }
                 }
-                if (!empty($adjustmentData['nozzle_id'])) {
-                    $nozzleAdjustment[$adjustmentData['nozzle_id']][] = $adjustmentData;
+
+                $nozzle['start_reading'] =  $nozzle['opening_stock'] ?? 0;
+                if (!empty($nozzle['latest_shift_summary'])) {
+                    $nozzle['start_reading'] = !empty($nozzle['latest_shift_summary']['end_reading']) ? $nozzle['latest_shift_summary']['end_reading'] : $nozzle['latest_shift_summary']['start_reading'];
+                }
+                $nozzle['end_reading'] = 0;
+                $nozzle['adjustment'] = $adjustment;
+                $nozzle['consumption'] =  $nozzle['end_reading']  - $nozzle['start_reading'] -  $adjustment;
+                $nozzle['amount'] = 0;
+                $nozzle['consumption'] = max($nozzle['consumption'], 0);
+                unset($nozzle['latest_shift_summary']);
+
+            }
+            $dispenserArray[$dispenser['tank_id']][] = $dispenser;
+        }
+        $tankRefill = TankRefill::where('shift_sale_id', $shiftSaleId)
+            ->get()
+            ->keyBy('tank_id')
+            ->toArray();
+//        $adjustment = 0;
+//        $nozzleAdjustment = [];
+//        if (!empty($fuelAdjustment)) {
+//            $fuelAdjustmentId = array_column($fuelAdjustment, 'id');
+//            $fuelAdjustmentData = FuelAdjustmentData::whereIn('fuel_adjustment_id', $fuelAdjustmentId)->get()->toArray();
+//            foreach ($fuelAdjustmentData as $adjustmentData) {
+//                if (!empty($adjustmentData['tank_id'])) {
+//                    if ($adjustmentData['tank_id'] == $tank['id']) {
+//                        $adjustment += $adjustmentData['quantity'];
+//                    }
+//                }
+//                if (!empty($adjustmentData['nozzle_id'])) {
+//                    $nozzleAdjustment[$adjustmentData['nozzle_id']][] = $adjustmentData;
+//                }
+//            }
+//        }
+        foreach ($tanks as &$tank) {
+            $adjustment = 0;
+            if (!empty($fuelAdjustment)) {
+                foreach ($fuelAdjustmentData as $adjustmentData) {
+                    if (!empty($adjustmentData['tank_id'])) {
+                        if ($adjustmentData['tank_id'] == $tank['id']) {
+                            $adjustment += $adjustmentData['quantity'];
+                        }
+                    }
                 }
             }
+
+            $tank['noDIPShow'] = 1;
+            if (empty($shiftSaleId)) {
+                if (!empty($tank['end_reading'])) {
+                    $tank['start_reading'] = $tank['end_reading'];
+                } else {
+                    $tank['start_reading'] = $tank['opening_stock'] ?? 0;
+                }
+            }
+            $tank['start_reading_mm'] = Tank::findHeight($tank['id'], $tank['start_reading']);
+            $tank['end_reading'] = 0;
+            $tank['end_reading_mm'] = 0;
+            $tank['tank_refill'] = isset($tankRefill[$tank['id']]) ? $tankRefill[$tank['id']]['total_refill_volume'] : 0;
+            $tank['tank_refill_mm'] = 0;
+            $tank['adjustment'] = $adjustment;
+            $tank['adjustment_mm'] = 0;
+            $tank['consumption'] = $tank['start_reading'] + $tank['tank_refill'] - $tank['end_reading'] + $adjustment;
+            $tank['consumption_mm'] = $tank['start_reading_mm'] + $tank['tank_refill_mm'] - $tank['end_reading_mm'];
+
+            $tank['dispensers'] = $dispenserArray[$tank['id']] ?? [];
+            unset($tank['opening_stock']);
         }
-        $tankRefill = TankRefill::where('shift_sale_id', $shiftSale['id'] ?? 0)
-            ->first();
-        if ($tankRefill instanceof TankRefill) {
-            $tank_refill = $tankRefill['total_refill_volume'];
-        }
-        $consumption = $start_reading + $tank_refill + $adjustment - $end_reading;
+        $consumption = array_sum(array_column($tanks, 'consumption'));
         $amount = $consumption * $product['selling_price'];
 
-        $tank_refill_mm = 0;
-        $adjustment_mm = 0;
-        $end_reading_mm = TankRepository::getHeight(['tank_id' => $tank['id'] ?? 0, 'volume' => $end_reading]);
-        $consumption_mm = $start_reading_mm + $tank_refill_mm +  $adjustment_mm - $end_reading_mm;
-
         $result = [
-            'date' => date('Y-m-d'),
+            'date' => Carbon::now(SessionUser::TIMEZONE)->format('Y-m-d H:i:s'),
             'product_id' => $inputData['product_id'],
-            'start_reading' => $start_reading,
-            'start_reading_mm' => $start_reading_mm,
-            'tank_refill' => $tank_refill,
-            'tank_refill_mm' => $tank_refill_mm,
-            'adjustment' => $adjustment,
-            'adjustment_mm' => $adjustment,
-            'end_reading' => $end_reading,
-            'end_reading_mm' => $end_reading,
-            'consumption' => $consumption,
-            'consumption_mm' => $consumption_mm,
+            'tanks' => $tanks,
             'amount' => $amount,
             'selling_price' => $product->selling_price,
-            'tank_height' => $tank['height'] ?? 0,
             'unit' => $productType['unit'],
             'tank' => $productType['tank'],
             'net_profit' => 0
         ];
-        $dispensers = Dispenser::select('id', 'dispenser_name')
-            ->where('product_id', $inputData['product_id'])
-            ->where('client_company_id', $sessionUser['client_company_id'])
-            ->with(['nozzle' => function($q) {
-                $q->select('nozzles.id', 'nozzles.dispenser_id', 'nozzles.name', 'nozzles.opening_stock', 'pf', 'max_value');
-            }])
-            ->get()
-            ->toArray();
-        $shiftSaleData = ShiftSummary::select('nozzle_id', 'end_reading')->where('shift_sale_id', $shiftSaleId)->get()->keyBy('nozzle_id')->toArray();
-        foreach ($dispensers as &$dispenser) {
-            foreach ($dispenser['nozzle'] as &$nozzle) {
-                $nozzle['start_reading'] = isset($shiftSaleData[$nozzle['id']]) ? $shiftSaleData[$nozzle['id']]['end_reading'] : $nozzle['opening_stock'] ?? 0;
-                $nozzle['end_reading'] = 0;
-                $nozzle['adjustment'] = isset($nozzleAdjustment[$nozzle['id']]) ? array_sum(array_column($nozzleAdjustment[$nozzle['id']], 'quantity')) : 0;
-                $nozzle['consumption'] =  $nozzle['end_reading']  - $nozzle['start_reading'] -  $nozzle['adjustment'];
-                $nozzle['amount'] = $nozzle['consumption'] * $product['selling_price'];
-                $nozzle['consumption'] = max($nozzle['consumption'], 0);
-            }
-        }
-        $result['dispensers'] = $dispensers;
-        $shiftSale = ShiftSale::where('client_company_id', $sessionUser['client_company_id'])
-            ->where('product_id', $inputData['product_id'])
-            ->where('date', '<=', $date)
-            ->orderBy('id', 'DESC')
-            ->first();
         $result['status'] = 'start';
         $result['pos_sale'] = [];
         $result['total_pos_sale_liter'] = 0;
-        if ($shiftSale instanceof ShiftSale) {
+        if ($shiftSale instanceof ShiftTotal) {
             if ($shiftSale['status'] == 'end') {
                 $result['status'] = 'start';
             } else {
-                $result['date'] = $shiftSale['date'];
+                $result['date'] = Carbon::parse($shiftSale['date'], SessionUser::TIMEZONE)->format('Y-m-d H:i:s');
                 $result['status'] = 'end';
             }
             $posSale = SaleData::select('sale_data.sale_id', 'sale_data.id', DB::raw('SUM(sale_data.quantity) as quantity'), DB::raw('SUM(sale_data.subtotal) as amount'), 'sale.payment_category_id as category_id')
@@ -437,6 +473,7 @@ class ProductController extends Controller
             $result['pos_sale'] = $posSale;
             $result['total_pos_sale_liter'] = array_sum(array_column($posSale, 'quantity'));
         }
+        $result['shift_id'] = $shiftSaleId;
         return response()->json(['status' => 200, 'data' => $result]);
     }
     /**

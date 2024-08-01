@@ -17,6 +17,7 @@ use App\Models\Product;
 use App\Models\ProductType;
 use App\Models\Sale;
 use App\Models\SaleData;
+use App\Models\ShiftTotal;
 use App\Models\Transaction;
 use App\Models\User;
 use App\Models\Voucher;
@@ -47,18 +48,37 @@ class SaleController extends Controller
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
 
+        $sessionUser = SessionUser::getUser();
         $errorsMessage = [];
-        foreach ($requestData['products'] as $key => $product) {
-            $productModel = Product::where('products.id', $product['product_id'])
+        $products = $request->input('products');
+        foreach ($products as $key => &$eachProduct) {
+            $productModel = Product::where('products.id', $eachProduct['product_id'])
                 ->leftJoin('product_types', 'product_types.id', '=', 'products.type_id')
                 ->first();
             if ($productModel['inventory'] == 1) {
-                if ($product['quantity'] > $productModel['current_stock']) {
-                    $errorsMessage[$product['name']][] = $product['name'].' has not enough stock. Available quantity: '.$productModel['current_stock'];
+                if ($eachProduct['quantity'] > $productModel['current_stock']) {
+                    $errorsMessage[$eachProduct['name']][] = $eachProduct['name'].' has not enough stock. Available quantity: '.$productModel['current_stock'];
                     return response()->json(['status' => 600, 'errors' => $errorsMessage]);
                 }
             }
+            if (empty($requestData['advance_pay'])) {
+                if ($productModel['shift_sale'] == 1) {
+                    $shiftSale = ShiftTotal::select('product_id', 'id')
+                        ->where('client_company_id', $sessionUser['client_company_id'])->orderBy('id', 'DESC')
+                        ->where('status', 'start')
+                        ->where('product_id', $eachProduct['product_id'])
+                        ->first();
+                    if ($shiftSale instanceof ShiftTotal) {
+                        $eachProduct['shift_sale_id'] = $shiftSale->id;
+                    } else {
+                        $errorsMessage[$eachProduct['name']][] = $eachProduct['name'].' shift sale is not started.';
+                        return response()->json(['status' => 600, 'errors' => $errorsMessage]);
+                    }
+                }
+            }
         }
+        $request->merge(['products' => $products]);
+        $requestData = $request->all();
 
         $driverId = null;
         $voucher = null;
@@ -68,7 +88,6 @@ class SaleController extends Controller
         $payment_category_id = $requestData['company_id'] ?? '';
         $carId = null;
 
-        $sessionUser = SessionUser::getUser();
         if (!$sessionUser instanceof User) {
             return response()->json(['status' => 500, 'message' => 'Cannot find session [user].']);
         }

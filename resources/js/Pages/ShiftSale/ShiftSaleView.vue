@@ -18,164 +18,129 @@
                         <div class="card-body">
                             <div class="process-wrapper">
                                 <div id="progress-bar-container">
-                                    <div class="fs-18 fw-bold">Date: {{ shiftSale.date_format }}</div>
-                                    <div class="fs-18 fw-bold">Product: {{ shiftSale.product_name }}</div>
+                                    <div class="fs-18">Start Date: {{ shiftSale.start_date_format }}</div>
+                                    <div class="fs-18">End Date: {{ shiftSale.end_date_format }}</div>
+                                    <div class="fs-18">Product: {{ shiftSale.product_name }}</div>
                                 </div>
 
                                 <div id="progress-content-section">
-                                    <div class="section-content discovery active">
-                                        <template v-if="shiftSale.tank == 1">
-                                            <div class="card">
-                                                <div class="card-header">
-                                                    <h5 class="card-title">
-                                                        {{ shiftSale.product_name }}</h5>
+
+                                    <div class="card" v-for="(tank,tankIndex) in shiftSale.tanks">
+                                        <div class="card-header">
+                                            <h5 class="card-title w-100">
+                                                <div class="row">
+                                                    <div class="col-md-6"> Tank: {{ tank.tank_name }}</div>
                                                 </div>
-                                                <div class="card-body">
-                                                    <div class="row align-items-center text-start">
-                                                        <div class="col-md-2">
-                                                            <label class="form-label">
-                                                                <p class="m-0">OIL Stock </p>
-                                                            </label>
+                                            </h5>
+                                        </div>
+                                        <template v-if="parseInt(shiftSale.tank) === 1">
+                                            <div class="card-body">
+                                                <div class="row align-items-center text-start">
+                                                    <div class="col-md-2">
+                                                        <label class="form-label">
+                                                            <p class="m-0">OIL Stock </p>
+                                                        </label>
 
+                                                    </div>
+                                                    <div class="mb-3 col-md-2">
+                                                        <label class="fw-bold">Start Reading </label>
+                                                    </div>
+                                                    <div class="mb-3 col-md-2">
+                                                        <label class="fw-bold">Tank Refill </label>
+                                                    </div>
+                                                    <div class="mb-3 col-md-2">
+                                                        <label class="fw-bold">End Reading </label>
+                                                    </div>
+                                                    <div class="mb-3 col-md-2">
+                                                        <label class="fw-bold">Adjustment </label>
+                                                    </div>
+                                                    <div class="mb-3 col-md-2">
+                                                        <label class="fw-bold">Consumption </label>
+                                                    </div>
+                                                    <div class="mb-3 col-md-2 offset-2">
+                                                        <div class="input-group">
+                                                            <div v-if="tank.start_reading">{{tank.start_reading}} {{ shiftSale.unit }}</div>
                                                         </div>
-                                                        <div class="mb-3 col-md-2">
-                                                            <label class="fw-bold">Start Reading </label>
-                                                        </div>
-                                                        <div class="mb-3 col-md-2">
-                                                            <label class="fw-bold">Tank Refill </label>
-                                                        </div>
-                                                        <div class="mb-3 col-md-2">
-                                                            <label class="fw-bold">End Reading </label>
-                                                        </div>
-                                                        <div class="mb-3 col-md-2">
-                                                            <label class="fw-bold">Adjustment </label>
-                                                        </div>
-                                                        <div class="mb-3 col-md-2">
-                                                            <label class="fw-bold">Consumption </label>
-                                                        </div>
-                                                        <div class="mb-3 col-md-2 offset-2">
-                                                            <div class="input-group">
-                                                                <div>{{shiftSale.start_reading}} {{ shiftSale.unit }}</div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="mb-3 col-md-2">
-                                                            <div>{{shiftSale.tank_refill}} {{ shiftSale.unit }}</div>
-                                                        </div>
-                                                        <div class="mb-3 col-md-2" >
-                                                            <div>{{shiftSale.end_reading}} {{ shiftSale.unit }}</div>
-                                                        </div>
-                                                        <div class="mb-3 col-md-2">
-                                                            <div>{{shiftSale.adjustment}} {{ shiftSale.unit }}</div>
-                                                        </div>
+                                                    </div>
+                                                    <div class="mb-3 col-md-2">
+                                                        <div v-if="tank.tank_refill">{{tank.tank_refill}} {{ shiftSale.unit }}</div>
+                                                    </div>
+                                                    <div class="mb-3 col-md-2" >
+                                                        <div v-if="tank.end_reading">{{tank.end_reading}} {{ shiftSale.unit }}</div>
+                                                    </div>
+                                                    <div class="mb-3 col-md-2">
+                                                        <div v-if="tank.adjustment">{{tank.adjustment}} {{ shiftSale.unit }}</div>
+                                                    </div>
 
-                                                        <div class="mb-3 col-md-2">
-                                                            <div>{{shiftSale.consumption}} {{ shiftSale.unit }}</div>
-                                                        </div>
+                                                    <div class="mb-3 col-md-2">
+                                                        <div v-if="tank.consumption">{{tank.consumption}} {{ shiftSale.unit }}</div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </template>
-                                        <div class="card" v-if="shiftSale.dispensers.length > 0"
-                                             v-for="(d, dIndex) in shiftSale.dispensers">
-                                            <div class="card-header">
-                                                <h5 class="card-title">{{ d.dispenser_name }}</h5>
+                                        <div  v-for="(d, dIndex) in tank.dispensers">
+                                            <div class="custom-bg">
+                                                <h5 class="card-title">Dispenser: {{ d.dispenser_name }}</h5>
                                             </div>
-                                            <div class="card-body" v-if="d.nozzle.length > 0">
-                                                <div class="row align-items-center text-start" v-for="(n, nIndex) in d.nozzle">
+                                            <div class="card-body">
+                                                <div class="row align-items-center text-start" v-for="(n, nIndex) in d.nozzles">
                                                     <div class=" col-md-4">
                                                         <label class="form-label">
-                                                            <p class="m-0">{{ n.name }}</p>
+                                                            <p class="m-0">{{ n.nozzle_name }}</p>
                                                         </label>
                                                     </div>
                                                     <div class="mb-3 col-md-2">
                                                         <label class="fw-bold">Start Reading </label>
-                                                        <div>{{n.start_reading}} {{ shiftSale.unit }}</div>
+                                                        <div v-if="n.start_reading">{{n.start_reading}} {{ shiftSale.unit }}</div>
                                                     </div>
                                                     <div class="mb-3 col-md-2">
                                                         <label class="fw-bold">End Reading </label>
-                                                        <div>{{n.end_reading}} {{ shiftSale.unit }}</div>
+                                                        <div v-if="n.end_reading">{{n.end_reading}} {{ shiftSale.unit }}</div>
                                                     </div>
                                                     <div class="mb-3 col-md-2">
                                                         <label class="fw-bold">Adjustment </label>
-                                                        <div>{{n.adjustment}} {{ shiftSale.unit }}</div>
+                                                        <div v-if="n.adjustment">{{n.adjustment}} {{ shiftSale.unit }}</div>
                                                     </div>
 
                                                     <div class="mb-3 col-md-2" >
                                                         <label class="fw-bold">Consumption </label>
-                                                        <div>{{n.consumption}} {{ shiftSale.unit }}</div>
+                                                        <div v-if="n.consumption">{{n.consumption}} {{ shiftSale.unit }}</div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
-                                        <template>
-                                            <div class="row">
-                                                <div class="col-sm-7"></div>
-                                                <div class="col-sm-5 text-end mb-2">
-                                                    <table class="table">
-                                                        <tr>
-                                                            <td style="font-size: 18px;padding: 0px;" class="">Total sale:</td>
-                                                            <td style="font-size: 18px;padding: 0px;" class="text-end ">{{shiftSale.consumption}} {{ shiftSale.unit }}</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td style="font-size: 18px;padding: 0px;" class="">Total amount:</td>
-                                                            <td style="font-size: 18px;padding: 0px;" class="text-end ">{{shiftSale.amount}} Tk</td>
-                                                        </tr>
-                                                    </table>
-                                                </div>
-                                            </div>
-<!--                                            <div class="row" v-if="listDispenser.pos_sale.length > 0">
-                                                <div class="col-sm-6">
-                                                </div>
-                                                <div class="col-sm-6 text-end">
-                                                    <h4 style="text-align: left;margin-left: 5rem;">POS Sale</h4>
-                                                    <div class="d-flex mb-3 justify-content-end"  v-for="pos in listDispenser.pos_sale">
-                                                        <select class="form-control me-3" style="max-width: 210px" v-model="pos.category_id" disabled>
-                                                            <option v-for="c in allAmountCategory" :value="c.id">{{c.name}}</option>
-                                                        </select>
-                                                        <div class="form-group">
-                                                            <input class="form-control me-3 text-end"  style="max-width: 210px" type="number" v-model="pos.amount"
-                                                                   disabled>
-                                                            <div class="invalid-feedback"></div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-sm-8"></div>
-                                                <div class="col-sm-4">
-                                                    <table class="table">
-                                                        <tr>
-                                                            <td style="font-size: 18px;padding: 0px;" class="">Total POS sale:</td>
-                                                            <td style="font-size: 18px;padding: 0px;" class="text-end ">{{totalPosSale()}} Tk</td>
-                                                        </tr>
-                                                        <tr v-if="totalAmount > 0">
-                                                            <td style="font-size: 18px;padding: 0px;" class="">Remaining Balance: </td>
-                                                            <td style="font-size: 18px;padding: 0px;" class="text-end ">{{totalAmount - totalPosSale()}} Tk</td>
-                                                        </tr>
-                                                    </table>
-                                                </div>
-                                            </div>-->
-
-                                            <div class="row">
-                                                <div class="col-sm-6"></div>
-                                                <div class="col-sm-6 text-end">
-                                                    <table class="table">
-                                                        <tr v-for="(category,index) in shiftSale.categories">
-                                                            <td style="font-size: 18px;padding: 0px;" class="text-end">{{category.name}}</td>
-                                                            <td style="font-size: 18px;padding: 0px;" class="text-end "> {{category.amount}} Tk</td>
-                                                        </tr>
-                                                    </table>
-                                                </div>
-                                                <div class="col-sm-8"></div>
-                                                <div class="col-sm-4">
-                                                    <table class="table">
-                                                        <tr>
-                                                            <td style="font-size: 18px;padding: 0px;" class="">Amount:</td>
-                                                            <td style="font-size: 18px;padding: 0px;" class="text-end ">{{shiftSale.amount}} Tk</td>
-                                                        </tr>
-                                                    </table>
-                                                </div>
-                                            </div>
-                                        </template>
-
+                                        <div class="card-body text-end" v-if="tank.net_profit > 0">
+                                            <strong>Net Profit: {{ tank.net_profit }} {{ shiftSale.unit }}</strong>
+                                        </div>
+                                        <div class="card-body text-end" v-if="tank.net_profit < 0">
+                                            <strong>Net Loss: {{ Math.abs(tank.net_profit) }} {{ shiftSale.unit }}</strong>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-7"></div>
+                                        <div class="col-sm-5 text-end mb-2">
+                                            <table class="table">
+                                                <tr>
+                                                    <td style="font-size: 18px;padding: 0;" class="">Total sale:</td>
+                                                    <td style="font-size: 18px;padding: 0;" class="text-end ">{{shiftSale.consumption}} {{ shiftSale.unit }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="font-size: 18px;padding: 0;" class="">Total amount:</td>
+                                                    <td style="font-size: 18px;padding: 0;" class="text-end ">{{shiftSale.amount}} Tk</td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-7"></div>
+                                        <div class="col-sm-5 text-end mb-2">
+                                            <table class="table">
+                                                <tr v-for="(category,index) in shiftSale.categories">
+                                                    <td style="font-size: 18px;padding: 0;" class="">{{category.name}}:</td>
+                                                    <td style="font-size: 18px;padding: 0;" class="text-end ">{{category.amount}} Tk</td>
+                                                </tr>
+                                            </table>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

@@ -62,7 +62,7 @@ class TransactionController extends Controller
                 $id = $newTransaction->id;
                 $newTransaction = new Transaction();
                 $newTransaction->date = $transaction['date'];
-                $newTransaction->description = null;
+                $newTransaction->description = $transaction['description'] ?? null;
                 $newTransaction->account_id = $inputData['linked_id'];
                 $newTransaction->debit_amount = $transaction['credit_amount'] ?? 0;
                 $newTransaction->credit_amount = $transaction['debit_amount'] ?? 0;

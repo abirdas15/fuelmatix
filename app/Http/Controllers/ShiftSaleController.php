@@ -4,315 +4,206 @@ namespace App\Http\Controllers;
 
 use App\Common\AccountCategory;
 use App\Common\FuelMatixDateTimeFormat;
-use App\Common\Module;
 use App\Helpers\Helpers;
 use App\Helpers\SessionUser;
-use App\Models\BstiChart;
 use App\Models\Category;
 use App\Models\Dispenser;
 use App\Models\Product;
-use App\Models\ProductType;
 use App\Models\ShiftSale;
 use App\Models\ShiftSaleTransaction;
 use App\Models\ShiftSummary;
-use App\Models\Tank;
-use App\Models\TankLog;
-use App\Repository\NozzleRepository;
-use App\Repository\TankRepository;
+use App\Models\ShiftTotal;
+use App\Models\User;
+use App\Repository\ShiftSaleRepository;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class ShiftSaleController extends Controller
 {
     /**
+     * Save method to handle the start and end of a shift sale.
+     *
      * @param Request $request
      * @return JsonResponse
      */
     public function save(Request $request): JsonResponse
     {
+        // Retrieve all input data from the request
         $inputData = $request->all();
+
+        // Validate the input data with specific rules
         $validator = Validator::make($inputData, [
             'date' => 'required',
-            'tank' => 'required',
+            'tanks' => 'required|array',
             'status' => 'required',
             'product_id' => 'required',
-            'start_reading' => $inputData['status'] == 'end' ? 'required' : 'nullable',
-            'end_reading' => $inputData['status'] == 'end' ? 'required' : 'nullable',
-            'consumption' => $inputData['status'] == 'end' ? 'required' : 'nullable',
+            'tanks.*.start_reading' => $inputData['status'] == 'end' ? 'required' : 'nullable',
+            'tanks.*.end_reading' => $inputData['status'] == 'end' ? 'required' : 'nullable',
+            'tanks.*.consumption' => $inputData['status'] == 'end' ? 'required' : 'nullable',
             'amount' => $inputData['status'] == 'end' ? 'required' : 'nullable',
-            'dispensers' => $inputData['status'] == 'end' ? 'required|array' : 'nullable',
+            'tanks.*.dispensers' => $inputData['status'] == 'end' ? 'required|array' : 'nullable',
             'categories.*.category_id' => $inputData['status'] == 'end' ? 'required' : 'nullable',
             'categories.*.amount' => $inputData['status'] == 'end' ? 'required' : 'nullable',
         ],[
             'categories.*.category_id.required' => 'The category field is required.',
             'categories.*.amount.required' => 'The category field is required.'
         ]);
+
+        // If validation fails, return a JSON response with validation errors
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
-        $sessionUser = SessionUser::getUser();
-        if ($inputData['status'] == 'start') {
-            $shiftSale = new ShiftSale();
-            $shiftSale->date = $inputData['date'];
-            $shiftSale->start_time = Carbon::now('UTC')->format(FuelMatixDateTimeFormat::ONLY_TIME);
-            $shiftSale->product_id = $inputData['product_id'];
-            $shiftSale->status = 'start';
-            $shiftSale->user_id = $sessionUser['id'];
-            $shiftSale->client_company_id = $inputData['session_user']['client_company_id'];
-            if (!$shiftSale->save()) {
-                return response()->json(['status' => 400, 'message' => 'Cannot start shift sale.']);
-            }
-            return response()->json(['status' => 200, 'message' => 'Successfully started shift sale.']);
-        }
-        $tank = null;
-        if (!empty($inputData['tank']) && $inputData['tank'] == 1) {
-            $tank = Tank::where('product_id', $inputData['product_id'])->first();
-            if (!$tank instanceof Tank) {
-                return response()->json(['status' => 400, 'message' => 'Cannot find tank.']);
-            }
-            $tankLog = TankLog::select('id', 'tank_id', 'height', 'water_height', 'volume')
-                ->where('tank_id', $tank['id'])
-                ->orderBy('id', 'DESC')
-                ->first();
-            if ($tankLog instanceof TankLog && $tankLog['volume'] > $request['consumption']) {
-                return response()->json(['status' => 400, 'message' => 'Your tank has not enough fuel. Please refill your tank.']);
-            }
-        }
-        $category = Category::where('slug', strtolower(AccountCategory::DIRECT_INCOME))->where('client_company_id', $inputData['session_user']['client_company_id'])->first();
-        $incomeCategory = Category::where('parent_category', $category['id'])
-            ->where('module', Module::PRODUCT)
-            ->where('module_id', $inputData['product_id'])
-            ->where('client_company_id', $inputData['session_user']['client_company_id'])
-            ->first();
-        if (!$incomeCategory instanceof Category) {
-            return response()->json(['status' => 500, 'error' => 'Cannot fin account income category.']);
-        }
-        $category = Category::where('slug', strtolower(AccountCategory::STOCK_IN_HAND))->where('client_company_id', $inputData['session_user']['client_company_id'])->first();
-        $stockCategory = Category::where('parent_category', $category['id'])
-            ->where('module', 'product')
-            ->where('module_id', $inputData['product_id'])
-            ->where('client_company_id', $inputData['session_user']['client_company_id'])
-            ->first();
-        if (!$stockCategory instanceof Category) {
-            return response()->json(['status' => 500, 'error' => 'Cannot fin account stock category.']);
-        }
-        $category = Category::where('slug', strtolower(AccountCategory::COST_OF_GOOD_SOLD))->where('client_company_id', $inputData['session_user']['client_company_id'])->first();
-        $costOfGoodSoldCategory = Category::where('parent_category', $category['id'])
-            ->where('module', 'product')
-            ->where('module_id', $inputData['product_id'])
-            ->where('client_company_id', $inputData['session_user']['client_company_id'])
-            ->first();
-        if (!$costOfGoodSoldCategory instanceof Category) {
-            return response()->json(['status' => 500, 'error' => 'Cannot fin account stock of good sold category.']);
-        }
-        $shiftSale = ShiftSale::where('client_company_id', $inputData['session_user']['client_company_id'])
-            ->where('product_id', $inputData['product_id'])->where('status', 'start')
-            ->where('date', '<=', $inputData['date'])
-            ->first();
-        if (!$shiftSale instanceof ShiftSale) {
-            return response()->json(['status' => 400, 'message' => 'Cannot find shift sale.']);
-        }
-        $nozzleConsumption = 0;
-        foreach ($inputData['dispensers'] as $dispenser) {
-            foreach ($dispenser['nozzle'] as $nozzle) {
-                $nozzleConsumption += $nozzle['consumption'];
-            }
-        }
+
+        // Retrieve the product from the database using product_id from the input data
         $product = Product::where('id', $inputData['product_id'])->first();
-        $inputData['net_profit'] = $nozzleConsumption  - $inputData['consumption'];
-        $lossAmount = $inputData['net_profit'] * $product['buying_price'];
-        $shiftSale->end_time = Carbon::now('UTC')->format(FuelMatixDateTimeFormat::ONLY_TIME);
-        $shiftSale->start_reading =  $inputData['tank'] == 1 ? $inputData['start_reading'] : null;
-        $shiftSale->tank_refill = $inputData['tank_refill'];
-        $shiftSale->end_reading = $inputData['tank'] == 1 ? $inputData['end_reading'] : null;
-        $shiftSale->adjustment = $inputData['adjustment'];
-        $shiftSale->consumption = $inputData['consumption'];
-        $shiftSale->amount = $inputData['amount'];
-        $shiftSale->net_profit = $inputData['net_profit'] ?? null;
-        $shiftSale->net_profit_amount = $lossAmount ?? 0;
-        $shiftSale->status = 'end';
-        if (!$shiftSale->save()) {
-            return response()->json(['status' => 500, 'error' => 'Cannot ended shift sale.']);
+
+        // If the product is not found, return an error response
+        if (!$product instanceof Product) {
+            return response()->json(['status' => 400, 'message' => 'Cannot find product.']);
         }
-        if (!empty($inputData['tank']) && $inputData['tank'] == 1) {
-            $bstiChart = BstiChart::where('tank_id', $tank['id'])
-                ->where('volume', '=', floor($inputData['end_reading']))
-                ->first();
-            TankRepository::readingSave([
-                'tank_id' => $tank['id'],
-                'date' => $inputData['date'],
-                'volume' => $inputData['end_reading'],
-                'height' => $bstiChart->height ?? 0,
-                'type' => 'shift sell',
+
+        // If the status is 'start', initiate the shift sale
+        if ($inputData['status'] == 'start') {
+            $shiftSaleRepose = ShiftSaleRepository::startShiftSale($request->all());
+
+            // If starting the shift sale fails, return the error response
+            if (!$shiftSaleRepose instanceof ShiftTotal) {
+                return response()->json($shiftSaleRepose);
+            }
+
+            // Return a success response for starting the shift sale
+            return response()->json([
+                'status' => 200,
+                'message' => 'Successfully started shift sale.'
             ]);
         }
-        $stockData = [
-            'client_company_id' => $inputData['session_user']['client_company_id'],
-            'date' => $inputData['date'],
-            'out_stock' => $inputData['consumption'],
-            'in_stock' => 0,
-            'product_id' => $inputData['product_id'],
-            'opening_stock' => $inputData['start_reading'] + $inputData['tank_refill']
-        ];
-        TransactionController::saveStock($stockData);
-        foreach ($inputData['dispensers'] as $dispenser) {
-            foreach ($dispenser['nozzle'] as $nozzle) {
-                $shiftSaleSummary = new ShiftSummary();
-                $shiftSaleSummary->shift_sale_id = $shiftSale->id;
-                $shiftSaleSummary->dispenser_id = $dispenser['id'];
-                $shiftSaleSummary->nozzle_id = $nozzle['id'];
-                $shiftSaleSummary->start_reading = $nozzle['start_reading'];
-                $shiftSaleSummary->end_reading = $nozzle['end_reading'] != 0 ? $nozzle['end_reading'] : $nozzle['start_reading'];
-                $shiftSaleSummary->adjustment = $nozzle['adjustment'];
-                $shiftSaleSummary->consumption = $nozzle['consumption'];
-                $shiftSaleSummary->amount = $nozzle['amount'];
-                $shiftSaleSummary->save();
-                $readingData = [
-                    'date' => $inputData['date'],
-                    'nozzle_id' => $nozzle['id'],
-                    'reading' => $nozzle['end_reading'],
-                    'type' => 'shift sell',
-                ];
-                NozzleRepository::readingSave($readingData);
-            }
-        }
-        $buyingPrice = 0;
-        $totalNozzleConsumption = $inputData['amount'] / $product['selling_price'];
-        if (!empty($product['buying_price'])) {
-            $buyingPrice = $product['buying_price'] * $totalNozzleConsumption;
-        }
-        $shiftSaleTransaction = [];
-        foreach ($inputData['categories'] as $category) {
-            $transactionData['linked_id'] = $incomeCategory['id'];
-            $transactionData['transaction'] = [
-                ['date' => $inputData['date'], 'account_id' => $category['category_id'], 'debit_amount' => 0, 'credit_amount' => $category['amount'], 'module' => 'shift sale', 'module_id' => $shiftSale->id]
-            ];
-            TransactionController::saveTransaction($transactionData);
-            $shiftSaleTransaction[] = [
-                'shift_sale_id' => $shiftSale->id,
-                'category_id' => $category['category_id'],
-                'amount' => $category['amount']
-            ];
-        }
-        $linkedId = $stockCategory['id'];
-        if (!empty($product['vendor_id'])) {
-            $productType = ProductType::find($product['type_id']);
-            if ($productType instanceof ProductType && $productType['vendor'] == 1) {
-                $linkedId = $product['vendor_id'];
-            }
-        }
-        $transactionData = [];
-        $transactionData['linked_id'] = $linkedId;
-        $transactionData['transaction'] = [
-            ['date' => $inputData['date'], 'account_id' => $costOfGoodSoldCategory['id'], 'debit_amount' => 0, 'credit_amount' => $buyingPrice, 'module' => 'shift sale', 'module_id' => $shiftSale->id]
-        ];
-        TransactionController::saveTransaction($transactionData);
 
-        if ($lossAmount < 0) {
-            // Loss amount transaction after tank refill
-            $lossCategory = Category::where('slug', strtolower(AccountCategory::EVAPORATIVE))
-                ->where('client_company_id', $inputData['session_user']['client_company_id'])
-                ->first();
-            if ($lossCategory instanceof Category) {
-                $description = 'Shift ID: '.$shiftSale['id'].', Product: '.$product['name'].', Loss: '.abs($inputData['net_profit']);
-                $transactionData['linked_id'] = $lossCategory['id'];
-                $transactionData['transaction'] = [
-                    ['date' => $inputData['date'], 'description' => $description, 'account_id' => $stockCategory['id'], 'debit_amount' => abs($lossAmount), 'credit_amount' => 0],
-                ];
-                TransactionController::saveTransaction($transactionData);
-            }
-        } else if ($lossAmount > 0) {
-            // Profit amount transaction after tank refill
-            $description = 'Shift ID: '.$shiftSale['id'].', Product: '.$product['name'].', Windfall: '.abs($inputData['net_profit']);
-            $transactionData['linked_id'] = $stockCategory['id'];
-            $transactionData['transaction'] = [
-                ['date' => $inputData['date'], 'description' => $description, 'account_id' => $incomeCategory['id'], 'debit_amount' => abs($lossAmount), 'credit_amount' => 0],
-            ];
-            TransactionController::saveTransaction($transactionData);
+        // Retrieve the shift sale from the database using shift_id from the input data
+        $shiftTotal = ShiftTotal::where('id', $inputData['shift_id'])->first();
+
+        // If the shift sale is not found, return an error response
+        if (!$shiftTotal instanceof ShiftTotal) {
+            return response()->json([
+                'status' => 400,
+                'message' => 'Cannot find shift sale.'
+            ]);
         }
 
-        ShiftSaleTransaction::insert($shiftSaleTransaction);
-        return response()->json(['status' => 200, 'message' => 'Successfully ended shift sale.', 'shift_sale_id' => $shiftSale->id]);
+        // End the shift sale
+        $shiftSaleResponse = ShiftSaleRepository::shiftSaleEnd($shiftTotal, $product, $request->all());
+
+        // If ending the shift sale fails, return the error response
+        if (!$shiftSaleResponse instanceof ShiftTotal) {
+            return response()->json($shiftSaleResponse);
+        }
+
+        // Return a success response for ending the shift sale, including the shift sale ID
+        return response()->json([
+            'status' => 200,
+            'message' => 'Successfully ended shift sale.',
+            'shift_sale_id' => $shiftSaleResponse->id
+        ]);
     }
+
     /**
+     * List ShiftTotals with their related data.
+     *
      * @param Request $request
      * @return JsonResponse
      */
     public function list(Request $request): JsonResponse
     {
-        $inputData = $request->all();
-        $limit = $inputData['limit'] ?? 10;
-        $keyword = $inputData['keyword'] ?? '';
-        $order_by = $inputData['order_by'] ?? 'shift_sale.id';
-        $order_mode = $inputData['order_mode'] ?? 'DESC';
-        $result = ShiftSale::select('shift_sale.*', 'products.name as product_name', 'users.name as user_name', 'product_types.tank')
-            ->leftJoin('products', 'products.id', 'shift_sale.product_id')
-            ->leftJoin('product_types', 'product_types.id', 'products.type_id')
-            ->leftJoin('users', 'users.id','=', 'shift_sale.user_id')
-            ->where('shift_sale.client_company_id', $inputData['session_user']['client_company_id']);
+        // Retrieve the session user
+        $session = SessionUser::getUser();
+        if (!$session instanceof User) {
+            // Return an error response if the session user cannot be found
+            return response()->json([
+                'status' => 400,
+                'message' => 'Session user cannot be found'
+            ]);
+        }
+
+        // Retrieve query parameters or set default values
+        $limit = $request->input('limit', 20);
+        $keyword = $request->input('keyword', '');
+        $order_by = $request->input('order_by', 'shift_sale.id');
+        $order_mode = $request->input('order_mode', 'DESC');
+
+        // Build the query
+        $result = ShiftTotal::select(
+            'shift_total.*',  // Select all columns from the shift_total table
+            'products.name as product_name',  // Get product name
+            'users.name as user_name',  // Get user name
+            'product_types.tank',  // Get tank information from product_types
+            DB::raw('SUM(shift_sale.consumption) as total_consumption'),  // Aggregate total consumption
+            DB::raw('SUM(shift_sale.amount) as total_amount')  // Aggregate total amount
+        )
+            ->leftJoin('shift_sale', 'shift_sale.shift_id', '=', 'shift_total.id')  // Join with shift_sale table
+            ->leftJoin('products', 'products.id', '=', 'shift_total.product_id')  // Join with products table
+            ->leftJoin('product_types', 'product_types.id', '=', 'products.type_id')  // Join with product_types table
+            ->leftJoin('users', 'users.id', '=', 'shift_total.user_id')  // Join with users table
+            ->where('shift_total.client_company_id', $session['client_company_id']);  // Filter by client company ID
+
+        // Apply keyword search if provided
         if (!empty($keyword)) {
             $result->where(function($q) use ($keyword) {
-                $q->where('products.product_name', 'LIKE', '%'.$keyword.'%');
-                $q->orWhere('users.name', 'LIKE', '%'.$keyword.'%');
+                $q->where('products.name', 'LIKE', '%'.$keyword.'%')
+                    ->orWhere('users.name', 'LIKE', '%'.$keyword.'%');
             });
         }
-        $result = $result->orderBy($order_by, $order_mode)
-            ->paginate($limit);
+
+        // Group by shift_total.id to aggregate data correctly
+        $result = $result->groupBy('shift_total.id')
+            ->orderBy($order_by, $order_mode)  // Order the results
+            ->paginate($limit);  // Paginate the results
+
+        // Format the results
         foreach ($result as &$data) {
-            if ($data['tank'] == 0) {
-                $data['start_reading'] = '';
-                $data['end_reading'] = '';
-            }
-            $data['date'] = Helpers::formatDate($data['date'].' '.$data['start_time'], FuelMatixDateTimeFormat::STANDARD_DATE_TIME);
+            // Format amount
+            $data['amount'] = !empty($data['amount']) ? number_format($data['amount'], 2) : '';
+            // Format consumption
+            $data['consumption'] = !empty($data['consumption']) ? number_format($data['consumption'], 2) : '';
+            // Format date
+            $data['date'] = Helpers::formatDate($data['start_date'], FuelMatixDateTimeFormat::STANDARD_DATE_TIME);
         }
-        return response()->json(['status' => 200, 'data' => $result]);
+
+        // Return the result as a JSON response
+        return response()->json([
+            'status' => 200,
+            'data' => $result
+        ]);
     }
     /**
-     * @param Request $request
-     * @return JsonResponse
+     * Handle the request to fetch a single shift sale.
+     *
+     * @param Request $request The incoming request object.
+     * @return JsonResponse The JSON response containing the shift sale details.
      */
     public function single(Request $request): JsonResponse
     {
-        $inputData = $request->all();
-        $validator = Validator::make($inputData, [
+        // Validate the incoming request, ensuring the 'id' field is provided
+        $validator = Validator::make($request->all(), [
             'id' => 'required'
         ]);
+
+        // If validation fails, return a JSON response with status 500 and validation errors
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
-        $result = ShiftSale::select('shift_sale.*', 'products.name as product_name', 'product_types.tank', 'product_types.unit')
-            ->leftJoin('products', 'products.id', '=', 'shift_sale.product_id')
-            ->leftJoin('product_types', 'product_types.id', '=', 'products.type_id')
-            ->where('shift_sale.id', $request['id'])
-            ->first();
-        $shiftSummary = ShiftSummary::where('shift_sale_id', $inputData['id'])->get()->keyBy('nozzle_id');
-        $dispensers = Dispenser::select('id', 'dispenser_name')
-            ->where('product_id', $result['product_id'])
-            ->where('client_company_id', $inputData['session_user']['client_company_id'])
-            ->with(['nozzle' => function($q) {
-                $q->select('nozzles.id', 'nozzles.dispenser_id', 'nozzles.name');
-            }])
-            ->get()
-            ->toArray();
-        foreach ($dispensers as &$dispenser) {
-            foreach ($dispenser['nozzle'] as &$nozzle) {
-                $nozzle['start_reading'] = isset($shiftSummary[$nozzle['id']]) ? $shiftSummary[$nozzle['id']]['start_reading'] : 0;
-                $nozzle['end_reading'] = isset($shiftSummary[$nozzle['id']]) ? $shiftSummary[$nozzle['id']]['end_reading'] : 0;
-                $nozzle['consumption'] = isset($shiftSummary[$nozzle['id']]) ? $shiftSummary[$nozzle['id']]['consumption'] : 0;
-                $nozzle['amount'] = isset($shiftSummary[$nozzle['id']]) ? $shiftSummary[$nozzle['id']]['amount'] : 0;
-            }
-        }
-        $result['dispensers'] = $dispensers;
-        $result['categories'] = ShiftSaleTransaction::select('shift_sale_transaction.category_id', 'shift_sale_transaction.amount', 'categories.name')
-            ->leftJoin('categories', 'categories.id', '=', 'shift_sale_transaction.category_id')
-            ->where('shift_sale_id', $inputData['id'])
-            ->get()
-            ->toArray();
-        $result['date_format'] = Helpers::formatDate($result['date']. ' '.$result['start_time'], FuelMatixDateTimeFormat::STANDARD_DATE_TIME);
-        return response()->json(['status' => 200, 'data' => $result]);
+
+        // Fetch the shift sale details using the ShiftSaleRepository
+        $response = ShiftSaleRepository::getSingleShiftSale($request->input('id'));
+
+        // Return a JSON response with status 200 and the fetched shift sale data
+        return response()->json([
+            'status' => 200,
+            'data' => $response
+        ]);
     }
+
     /**
      * @param Request $request
      * @return JsonResponse
@@ -406,30 +297,57 @@ class ShiftSaleController extends Controller
         return response()->json(['status' => 200, 'data' => $result]);
     }
     /**
-     * @param Request $request
-     * @return JsonResponse
+     * Retrieves shift information for a given date.
+     *
+     * @param Request $request The HTTP request instance containing request data.
+     * @return JsonResponse The JSON response containing the status and the shift data or validation errors.
      */
     public function getShiftByDate(Request $request): JsonResponse
     {
+        // Retrieve all request data
         $requestData = $request->all();
+
+        // Validate the request data to ensure 'date' is present and is a valid date
         $validator = Validator::make($requestData, [
             'date' => 'required|date'
         ]);
+
+        // Return validation errors if the validation fails
         if ($validator->fails()) {
-            return response()->json(['status' => 500, 'errors' => $validator->errors()]);
+            return response()->json([
+                'status' => 500,
+                'errors' => $validator->errors()
+            ]);
         }
-        $result = ShiftSale::select('shift_sale.id', 'shift_sale.start_time', 'shift_sale.end_time', 'products.name as product_name')
-            ->leftJoin('products', 'products.id', '=', 'shift_sale.product_id')
-            ->where('date', $requestData['date'])
+
+        // Get the current session user
+        $sessionUser = SessionUser::getUser();
+
+        // Parse the provided date into start and end timestamps for the whole day
+        $startDate = Carbon::parse($requestData['date'], SessionUser::TIMEZONE)->startOfDay();
+        $endDate = Carbon::parse($requestData['date'], SessionUser::TIMEZONE)->endOfDay();
+
+        // Query the ShiftTotal table for shifts within the specified date range and join with the products table
+        $result = ShiftTotal::select('shift_total.id', 'shift_total.start_date', 'shift_total.end_date', 'products.name as product_name')
+            ->leftJoin('products', 'products.id', '=', 'shift_total.product_id')
+            ->whereBetween('start_date', [$startDate, $endDate])
+            ->where('shift_total.client_company_id', $sessionUser['client_company_id'])
             ->get()
             ->toArray();
+
+        // Format the shift data
         foreach ($result as &$data) {
-            if (!empty($data['start_time']) && !empty($data['end_time'])) {
-                $data['name'] = $data['product_name']. ' ('.Helpers::formatDate($data['start_time'], FuelMatixDateTimeFormat::STANDARD_TIME).' - '.Helpers::formatDate($data['end_time'], FuelMatixDateTimeFormat::STANDARD_TIME).')';
+            if (!empty($data['start_date']) && !empty($data['end_date'])) {
+                $data['name'] = $data['product_name'] . ' (' . Helpers::formatDate($data['start_date'], FuelMatixDateTimeFormat::STANDARD_TIME) . ' - ' . Helpers::formatDate($data['end_date'], FuelMatixDateTimeFormat::STANDARD_TIME) . ')';
             } else {
-                $data['name'] = $data['product_name']. ' ('.Helpers::formatDate($data['start_time'], FuelMatixDateTimeFormat::STANDARD_TIME).' - Running)';
+                $data['name'] = $data['product_name'] . ' (' . Helpers::formatDate($data['start_date'], FuelMatixDateTimeFormat::STANDARD_TIME) . ' - Running)';
             }
         }
-        return response()->json(['status' => 200, 'data' => $result]);
+
+        // Return the formatted shift data as a JSON response
+        return response()->json([
+            'status' => 200,
+            'data' => $result
+        ]);
     }
 }

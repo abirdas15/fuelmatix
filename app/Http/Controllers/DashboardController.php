@@ -3,11 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Common\AccountCategory;
+use App\Common\FuelMatixStatus;
 use App\Helpers\SessionUser;
 use App\Models\Category;
 use App\Models\Invoice;
 use App\Models\ShiftSale;
+use App\Models\ShiftTotal;
 use App\Models\Transaction;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -34,23 +37,26 @@ class DashboardController extends Controller
     public static function getShiftSale(): array
     {
         $sessionUser = SessionUser::getUser();
-        $startDate = date("Y-m-d", strtotime("- 15 day"));
-        $endDate = date('Y-m-d');
-        $shiftSale = ShiftSale::select(DB::raw('SUM(consumption) as quantity'), DB::raw('SUM(amount) as amount'), 'date')
-            ->whereBetween('date',[$startDate, $endDate])
-            ->where('client_company_id', $sessionUser['client_company_id'])
-            ->groupBy('date')
+        $startDate = Carbon::now(SessionUser::TIMEZONE)->subDay(15);
+        $endDate = Carbon::now(SessionUser::TIMEZONE);
+        $shiftSale = ShiftTotal::select(DB::raw('SUM(shift_sale.consumption) as quantity'), DB::raw('SUM(shift_sale.amount) as amount'), 'start_date', DB::raw('DATE(start_date) as date'))
+            ->leftJoin('shift_sale', 'shift_total.id', '=', 'shift_sale.shift_id')
+            ->whereBetween('shift_total.start_date',[$startDate, $endDate])
+            ->where('shift_total.client_company_id', $sessionUser['client_company_id'])
+            ->where('shift_total.status', FuelMatixStatus::END)
+            ->groupBy(DB::raw('DATE(start_date)'))
             ->get()
             ->keyBy('date')
             ->toArray();
         $month = [];
         $amount = [];
         $quantity = [];
-        for($i = strtotime($startDate); $i <= strtotime($endDate); $i = $i + 86400) {
-            $month[] = date('d M', $i);
-            $date = date('Y-m-d', $i);
+        while ($startDate->lessThanOrEqualTo($endDate)) {
+            $month[] = $startDate->format('d M');
+            $date = $startDate->format('Y-m-d');
             $amount[] = isset($shiftSale[$date]) ? $shiftSale[$date]['amount'] : 0;
             $quantity[] = isset($shiftSale[$date]) ? $shiftSale[$date]['quantity'] : 0;
+            $startDate->addDay();
         }
         return [
             'month' => $month,

@@ -9,5 +9,5 @@ class FuelMatixDateTimeFormat
     const STANDARD_DATE_TIME = 'd/m/Y h:i A';
     const DATABASE_DATE_TIME = 'Y-m-d H:i:s';
     const ONLY_TIME = 'H:i:s';
-    const STANDARD_TIME = 'h:iA';
+    const STANDARD_TIME = 'h:i A';
 }

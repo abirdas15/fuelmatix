@@ -535,3 +535,13 @@ input[type=number] {
 button:disabled{
     opacity: .30;
 }
+.custom-bg {
+    background-color: #c8c8c8 !important;
+    padding: 10px;
+    .card-title {
+        color: #000000 !important;
+    }
+}
+.card-title {
+    color: #ffffff !important;
+}

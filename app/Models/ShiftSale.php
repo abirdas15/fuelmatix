@@ -15,4 +15,8 @@ class ShiftSale extends Model
     protected $hidden = [
         'user_id',
     ];
+    public function shift_summary()
+    {
+        return $this->hasMany(ShiftSummary::class, 'shift_sale_id', 'id');
+    }
 }

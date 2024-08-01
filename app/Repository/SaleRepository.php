@@ -23,10 +23,14 @@ class SaleRepository
         return true;
     }
     /**
-     * @param $inputData
-     * @return \Illuminate\Contracts\Validation\Validator
+     * Validate the advance payment input data.
+     *
+     * This method validates the given input data against the predefined rules for advance payments.
+     *
+     * @param array $inputData The input data to be validated.
+     * @return \Illuminate\Contracts\Validation\Validator The validator instance containing the validation rules and messages.
      */
-    public static function validateAdvancePayment($inputData): \Illuminate\Contracts\Validation\Validator
+    public static function validateAdvancePayment(array $inputData): \Illuminate\Contracts\Validation\Validator
     {
         return Validator::make($inputData, [
             'date' => 'required|date',
@@ -35,16 +39,21 @@ class SaleRepository
             'voucher_number' => 'required_if:payment_method,company|integer',
             'driver_sale.driver_id' => 'required'
         ],[
-            'voucher_number.required_if' => 'The voucher number filed is required.',
+            'voucher_number.required_if' => 'The voucher number field is required.',
             'driver_sale.driver_id.required' => 'The driver field is required.'
         ]);
     }
 
+
     /**
-     * @param $inputData
-     * @return \Illuminate\Contracts\Validation\Validator
+     * Validate the sale input data.
+     *
+     * This method validates the given input data against the predefined rules for sales.
+     *
+     * @param array $inputData The input data to be validated.
+     * @return \Illuminate\Contracts\Validation\Validator The validator instance containing the validation rules and messages.
      */
-    public static function validateSale($inputData): \Illuminate\Contracts\Validation\Validator
+    public static function validateSale(array $inputData): \Illuminate\Contracts\Validation\Validator
     {
         return Validator::make($inputData, [
             'date' => 'required|date',
@@ -63,18 +72,19 @@ class SaleRepository
             'products.*.price' => 'required',
             'products.*.subtotal' => 'required',
         ],[
-            'voucher_number.required_if' => 'The voucher number filed is required',
-            'driver_sale.driver_id.required_if' => 'The driver filed is required',
-            'driver_sale.price.required_if' => 'The amount filed is required',
+            'voucher_number.required_if' => 'The voucher number field is required.',
+            'driver_sale.driver_id.required_if' => 'The driver field is required.',
+            'driver_sale.price.required_if' => 'The amount field is required.',
             'products.*.shift_sale_id.required_if' => 'Shift sale is not started. Please start shift sale first.',
             'products.*.product_id.required' => 'The product field is required.',
-            'products.*.income_category_id.required' => 'Product is not a income category. Please update product first.',
-            'products.*.stock_category_id.required' => 'Product is not a stock category. Please update product first.',
-            'products.*.expense_category_id.required' => 'Product is not a expense category. Please update product first.',
+            'products.*.income_category_id.required' => 'Product is not an income category. Please update the product first.',
+            'products.*.stock_category_id.required' => 'Product is not a stock category. Please update the product first.',
+            'products.*.expense_category_id.required' => 'Product is not an expense category. Please update the product first.',
             'products.*.price.required' => 'The price field is required.',
             'products.*.subtotal.required' => 'The subtotal field is required.',
         ]);
     }
+
     /**
      * @param array $data
      * */

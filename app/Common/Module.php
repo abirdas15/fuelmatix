@@ -8,6 +8,7 @@ class Module
     const SHIFT_SALE = 'shift sale';
     const TANK_REFILL = 'tank refill';
     const PRODUCT = 'product';
+    const TANK = 'tank';
     const INVOICE  = 'invoice';
     const BALANCE_TRANSFER = 'balance transfer';
 

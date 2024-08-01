@@ -12,6 +12,8 @@ use App\Models\FuelAdjustment;
 use App\Models\FuelAdjustmentData;
 use App\Models\Product;
 use App\Models\ShiftSale;
+use App\Models\ShiftTotal;
+use App\Models\Tank;
 use App\Models\Transaction;
 use App\Repository\CategoryRepository;
 use Carbon\Carbon;
@@ -23,25 +25,34 @@ class FuelAdjustmentController extends Controller
 {
     /**
      * @param Request $request
-     * */
-    public function save(Request $request)
+     * @return JsonResponse
+     */
+    public function save(Request $request): JsonResponse
     {
         $requestData = $request->all();
         $validator = Validator::make($requestData, [
             'product_id' => 'required|integer',
+            'tank_id' => 'required|integer',
             'purpose' => 'required|string',
             'loss_quantity' => 'required|numeric'
         ]);
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
+        $tank = Tank::where('id', $requestData['tank_id'])->first();
+        if (!$tank instanceof Tank) {
+            return response()->json(['status' => 404, 'message' => 'Tank cannot be found.']);
+        }
         $product = Product::find($requestData['product_id']);
         if (!$product instanceof Product) {
             return response()->json(['status' => 400, 'message' => 'Cannot find [product]']);
         }
         $sessionUser = SessionUser::getUser();
-        $shiftSale = ShiftSale::where('client_company_id', $sessionUser['client_company_id'])->where('product_id', $requestData['product_id'])->where('status', 'start')->first();
-        if (!$shiftSale instanceof ShiftSale) {
+        $shiftSale = ShiftTotal::where('client_company_id', $sessionUser['client_company_id'])
+            ->where('product_id', $requestData['product_id'])
+            ->where('status', 'start')
+            ->first();
+        if (!$shiftSale instanceof ShiftTotal) {
             return response()->json(['status' => 400, 'message' => 'Please start shift sale first.']);
         }
 
@@ -71,18 +82,18 @@ class FuelAdjustmentController extends Controller
             }
             $categoryId = $incomeCategory['id'];
         }
-        $stockCategory = Category::where('slug', strtolower(AccountCategory::STOCK_IN_HAND))->where('client_company_id', $sessionUser['client_company_id'])->first();
+        $stockCategory = Category::where('module', Module::TANK)
+            ->where('module_id', $requestData['tank_id'])
+            ->where('client_company_id', $sessionUser['client_company_id'])
+            ->first();
         if (!$stockCategory instanceof Category) {
-            return response()->json(['status' => 400, 'message' => 'Cannot find [stock] category.'], 422);
-        }
-        $stockProduct = Category::where('parent_category', $stockCategory['id'])->where('module', Module::PRODUCT)->where('module_id', $product['id'])->first();
-        if (!$stockProduct instanceof Category) {
-            $stockProduct = CategoryRepository::saveCategory($categoryData, $stockCategory['id'], Module::PRODUCT);
+            return response()->json(['status' => 400, 'message' => 'Cannot find [tank] category.']);
         }
 
         $fuelAdjustmentModel = new FuelAdjustment();
-        $fuelAdjustmentModel->date = Carbon::now('UTC');
+        $fuelAdjustmentModel->date = Carbon::now(SessionUser::TIMEZONE);
         $fuelAdjustmentModel->product_id = $requestData['product_id'];
+        $fuelAdjustmentModel->tank_id = $requestData['tank_id'];
         $fuelAdjustmentModel->purpose = $requestData['purpose'];
         $fuelAdjustmentModel->loss_quantity = $requestData['loss_quantity'];
         $fuelAdjustmentModel->loss_amount = $requestData['loss_quantity'] * $product['buying_price'];
@@ -117,7 +128,7 @@ class FuelAdjustmentController extends Controller
         }
         FuelAdjustmentData::insert($fuelAdjustmentData);
         $transactionData['transaction'] = [
-            ['date' => date('Y-m-d'), 'account_id' => $stockProduct['id'], 'debit_amount' => $fuelAdjustmentModel['loss_amount'] > 0 ? $fuelAdjustmentModel['loss_amount'] : 0, 'credit_amount' => $fuelAdjustmentModel['loss_amount'] < 0 ? abs($fuelAdjustmentModel['loss_amount']) : 0, 'module' => Module::FUEL_ADJUSTMENT, 'module_id' => $fuelAdjustmentModel['id']]
+            ['date' => date('Y-m-d'), 'account_id' => $stockCategory['id'], 'debit_amount' => $fuelAdjustmentModel['loss_amount'] > 0 ? $fuelAdjustmentModel['loss_amount'] : 0, 'credit_amount' => $fuelAdjustmentModel['loss_amount'] < 0 ? abs($fuelAdjustmentModel['loss_amount']) : 0, 'module' => Module::FUEL_ADJUSTMENT, 'module_id' => $fuelAdjustmentModel['id']]
         ];
         $transactionData['linked_id'] = $categoryId;
         TransactionController::saveTransaction($transactionData);
@@ -134,8 +145,9 @@ class FuelAdjustmentController extends Controller
         $limit = $requestData['limit'] ?? 10;
         $sessionUser = SessionUser::getUser();
         $keyword = $requestData['keyword'] ?? '';
-        $result = FuelAdjustment::select('fuel_adjustment.id', 'fuel_adjustment.date', 'fuel_adjustment.purpose', 'fuel_adjustment.loss_quantity', 'fuel_adjustment.loss_amount', 'products.name', 'users.name as user_name')
+        $result = FuelAdjustment::select('fuel_adjustment.id', 'fuel_adjustment.date', 'tank.tank_name', 'fuel_adjustment.purpose', 'fuel_adjustment.loss_quantity', 'fuel_adjustment.loss_amount', 'products.name', 'users.name as user_name')
             ->leftJoin('products', 'products.id', '=', 'fuel_adjustment.product_id')
+            ->leftJoin('tank', 'tank.id', '=', 'fuel_adjustment.tank_id')
             ->leftJoin('users', 'users.id', '=', 'fuel_adjustment.user_id')
             ->where('fuel_adjustment.client_company_id', $sessionUser['client_company_id'])
             ->orderBy('id', 'DESC')
@@ -164,9 +176,10 @@ class FuelAdjustmentController extends Controller
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
-        $result = FuelAdjustment::select('fuel_adjustment.id', 'fuel_adjustment.product_id', 'fuel_adjustment.purpose', 'products.name as product_name', 'fuel_adjustment.loss_quantity', 'fuel_adjustment.date')
+        $result = FuelAdjustment::select('fuel_adjustment.id', 'tank.tank_name', 'fuel_adjustment.product_id', 'fuel_adjustment.purpose', 'products.name as product_name', 'fuel_adjustment.loss_quantity', 'fuel_adjustment.date')
             ->where('fuel_adjustment.id', $requestData['id'])
             ->leftJoin('products', 'products.id', '=', 'fuel_adjustment.product_id')
+            ->leftJoin('tank', 'tank.id', '=', 'fuel_adjustment.tank_id')
             ->first();
         $result['date_format'] = date('d/m/Y h:i A', strtotime($result['date']));
         $fuelAdjustmentData = FuelAdjustmentData::select('fuel_adjustment_data.*', 'nozzles.name as nozzle_name', 'tank.tank_name')

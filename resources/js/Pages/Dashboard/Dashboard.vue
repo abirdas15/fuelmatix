@@ -51,10 +51,10 @@
                                         <svg style="position: absolute; left: 0" width="100%" height="100%" version="1.1" xmlns="http://www.w3.org/2000/svg" class="wave"><defs></defs><path :id="'water'+i"d=""/></svg>
                                     </div>
                                     <div class="fuel-vol" :style="{top: calculateTop(f)}">
-                                        <div class="vol fw-bold">{{f.last_reading?.volume != null ? f.last_reading?.volume : 'N/A'}} Liter</div>
+                                        <div class="vol fw-bold">{{f.last_reading?.volume != null ? parseFloat(f.last_reading?.volume).toFixed(2) : 'N/A'}} Liter</div>
                                     </div>
                                     <div class="fuel-vol-right" :style="{top: calculateTop(f)}">
-                                        <div class="vol fw-bold">{{f.last_reading?.height != null ? f.last_reading?.height : 'N/A'}} mm</div>
+                                        <div class="vol fw-bold">{{f.last_reading?.height != null ? parseFloat(f.last_reading?.height).toFixed(2) : 'N/A'}} mm</div>
                                     </div>
                                 </div>
 
