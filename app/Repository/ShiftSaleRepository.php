@@ -322,7 +322,7 @@ class ShiftSaleRepository
                     $transactionData = [];
                     $transactionData['linked_id'] = $linkedId;
                     $transactionData['transaction'] = [
-                        ['date' => date('Y-m-d', strtotime($initialData['date'])), 'account_id' => $costOfGoodSoldCategory['id'], 'debit_amount' => 0, 'credit_amount' => $buyingPrice, 'module' => 'shift sale', 'module_id' => $shiftSale->id]
+                        ['date' => date('Y-m-d', strtotime($initialData['date'])), 'account_id' => $costOfGoodSoldCategory['id'], 'debit_amount' => 0, 'credit_amount' => $buyingPrice, 'module' => 'shift sale', 'module_id' => $shiftTotal->id]
                     ];
                     TransactionController::saveTransaction($transactionData);
                 }
@@ -334,7 +334,7 @@ class ShiftSaleRepository
         foreach ($initialData['categories'] as $category) {
             $transactionData['linked_id'] = $incomeCategory['id'];
             $transactionData['transaction'] = [
-                ['date' => date('Y-m-d', strtotime($initialData['date'])), 'account_id' => $category['category_id'], 'debit_amount' => 0, 'credit_amount' => $category['amount'], 'module' => 'shift sale', 'module_id' => $shiftSale->id]
+                ['date' => date('Y-m-d', strtotime($initialData['date'])), 'account_id' => $category['category_id'], 'debit_amount' => 0, 'credit_amount' => $category['amount'], 'module' => 'shift sale', 'module_id' => $shiftTotal->id]
             ];
             TransactionController::saveTransaction($transactionData);
             $shiftSaleTransaction[] = [

@@ -440,7 +440,7 @@ class SaleController extends Controller
                 $data['car_number'] = '';
                 $data['voucher_no'] = '';
             } else {
-                $data['created_at'] = Helpers::formatDate($data['created_at'], FuelMatixDateTimeFormat::STANDARD_DATE_TIME);
+                $data['created_at'] = !empty($data['created_at']) ? Helpers::formatDate($data['created_at'], FuelMatixDateTimeFormat::STANDARD_DATE_TIME) : '';
             }
             $data['amount_format'] = number_format($data['amount'], 2);
         }

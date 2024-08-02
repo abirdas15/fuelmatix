@@ -14,6 +14,7 @@ use App\Models\InvoiceItem;
 use App\Models\Sale;
 use App\Models\SaleData;
 use App\Models\ShiftSale;
+use App\Models\ShiftTotal;
 use App\Models\Transaction;
 use App\Repository\CategoryRepository;
 use App\Repository\InvoiceRepository;
@@ -63,11 +64,12 @@ class InvoiceController extends Controller
                         $invoiceItem[] = $sale;
                     }
                 } else if ($row['module'] == Module::SHIFT_SALE) {
-                    $shiftSale = ShiftSale::select('shift_sale.product_id', 'products.selling_price as price', 'shift_sale.date')
-                        ->leftJoin('products', 'products.id', '=', 'shift_sale.product_id')
-                        ->where('shift_sale.id', $row['module_id'])
+                    $shiftSale = ShiftTotal::select('shift_sale.product_id', 'products.selling_price as price', 'shift_sale.date')
+                        ->leftJoin('shift_sale', 'shift_total.id', 'shift_sale.shift_id')
+                        ->leftJoin('products', 'products.id', '=', 'shift_total.product_id')
+                        ->where('shift_total.id', $row['module_id'])
                         ->first();
-                    if ($shiftSale instanceof ShiftSale) {
+                    if ($shiftSale instanceof ShiftTotal) {
                         $shiftSale['quantity'] = $row['amount'] / $shiftSale['price'];
                         $shiftSale['subtotal'] = $row['amount'];
                         $shiftSale['transaction_id'] = $row['id'];
@@ -78,7 +80,7 @@ class InvoiceController extends Controller
             }
             $invoice = new Invoice();
             $invoice->invoice_number = Invoice::getInvoiceNumber();
-            $invoice->date = Carbon::now();
+            $invoice->date = Carbon::now(SessionUser::TIMEZONE);
             $invoice->category_id = $key;
             $invoice->amount = array_sum(array_column($transaction, 'amount'));
             $invoice->status = 'due';

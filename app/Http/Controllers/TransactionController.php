@@ -300,6 +300,7 @@ class TransactionController extends Controller
                 'parent_id' => $transaction['parent_id'],
                 'car_id' => $carId,
                 'voucher_no' => $data['voucher_number'],
+                'created_at' => Carbon::parse($transaction['date']. date(' H:i:s'), SessionUser::TIMEZONE),
             ];
         }
         Transaction::insert($transactionData);
