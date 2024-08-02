@@ -7,10 +7,8 @@ use App\Common\FuelMatixDateTimeFormat;
 use App\Helpers\Helpers;
 use App\Helpers\SessionUser;
 use App\Models\Category;
-use App\Models\Dispenser;
 use App\Models\Product;
 use App\Models\ShiftSale;
-use App\Models\ShiftSaleTransaction;
 use App\Models\ShiftSummary;
 use App\Models\ShiftTotal;
 use App\Models\User;
@@ -83,6 +81,10 @@ class ShiftSaleController extends Controller
 
         // Retrieve the shift sale from the database using shift_id from the input data
         $shiftTotal = ShiftTotal::where('id', $inputData['shift_id'])->first();
+
+        if ($request->input('status') ==  'previous') {
+            $shiftTotal = new ShiftTotal();
+        }
 
         // If the shift sale is not found, return an error response
         if (!$shiftTotal instanceof ShiftTotal) {
@@ -266,7 +268,8 @@ class ShiftSaleController extends Controller
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
-        ShiftSale::where('id', $inputData['id'])->delete();
+        ShiftTotal::where('id', $inputData['id'])->delete();
+        ShiftSale::where('shift_id', $inputData['id'])->delete();
         ShiftSummary::where('shift_sale_id', $inputData['id'])->delete();
         return response()->json(['status' => 200, 'message' => 'Successfully deleted shift sale.']);
     }

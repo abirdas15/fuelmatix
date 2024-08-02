@@ -15,7 +15,7 @@
                         <div class="card-header">
                             <h4 class="card-title">Shift Sale</h4>
                         </div>
-                        <form @submit.prevent="save">
+                        <form @submit.prevent="submit">
                             <div class="card-body">
                                 <div class="row align-items-center">
                                     <div class="col-4">
@@ -35,201 +35,209 @@
 
                                 <div class="process-wrapper">
                                     <div id="progress-content-section" v-if="listDispenser">
-                                        <div class="row">
-                                            <div class="col-sm-12 text-end">
-                                                <div class="form-check d-flex justify-content-end">
-                                                    <input class="form-check-input" type="checkbox" v-model="noDIPShow" value="" id="flexCheckChecked" :checked="noDIPShow">
-                                                    <label class="form-check-label" for="flexCheckChecked">
-                                                        No DIP Reading
-                                                    </label>
-                                                </div>
-                                            </div>
-                                        </div>
                                         <div class="section-content discovery active">
-                                            <template v-if="listDispenser.tank == 1 && !noDIPShow">
-                                                <div class="card">
+                                            <template v-if="listDispenser">
+                                                <div class="card" v-for="(tank,tankIndex) in listDispenser.tanks">
                                                     <div class="card-header">
-                                                        <h5 class="card-title">
-                                                            {{ listDispenser?.product_name }}</h5>
+                                                        <h5 class="card-title w-100">
+                                                            <div class="row">
+                                                                <div class="col-md-6"> Tank: {{ tank.tank_name }}</div>
+                                                                <div class="col-md-6 float-end">
+                                                                    <div class="form-check d-flex justify-content-end">
+                                                                        <input class="form-check-input" type="checkbox" v-model="tank.noDIPShow" value="" :id="tank.id">
+                                                                        <label class="form-check-label" :for="tank.id">
+                                                                            No DIP Reading
+                                                                        </label>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </h5>
                                                     </div>
                                                     <div class="card-body">
-                                                        <div class="row align-items-center text-start">
-                                                            <div class="col-md-2">
-                                                                <label class="form-label">
-                                                                    <p class="m-0">OIL Stock </p>
-                                                                </label>
+                                                        <div class="section-content discovery active">
+                                                            <template v-if="listDispenser.tank === '1' && !tank.noDIPShow">
+                                                                <div class="card">
+                                                                    <div class="card-body">
+                                                                        <div class="row align-items-center text-start">
+                                                                            <div class="col-md-2">
+                                                                                <label class="form-label">
+                                                                                    <p class="m-0">OIL Stock </p>
+                                                                                </label>
 
-                                                            </div>
-                                                            <div class="mb-3 col-md-2">
-                                                                <label>Start Reading </label>
-                                                            </div>
-                                                            <div class="mb-3 col-md-2">
-                                                                <label>Tank Refill </label>
-                                                            </div>
-                                                            <div class="mb-3 col-md-2">
-                                                                <label>End Reading </label>
-                                                            </div>
-                                                            <div class="mb-3 col-md-2">
-                                                                <label>Adjustment </label>
-                                                            </div>
-                                                            <div class="mb-3 col-md-2">
-                                                                <label>Consumption </label>
-                                                            </div>
-                                                            <div class="col-md-2 offset-2 mb-3">
-                                                                <div class="input-group">
-                                                                    <input disabled id="prReading"
-                                                                           type="text" class="form-control"
-                                                                           v-model="listDispenser.start_reading_mm">
-                                                                    <div class="input-group-append">
-                                                                        <span class="input-group-text" >mm</span>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="mb-3 col-md-2"></div>
-                                                            <div class="mb-3 col-md-2" v-if="listDispenser.status == 'end'">
-                                                                <div class="input-group">
-                                                                    <input id="prReading"
-                                                                           type="text" class="form-control text-end"
-                                                                           v-model="listDispenser.end_reading_mm">
-                                                                    <div class="input-group-append">
-                                                                        <span class="input-group-text" >mm</span>
-                                                                    </div>
-                                                                </div>
+                                                                            </div>
+                                                                            <div class="mb-3 col-md-2">
+                                                                                <label>Start Reading </label>
+                                                                            </div>
+                                                                            <div class="mb-3 col-md-2">
+                                                                                <label>Tank Refill </label>
+                                                                            </div>
+                                                                            <div class="mb-3 col-md-2">
+                                                                                <label>End Reading </label>
+                                                                            </div>
+                                                                            <div class="mb-3 col-md-2">
+                                                                                <label>Adjustment </label>
+                                                                            </div>
+                                                                            <div class="mb-3 col-md-2">
+                                                                                <label>Consumption </label>
+                                                                            </div>
+                                                                            <div class="col-md-2 offset-2 mb-3">
+                                                                                <div class="input-group">
+                                                                                    <input disabled id="prReading"
+                                                                                           type="text" class="form-control"
+                                                                                           v-model="tank.start_reading_mm">
+                                                                                    <div class="input-group-append">
+                                                                                        <span class="input-group-text" >mm</span>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="mb-3 col-md-2"></div>
+                                                                            <div class="mb-3 col-md-2" v-if="listDispenser.status === 'previous'">
+                                                                                <div class="input-group">
+                                                                                    <input id="prReading"
+                                                                                           type="text" class="form-control text-end"
+                                                                                           v-model="tank.end_reading_mm" @input="getReading($event, 'end_reading', tankIndex, tank.id)">
+                                                                                    <div class="input-group-append">
+                                                                                        <span class="input-group-text" >mm</span>
+                                                                                    </div>
+                                                                                </div>
 
-                                                            </div>
-                                                            <div class="mb-3 col-md-2"></div>
-                                                            <div class="mb-3 col-md-2"></div>
-                                                            <div class="mb-3 col-md-2 offset-2">
-                                                                <div class="input-group">
-                                                                    <input disabled id="prReading"
-                                                                           type="text" class="form-control"
-                                                                           v-model="listDispenser.start_reading">
-                                                                    <div class="input-group-append">
-                                                                        <span class="input-group-text" >{{ listDispenser.unit }}</span>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="mb-3 col-md-2" v-if="listDispenser.status == 'end'">
-                                                                <div class="input-group">
-                                                                    <input type="text" class="form-control"  disabled
-                                                                           v-model="listDispenser.tank_refill">
-                                                                    <div class="input-group-append">
-                                                                        <span class="input-group-text" >{{ listDispenser.unit }}</span>
-                                                                    </div>
-                                                                </div>
+                                                                            </div>
+                                                                            <div class="mb-3 col-md-2"></div>
+                                                                            <div class="mb-3 col-md-2"></div>
+                                                                            <div class="mb-3 col-md-2 offset-2">
+                                                                                <div class="input-group">
+                                                                                    <input disabled id="prReading"
+                                                                                           type="text" class="form-control"
+                                                                                           v-model="tank.start_reading">
+                                                                                    <div class="input-group-append">
+                                                                                        <span class="input-group-text" >{{ listDispenser.unit }}</span>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="mb-3 col-md-2" v-if="listDispenser.status === 'previous'">
+                                                                                <div class="input-group">
+                                                                                    <input type="text" class="form-control"  disabled
+                                                                                           v-model="tank.tank_refill">
+                                                                                    <div class="input-group-append">
+                                                                                        <span class="input-group-text" >{{ listDispenser.unit }}</span>
+                                                                                    </div>
+                                                                                </div>
 
-                                                            </div>
-                                                            <div class="mb-3 col-md-2" v-if="listDispenser.status == 'end'">
-                                                                <div class="input-group">
-                                                                    <input id="frReading" disabled
-                                                                           type="text" class="form-control"
-                                                                           v-model="listDispenser.end_reading">
-                                                                    <div class="input-group-append">
-                                                                        <span class="input-group-text" >Liter</span>
+                                                                            </div>
+                                                                            <div class="mb-3 col-md-2" v-if="listDispenser.status === 'previous'">
+                                                                                <div class="input-group">
+                                                                                    <input id="frReading" disabled
+                                                                                           type="text" class="form-control"
+                                                                                           v-model="tank.end_reading">
+                                                                                    <div class="input-group-append">
+                                                                                        <span class="input-group-text" >Liter</span>
+                                                                                    </div>
+                                                                                </div>
+
+                                                                                <!--                                                            <input class="form-control" value="0" v-if="listDispenser.status == 'start'" disabled>-->
+                                                                            </div>
+                                                                            <div class="mb-3 col-md-2" v-if="listDispenser.status === 'previous'">
+                                                                                <div class="input-group">
+                                                                                    <input id="frReading" @blur="disableInput('frReading')" v-if="listDispenser.status === 'previous'"
+                                                                                           type="text" class="form-control" disabled
+                                                                                           v-model="tank.adjustment"
+                                                                                           @input="calculateAmount(tankIndex)">
+                                                                                    <div class="input-group-append">
+                                                                                        <span class="input-group-text" >{{ listDispenser.unit }}</span>
+                                                                                    </div>
+                                                                                </div>
+
+                                                                                <!--                                                            <input class="form-control" value="0" v-if="listDispenser.status == 'start'" disabled>-->
+                                                                            </div>
+
+                                                                            <div class="mb-3 col-md-2" v-if="listDispenser.status === 'previous'">
+                                                                                <div class="input-group">
+                                                                                    <input type="text" class="form-control" id="consumption" disabled  v-if="listDispenser.status === 'previous'"
+                                                                                           v-model="tank.consumption">
+                                                                                    <div class="input-group-append">
+                                                                                        <span class="input-group-text" >Liter</span>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <!--                                                            <input class="form-control" value="0" v-if="listDispenser.status == 'start'" disabled>-->
+                                                                            </div>
+                                                                        </div>
                                                                     </div>
                                                                 </div>
+                                                            </template>
+                                                            <div v-if="tank.dispensers.length > 0" v-for="(d, dIndex) in tank.dispensers">
+                                                                <div class="custom-bg">
+                                                                    <h5 class="card-title">Dispenser: {{ d.dispenser_name }}</h5>
+                                                                </div>
+                                                                <div class="card-body" v-if="d.nozzle.length > 0">
+                                                                    <div class="row align-items-center text-start" v-for="(n, nIndex) in d.nozzle">
+                                                                        <div class=" col-md-2">
+                                                                            <label class="form-label">
+                                                                                <p class="m-0">{{ n.name }}</p>
+                                                                            </label>
+                                                                        </div>
+                                                                        <div class="mb-3 col-md-2">
+                                                                            <label>Start Reading </label>
+                                                                            <div class="input-group">
+                                                                                <input type="text" class="form-control" disabled
+                                                                                       v-model="n.start_reading">
+                                                                                <div class="input-group-append">
+                                                                                    <span class="input-group-text" >{{ listDispenser.unit }}</span>
+                                                                                </div>
+                                                                            </div>
 
-                                                                <!--                                                            <input class="form-control" value="0" v-if="listDispenser.status == 'start'" disabled>-->
-                                                            </div>
-                                                            <div class="mb-3 col-md-2" v-if="listDispenser.status == 'end'">
-                                                                <div class="input-group">
-                                                                    <input id="frReading" @blur="disableInput('frReading')" v-if="listDispenser.status == 'end'"
-                                                                           type="text" class="form-control" disabled
-                                                                           v-model="listDispenser.adjustment"
-                                                                           @input="calculateAmount">
-                                                                    <div class="input-group-append">
-                                                                        <span class="input-group-text" >{{ listDispenser.unit }}</span>
+                                                                        </div>
+                                                                        <div class="mb-3 col-md-2"  v-if="listDispenser.status === 'previous'">
+                                                                            <label>End Reading </label>
+                                                                            <div class="input-group">
+                                                                                <input type="text" class="form-control text-end" @blur="disableInput('frReading'+nIndex+dIndex)"
+                                                                                       v-if="listDispenser.status === 'previous'"
+                                                                                       v-model="n.end_reading" @click="enableInput('frReading'+nIndex+dIndex)"
+                                                                                       @input="calculateAmountNozzle(dIndex, nIndex, tankIndex) ">
+                                                                                <div class="input-group-append">
+                                                                                    <span class="input-group-text" >{{ listDispenser.unit }}</span>
+                                                                                </div>
+                                                                            </div>
+
+                                                                            <!--                                                            <input class="form-control" value="0" v-if="listDispenser.status == 'start'" disabled>-->
+                                                                        </div>
+                                                                        <div class="mb-3 col-md-2" v-if="listDispenser.status === 'previous'">
+                                                                            <label>Adjustment </label>
+                                                                            <div class="input-group">
+                                                                                <input type="text" class="form-control text-end" @blur="disableInput('frReading'+nIndex+dIndex)"
+                                                                                       v-if="listDispenser.status === 'previous'"
+                                                                                       v-model="n.adjustment"
+                                                                                       @input="calculateAmountNozzle(dIndex, nIndex, tankIndex) " disabled>
+                                                                                <div class="input-group-append">
+                                                                                    <span class="input-group-text" >{{ listDispenser.unit }}</span>
+                                                                                </div>
+                                                                            </div>
+                                                                            <!--                                                            <input class="form-control" value="0" v-if="listDispenser.status == 'start'" disabled>-->
+                                                                        </div>
+
+                                                                        <div class="mb-3 col-md-2"  v-if="listDispenser.status === 'previous' && n.pf != null && n.pf != ''">
+                                                                            <label class="text-center">PF </label>
+                                                                            <input type="text" disabled class="form-control" v-model="n.pf">
+                                                                        </div>
+                                                                        <div class="col-md-2 mb-3" v-else></div>
+                                                                        <div class="mb-3 col-md-2"  v-if="listDispenser.status === 'previous'">
+                                                                            <label>Consumption </label>
+                                                                            <div class="input-group">
+                                                                                <input type="text" disabled class="form-control"
+                                                                                       v-model="n.consumption">
+                                                                                <div class="input-group-append">
+                                                                                    <span class="input-group-text" >{{ listDispenser.unit }}</span>
+                                                                                </div>
+                                                                            </div>
+
+                                                                            <!--                                                            <input class="form-control" value="0" v-if="listDispenser.status == 'start'" disabled>-->
+                                                                        </div>
                                                                     </div>
                                                                 </div>
-
-                                                                <!--                                                            <input class="form-control" value="0" v-if="listDispenser.status == 'start'" disabled>-->
-                                                            </div>
-
-                                                            <div class="mb-3 col-md-2" v-if="listDispenser.status == 'end'">
-                                                                <div class="input-group">
-                                                                    <input type="text" class="form-control" id="consumption" disabled  v-if="listDispenser.status == 'end'"
-                                                                           v-model="listDispenser.consumption">
-                                                                    <div class="input-group-append">
-                                                                        <span class="input-group-text" >Liter</span>
-                                                                    </div>
-                                                                </div>
-                                                                <!--                                                            <input class="form-control" value="0" v-if="listDispenser.status == 'start'" disabled>-->
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </template>
-                                            <div class="card" v-if="listDispenser.dispensers.length > 0"
-                                                 v-for="(d, dIndex) in listDispenser.dispensers">
-                                                <div class="card-header">
-                                                    <h5 class="card-title">{{ d.dispenser_name }}</h5>
-                                                </div>
-                                                <div class="card-body" v-if="d.nozzle.length > 0">
-                                                    <div class="row align-items-center text-start" v-for="(n, nIndex) in d.nozzle">
-                                                        <div class=" col-md-2">
-                                                            <label class="form-label">
-                                                                <p class="m-0">{{ n.name }}</p>
-                                                            </label>
-                                                        </div>
-                                                        <div class="mb-3 col-md-2">
-                                                            <label>Start Reading </label>
-                                                            <div class="input-group">
-                                                                <input type="text" class="form-control" disabled
-                                                                       v-model="n.start_reading">
-                                                                <div class="input-group-append">
-                                                                    <span class="input-group-text" >{{ listDispenser.unit }}</span>
-                                                                </div>
-                                                            </div>
-
-                                                        </div>
-                                                        <div class="mb-3 col-md-2"  v-if="listDispenser.status == 'end'">
-                                                            <label>End Reading </label>
-                                                            <div class="input-group">
-                                                                <input type="text" class="form-control text-end" @blur="disableInput('frReading'+nIndex+dIndex)"
-                                                                       v-if="listDispenser.status == 'end'"
-                                                                       v-model="n.end_reading" @click="enableInput('frReading'+nIndex+dIndex)"
-                                                                       @input="calculateAmountNozzle(dIndex, nIndex) ">
-                                                                <div class="input-group-append">
-                                                                    <span class="input-group-text" >{{ listDispenser.unit }}</span>
-                                                                </div>
-                                                            </div>
-
-                                                            <!--                                                            <input class="form-control" value="0" v-if="listDispenser.status == 'start'" disabled>-->
-                                                        </div>
-                                                        <div class="mb-3 col-md-2" v-if="listDispenser.status == 'end'">
-                                                            <label>Adjustment </label>
-                                                            <div class="input-group">
-                                                                <input type="text" class="form-control text-end" @blur="disableInput('frReading'+nIndex+dIndex)"
-                                                                       v-if="listDispenser.status == 'end'"
-                                                                       v-model="n.adjustment"
-                                                                       @input="calculateAmountNozzle(dIndex, nIndex) " disabled>
-                                                                <div class="input-group-append">
-                                                                    <span class="input-group-text" >{{ listDispenser.unit }}</span>
-                                                                </div>
-                                                            </div>
-                                                            <!--                                                            <input class="form-control" value="0" v-if="listDispenser.status == 'start'" disabled>-->
-                                                        </div>
-
-                                                        <div class="mb-3 col-md-2"  v-if="listDispenser.status == 'end' && n.pf != null && n.pf != ''">
-                                                            <label class="text-center">PF </label>
-                                                            <input type="text" disabled class="form-control" v-model="n.pf">
-                                                        </div>
-                                                        <div class="col-md-2 mb-3" v-else></div>
-                                                        <div class="mb-3 col-md-2"  v-if="listDispenser.status == 'end'">
-                                                            <label>Consumption </label>
-                                                            <div class="input-group">
-                                                                <input type="text" disabled class="form-control"
-                                                                       v-model="n.consumption">
-                                                                <div class="input-group-append">
-                                                                    <span class="input-group-text" >{{ listDispenser.unit }}</span>
-                                                                </div>
-                                                            </div>
-
-                                                            <!--                                                            <input class="form-control" value="0" v-if="listDispenser.status == 'start'" disabled>-->
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
                                             <template v-if="listDispenser.status != 'start'">
                                                 <div class="row">
                                                     <div class="col-sm-7"></div>
@@ -328,8 +336,7 @@
 
                                     </div>
                                     <div class="mb-3 col-md-6">
-                                        <button type="submit" class="btn btn-primary" v-if="!loading && listDispenser?.status == 'start'">Start</button>
-                                        <button type="submit" class="btn btn-primary" v-if="!loading && listDispenser?.status == 'end'">Submit</button>
+                                        <button type="submit" class="btn btn-primary">Submit</button>
                                         <button type="button" class="btn btn-primary" v-if="loading">Submitting...</button>
                                     </div>
                                 </div>
@@ -392,18 +399,22 @@ export default {
         }
     },
     methods: {
+        getReading: function(event, field, index, tank_id) {
+            this.getBstiChart(event.target.value, field, index, tank_id);
+        },
+        getBstiChart: function(height, field, index, tank_id) {
+            ApiService.POST(ApiRoutes.TankGetVolume, {tank_id: tank_id, height: height}, res => {
+                if (parseInt(res.status) === 200) {
+                    this.listDispenser.tanks[index][field] =  res.data;
+                    this.calculateAmount(index);
+                }
+            });
+        },
         getDispenser: function () {
             if (this.date != '' && this.product_id != '') {
                 this.getProductDispenser()
                 this.getBstiChart();
             }
-        },
-        getBstiChart: function(height) {
-            ApiService.POST(ApiRoutes.TankGetVolume, {product_id: this.product_id, height: height}, res => {
-                if (parseInt(res.status) === 200) {
-                    this.listDispenser.end_reading =  res.data;
-                }
-            });
         },
         updateOilStock: function() {
             if (this.listData.length > 0) {
@@ -461,14 +472,16 @@ export default {
         getTotalSale: function () {
             this.totalSale = 0
             this.totalAmount = 0
-            this.listDispenser.dispensers.map((dispenser) => {
-                dispenser.nozzle.map((nozzle) => {
-                    this.totalSale += nozzle.consumption
-                    if (nozzle.end_reading > 0) {
-                        this.totalAmount += nozzle.amount
-                    }
+            this.listDispenser.tanks.map((tank) => {
+                tank.dispensers.map((dispenser) => {
+                    dispenser.nozzle.map((nozzle) => {
+                        this.totalSale += nozzle.consumption
+                        if (nozzle.end_reading > 0) {
+                            this.totalAmount += nozzle.amount
+                        }
+                    })
                 })
-            })
+            });
             this.totalSale < 0 ? this.totalSale = 0 : this.totalSale;
             this.totalSale < 0 ? this.totalAmount = 0 : this.totalAmount;
         },
@@ -483,25 +496,25 @@ export default {
             let eachProgress = Math.round(progress / (this.listData?.length - 1))
             return (eachProgress * this.productIndex)
         },
-        calculateAmount: function () {
-            this.listDispenser.consumption = parseFloat(this.listDispenser.start_reading) + parseFloat(this.listDispenser.tank_refill) - parseFloat(this.listDispenser.end_reading) + parseFloat(this.listDispenser.adjustment)
-            this.listDispenser.amount = parseFloat(this.listDispenser.consumption ) * parseFloat(this.listDispenser.selling_price)
+        calculateAmount: function (tankIndex) {
+            this.listDispenser.tanks[tankIndex]['consumption'] = parseFloat(this.listDispenser.tanks[tankIndex]['start_reading']) + parseFloat(this.listDispenser.tanks[tankIndex]['tank_refill']) - parseFloat(this.listDispenser.tanks[tankIndex]['end_reading']) + parseFloat(this.listDispenser.tanks[tankIndex]['adjustment'])
+            this.listDispenser.amount = parseFloat(this.listDispenser.tanks[tankIndex].consumption ) * parseFloat(this.listDispenser.selling_price)
         },
-        calculateAmountNozzle: function (dIndex, nIndex) {
-            if (this.isNumeric(this.listDispenser.dispensers[dIndex].nozzle[nIndex].end_reading)) {
+        calculateAmountNozzle: function (dIndex, nIndex, tankIndex) {
+            if (this.isNumeric(this.listDispenser.tanks[tankIndex].dispensers[dIndex].nozzle[nIndex].end_reading)) {
                 let pf = 1;
-                if (this.listDispenser.dispensers[dIndex].nozzle[nIndex].pf != null && this.listDispenser.dispensers[dIndex].nozzle[nIndex].pf != '') {
-                    pf = this.listDispenser.dispensers[dIndex].nozzle[nIndex].pf;
+                if (this.listDispenser.tanks[tankIndex].dispensers[dIndex].nozzle[nIndex].pf != null && this.listDispenser.tanks[tankIndex].dispensers[dIndex].nozzle[nIndex].pf !== '') {
+                    pf = this.listDispenser.tanks[tankIndex].dispensers[dIndex].nozzle[nIndex].pf;
                 }
-                if (parseFloat(this.listDispenser.dispensers[dIndex].nozzle[nIndex].end_reading) < parseFloat(this.listDispenser.dispensers[dIndex].nozzle[nIndex].start_reading)) {
-                    this.listDispenser.dispensers[dIndex].nozzle[nIndex].consumption = (parseFloat(this.listDispenser.dispensers[dIndex].nozzle[nIndex].max_value) - parseFloat(this.listDispenser.dispensers[dIndex].nozzle[nIndex].start_reading) + parseFloat(this.listDispenser.dispensers[dIndex].nozzle[nIndex].end_reading) - parseFloat(this.listDispenser.dispensers[dIndex].nozzle[nIndex].adjustment)) * pf;
+                if (parseFloat(this.listDispenser.tanks[tankIndex].dispensers[dIndex].nozzle[nIndex].end_reading) < parseFloat(this.listDispenser.tanks[tankIndex].dispensers[dIndex].nozzle[nIndex].start_reading)) {
+                    this.listDispenser.tanks[tankIndex].dispensers[dIndex].nozzle[nIndex].consumption = (parseFloat(this.listDispenser.tanks[tankIndex].dispensers[dIndex].nozzle[nIndex].max_value) - parseFloat(this.listDispenser.tanks[tankIndex].dispensers[dIndex].nozzle[nIndex].start_reading) + parseFloat(this.listDispenser.tanks[tankIndex].dispensers[dIndex].nozzle[nIndex].end_reading) - parseFloat(this.listDispenser.tanks[tankIndex].dispensers[dIndex].nozzle[nIndex].adjustment)) * pf;
                 } else {
-                    this.listDispenser.dispensers[dIndex].nozzle[nIndex].consumption = (parseFloat(this.listDispenser.dispensers[dIndex].nozzle[nIndex].end_reading) - parseFloat(this.listDispenser.dispensers[dIndex].nozzle[nIndex].start_reading)  - parseFloat(this.listDispenser.dispensers[dIndex].nozzle[nIndex].adjustment)) * parseFloat(pf)
+                    this.listDispenser.tanks[tankIndex].dispensers[dIndex].nozzle[nIndex].consumption = (parseFloat(this.listDispenser.tanks[tankIndex].dispensers[dIndex].nozzle[nIndex].end_reading) - parseFloat(this.listDispenser.tanks[tankIndex].dispensers[dIndex].nozzle[nIndex].start_reading)  - parseFloat(this.listDispenser.tanks[tankIndex].dispensers[dIndex].nozzle[nIndex].adjustment)) * parseFloat(pf)
                 }
-                this.listDispenser.dispensers[dIndex].nozzle[nIndex].amount = parseFloat(this.listDispenser.dispensers[dIndex].nozzle[nIndex].consumption) * parseFloat(this.listDispenser.selling_price)
+                this.listDispenser.tanks[tankIndex].dispensers[dIndex].nozzle[nIndex].amount = parseFloat(this.listDispenser.tanks[tankIndex].dispensers[dIndex].nozzle[nIndex].consumption) * parseFloat(this.listDispenser.selling_price)
             } else {
-                this.listDispenser.dispensers[dIndex].nozzle[nIndex].consumption = 0
-                this.listDispenser.dispensers[dIndex].nozzle[nIndex].amount = 0
+                this.listDispenser.tanks[tankIndex].dispensers[dIndex].nozzle[nIndex].consumption = 0
+                this.listDispenser.tanks[tankIndex].dispensers[dIndex].nozzle[nIndex].amount = 0
             }
             this.getTotalSale()
         },
@@ -535,7 +548,7 @@ export default {
         getProductDispenser: function () {
             this.totalSale = 0
             this.totalAmount = 0
-            ApiService.POST(ApiRoutes.ProductDispenser, {product_id: this.product_id}, res => {
+            ApiService.POST(ApiRoutes.ProductDispenser, {product_id: this.product_id, date: this.date, status: 'previous'}, res => {
                 this.TableLoading = false
                 if (parseInt(res.status) === 200) {
                     this.listDispenser = res.data;
@@ -552,43 +565,44 @@ export default {
             ApiService.ClearErrorHandler();
             this.listDispenser.categories = this.categories;
             let flag = false;
-            if (this.listDispenser.status == 'end') {
+            if (this.listDispenser.status === 'previous') {
                 let totalCategoryAmount = 0
                 let totalConsumption = 0
                 this.listDispenser.categories.map(v => {
                     totalCategoryAmount += parseFloat(v.amount)
                 });
                 // if ((this.totalAmount - this.totalPosSale()) != totalCategoryAmount) {
-                this.listDispenser.dispensers.map(dispenser => {
-                    dispenser.nozzle.map(nozzle => {
-                        totalConsumption += parseFloat(nozzle.consumption)
-                        if (nozzle.end_reading < nozzle.start_reading) {
-                            flag = true;
-                        }
+                this.listDispenser.tanks.map((tank) => {
+                    tank.dispensers.map(dispenser => {
+                        dispenser.nozzle.map(nozzle => {
+                            totalConsumption += parseFloat(nozzle.consumption)
+                            if (nozzle.end_reading < nozzle.start_reading) {
+                                flag = true;
+                            }
+                        })
                     })
-                })
+                });
+                let totalSale = parseFloat(this.listDispenser.total_pos_sale_liter) + parseFloat(this.totalLiter);
+                if (parseFloat(this.totalSale).toFixed(2) !== parseFloat(totalSale).toFixed(2)) {
+                    this.$toast.error('Total sale and total liter does not match');
+                    return;
+                }
+
                 // check if mismatch allow
-                if (this.mismatchAllow != null && this.listDispenser.tank == 1) {
-                    if (this.totalShiftParcent(totalConsumption) > this.mismatchAllow) {
-                        this.loading = false
-                        this.$toast.error('The mismatch is grater than allowed consumption')
-                        return
-                    }
-                }
-                if (this.noDIPShow) {
-                    this.listDispenser.end_reading = this.listDispenser.end_reading == 0 ? parseFloat(this.listDispenser.consumption) - parseFloat(this.totalSale) : this.listDispenser.end_reading;
-                }
-                if (this.listDispenser.tank == 1 && !this.noDIPShow) {
-                    this.listDispenser.net_profit = this.listDispenser.consumption - this.totalSale;
-                }
+                // if (this.mismatchAllow != null && this.listDispenser.tank == 1) {
+                //     if (this.totalShiftParcent(totalConsumption) > this.mismatchAllow) {
+                //         this.loading = false
+                //         this.$toast.error('The mismatch is grater than allowed consumption')
+                //         return
+                //     }
+                // }
                 this.listDispenser.amount = totalCategoryAmount;
-                this.listDispenser.consumption = totalConsumption;
-                if (this.listDispenser.consumption == 0) {
+                if (totalConsumption === 0) {
                     this.$toast.error('The consumption amount is 0');
                     return;
                 }
             }
-            if (flag == true) {
+            if (flag === true) {
                 Swal.fire({
                     title: "Are you sure?",
                     text: "Your nozzle end reading is correct",
@@ -613,18 +627,12 @@ export default {
                 this.loading = false
                 if (parseInt(res.status) === 200) {
                     this.$toast.success(res.message);
-                    if (this.listDispenser.status == 'start') {
-                        this.$router.push({
-                            name: 'ShiftSaleListStart'
-                        })
-                    } else {
-                        this.$router.push({
-                            name: 'ShiftSaleView',
-                            params: {
-                                id: res.shift_sale_id
-                            }
-                        })
-                    }
+                    this.$router.push({
+                        name: 'ShiftSaleView',
+                        params: {
+                            id: res.shift_sale_id
+                        }
+                    });
                 } else if (parseInt(res.status) === 200) {
                     this.$toast.warning(res.message);
                 } else {

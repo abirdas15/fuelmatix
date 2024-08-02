@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Common\AccountCategory;
 use App\Common\FuelMatixDateTimeFormat;
+use App\Common\FuelMatixStatus;
 use App\Common\Module;
 use App\Helpers\Helpers;
 use App\Helpers\SessionUser;
@@ -37,7 +38,7 @@ class ShiftSaleRepository
         $shiftTotal = new ShiftTotal();
         $shiftTotal->start_date = $initialData['date'];
         $shiftTotal->product_id = $initialData['product_id'];
-        $shiftTotal->status = 'start';
+        $shiftTotal->status = FuelMatixStatus::START;
         $shiftTotal->amount = 0;
         $shiftTotal->consumption = 0;
         $shiftTotal->client_company_id = $sessionUser['client_company_id'];
@@ -184,10 +185,17 @@ class ShiftSaleRepository
                 }
             }
         }
-
         // Set shift end details and save
-        $shiftTotal->end_date = Carbon::now(SessionUser::TIMEZONE);
-        $shiftTotal->status = 'end';
+        if ($initialData['status'] == 'previous') {
+            $shiftTotal->product_id = $initialData['product_id'];
+            $shiftTotal->start_date = Carbon::parse($initialData['date'], SessionUser::TIMEZONE)->startOfDay();
+            $shiftTotal->end_date = Carbon::parse($initialData['date'], SessionUser::TIMEZONE)->endOfDay();
+            $shiftTotal->user_id = $sessionUser['id'];
+            $shiftTotal->client_company_id = $sessionUser['client_company_id'];
+        } else {
+            $shiftTotal->end_date = Carbon::now(SessionUser::TIMEZONE);
+        }
+        $shiftTotal->status = FuelMatixStatus::END;
         $shiftTotal->consumption = $nozzleTotalConsumption;
         $shiftTotal->amount = $nozzleTotalConsumption * $product['selling_price'];
         $shiftTotal->save();
@@ -209,6 +217,11 @@ class ShiftSaleRepository
             $shiftSale = ShiftSale::where('tank_id', $eachTank['id'])
                 ->where('shift_id', $initialData['shift_id'])
                 ->first();
+            if ($initialData['status'] == 'previous') {
+                $shiftSale = new ShiftSale();
+            }
+            $shiftSale->shift_id = $shiftTotal['id'];
+            $shiftSale->tank_id = $eachTank['id'];
             $shiftSale->start_reading = $eachTank['start_reading'];
             $shiftSale->end_reading = $eachTank['end_reading'];
             $shiftSale->adjustment = $eachTank['adjustment'];
@@ -238,6 +251,9 @@ class ShiftSaleRepository
                         ->where('dispenser_id', $dispenser['id'])
                         ->where('nozzle_id', $nozzle['id'])
                         ->first();
+                    if ($initialData['status'] == 'previous') {
+                        $shiftSaleSummary = new ShiftSummary();
+                    }
                     if ($shiftSaleSummary instanceof ShiftSummary) {
                         $shiftSaleSummary->shift_sale_id = $shiftSale->id;
                         $shiftSaleSummary->dispenser_id = $dispenser['id'];

@@ -8,4 +8,5 @@ class FuelMatixStatus
     const PENDING = 'pending';
     const COMPLETE = 'complete';
     const END = 'end';
+    const START = 'start';
 }

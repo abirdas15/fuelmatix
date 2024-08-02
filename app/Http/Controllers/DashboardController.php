@@ -32,38 +32,61 @@ class DashboardController extends Controller
     }
 
     /**
-     * @return array[]
+     * Retrieves the shift sales data for the last 15 days.
+     *
+     * @return array[] An array containing the dates, amounts, and quantities for each day.
      */
     public static function getShiftSale(): array
     {
+        // Get the current session user
         $sessionUser = SessionUser::getUser();
+
+        // Define the date range: from 15 days ago to today, in the user's timezone
         $startDate = Carbon::now(SessionUser::TIMEZONE)->subDay(15);
         $endDate = Carbon::now(SessionUser::TIMEZONE);
-        $shiftSale = ShiftTotal::select(DB::raw('SUM(shift_sale.consumption) as quantity'), DB::raw('SUM(shift_sale.amount) as amount'), 'start_date', DB::raw('DATE(start_date) as date'))
+
+        // Fetch shift sales data within the date range for the user's company, grouped by date
+        $shiftSale = ShiftTotal::select(
+            DB::raw('SUM(shift_sale.consumption) as quantity'), // Sum of consumption (quantity)
+            DB::raw('SUM(shift_sale.amount) as amount'), // Sum of amount
+            'start_date', // Start date of the shift
+            DB::raw('DATE(start_date) as date') // Date portion of the start date
+        )
             ->leftJoin('shift_sale', 'shift_total.id', '=', 'shift_sale.shift_id')
-            ->whereBetween('shift_total.start_date',[$startDate, $endDate])
-            ->where('shift_total.client_company_id', $sessionUser['client_company_id'])
-            ->where('shift_total.status', FuelMatixStatus::END)
-            ->groupBy(DB::raw('DATE(start_date)'))
+            ->whereBetween('shift_total.start_date', [$startDate, $endDate]) // Filter by date range
+            ->where('shift_total.client_company_id', $sessionUser['client_company_id']) // Filter by company ID
+            ->where('shift_total.status', FuelMatixStatus::END) // Filter by status
+            ->groupBy(DB::raw('DATE(start_date)')) // Group by date
             ->get()
-            ->keyBy('date')
+            ->keyBy('date') // Use the date as the key for easy access
             ->toArray();
+
+        // Initialize arrays for storing the result
         $month = [];
         $amount = [];
         $quantity = [];
+
+        // Iterate through each day in the date range
         while ($startDate->lessThanOrEqualTo($endDate)) {
-            $month[] = $startDate->format('d M');
-            $date = $startDate->format('Y-m-d');
+            $month[] = $startDate->format('d M'); // Format date as 'day month'
+            $date = $startDate->format('Y-m-d'); // Format date as 'year-month-day'
+
+            // Get the amount and quantity for the current date, or 0 if not available
             $amount[] = isset($shiftSale[$date]) ? $shiftSale[$date]['amount'] : 0;
             $quantity[] = isset($shiftSale[$date]) ? $shiftSale[$date]['quantity'] : 0;
+
+            // Move to the next day
             $startDate->addDay();
         }
+
+        // Return the results
         return [
-            'month' => $month,
-            'amount' => $amount,
-            'quantity' => $quantity
+            'month' => $month, // Array of dates
+            'amount' => $amount, // Array of amounts
+            'quantity' => $quantity // Array of quantities
         ];
     }
+
     public static function getInvoiceAmount()
     {
         $sessionUser = SessionUser::getUser();
