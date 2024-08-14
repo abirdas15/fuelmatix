@@ -12,7 +12,7 @@ use App\Models\Invoice;
 use App\Models\Sale;
 use App\Models\ShiftTotal;
 use App\Models\TankLog;
-use App\Models\TankRefill;
+use App\Models\TankRefillTotal;
 use App\Models\Transaction;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -53,7 +53,7 @@ class ReportRepository
         $result['due_invoice'] = self::getDueInvoice($filter['date']);
 
         // Retrieve and add asset balance (cash in hand) to the result array for the specified date
-        $result['asset_balance']['cash'] = self::getAssetBalance($filter['date'], AccountCategory::CASH_IM_HAND);
+        $result['asset_balance']['cash'] = self::getAssetBalance($filter['date'], AccountCategory::CASH_IN_HAND);
 
         // Retrieve and add asset balance (bank) to the result array for the specified date
         $result['asset_balance']['bank'] = self::getAssetBalance($filter['date'], AccountCategory::BANK);
@@ -407,15 +407,16 @@ class ReportRepository
     public static function getTankRefill(array  $filter)
     {
         $sessionUser = SessionUser::getUser();
-        $result = TankRefill::select('tank_refill.id', 'tank_refill.date', 'tank_refill.time', 'tank_refill.total_refill_volume as quantity', 'tank_refill.net_profit', 'products.name as product_name', 'product_types.unit')
+        $result = TankRefillTotal::select('tank_refill_total.id', 'tank_refill_total.date', 'tank_refill_total.time', 'tank_refill_total.total_refill_volume as quantity', 'tank_refill_total.net_profit', 'products.name as product_name', 'product_types.unit')
+            ->leftJoin('tank_refill', 'tank_refill.refill_id', 'tank_refill_total.id')
             ->leftJoin('tank', 'tank.id', 'tank_refill.tank_id')
             ->leftJoin('products', 'products.id', 'tank.product_id')
             ->leftJoin('product_types', 'product_types.id', 'products.type_id')
-            ->where('tank_refill.date', $filter['date'])
-            ->where('tank_refill.client_company_id', $sessionUser['client_company_id']);
+            ->where('tank_refill_total.date', $filter['date'])
+            ->where('tank_refill_total.client_company_id', $sessionUser['client_company_id']);
         if (!empty($filter['shift_sale_id'])) {
             $result->where(function($q) use ($filter) {
-                $q->where('tank_refill.shift_sale_id', $filter['shift_sale_id']);
+                $q->where('tank_refill_total.shift_id', $filter['shift_sale_id']);
             });
         }
         $result = $result->get()

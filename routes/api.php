@@ -158,6 +158,7 @@ Route::group(['middleware' => 'AuthReqCheck'], function() {
         Route::post('byProduct', [TankController::class, 'getTankByProduct']);
         Route::post('getVolume', [TankController::class, 'getVolume']);
         Route::post('getBstiChart', [TankController::class, 'getBstiChart']);
+        Route::post('tankWithLatestReading', [TankController::class, 'tankWithLatestReading']);
         Route::group(['prefix' => 'reading'], function() {
             Route::post('save', [TankController::class, 'readingSave']);
             Route::post('list', [TankController::class, 'readingList']);

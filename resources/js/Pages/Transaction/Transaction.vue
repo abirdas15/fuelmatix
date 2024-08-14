@@ -26,12 +26,12 @@
                     <tr v-for="transaction of transactionParam.transaction">
                         <td class="text-start">{{ transaction.date }}</td>
                         <td class="text-start">{{ transaction.description }}</td>
-                        <td class="text-start">{{ categoryName(transaction.account_id) }}</td>
+                        <td class="text-start">{{ categoryName(transaction.linked_id) }}</td>
                         <td>{{ formatPrice(transaction.debit_amount) }}</td>
                         <td>{{ formatPrice(transaction.credit_amount) }}</td>
                         <td>
-                            <span v-if="transaction.balance < 0" class="text-danger">({{ formatPrice(Math.abs(transaction.balance)) }})</span>
-                            <span v-else>{{ formatPrice(transaction.balance) }}</span>
+                            <span v-if="transaction.balance >= 0">{{ formatPrice(transaction.balance) }}</span>
+                            <span v-else class="text-danger">({{ formatPrice(Math.abs(transaction.balance)) }})</span>
                         </td>
                         <td>
                             <i class="fa fa-edit me-2 cursor-pointer"></i>

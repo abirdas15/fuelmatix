@@ -96,6 +96,7 @@ const ApiRoutes = {
     TankReadingList: ApiVersion + '/tank/reading/list',
     TankReadingSingle: ApiVersion + '/tank/reading/single',
     TankReadingLatest: ApiVersion + '/tank/reading/latest',
+    TankWithLatestReading: ApiVersion + '/tank/tankWithLatestReading',
     //Tank Refill
     TankRefillAdd: ApiVersion + '/tank/refill/save',
     TankRefillEdit: ApiVersion + '/tank/refill/update',

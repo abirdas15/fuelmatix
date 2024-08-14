@@ -281,7 +281,7 @@ class ShiftSaleController extends Controller
     {
         $inputData = $request->all();
         $categoryId = Category::select('id')
-            ->whereIn('slug', [strtolower(AccountCategory::CASH_IM_HAND), strtolower(AccountCategory::ACCOUNT_RECEIVABLE),  strtolower(AccountCategory::POS_MACHINE)])
+            ->whereIn('slug', [strtolower(AccountCategory::CASH_IN_HAND), strtolower(AccountCategory::ACCOUNT_RECEIVABLE),  strtolower(AccountCategory::POS_MACHINE)])
             ->where('client_company_id', $inputData['session_user']['client_company_id'])
             ->pluck('id')
             ->toArray();

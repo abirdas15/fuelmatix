@@ -10,6 +10,7 @@ use App\Models\Category;
 use App\Models\ClientCompany;
 use App\Models\Transaction;
 use App\Repository\EmployeeRepository;
+use App\Repository\TransactionRepository;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -19,128 +20,219 @@ use Rmunate\Utilities\SpellNumber;
 class SalaryController extends Controller
 {
     /**
-     * @param Request $request
-     * @return JsonResponse
+     * Search employees and retrieve their transaction data for a given month and year.
+     *
+     * @param Request $request The HTTP request object containing the search parameters.
+     * @return JsonResponse The JSON response containing the employee data and their transactions.
      */
     public function searchEmployee(Request $request): JsonResponse
     {
-        $requestData = $request->all();
-        $validator = Validator::make($requestData, [
-            'month' => 'required',
-            'year' => 'required'
+        // Validate the request to ensure 'month' and 'year' are within the acceptable range
+        $validator = Validator::make($request->all(), [
+            'month' => 'required|integer|min:1|max:12',
+            'year' => 'required|integer',
         ]);
+
+        // If validation fails, return the validation errors
         if ($validator->fails()) {
-            return response()->json(['status' => 500, 'errors' => $validator->errors()]);
+            return response()->json([
+                'status' => 500,
+                'errors' => $validator->errors()
+            ]);
         }
-        $employees = EmployeeRepository::list($requestData);
-        $employeeId = [];
-        foreach ($employees as $employee) {
-            $employeeId[] = $employee['id'];
+
+        // Retrieve the list of employees based on the search criteria
+        $employees = EmployeeRepository::list($request->all());
+        if ($employees->isEmpty()) {
+            return response()->json([
+                'status' => 404,
+                'message' => 'No employees found for the provided criteria.'
+            ]);
         }
-        $transaction = Transaction::select('linked_id as employee_id','debit_amount as amount', 'account_id as category_id')
-            ->whereIn('linked_id', $employeeId)
-            ->whereMonth('date', $requestData['month'])
-            ->whereYear('date', $requestData['year'])
+
+        // Extract employee IDs for transaction lookup
+        $employeeIds = $employees->pluck('id')->toArray();
+
+        // Retrieve transactions for the given month and year
+        $transactions = Transaction::select('linked_id as employee_id', 'debit_amount as amount', 'account_id as category_id')
+            ->whereIn('linked_id', $employeeIds)
+            ->whereMonth('date', $request->input('month'))
+            ->whereYear('date', $request->input('year'))
             ->get()
             ->keyBy('employee_id')
             ->toArray();
+
+        // Merge transaction data with employee data
         foreach ($employees as &$employee) {
-            $employee['salary'] = isset($transaction[$employee['id']]) ? $transaction[$employee['id']]['amount'] : $employee['salary'];
-            $employee['category_id'] = isset($transaction[$employee['id']]) ? $transaction[$employee['id']]['category_id'] : '';
+            $transaction = $transactions[$employee['id']] ?? null;
+            $employee['salary'] = $transaction['amount'] ?? $employee['salary'];
+            $employee['category_id'] = $transaction['category_id'] ?? '';
             $employee['checked'] = true;
         }
-        return response()->json(['status' => 200, 'data' => $employees]);
+
+        // Return the combined data with a success status
+        return response()->json([
+            'status' => 200,
+            'data' => $employees
+        ]);
     }
+
     /**
-     * @param Request $request
-     * @return JsonResponse
+     * Save employee salary transactions for a given month and year.
+     *
+     * @param Request $request The HTTP request containing salary details.
+     * @return JsonResponse The JSON response indicating success or errors.
      */
     public function save(Request $request): JsonResponse
     {
-        $requestData = $request->all();
-        $validator = Validator::make($requestData, [
-            'month' => 'required',
-            'year' => 'required',
+        // Validate the request input
+        $validator = Validator::make($request->all(), [
+            'month' => 'required|integer|min:1|max:12',
+            'year' => 'required|integer|min:2000|max:' . date('Y'),
             'employees' => 'required|array',
-            'employees.*.id' => 'required',
-            'employees.*.salary' => 'required',
-            'employees.*.category_id' => 'required',
+            'employees.*.id' => 'required|integer',
+            'employees.*.salary' => 'required|numeric|min:0',
+            'employees.*.category_id' => 'required|integer',
         ]);
+
+        // If validation fails, return errors
         if ($validator->fails()) {
-            return response()->json(['status' => 500, 'errors' => $validator->errors()]);
+            return response()->json([
+                'status' => 500,
+                'errors' => $validator->errors()
+            ]);
         }
+
+        // Retrieve the session user and construct the date
         $sessionUser = SessionUser::getUser();
-        $date = $requestData['year'].'-'.$requestData['month'].'-01';
-        $employeeIds = array_column($requestData['employees'], 'id');
-        Transaction::where('client_company_id', $sessionUser['client_company_id'])
+        $date = sprintf('%04d-%02d-01', $request->input('year'), $request->input('month'));
+
+        // Extract employee IDs from the request
+        $employeeIds = array_column($request->input('employees'), 'id');
+
+        // Delete existing salary transactions for the provided month and year
+        $transactionIds = Transaction::where('client_company_id', $sessionUser['client_company_id'])
             ->where('date', $date)
             ->where('module', Module::SALARY)
-            ->where(function($q) use ($employeeIds) {
-                $q->whereIn('account_id', $employeeIds);
-                $q->orWhereIn('linked_id', $employeeIds);
-            })
+            ->where('account_id', $employeeIds)
+            ->pluck('id')
+            ->toArray();
+        Transaction::whereIn('account_id', $employeeIds)
+            ->orWhereIn('linked_id', $transactionIds)
             ->delete();
-        foreach ($requestData['employees'] as $employee) {
-            if ($employee['checked']) {
-                $transactions  = [];
-                $transactions['linked_id'] = $employee['id'];
-                $transactions['transaction'] = [
-                    ['date' => $date, 'account_id' => $employee['category_id'], 'debit_amount' => $employee['salary'], 'credit_amount' => 0, 'module' => Module::SALARY]
+
+        // Loop through each employee and save the transactions
+        foreach ($request->input('employees') as $employee) {
+            if (!empty($employee['checked'])) {
+                $transactions = [
+                    [
+                        'date' => $date,
+                        'account_id' => $employee['id'],
+                        'debit_amount' => $employee['salary'],
+                        'credit_amount' => 0,
+                        'module' => Module::SALARY,
+                        'client_company_id' => $sessionUser['client_company_id']
+                    ],
+                    [
+                        'date' => $date,
+                        'account_id' => $employee['category_id'],
+                        'debit_amount' => 0,
+                        'credit_amount' => $employee['salary'],
+                        'module' => Module::SALARY,
+                        'client_company_id' => $sessionUser['client_company_id']
+                    ]
                 ];
-                TransactionController::saveTransaction($transactions);
+                TransactionRepository::saveTransaction($transactions);
             }
         }
-        return response()->json(['status' => 200, 'message' => 'Successfully saved salary.']);
+
+        // Return a success response
+        return response()->json([
+            'status' => 200,
+            'message' => 'Successfully saved salary.'
+        ]);
     }
+
     /**
-     * @param Request $request
-     * @return JsonResponse
+     * List salary-related transactions with filtering and pagination.
+     *
+     * @param Request $request The HTTP request containing filtering and pagination options.
+     * @return JsonResponse The JSON response containing the list of transactions.
      */
     public function list(Request $request): JsonResponse
     {
-        $requestData = $request->all();
+        // Retrieve session user and input parameters with defaults
         $sessionUser = SessionUser::getUser();
-        $limit = $requestData['limit'] ?? 10;
-        $orderBy = $requestData['order_by'] ?? 'id';
-        $orderMode = $requestData['order_mode'] ?? 'DESC';
-        $keyword = $requestData['keyword'] ?? '';
-        $month = $requestData['month'] ?? '';
-        $year = $requestData['year'] ?? '';
+        $limit = (int) $request->input('limit', 10);
+        $orderBy = $request->input('order_by', 'id');
+        $orderMode = $request->input('order_mode', 'DESC');
+        $keyword = $request->input('keyword', '');
+        $month = $request->input('month', '');
+        $year = $request->input('year', '');
+
+        // Fetch the salary category for the user's company
         $salaryCategory = Category::select('id')
             ->where('client_company_id', $sessionUser['client_company_id'])
             ->where('slug', strtolower(AccountCategory::SALARY_EXPENSE))
             ->first();
+
+        // If salary category is not found, return an error response
         if (!$salaryCategory instanceof Category) {
-            return response()->json(['status' => 500, 'errors' => 'Can not find account salary category.']);
+            return response()->json([
+                'status' => 500,
+                'errors' => 'Cannot find account salary category.'
+            ]);
         }
-        $result = Transaction::select('transactions.id', 'transactions.debit_amount as amount', 'c.name', 'transactions.date', 'c1.name as payment_method')
-            ->leftJoin('categories as c', 'c.id', '=', 'transactions.linked_id')
-            ->leftJoin('categories as c1', 'c1.id', '=', 'transactions.account_id')
+
+        // Build the base query for fetching transactions
+        $query = Transaction::select(
+            'transactions.id',
+            'transactions.debit_amount as amount',
+            'c.name',
+            'transactions.date',
+            'c1.name as payment_method'
+        )
+            ->leftJoin('categories as c', 'c.id', '=', 'transactions.account_id')
+            ->leftJoin('transactions as t1', 't1.linked_id', '=', 'transactions.id')
+            ->leftJoin('categories as c1', 'c1.id', '=', 't1.account_id')
             ->where('c.parent_category', $salaryCategory->id)
             ->where('transactions.client_company_id', $sessionUser['client_company_id']);
+
+        // Apply month filter if provided
         if (!empty($month)) {
-            $result->where(function($q) use ($month) {
-                $q->whereMonth('date', $month);
-            });
+            $query->whereMonth('transactions.date', $month);
         }
+
+        // Apply year filter if provided
         if (!empty($year)) {
-            $result->where(function($q) use ($year) {
-                $q->whereYear('date', $year);
-            });
+            $query->whereYear('transactions.date', $year);
         }
+
+        // Apply keyword search filter if provided
         if (!empty($keyword)) {
-            $result->where(function($q) use ($keyword) {
-                $q->where('c.name', 'LIKE', '%'.$keyword.'%');
-                $q->orWhere('c1.name', 'LIKE', '%'.$keyword.'%');
+            $query->where(function ($q) use ($keyword) {
+                $q->where('c.name', 'LIKE', '%' . $keyword . '%')
+                    ->orWhere('c1.name', 'LIKE', '%' . $keyword . '%');
             });
         }
-        $result = $result->orderBy($orderBy, $orderMode)
+
+        // Group, order, and paginate the results
+        $transactions = $query->groupBy('transactions.id')
+            ->orderBy($orderBy, $orderMode)
             ->paginate($limit);
-        foreach ($result as &$data) {
-            $data['date'] = date('F, Y', strtotime($data['date']));
+
+        // Format the date in the response
+        foreach ($transactions as &$transaction) {
+            $transaction->date = date('F, Y', strtotime($transaction->date));
         }
-        return response()->json(['status' => 200, 'data' => $result]);
+
+        // Return the response with the transaction data
+        return response()->json([
+            'status' => 200,
+            'data' => $transactions
+        ]);
     }
+
     /**
      * @param Request $request
      * @return JsonResponse
@@ -149,7 +241,7 @@ class SalaryController extends Controller
     {
         $sessionUser = SessionUser::getUser();
         $cashInHand = Category::select('id')
-            ->where('slug', strtolower(AccountCategory::CASH_IM_HAND))
+            ->where('slug', strtolower(AccountCategory::CASH_IN_HAND))
             ->where('client_company_id', $sessionUser['client_company_id'])
             ->first();
         $bank = Category::select('id')
@@ -164,33 +256,72 @@ class SalaryController extends Controller
     }
 
     /**
-     * @param Request $request
-     * @return JsonResponse|string
+     * Generate and return a PDF salary report for a specific transaction.
+     *
+     * @param Request $request The HTTP request containing the transaction ID.
+     * @return JsonResponse|string The generated PDF or a JSON error response.
      */
     public function print(Request $request)
     {
-        $requestData = $request->all();
-        $validator = Validator::make($requestData, [
-            'id' => 'required|integer'
+        // Validate the incoming request to ensure 'id' is provided and is an integer
+        $validator = Validator::make($request->all(), [
+            'id' => 'required|integer',
         ]);
+
+        // Return validation errors if validation fails
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
+
+        // Retrieve the session user and transaction details
         $sessionUser = SessionUser::getUser();
-        $result = Transaction::select('date', 'debit_amount as amount', 'c1.name as employee_name', 'c1.rfid as employee_id', 'c1.others', 'c2.name as bank_name')
-            ->leftJoin('categories as c1', 'c1.id', '=', 'transactions.linked_id')
-            ->leftJoin('categories as c2', 'c2.id', '=', 'transactions.account_id')
-            ->where('transactions.id', $requestData['id'])
+        $transaction = Transaction::select(
+            'transactions.date',
+            'transactions.debit_amount as amount',
+            'c1.name as employee_name',
+            'c1.rfid as employee_id',
+            'c1.others',
+            'c2.name as bank_name'
+        )
+            ->leftJoin('categories as c1', 'c1.id', '=', 'transactions.account_id')
+            ->leftJoin('transactions as t1', 't1.linked_id', '=', 'transactions.id')
+            ->leftJoin('categories as c2', 'c2.id', '=', 't1.account_id')
+            ->where('transactions.id', $request->input('id'))
             ->first();
-        $result['others'] = json_decode($result['others']);
-        $result['amount_in_word'] = Helpers::convertNumberToWord($result['amount']);
+
+        // Check if the transaction was found
+        if (!$transaction) {
+            return response()->json(['status' => 404, 'errors' => 'Transaction not found.']);
+        }
+
+        // Decode the JSON stored in the 'others' field and handle null cases
+        $transaction->others = json_decode($transaction->others, true);
+
+        // Convert the amount to words
+        $transaction->amount_in_word = Helpers::convertNumberToWord($transaction->amount);
+
+        // Retrieve the company information
         $company = ClientCompany::find($sessionUser['client_company_id']);
-        $result['company_name'] = $company['name'];
-        $result['address'] = $company['address'];
-        $result['date'] = date('F Y', strtotime($result['date']));
-        $result['pay_date'] = date('d, F Y', strtotime($result['date']));
-        $result['position'] = $result['others']->position ?? '';
-        $pdf = Pdf::loadView('pdf.salary-report', ['data' => $result]);
+        if (!$company) {
+            return response()->json(['status' => 404, 'errors' => 'Company not found.']);
+        }
+
+        // Add company details to the transaction data
+        $transaction->company_name = $company->name;
+        $transaction->address = $company->address;
+
+        // Format the dates
+        $transaction->date = date('F Y', strtotime($transaction->date));
+        $transaction->pay_date = date('d, F Y', strtotime($transaction->date));
+
+        // Extract and assign the employee position if available
+        $transaction->position = $transaction->others['position'] ?? '';
+
+        // Generate the PDF using the 'pdf.salary-report' view and the transaction data
+        $pdf = Pdf::loadView('pdf.salary-report', ['data' => $transaction]);
+
+        // Return the generated PDF output
         return $pdf->output();
     }
+
 }

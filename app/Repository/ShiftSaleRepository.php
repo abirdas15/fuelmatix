@@ -8,7 +8,6 @@ use App\Common\FuelMatixStatus;
 use App\Common\Module;
 use App\Helpers\Helpers;
 use App\Helpers\SessionUser;
-use App\Http\Controllers\TransactionController;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductType;
@@ -19,7 +18,7 @@ use App\Models\ShiftTotal;
 use App\Models\Tank;
 use App\Models\TankLog;
 use Carbon\Carbon;
-use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 
 class ShiftSaleRepository
 {
@@ -185,166 +184,175 @@ class ShiftSaleRepository
                 }
             }
         }
-        // Set shift end details and save
-        if ($initialData['status'] == 'previous') {
-            $shiftTotal->product_id = $initialData['product_id'];
-            $shiftTotal->start_date = Carbon::parse($initialData['date'], SessionUser::TIMEZONE)->startOfDay();
-            $shiftTotal->end_date = Carbon::parse($initialData['date'], SessionUser::TIMEZONE)->endOfDay();
-            $shiftTotal->user_id = $sessionUser['id'];
-            $shiftTotal->client_company_id = $sessionUser['client_company_id'];
-        } else {
-            $shiftTotal->end_date = Carbon::now(SessionUser::TIMEZONE);
+        if (!empty($initialData['pos_sale'])) {
+            foreach ($initialData['pos_sale'] as $posSale) {
+                $initialData['categories'][] = [
+                    'amount' => $posSale['amount'],
+                    'category_id' => $posSale['category_id'],
+                    'liter' => $posSale['quantity']
+                ];
+            }
         }
-        $shiftTotal->status = FuelMatixStatus::END;
-        $shiftTotal->consumption = $nozzleTotalConsumption;
-        $shiftTotal->amount = $nozzleTotalConsumption * $product['selling_price'];
-        $shiftTotal->save();
-
-        // Process each tank's shift sale details
-        foreach ($initialData['tanks'] as $eachTank) {
-            $nozzleConsumption = 0;
-            foreach ($eachTank['dispensers'] as $dispenser) {
-                foreach ($dispenser['nozzle'] as $nozzle) {
-                    $nozzleConsumption += $nozzle['consumption'];
-                }
-            }
-
-            // Calculate net profit and loss amount
-            $netProfit = $nozzleConsumption - $eachTank['consumption'];
-            $lossAmount = $netProfit * $product['buying_price'];
-
-            // Fetch or create shift sale record for the tank
-            $shiftSale = ShiftSale::where('tank_id', $eachTank['id'])
-                ->where('shift_id', $initialData['shift_id'])
-                ->first();
+        DB::transaction(function() use ($shiftTotal, $product, $initialData, $sessionUser, $nozzleTotalConsumption, $incomeCategory, $costOfGoodSoldCategory) {
+            // Set shift end details and save
             if ($initialData['status'] == 'previous') {
-                $shiftSale = new ShiftSale();
+                $shiftTotal->product_id = $initialData['product_id'];
+                $shiftTotal->start_date = Carbon::parse($initialData['date'], SessionUser::TIMEZONE)->startOfDay();
+                $shiftTotal->end_date = Carbon::parse($initialData['date'], SessionUser::TIMEZONE)->endOfDay();
+                $shiftTotal->user_id = $sessionUser['id'];
+                $shiftTotal->client_company_id = $sessionUser['client_company_id'];
+            } else {
+                $shiftTotal->end_date = Carbon::now(SessionUser::TIMEZONE);
             }
-            $shiftSale->shift_id = $shiftTotal['id'];
-            $shiftSale->tank_id = $eachTank['id'];
-            $shiftSale->start_reading = $eachTank['start_reading'];
-            $shiftSale->end_reading = $eachTank['end_reading'];
-            $shiftSale->adjustment = $eachTank['adjustment'];
-            $shiftSale->tank_refill = $eachTank['tank_refill'];
-            $shiftSale->consumption = $eachTank['consumption'];
-            $shiftSale->amount = $eachTank['consumption'] * $product['selling_price'];
-            $shiftSale->net_profit = $netProfit ?? 0;
-            $shiftSale->net_profit_amount = $lossAmount ?? 0;
-            $shiftSale->save();
+            $shiftTotal->status = FuelMatixStatus::END;
+            $shiftTotal->consumption = $nozzleTotalConsumption;
+            $shiftTotal->amount = $nozzleTotalConsumption * $product['selling_price'];
+            $shiftTotal->save();
 
-            // Save tank reading if tank check is enabled
-            if ($initialData['tank'] == 1) {
-                $height = Tank::findHeight($eachTank['id'], $eachTank['end_reading']);
-                TankRepository::readingSave([
-                    'tank_id' => $eachTank['id'],
-                    'date' => date('Y-m-d', strtotime($initialData['date'])),
-                    'volume' => $eachTank['end_reading'],
-                    'height' => $height,
-                    'type' => 'shift sell',
-                ]);
-            }
-
-            // Process shift sale summaries for each nozzle
-            foreach ($eachTank['dispensers'] as $dispenser) {
-                foreach ($dispenser['nozzle'] as $nozzle) {
-                    $shiftSaleSummary = ShiftSummary::where('shift_sale_id', $shiftSale['id'])
-                        ->where('dispenser_id', $dispenser['id'])
-                        ->where('nozzle_id', $nozzle['id'])
-                        ->first();
-                    if ($initialData['status'] == 'previous') {
-                        $shiftSaleSummary = new ShiftSummary();
-                    }
-                    if ($shiftSaleSummary instanceof ShiftSummary) {
-                        $shiftSaleSummary->shift_sale_id = $shiftSale->id;
-                        $shiftSaleSummary->dispenser_id = $dispenser['id'];
-                        $shiftSaleSummary->nozzle_id = $nozzle['id'];
-                        $shiftSaleSummary->start_reading = $nozzle['start_reading'];
-                        $shiftSaleSummary->end_reading = $nozzle['end_reading'] != 0 ? $nozzle['end_reading'] : $nozzle['start_reading'];
-                        $shiftSaleSummary->adjustment = $nozzle['adjustment'];
-                        $shiftSaleSummary->consumption = $nozzle['consumption'];
-                        $shiftSaleSummary->amount = $nozzle['consumption'] * $product['selling_price'];
-                        $shiftSaleSummary->save();
-
-                        // Save nozzle reading
-                        $readingData = [
-                            'date' => $initialData['date'],
-                            'nozzle_id' => $nozzle['id'],
-                            'reading' => $nozzle['end_reading'],
-                            'type' => 'shift sell',
-                        ];
-                        NozzleRepository::readingSave($readingData);
+            // Process each tank's shift sale details
+            foreach ($initialData['tanks'] as $eachTank) {
+                $nozzleConsumption = 0;
+                foreach ($eachTank['dispensers'] as $dispenser) {
+                    foreach ($dispenser['nozzle'] as $nozzle) {
+                        $nozzleConsumption += $nozzle['consumption'];
                     }
                 }
-            }
 
-            // Fetch stock category for the tank
-            $stockCategory = Category::where('module', Module::TANK)
-                ->where('module_id', $eachTank['id'])
-                ->where('client_company_id', $sessionUser['client_company_id'])
-                ->first();
-            if ($stockCategory instanceof Category) {
-                $buyingPrice = $eachTank['total_consumption'] * $product['buying_price'];
+                // Calculate net profit and loss amount
+                $netProfit = $nozzleConsumption - $eachTank['consumption'];
+                $lossAmount = $netProfit * $product['buying_price'];
 
-                // Handle loss amount transaction
-                if ($lossAmount < 0) {
-                    $lossCategory = Category::where('slug', strtolower(AccountCategory::EVAPORATIVE))
-                        ->where('client_company_id', $initialData['session_user']['client_company_id'])
-                        ->first();
-                    if ($lossCategory instanceof Category) {
-                        $description = 'Shift ID: ' . $shiftSale['id'] . ', Product: ' . $product['name'] . ', Loss: ' . abs($netProfit);
-                        $transactionData['linked_id'] = $lossCategory['id'];
-                        $transactionData['transaction'] = [
-                            ['date' => date('Y-m-d', strtotime($initialData['date'])), 'description' => $description, 'account_id' => $stockCategory['id'], 'debit_amount' => abs($lossAmount), 'credit_amount' => 0],
-                        ];
-                        TransactionController::saveTransaction($transactionData);
-                    }
-                } else if ($lossAmount > 0) {
-                    // Handle profit amount transaction
-                    $description = 'Shift ID: ' . $shiftSale['id'] . ', Product: ' . $product['name'] . ', Windfall: ' . abs($netProfit);
-                    $transactionData['linked_id'] = $stockCategory['id'];
-                    $transactionData['transaction'] = [
-                        ['date' => date('Y-m-d', strtotime($initialData['date'])), 'description' => $description, 'account_id' => $incomeCategory['id'], 'debit_amount' => abs($lossAmount), 'credit_amount' => 0],
-                    ];
-                    TransactionController::saveTransaction($transactionData);
+                // Fetch or create shift sale record for the tank
+                $shiftSale = ShiftSale::where('tank_id', $eachTank['id'])
+                    ->where('shift_id', $initialData['shift_id'])
+                    ->first();
+                if ($initialData['status'] == 'previous') {
+                    $shiftSale = new ShiftSale();
+                }
+                $shiftSale->shift_id = $shiftTotal['id'];
+                $shiftSale->tank_id = $eachTank['id'];
+                $shiftSale->start_reading = $eachTank['start_reading'];
+                $shiftSale->end_reading = $eachTank['end_reading'];
+                $shiftSale->adjustment = $eachTank['adjustment'];
+                $shiftSale->tank_refill = $eachTank['tank_refill'];
+                $shiftSale->consumption = $eachTank['consumption'];
+                $shiftSale->amount = $eachTank['consumption'] * $product['selling_price'];
+                $shiftSale->net_profit = $netProfit ?? 0;
+                $shiftSale->net_profit_amount = $lossAmount ?? 0;
+                $shiftSale->save();
+
+                // Save tank reading if tank check is enabled
+                if ($initialData['tank'] == 1) {
+                    $height = Tank::findHeight($eachTank['id'], $eachTank['end_reading']);
+                    TankRepository::readingSave([
+                        'tank_id' => $eachTank['id'],
+                        'date' => date('Y-m-d', strtotime($initialData['date'])),
+                        'volume' => $eachTank['end_reading'],
+                        'height' => $height,
+                        'type' => 'shift sell',
+                    ]);
                 }
 
-                if (!empty($buyingPrice)) {
-                    // Set linked ID based on vendor
-                    $linkedId = $stockCategory['id'];
-                    if (!empty($product['vendor_id'])) {
-                        $productType = ProductType::find($product['type_id']);
-                        if ($productType instanceof ProductType && $productType['vendor'] == 1) {
-                            $linkedId = $product['vendor_id'];
+                // Process shift sale summaries for each nozzle
+                foreach ($eachTank['dispensers'] as $dispenser) {
+                    foreach ($dispenser['nozzle'] as $nozzle) {
+                        $shiftSaleSummary = ShiftSummary::where('shift_sale_id', $shiftSale['id'])
+                            ->where('dispenser_id', $dispenser['id'])
+                            ->where('nozzle_id', $nozzle['id'])
+                            ->first();
+                        if ($initialData['status'] == 'previous') {
+                            $shiftSaleSummary = new ShiftSummary();
+                        }
+                        if ($shiftSaleSummary instanceof ShiftSummary) {
+                            $shiftSaleSummary->shift_sale_id = $shiftSale->id;
+                            $shiftSaleSummary->dispenser_id = $dispenser['id'];
+                            $shiftSaleSummary->nozzle_id = $nozzle['id'];
+                            $shiftSaleSummary->start_reading = $nozzle['start_reading'];
+                            $shiftSaleSummary->end_reading = $nozzle['end_reading'] != 0 ? $nozzle['end_reading'] : $nozzle['start_reading'];
+                            $shiftSaleSummary->adjustment = $nozzle['adjustment'];
+                            $shiftSaleSummary->consumption = $nozzle['consumption'];
+                            $shiftSaleSummary->amount = $nozzle['consumption'] * $product['selling_price'];
+                            $shiftSaleSummary->save();
+
+                            // Save nozzle reading
+                            $readingData = [
+                                'date' => $initialData['date'],
+                                'nozzle_id' => $nozzle['id'],
+                                'reading' => $nozzle['end_reading'],
+                                'type' => 'shift sell',
+                            ];
+                            NozzleRepository::readingSave($readingData);
                         }
                     }
+                }
 
-                    // Save transaction for cost of goods sold
-                    $transactionData = [];
-                    $transactionData['linked_id'] = $linkedId;
-                    $transactionData['transaction'] = [
-                        ['date' => date('Y-m-d', strtotime($initialData['date'])), 'account_id' => $costOfGoodSoldCategory['id'], 'debit_amount' => 0, 'credit_amount' => $buyingPrice, 'module' => 'shift sale', 'module_id' => $shiftTotal->id]
-                    ];
-                    TransactionController::saveTransaction($transactionData);
+                // Fetch stock category for the tank
+                $stockCategory = Category::where('module', Module::TANK)
+                    ->where('module_id', $eachTank['id'])
+                    ->where('client_company_id', $sessionUser['client_company_id'])
+                    ->first();
+                if ($stockCategory instanceof Category) {
+                    $buyingPrice = $eachTank['total_consumption'] * $product['buying_price'];
+
+                    // Handle loss amount transaction
+                    if ($lossAmount < 0) {
+                        $lossCategory = Category::where('slug', strtolower(AccountCategory::EVAPORATIVE))
+                            ->where('client_company_id', $initialData['session_user']['client_company_id'])
+                            ->first();
+                        if ($lossCategory instanceof Category) {
+                            $description = 'Shift ID: ' . $shiftSale['id'] . ', Product: ' . $product['name'] . ', Loss: ' . abs($netProfit);
+                            $transactionData = [
+                                ['date' => date('Y-m-d', strtotime($initialData['date'])), 'description' => $description, 'account_id' => $lossCategory['id'], 'debit_amount' => abs($lossAmount), 'credit_amount' => 0],
+                                ['date' => date('Y-m-d', strtotime($initialData['date'])), 'description' => $description, 'account_id' => $stockCategory['id'], 'debit_amount' => 0, 'credit_amount' => abs($lossAmount)],
+                            ];
+                            TransactionRepository::saveTransaction($transactionData);
+                        }
+                    } else if ($lossAmount > 0) {
+                        // Handle profit amount transaction
+                        $description = 'Shift ID: ' . $shiftSale['id'] . ', Product: ' . $product['name'] . ', Windfall: ' . abs($netProfit);
+                        $transactionData = [
+                            ['date' => date('Y-m-d', strtotime($initialData['date'])), 'description' => $description, 'account_id' =>$stockCategory['id'], 'debit_amount' => abs($lossAmount), 'credit_amount' => 0],
+                            ['date' => date('Y-m-d', strtotime($initialData['date'])), 'description' => $description, 'account_id' => $incomeCategory['id'], 'debit_amount' => 0, 'credit_amount' => abs($lossAmount)],
+                        ];
+                        TransactionRepository::saveTransaction($transactionData);
+                    }
+
+                    if (!empty($buyingPrice)) {
+                        // Set linked ID based on vendor
+                        $linkedId = $stockCategory['id'];
+                        if (!empty($product['vendor_id'])) {
+                            $productType = ProductType::find($product['type_id']);
+                            if ($productType instanceof ProductType && $productType['vendor'] == 1) {
+                                $linkedId = $product['vendor_id'];
+                            }
+                        }
+
+                        // Save transaction for cost of goods sold
+                        $transactionData = [
+                            ['date' => date('Y-m-d', strtotime($initialData['date'])), 'account_id' => $costOfGoodSoldCategory['id'], 'debit_amount' => $buyingPrice, 'credit_amount' => 0, 'module' => 'shift sale', 'module_id' => $shiftTotal['id']],
+                            ['date' => date('Y-m-d', strtotime($initialData['date'])), 'account_id' => $linkedId, 'debit_amount' => 0, 'credit_amount' => $buyingPrice, 'module' => 'shift sale', 'module_id' => $shiftTotal['id']]
+                        ];
+                        TransactionRepository::saveTransaction($transactionData);
+                    }
                 }
             }
-        }
 
-        // Save transactions for each category in initialData
-        $shiftSaleTransaction = [];
-        foreach ($initialData['categories'] as $category) {
-            $transactionData['linked_id'] = $incomeCategory['id'];
-            $transactionData['transaction'] = [
-                ['date' => date('Y-m-d', strtotime($initialData['date'])), 'account_id' => $category['category_id'], 'debit_amount' => 0, 'credit_amount' => $category['amount'], 'module' => 'shift sale', 'module_id' => $shiftTotal->id]
-            ];
-            TransactionController::saveTransaction($transactionData);
-            $shiftSaleTransaction[] = [
-                'shift_id' => $shiftTotal['id'],
-                'category_id' => $category['category_id'],
-                'amount' => $category['amount']
-            ];
-        }
-        ShiftSaleTransaction::insert($shiftSaleTransaction);
-
+            // Save transactions for each category in initialData
+            $shiftSaleTransaction = [];
+            foreach ($initialData['categories'] as $category) {
+                $transactionData = [
+                    ['date' => date('Y-m-d', strtotime($initialData['date'])), 'account_id' => $category['category_id'], 'debit_amount' => $category['amount'], 'credit_amount' => 0, 'module' => 'shift sale', 'module_id' => $shiftTotal['id']],
+                    ['date' => date('Y-m-d', strtotime($initialData['date'])), 'account_id' => $incomeCategory['id'], 'debit_amount' => 0, 'credit_amount' => $category['amount'], 'module' => 'shift sale', 'module_id' => $shiftTotal['id']]
+                ];
+                TransactionRepository::saveTransaction($transactionData);
+                $shiftSaleTransaction[] = [
+                    'shift_id' => $shiftTotal['id'],
+                    'category_id' => $category['category_id'],
+                    'amount' => $category['amount']
+                ];
+            }
+            ShiftSaleTransaction::insert($shiftSaleTransaction);
+        });
         return $shiftTotal;
     }
 

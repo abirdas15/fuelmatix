@@ -56,9 +56,9 @@
                                                 <td><a href="javascript:void(0);">{{f.date}}</a></td>
                                                 <td><a href="javascript:void(0);">{{f.due_date}}</a></td>
                                                 <td><a href="javascript:void(0);">{{f?.name}}</a></td>
-                                                <td><a href="javascript:void(0);">{{f?.amount}}</a></td>
-                                                <td><a href="javascript:void(0);">{{f?.due_amount}}</a></td>
-                                                <td><a href="javascript:void(0);">{{f?.paid_amount}}</a></td>
+                                                <td><a href="javascript:void(0);">{{f?.format_amount}}</a></td>
+                                                <td><a href="javascript:void(0);">{{f?.format_due_amount}}</a></td>
+                                                <td><a href="javascript:void(0);">{{f?.format_paid_amount}}</a></td>
                                                 <td>
                                                     <a href="javascript:void(0);">
                                                         <span class="badge bg-warning text-bg-warning text-capitalize" v-if="f.status == 'due'">{{f?.status}}</span>

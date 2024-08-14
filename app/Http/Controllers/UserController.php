@@ -20,219 +20,353 @@ class UserController extends Controller
      */
     public function save(Request $request): JsonResponse
     {
-        $requestData = $request->all();
-        $validator = Validator::make($requestData, [
+        // Validate incoming request data
+        $validator = Validator::make($request->all(), [
             'name' => 'required|string',
             'role_id' => 'required|integer',
             'email' => 'required|email|unique:users,email',
-            'password' => 'required|min:8'
+            'password' => 'required|min:6',
+            'phone' => 'nullable|string',
+            'address' => 'nullable|string',
+            'cashier_balance' => 'nullable|boolean',
+            'opening_balance' => 'nullable|numeric'
         ]);
+
+        // Return validation errors if validation fails
         if ($validator->fails()) {
-            return response()->json(['status' => 500, 'errors' => $validator->errors()]);
+            return response()->json([
+                'status' => 500,
+                'errors' => $validator->errors()
+            ]);
         }
+
+        // Get the currently logged-in user
         $sessionUser = SessionUser::getUser();
+
+        // Create a new User instance
         $user = new User();
-        $user->name = $requestData['name'];
-        $user->email = $requestData['email'];
-        $user->role_id = $requestData['role_id'];
-        $user->password = bcrypt($requestData['password']);
-        $user->phone = $requestData['phone'] ?? null;
-        $user->address = $requestData['address'] ?? null;
+        $user->name = $request->input('name');
+        $user->email = $request->input('email');
+        $user->role_id = $request->input('role_id');
+        $user->password = bcrypt($request->input('password')); // Hash the password
+        $user->phone = $request->input('phone') ?? null; // Set phone if provided, else null
+        $user->address = $request->input('address') ?? null; // Set address if provided, else null
         $user->client_company_id = $sessionUser['client_company_id'];
-        $user->cashier_balance = !empty($requestData['cashier_balance']) ? 1 : 0;
+        $user->cashier_balance = !empty($request->input('cashier_balance')) ? 1 : 0; // Set cashier balance flag
+
+        // Save the user and check if it was successful
         if (!$user->save()) {
-            return response()->json(['status' => 500, 'message' => 'Cannot saved [user].']);
+            return response()->json(['status' => 500, 'message' => 'Cannot save user.']);
         }
-        if (!empty($requestData['cashier_balance'])) {
-            $cashInHandCategory = Category::where('client_company_id', $sessionUser['client_company_id'])->where('slug', strtolower(AccountCategory::CASH_IM_HAND))->first();
+
+        // If cashier_balance is set, handle cash in hand category
+        if (!empty($request->input('cashier_balance'))) {
+            // Find the "cash in hand" category for the user's company
+            $cashInHandCategory = Category::where('client_company_id', $sessionUser['client_company_id'])
+                ->where('slug', strtolower(AccountCategory::CASH_IN_HAND))
+                ->first();
+
             if (!$cashInHandCategory instanceof Category) {
-                return response()->json(['status' => 400, 'message' => 'Cannot find [cash in hand] category']);
+                return response()->json(['status' => 400, 'message' => 'Cannot find cash in hand category.']);
             }
+
+            // Prepare data for the new category
             $categoryData = [
-                'name' => $requestData['name'],
-                'opening_balance' => $requestData['opening_balance']
+                'name' => $request->input('name'),
+                'opening_balance' => $request->input('opening_balance', 0) // Default to 0 if not provided
             ];
-            $cashInHandCategory = CategoryRepository::saveCategory($categoryData, $cashInHandCategory['id'], null);
+
+            // Save or update the cash in hand category
+            $cashInHandCategory = CategoryRepository::saveCategory($categoryData, $cashInHandCategory->id, null);
+
+            // Update user's category_id with the new category ID
             if ($cashInHandCategory instanceof Category) {
                 $user->category_id = $cashInHandCategory->id;
                 $user->save();
             }
-            if (!empty($request['opening_balance'])) {
-                $deleteResponse = $cashInHandCategory->deleteOpeningBalance();
-                if ($deleteResponse) {
-                    if (!empty($request['opening_balance'])) {
-                        $retainEarning = Category::where('client_company_id', $request['session_user']['client_company_id'])->where('slug', strtolower(AccountCategory::RETAIN_EARNING))->first();
-                        if ($retainEarning instanceof Category) {
-                            $transactionData['linked_id'] = $cashInHandCategory['id'];
-                            $transactionData['transaction'] = [
-                                ['date' => "1970-01-01",  'account_id' => $retainEarning['id'], 'debit_amount' => $requestData['opening_balance'], 'credit_amount' => 0, 'opening_balance' => 1],
-                            ];
-                            TransactionController::saveTransaction($transactionData);
-                        }
-                    }
-                }
-            }
+
+            // Add the opening balance to the category
+            $cashInHandCategory->addOpeningBalance();
         }
-        return response()->json(['status' => 200, 'message' => 'Successfully saved user.']);
+
+        // Return success response
+        return response()->json([
+            'status' => 200,
+            'message' => 'Successfully saved user.'
+        ]);
     }
+
     /**
-     * @param Request $request
-     * @return JsonResponse
+     * Retrieves a paginated list of users with optional filtering and sorting.
+     *
+     * @param Request $request The HTTP request object containing input parameters.
+     * @return JsonResponse The JSON response containing the paginated list of users.
      */
     public function list(Request $request): JsonResponse
     {
-        $requestData = $request->all();
+        // Get the currently logged-in user's session information
         $sessionUser = SessionUser::getUser();
-        $limit = $requestData['limit'] ?? 10;
-        $orderBy = $requestData['order_by'] ?? 'id';
-        $orderMode = $requestData['order_mode'] ?? 'DESC';
-        $keyword = $requestData['keyword'] ?? '';
+
+        // Get the limit for pagination, defaulting to 10 if not provided
+        $limit = $request->input('limit', 10);
+
+        // Get the column to sort by, defaulting to 'id' if not provided
+        $orderBy = $request->input('order_by', 'id');
+
+        // Get the sorting direction, defaulting to 'DESC' if not provided
+        $orderMode = $request->input('order_mode', 'DESC');
+
+        // Get the search keyword from the request, defaulting to an empty string if not provided
+        $keyword = $request->input('keyword', '');
+
+        // Query the User model with selected columns and join with roles and categories
         $result = User::select('users.id', 'users.name', 'users.email', 'users.phone', 'users.category_id', 'users.address', 'roles.name as role', 'categories.opening_balance')
             ->leftJoin('roles', 'roles.id', '=', 'users.role_id')
             ->leftJoin('categories', 'categories.id', '=', 'users.category_id')
             ->where('users.client_company_id', $sessionUser['client_company_id']);
+
+        // Apply keyword search if a keyword is provided
         if (!empty($keyword)) {
             $result->where(function($q) use ($keyword) {
-                $q->where('users.name', 'LIKE', '%'.$keyword.'%');
-                $q->owWhere('users.email', 'LIKE', '%'.$keyword.'%');
+                $q->where('users.name', 'LIKE', '%'.$keyword.'%')
+                    ->orWhere('users.email', 'LIKE', '%'.$keyword.'%');
             });
         }
+
+        // Order the results and paginate based on the limit
         $result = $result->orderBy($orderBy, $orderMode)
             ->paginate($limit);
-        return response()->json(['status' => 200, 'data' => $result]);
+
+        // Return the paginated results as a JSON response
+        return response()->json([
+            'status' => 200,
+            'data' => $result
+        ]);
     }
+
     /**
-     * @param Request $request
-     * @return JsonResponse
+     * Retrieves a single user's details based on the provided ID.
+     *
+     * @param Request $request The HTTP request object containing the user ID.
+     * @return JsonResponse The JSON response containing the user's details.
      */
     public function single(Request $request): JsonResponse
     {
-        $requestData = $request->all();
-        $validator = Validator::make($requestData, [
-            'id' => 'required'
+        // Validate the request input to ensure the 'id' is provided and is an integer
+        $validator = Validator::make($request->all(), [
+            'id' => 'required|integer'
         ]);
+
+        // If validation fails, return a JSON response with status 500 and validation errors
         if ($validator->fails()) {
-            return response()->json(['status' => 500, 'errors' => $validator->errors()]);
+            return response()->json([
+                'status' => 500,
+                'errors' => $validator->errors()
+            ]);
         }
+
+        // Retrieve the user details based on the provided ID
         $result = User::select('id', 'name', 'email', 'phone', 'address', 'cashier_balance', 'role_id', 'category_id')
-            ->where('id', $requestData['id'])
+            ->where('id', $request->input('id'))
             ->first();
+
+        // Initialize 'opening_balance' to null
         $result['opening_balance'] = null;
+
+        // If the user has a category ID, find the category and set the 'opening_balance'
         if (!empty($result['category_id'])) {
             $category = Category::find($result['category_id']);
             if ($category instanceof Category) {
                 $result['opening_balance'] = $category['opening_balance'];
             }
         }
-        return response()->json(['status' => 200, 'data' => $result]);
+
+        // Return the user's details as a JSON response
+        return response()->json([
+            'status' => 200,
+            'data' => $result
+        ]);
     }
 
+
     /**
-     * @param Request $request
-     * @return JsonResponse
+     * Updates a user's details based on the provided input.
+     *
+     * @param Request $request The HTTP request object containing the user details to update.
+     * @return JsonResponse The JSON response indicating the result of the update operation.
      */
     public function update(Request $request): JsonResponse
     {
-        $requestData = $request->all();
-        $validator = Validator::make($requestData, [
+        // Validate the request input to ensure all required fields are provided and correctly formatted
+        $validator = Validator::make($request->all(), [
             'id' => 'required|integer',
             'name' => 'required|string',
             'role_id' => 'required|integer',
             'email' => 'required|email',
-            'password' => 'sometimes|min:8',
+            'password' => 'sometimes|min:6',
             'opening_balance' => 'nullable|numeric'
         ]);
+
+        // If validation fails, return a JSON response with status 500 and validation errors
         if ($validator->fails()) {
-            return response()->json(['status' => 500, 'errors' => $validator->errors()]);
-        }
-        $sessionUser = SessionUser::getUser();
-        $user = User::where('client_company_id', $sessionUser['client_company_id'])->where('email', $requestData['email'])->where('id', '!=', $requestData['id'])->first();
-        if ($user instanceof User) {
-            return response()->json(['status' => 500, 'errors' => ['email' => ['The email already have been taken.']]]);
+            return response()->json([
+                'status' => 500,
+                'errors' => $validator->errors()
+            ]);
         }
 
-        $user = User::find($requestData['id']);
+        // Retrieve the session user information
+        $sessionUser = SessionUser::getUser();
+
+        // Check if another user with the same email exists within the same company
+        $user = User::where('client_company_id', $sessionUser['client_company_id'])
+            ->where('email', $request->input('email'))
+            ->where('id', '!=', $request->input('id'))
+            ->first();
+
+        // If another user with the same email exists, return an error response
+        if ($user instanceof User) {
+            return response()->json([
+                'status' => 500,
+                'errors' => ['email' => ['The email has already been taken.']]
+            ]);
+        }
+
+        // Find the user to update
+        $user = User::find($request->input('id'));
+
+        // If the user is not found, return an error response
         if (!$user instanceof User) {
-            return response()->json(['status' => 500, 'message' => 'Cannot find user']);
+            return response()->json([
+                'status' => 500,
+                'message' => 'Cannot find user'
+            ]);
         }
-        $user->name = $requestData['name'];
-        $user->role_id = $requestData['role_id'];
-        $user->email = $requestData['email'];
-        if (!empty($requestData['password'])) {
-            $user->password = bcrypt($requestData['password']);
+
+        // Update the user details with the provided data
+        $user->name = $request->input('name');
+        $user->role_id = $request->input('role_id');
+        $user->email = $request->input('email');
+
+        // Update the password if provided
+        if (!empty($request->input('password'))) {
+            $user->password = bcrypt($request->input('password'));
         }
-        $user->phone = $requestData['phone'] ?? null;
-        $user->address = $requestData['address'] ?? null;
+
+        // Update optional fields
+        $user->phone = $request->input('phone') ?? null;
+        $user->address = $request->input('address') ?? null;
         $user->client_company_id = $sessionUser['client_company_id'];
-        $user->cashier_balance = !empty($requestData['cashier_balance']) ? 1 : 0;
+        $user->cashier_balance = !empty($request->input('cashier_balance')) ? 1 : 0;
+
+        // Save the user and return an error response if saving fails
         if (!$user->save()) {
-            return response()->json(['status' => 400, 'message' => 'Cannot updated [user].']);
+            return response()->json([
+                'status' => 400,
+                'message' => 'Cannot update user.'
+            ]);
         }
+
+        // Prepare category data for cash-in-hand category
         $categoryData = [
-            'name' => $requestData['name'],
-            'opening_balance' => $requestData['opening_balance'],
+            'name' => $request->input('name'),
+            'opening_balance' => $request->input('opening_balance'),
         ];
-        $cashInHandCategory = Category::where('client_company_id', $sessionUser['client_company_id'])->where('slug', strtolower(AccountCategory::CASH_IM_HAND))->first();
+
+        // Find or create the cash-in-hand category
+        $cashInHandCategory = Category::where('client_company_id', $sessionUser['client_company_id'])
+            ->where('slug', strtolower(AccountCategory::CASH_IN_HAND))
+            ->first();
+
+        // If the cash-in-hand category is not found, return an error response
         if (!$cashInHandCategory instanceof Category) {
-            return response()->json(['status' => 400, 'message' => 'Cannot find [cash in hand] category']);
+            return response()->json([
+                'status' => 400,
+                'message' => 'Cannot find [cash in hand] category'
+            ]);
         }
-        if (!empty($requestData['cashier_balance']) && empty($user['category_id'])) {
-            $cashInHandCategory = CategoryRepository::saveCategory($categoryData, $cashInHandCategory['id'], null);
+
+        // Handle cash-in-hand category creation or update based on the user's cashier balance
+        if (!empty($request->input('cashier_balance')) && empty($user->category_id)) {
+            $cashInHandCategory = CategoryRepository::saveCategory($categoryData, $cashInHandCategory->id, null);
             if ($cashInHandCategory instanceof Category) {
                 $user->category_id = $cashInHandCategory->id;
                 $user->save();
             }
-        } else if (!empty($requestData['cashier_balance']) && !empty($user['category_id'])) {
+        } else if (!empty($request->input('cashier_balance')) && !empty($user->category_id)) {
             $category = Category::find($user->category_id);
             if (!$category instanceof Category) {
-                $cashInHandCategory = CategoryRepository::saveCategory($categoryData, $cashInHandCategory['id'], null);
+                $cashInHandCategory = CategoryRepository::saveCategory($categoryData, $cashInHandCategory->id, null);
                 $user->category_id = $cashInHandCategory->id;
                 $user->save();
             } else {
                 $cashInHandCategory = CategoryRepository::updateCategory($category, $categoryData);
             }
         }
-        if ($cashInHandCategory instanceof Category && !empty($request['opening_balance'])) {
-            $deleteResponse = $cashInHandCategory->deleteOpeningBalance();
-            if ($deleteResponse) {
-                if (!empty($request['opening_balance'])) {
-                    $retainEarning = Category::where('client_company_id', $request['session_user']['client_company_id'])->where('slug', strtolower(AccountCategory::RETAIN_EARNING))->first();
-                    if ($retainEarning instanceof Category) {
-                        $transactionData['linked_id'] = $cashInHandCategory['id'];
-                        $transactionData['transaction'] = [
-                            ['date' => "1970-01-01",  'account_id' => $retainEarning['id'], 'debit_amount' => $request['opening_balance'], 'credit_amount' => 0, 'opening_balance' => 1],
-                        ];
-                        TransactionController::saveTransaction($transactionData);
-                    }
-                }
-            }
+
+        // Add opening balance if applicable
+        if ($cashInHandCategory instanceof Category && !empty($request->input('opening_balance'))) {
+            $cashInHandCategory->addOpeningBalance();
         }
-        return response()->json(['status' => 200, 'message' => 'Successfully updated user.']);
+
+        // Return a success response
+        return response()->json([
+            'status' => 200,
+            'message' => 'Successfully updated user.'
+        ]);
     }
+
     /**
-     * @param Request $request
-     * @return JsonResponse
+     * Deletes a user based on the provided ID.
+     *
+     * @param Request $request The HTTP request object containing the user ID to delete.
+     * @return JsonResponse The JSON response indicating the result of the delete operation.
      */
     public function delete(Request $request): JsonResponse
     {
+        // Retrieve all request data
         $requestData = $request->all();
+
+        // Validate the request input to ensure 'id' is provided
         $validator = Validator::make($requestData, [
-            'id' => 'required',
+            'id' => 'required'
         ]);
+
+        // If validation fails, return a JSON response with status 500 and validation errors
         if ($validator->fails()) {
-            return response()->json(['status' => 500, 'errors' => $validator->errors()]);
+            return response()->json([
+                'status' => 500,
+                'errors' => $validator->errors()
+            ]);
         }
+
+        // Find the user by ID
         $user = User::find($requestData['id']);
+
+        // If the user is not found, return an error response
         if (!$user instanceof User) {
-            return response()->json(['status' => 500, 'message' => 'Cannot find user.']);
+            return response()->json([
+                'status' => 500,
+                'message' => 'Cannot find user.'
+            ]);
         }
+
+        // If the user has a category ID, find the category and delete it
         if (!empty($user['category_id'])) {
-            $transaction = Transaction::where('account_id', $user['category_id'])->orWhere('linked_id', $user['category_id'])->first();
-            if ($transaction instanceof Transaction) {
-                return response()->json(['status' => 500, 'message' => 'Cannot deleted user. Because user already have been transaction.']);
+            $category = Category::where('id', $user['category_id'])->first();
+            if ($category) {
+                $category->deleteCategory();
             }
         }
+
+        // Delete the user
         User::where('id', $requestData['id'])->delete();
-        return response()->json(['status' => 200, 'message' => 'Successfully deleted user.']);
+
+        // Return a success response
+        return response()->json([
+            'status' => 200,
+            'message' => 'Successfully deleted user.'
+        ]);
     }
+
 }

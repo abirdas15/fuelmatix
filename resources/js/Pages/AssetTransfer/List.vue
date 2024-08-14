@@ -197,6 +197,12 @@ export default {
                 if (parseInt(res.status) === 200) {
                     this.$toast.success(res.message);
                     // this.list()
+                } else if (parseInt(res.status) === 300) {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Oops...",
+                        text: res.message
+                    });
                 } else {
                     ApiService.ErrorHandler(res.error);
                 }

@@ -12,10 +12,12 @@ use App\Models\Purchase;
 use App\Models\PurchaseItem;
 use App\Repository\ProductPriceRepository;
 use App\Repository\PurchaseRepository;
+use App\Repository\TransactionRepository;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat\Wizard\Currency;
 
 class PurchaseController extends Controller
 {
@@ -81,11 +83,11 @@ class PurchaseController extends Controller
             if (!$stockCategory instanceof Category) {
                 return response()->json(['status' => 500, 'error' => 'Cannot find account stock category.']);
             }
-            $transactionData['linked_id'] = $stockCategory['id'];
-            $transactionData['transaction'] = [
-                ['date' => $requestData['date'], 'account_id' => $vendor['id'], 'debit_amount' => $purchase_item['total'], 'credit_amount' => 0, 'module' => Module::PURCHASE, 'module_id' => $purchase->id]
+            $transactionData = [
+                ['date' => $requestData['date'], 'account_id' => $stockCategory['id'], 'debit_amount' => $purchase_item['total'], 'credit_amount' => 0, 'module' => Module::PURCHASE, 'module_id' => $purchase->id],
+                ['date' => $requestData['date'], 'account_id' => $vendor['id'], 'debit_amount' => 0, 'credit_amount' => $purchase_item['total'], 'module' => Module::PURCHASE, 'module_id' => $purchase->id]
             ];
-            TransactionController::saveTransaction($transactionData);
+            TransactionRepository::saveTransaction($transactionData);
             ProductPriceRepository::save(new ProductPrice(), [
                 'date' => $requestData['date'],
                 'product_id' => $purchase_item['product_id'],
@@ -122,38 +124,97 @@ class PurchaseController extends Controller
         return response()->json(['status' => 200, 'data' => $response]);
     }
     /**
-     * @param Request $request
-     * @return JsonResponse
+     * Handles the payment for a purchase.
+     *
+     * @param Request $request The HTTP request containing payment details.
+     * @return JsonResponse The response indicating the success or failure of the payment process.
      */
     public function pay(Request $request): JsonResponse
     {
-        $requestData = $request->all();
-        $validator = Validator::make($requestData, [
+        // Validate the incoming request data to ensure required fields are present and correctly formatted
+        $validator = Validator::make($request->all(), [
             'purchase_id' => 'required|integer',
             'payment_id' => 'required|integer',
-            'amount' => 'required'
+            'amount' => 'required|numeric|min:0'
         ]);
+
+        // If validation fails, return a JSON response with error details
         if ($validator->fails()) {
-            return response()->json(['status' => 500, 'errors' => $validator->errors()]);
+            return response()->json([
+                'status' => 500,
+                'errors' => $validator->errors()
+            ]);
         }
-        $purchase = Purchase::where('id', $requestData['purchase_id'])->first();
-        if (!$purchase instanceof Purchase) {
-            return response()->json(['status' => 400, 'message' => 'Cannot find purchase.']);
+
+        // Retrieve the purchase record by ID and check if it exists
+        $purchase = Purchase::find($request->input('purchase_id'));
+        if (!$purchase) {
+            // If the purchase record is not found, return an error response
+            return response()->json([
+                'status' => 400,
+                'message' => 'Cannot find purchase.'
+            ]);
         }
-        $category = Category::where('id', $requestData['payment_id'])->first();
-        if (!$category instanceof Category) {
-            return response()->json(['status' => 500, 'message' => 'Cannot find payment category.']);
+
+        // Retrieve the payment category by ID and check if it exists
+        $category = Category::find($request->input('payment_id'));
+        if (!$category) {
+            // If the payment category is not found, return an error response
+            return response()->json([
+                'status' => 500,
+                'errors' => ['payment_id' => ['Cannot find payment category.']]
+            ]);
         }
-        $purchase->paid = $requestData['amount'] + $purchase['paid'];
+
+        // Check if the category has enough available balance for the payment amount
+        if (!$category->checkAvailableBalance($request->input('amount'))) {
+            // If there is not enough balance, return an error response
+            return response()->json([
+                'status' => 500,
+                'errors' => ['payment_id' => ['Not enough balance in '.$category->name.'.']]
+            ]);
+        }
+
+        // Update the paid amount and status of the purchase
+        $purchase->paid += $request->input('amount');
         $purchase->status = $purchase->paid == 0 ? 'paid' : 'partially paid';
+
+        // Attempt to save the purchase record; if it fails, return an error response
         if (!$purchase->save()) {
-            return response()->json(['status' => 400, 'message' => 'Cannot pay amount.']);
+            return response()->json([
+                'status' => 400,
+                'message' => 'Cannot pay amount.'
+            ]);
         }
-        $transactionData['linked_id'] = $requestData['payment_id'];
-        $transactionData['transaction'] = [
-            ['date' => date('Y-m-d'), 'account_id' => $purchase['vendor_id'], 'debit_amount' => 0, 'credit_amount' => $requestData['amount'], 'module' => Module::PURCHASE_PAYMENT, 'module_id' => $purchase->id]
+
+        // Prepare the transaction data for recording the payment
+        $transactionData = [
+            [
+                'date' => date('Y-m-d'),
+                'account_id' => $purchase->vendor_id,
+                'debit_amount' => $request->input('amount'),
+                'credit_amount' => 0,
+                'module' => Module::PURCHASE_PAYMENT,
+                'module_id' => $purchase->id,
+            ],
+            [
+                'date' => date('Y-m-d'),
+                'account_id' => $request->input('payment_id'),
+                'debit_amount' => 0,
+                'credit_amount' => $request->input('amount'),
+                'module' => Module::PURCHASE_PAYMENT,
+                'module_id' => $purchase->id,
+            ]
         ];
-        TransactionController::saveTransaction($transactionData);
-        return response()->json(['status' => 200, 'message' => 'Successfully paid amount.']);
+
+        // Save the transaction records to the database
+        TransactionRepository::saveTransaction($transactionData);
+
+        // Return a success response indicating the payment was processed successfully
+        return response()->json([
+            'status' => 200,
+            'message' => 'Successfully paid amount.'
+        ]);
     }
+
 }

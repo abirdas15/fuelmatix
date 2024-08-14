@@ -91,6 +91,7 @@
 import ApiService from "../../Services/ApiService";
 import ApiRoutes from "../../Services/ApiRoutes";
 import moment from "moment";
+import Swal from 'sweetalert2/dist/sweetalert2.js'
 export default {
     data() {
         return {
@@ -163,6 +164,12 @@ export default {
                     this.$router.push({
                         name: 'Expense'
                     })
+                } else if (parseInt(res.status) === 300) {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Oops...",
+                        text: res.message
+                    });
                 } else {
                     ApiService.ErrorHandler(res.errors);
                 }

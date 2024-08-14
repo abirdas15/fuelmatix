@@ -114,17 +114,17 @@ class FuelMatixCategory extends Command
         }
         $this->info('Successfully Save '. AccountCategory::ACCOUNT_RECEIVABLE);
 
-        $this->info('Category: '. AccountCategory::CASH_IM_HAND);
+        $this->info('Category: '. AccountCategory::CASH_IN_HAND);
         $cashInHandCategory = $this->saveCategory([
-            'name' => AccountCategory::CASH_IM_HAND,
+            'name' => AccountCategory::CASH_IN_HAND,
             'parent_category' => $currentAssetCategory['id'],
             'type' => FuelMatixCategoryType::ASSET,
             'client_company_id' => $clientCompany->id,
         ]);
         if (!$cashInHandCategory instanceof Category) {
-            $this->warn('Cannot save category ['.AccountCategory::CASH_IM_HAND.']...');
+            $this->warn('Cannot save category ['.AccountCategory::CASH_IN_HAND.']...');
         }
-        $this->info('Successfully Save '. AccountCategory::CASH_IM_HAND);
+        $this->info('Successfully Save '. AccountCategory::CASH_IN_HAND);
 
 
         $this->info('Category: '. AccountCategory::STOCK_IN_HAND);

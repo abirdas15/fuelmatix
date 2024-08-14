@@ -25,6 +25,7 @@ use App\Models\Tank;
 use App\Models\TankLog;
 use App\Models\TankRefill;
 use App\Models\TankRefillHistory;
+use App\Models\TankRefillTotal;
 use App\Models\User;
 use App\Repository\CategoryRepository;
 use App\Repository\NozzleRepository;
@@ -478,145 +479,83 @@ class TankController extends Controller
     public function refillSave(Request $request): JsonResponse
     {
         $inputData = $request->all();
-        $validator = Validator::make($inputData, [
-            'date' => 'required',
-            'tank_id' => 'required',
-            'pay_order_id' => 'required',
-            'quantity' => 'required',
+        $validator = Validator::make($request->all(), [
+            'date' => 'required|date',
+            'pay_order_id' => 'required|integer',
+            'tanks' => 'required|array',
+            'tanks.*.id' => 'required',
+            'tanks.*.dip_sale' => 'required|numeric|min:0',
+            'tanks.*.start_reading_mm' => 'nullable|numeric|min:0',
+            'tanks.*.end_reading_mm' => 'nullable|numeric|min:0',
+            'tanks.*.dispensers' => 'array',
+            'tanks.*.dispensers.*.nozzle' => 'array',
+            'tanks.*.dispensers.*.nozzle.*.start_reading' => 'nullable|numeric|min:0',
+            'tanks.*.dispensers.*.nozzle.*.end_reading' => 'nullable|numeric|min:0',
+            'tanks.*.dispensers.*.nozzle.*.sale' => 'nullable|numeric|min:0',
+            'total_refill_volume' => 'required|numeric|min:0',
+        ],[
+            'tanks.*.dip_sale.min' => 'The volume cannot be negative.',
+            'total_refill_volume.min' => 'The total refill volume cannot be negative.',
+            'tanks.*.start_reading_mm.min' => 'The start reading cannot be negative.',
+            'tanks.*.end_reading_mm.min' => 'The end reading cannot be negative.',
+            'tanks.*.dispensers.*.nozzle.*.start_reading.min' => 'The start reading cannot be negative.',
+            'tanks.*.dispensers.*.nozzle.*.end_reading.min' => 'The end reading cannot be negative.',
+            'tanks.*.dispensers.*.nozzle.*.sale.min' => 'The sale cannot be negative.',
         ]);
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
-
         $sessionUser = SessionUser::getUser();
-        $tank = Tank::find($inputData['tank_id']);
-        if (!$tank instanceof Tank) {
-            return response()->json(['status' => 400, 'message' => 'Can not find [tank].']);
+        if (!$sessionUser instanceof User) {
+            return response()->json([
+                'status' => 500,
+                'message' => 'Session user cannot be found.'
+            ]);
         }
-        if (empty($tank['product_id'])) {
-            return response()->json(['status' => 400, 'message' => 'Tank has no product. Please assign product.']);
-        }
-        $shiftSale = ShiftTotal::where('client_company_id', $sessionUser['client_company_id'])->where('product_id', $tank['product_id'])->where('status', 'start')->first();
+        $shiftSale = ShiftTotal::where('client_company_id', $sessionUser['client_company_id'])
+            ->where('product_id', $request->input('product_id'))
+            ->where('status', 'start')
+            ->first();
         if (!$shiftSale instanceof ShiftTotal) {
             return response()->json(['status' => 400, 'message' => 'Please start shift sale first.']);
         }
-        $product = Product::find($tank['product_id']);
+        $payOrder = PayOrderData::where('product_id', $request->input('product_id'))
+            ->leftJoin('pay_order', 'pay_order.id', '=', 'pay_order_data.pay_order_id')
+            ->where('pay_order_id', $inputData['pay_order_id'])
+            ->where('status', FuelMatixStatus::PENDING)->first();
+        if (!$payOrder instanceof PayOrderData) {
+            return response()->json([
+                'status' => 500,
+                'errors' => ['pay_order_id' => ['The pay order cannot be found.']]
+            ]);
+        }
+        $product = Product::find($request->input('product_id'));
         if (!$product instanceof Product) {
             return response()->json(['status' => 400, 'message' => 'Can not find [product].']);
-        }
-
-        $payOrder = PayOrderData::where('product_id', $tank['product_id'])->where('pay_order_id', $inputData['pay_order_id'])->where('status', FuelMatixStatus::PENDING)->first();
-        if (!$payOrder instanceof PayOrderData) {
-            return response()->json(['status' => 400, 'message' => 'Cannot find [pay order].']);
-        }
-
-        // Fetch stock category for the tank
-        $stockCategory = Category::where('module', Module::TANK)
-            ->where('module_id', $inputData['tank_id'])
-            ->where('client_company_id', $sessionUser['client_company_id'])
-            ->first();
-        if (!$stockCategory instanceof Category) {
-            return response()->json(['status' => 400, 'message' => 'Cannot find [stock] category.']);
         }
         $category = Category::where('slug', strtolower(AccountCategory::COST_OF_GOOD_SOLD))->where('client_company_id', $inputData['session_user']['client_company_id'])->first();
         $costOfGoodSoldCategory = Category::where('parent_category', $category['id'])
             ->where('module', 'product')
-            ->where('module_id', $tank['product_id'])
+            ->where('module_id', $request->input('product_id'))
             ->where('client_company_id', $inputData['session_user']['client_company_id'])
             ->first();
         if (!$costOfGoodSoldCategory instanceof Category) {
             return response()->json(['status' => 400, 'message' => 'Cannot find [cost of good sold] category.']);
         }
-        $lossAmount = $inputData['net_profit']  * $payOrder['unit_price'];
-        $tankRefill = new TankRefill();
-        $tankRefill->date = $inputData['date'];
-        $tankRefill->time = Carbon::now(SessionUser::TIMEZONE)->format(FuelMatixDateTimeFormat::ONLY_TIME);
-        $tankRefill->tank_id = $inputData['tank_id'];
-        $tankRefill->pay_order_id = $inputData['pay_order_id'];
-        $tankRefill->quantity = $inputData['quantity'];
-        $tankRefill->start_reading = $inputData['start_reading'];
-        $tankRefill->end_reading = $inputData['end_reading'] ?? 0;
-        $tankRefill->dip_sale = $inputData['dip_sale'] ?? 0;
-        $tankRefill->total_refill_volume = $inputData['total_refill_volume'] ?? 0;
-        $tankRefill->net_profit = $inputData['net_profit'] ?? 0;
-        $tankRefill->net_profit_amount = $lossAmount ?? 0;
-        $tankRefill->shift_sale_id = $shiftSale['id'];
-        $tankRefill->client_company_id = $inputData['session_user']['client_company_id'];
-        if (!$tankRefill->save()) {
-            return response()->json(['status' => 400, 'message' => 'Cannot saved tank refill.']);
-        }
-        TankRepository::readingSave([
-            'tank_id' => $inputData['tank_id'],
-            'date' => date('Y-m-d'),
-            'height' =>  $inputData['end_reading_mm'] ?? 0,
-            'volume' =>  $inputData['end_reading'] ?? 0,
-            'type' => 'tank refill',
-        ]);
-        if ($tankRefill['net_profit'] < 0) {
-            // Loss amount transaction after tank refill
-            $lossCategory = Category::where('slug', strtolower(AccountCategory::EVAPORATIVE))
-                ->where('client_company_id', $inputData['session_user']['client_company_id'])
-                ->first();
-            if ($lossCategory instanceof Category) {
-                $description = 'Shift ID: '.$shiftSale['id'].', Product: '.$product['name'].', Loss: '.abs($tankRefill['net_profit']);
-                $transactionData['linked_id'] = $lossCategory['id'];
-                $transactionData['transaction'] = [
-                    ['date' => $inputData['date'], 'description' => $description, 'account_id' => $stockCategory['id'], 'debit_amount' => abs($lossAmount), 'credit_amount' => 0, 'module' => 'tank refill', 'module_id' => $tankRefill->id],
-                ];
-                TransactionController::saveTransaction($transactionData);
-            }
-        } else if ($tankRefill['net_profit'] > 0) {
-            // Profit amount transaction after tank refill
-            $category = Category::where('slug', strtolower(AccountCategory::DIRECT_INCOME))->where('client_company_id', $inputData['session_user']['client_company_id'])->first();
-            $incomeCategory = Category::where('parent_category', $category['id'])
-                ->where('module', 'product')
-                ->where('module_id', $tank['product_id'])
-                ->where('client_company_id', $inputData['session_user']['client_company_id'])
-                ->first();
-            if ($incomeCategory instanceof Category) {
-                $description = 'Shift ID: '.$shiftSale['id'].', Product: '.$product['name'].', Windfall: '.abs($tankRefill['net_profit']);
-                $transactionData['linked_id'] = $stockCategory['id'];
-                $transactionData['transaction'] = [
-                    ['date' => $inputData['date'], 'description' => $description, 'account_id' => $incomeCategory['id'], 'debit_amount' => abs($lossAmount), 'credit_amount' => 0, 'module' => 'tank refill', 'module_id' => $tankRefill->id],
-                ];
-                TransactionController::saveTransaction($transactionData);
-            }
-        }
+        $request->merge(['shift_id' => $shiftSale->id]);
+        $request->merge(['product_name' => $product->name]);
+        $request->merge(['vendor_id' => $payOrder->vendor_id]);
 
-        $productPrice = new ProductPrice();
-        $productPrice->date = $inputData['date'];
-        $productPrice->product_id = $tank['product_id'];
-        $productPrice->quantity = $payOrder['quantity'];
-        $productPrice->stock_quantity = $payOrder['quantity'];
-        $productPrice->price = $payOrder['amount'];
-        $productPrice->unit_price = $payOrder['amount'] / $payOrder['quantity'];
-        $productPrice->module = 'tank refill';
-        $productPrice->module_id = $tankRefill->id;
-        $productPrice->client_company_id = $inputData['session_user']['client_company_id'];
-        $productPrice->save();
-        if (isset($inputData['dispensers'])) {
-            foreach ($inputData['dispensers'] as $dispenser) {
-                foreach ($dispenser['nozzle'] as $nozzle) {
-                    $tankRefillHistory = new TankRefillHistory();
-                    $tankRefillHistory->tank_refill_id = $tankRefill->id;
-                    $tankRefillHistory->nozzle_id = $nozzle['id'];
-                    $tankRefillHistory->start_reading = $nozzle['start_reading'];
-                    $tankRefillHistory->end_reading = $nozzle['end_reading'];
-                    $tankRefillHistory->sale = $nozzle['sale'];
-                    $tankRefillHistory->save();
-                    $readingData = [
-                        'date' => date('Y-m-d'),
-                        'nozzle_id' => $nozzle['id'],
-                        'reading' => $nozzle['end_reading'],
-                        'type' => 'tank refill',
-                    ];
-                    NozzleRepository::readingSave($readingData);
-                }
-            }
+        $response = TankRepository::saveTankRefill($request->all(), $product);
+        if (!$response instanceof TankRefillTotal) {
+            return response()->json($response);
         }
         $payOrder->status = FuelMatixStatus::COMPLETE;
         $payOrder->save();
-        return response()->json(['status' => 200, 'message' => 'Successfully saved tank refill.']);
+        return response()->json([
+            'status' => 200,
+            'message' => 'Successfully saved tank refill.'
+        ]);
     }
     /**
      * @param Request $request
@@ -795,11 +734,16 @@ class TankController extends Controller
                 $tank_id = $tank['id'];
             }
         }
-        $bstiChart = BstiChart::select('volume')->where('tank_id', $tank_id) ->where('height', '=', floor($requestData['height']))
-            ->first();
+        $tank = Tank::where('id', $tank_id)->first();
+        if (!$tank instanceof Tank) {
+            return response()->json([
+                'status' => 400,
+                'message' => 'Cannot find [tank].'
+            ]);
+        }
         return response()->json([
             'status' => 200,
-            'data' => $bstiChart['volume'] ?? 0
+            'data' => $tank->findVolume($request->input('height'))
         ]);
     }
     /**
@@ -823,4 +767,96 @@ class TankController extends Controller
             'data' => $bstiChart
         ]);
     }
+    /**
+     * Retrieves tanks with the latest readings and their associated dispensers and nozzles.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function tankWithLatestReading(Request $request): JsonResponse
+    {
+        // Validate the incoming request
+        $validator = Validator::make($request->all(), [
+            'product_id' => 'required|integer'
+        ]);
+
+        // If validation fails, return a JSON response with status 500 and error messages
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 500,
+                'errors' => $validator->errors()
+            ]);
+        }
+
+        // Get the session user
+        $sessionUser = SessionUser::getUser();
+
+        // Query to get tanks with the latest log
+        $tanks = Tank::select('tank.id', 'tank.tank_name', 'tank.opening_stock', 'tank_log.volume', 'tank_log.height')
+            ->leftJoin('tank_log', function($join) {
+                $join->on('tank.id', '=', 'tank_log.tank_id')
+                    ->whereRaw('tank_log.id = (SELECT MAX(t2.id) FROM tank_log t2 WHERE t2.tank_id = tank.id)');
+            })
+            ->where('tank.product_id', $request->input('product_id'))
+            ->where('tank.client_company_id', $sessionUser['client_company_id'])
+            ->get()
+            ->toArray();
+
+        // Query to get dispensers with their associated nozzles and latest nozzle readings
+        $dispensers = Dispenser::select('id', 'dispenser_name', 'tank_id')
+            ->where('product_id', $request->input('product_id'))
+            ->where('client_company_id', $sessionUser['client_company_id'])
+            ->with(['nozzle' => function ($query) {
+                $query->select('nozzles.id', 'nozzles.dispenser_id', 'nozzles.name', 'nozzles.opening_stock', 'nozzles.pf', 'nozzles.max_value', 'nozzle_readings.reading')
+                    ->leftJoin('nozzle_readings', function($join) {
+                        $join->on('nozzles.id', '=', 'nozzle_readings.nozzle_id')
+                            ->whereRaw('nozzle_readings.id = (SELECT MAX(nr2.id) FROM nozzle_readings nr2 WHERE nr2.nozzle_id = nozzles.id)');
+                    });
+            }])
+            ->get()
+            ->toArray();
+
+        // Initialize an array to store dispensers grouped by tank_id
+        $dispenserArray = [];
+
+        // Process dispensers and their nozzles
+        foreach ($dispensers as &$dispenser) {
+            foreach ($dispenser['nozzle'] as &$nozzle) {
+                // Set initial values for nozzle readings
+                $nozzle['start_reading'] = $nozzle['opening_stock'] ?? 0;
+                if (!empty($nozzle['reading'])) {
+                    $nozzle['start_reading'] = $nozzle['reading'];
+                }
+                $nozzle['end_reading'] = $nozzle['start_reading'];
+                $nozzle['sale'] = 0;
+                unset($nozzle['reading']);
+                unset($nozzle['opening_stock']);
+            }
+            // Group dispensers by their tank_id
+            $dispenserArray[$dispenser['tank_id']][] = $dispenser;
+        }
+
+        // Process tanks and associate them with their dispensers
+        foreach ($tanks as &$tank) {
+            // Set initial values for tank readings
+            $tank['start_reading'] = $tank['opening_stock'] ?? 0;
+            if (!empty($tank['volume'])) {
+                $tank['start_reading'] = $tank['volume'];
+            }
+            $tank['start_reading_mm'] = Tank::findHeight($tank['id'], $tank['start_reading']);
+            $tank['end_reading'] = $tank['start_reading'];
+            $tank['end_reading_mm'] = $tank['start_reading_mm'];
+            $tank['dip_sale'] = 0;
+            unset($tank['opening_stock']);
+            // Attach the dispensers to the tank
+            $tank['dispensers'] = $dispenserArray[$tank['id']] ?? [];
+        }
+
+        // Return the processed data in a JSON response with status 200
+        return response()->json([
+            'status' => 200,
+            'data' => $tanks
+        ]);
+    }
+
 }

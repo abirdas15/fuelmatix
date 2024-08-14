@@ -17,7 +17,7 @@
                         </div>
                         <form @submit.prevent="submit">
                             <div class="card-body">
-                                <div class="process-wrapper">
+                                <div class="">
                                     <div id="progress-bar-container" v-if="listData.length > 0">
                                         <ul>
                                             <li class="step step01" :class="{'active': p.id == product_id}"
@@ -238,7 +238,7 @@
                                     </template>
                                 </div>
                                 <template v-if="listDispenser && listDispenser.status !== 'start'">
-                                    <div class="process-wrapper">
+                                    <div class="">
                                         <div class="row">
                                             <div class="col-sm-7"></div>
                                             <div class="col-sm-5 text-end mb-2">

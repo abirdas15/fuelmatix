@@ -16,6 +16,7 @@ use App\Models\ShiftTotal;
 use App\Models\Tank;
 use App\Models\Transaction;
 use App\Repository\CategoryRepository;
+use App\Repository\TransactionRepository;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -127,11 +128,22 @@ class FuelAdjustmentController extends Controller
             ];
         }
         FuelAdjustmentData::insert($fuelAdjustmentData);
-        $transactionData['transaction'] = [
-            ['date' => date('Y-m-d'), 'account_id' => $stockCategory['id'], 'debit_amount' => $fuelAdjustmentModel['loss_amount'] > 0 ? $fuelAdjustmentModel['loss_amount'] : 0, 'credit_amount' => $fuelAdjustmentModel['loss_amount'] < 0 ? abs($fuelAdjustmentModel['loss_amount']) : 0, 'module' => Module::FUEL_ADJUSTMENT, 'module_id' => $fuelAdjustmentModel['id']]
-        ];
-        $transactionData['linked_id'] = $categoryId;
-        TransactionController::saveTransaction($transactionData);
+        $amount = abs($fuelAdjustmentModel['loss_amount']);
+        $transactionData = [];
+        if ($requestData['loss_quantity'] < 0) {
+            $transactionData = [
+                ['date' => date('Y-m-d'), 'account_id' => $stockCategory['id'], 'debit_amount' => $amount,  'credit_amount' => 0, 'module' => Module::FUEL_ADJUSTMENT, 'module_id' => $fuelAdjustmentModel['id']],
+                ['date' => date('Y-m-d'), 'account_id' => $categoryId, 'debit_amount' => 0,  'credit_amount' => $amount, 'module' => Module::FUEL_ADJUSTMENT, 'module_id' => $fuelAdjustmentModel['id']]
+            ];
+        } else if ($requestData['loss_quantity']  > 0) {
+            $transactionData = [
+                ['date' => date('Y-m-d'), 'account_id' => $categoryId, 'debit_amount' => $amount,  'credit_amount' => 0, 'module' => Module::FUEL_ADJUSTMENT, 'module_id' => $fuelAdjustmentModel['id']],
+                ['date' => date('Y-m-d'), 'account_id' => $stockCategory['id'], 'debit_amount' => 0,  'credit_amount' => $amount, 'module' => Module::FUEL_ADJUSTMENT, 'module_id' => $fuelAdjustmentModel['id']]
+            ];
+        }
+        if (!empty($transactionData)) {
+            TransactionRepository::saveTransaction($transactionData);
+        }
         return response()->json(['status' => 200, 'message' => 'Successfully saved fuel adjustment.', 'adjustment_id' => $fuelAdjustmentModel['id']]);
     }
 

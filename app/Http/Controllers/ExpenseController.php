@@ -7,117 +7,182 @@ use App\Common\FuelMatixStatus;
 use App\Common\Module;
 use App\Helpers\Helpers;
 use App\Helpers\SessionUser;
+use App\Models\Category;
 use App\Models\Expense;
-use App\Models\ShiftSale;
-use App\Models\Transaction;
+use App\Repository\TransactionRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class ExpenseController extends Controller
 {
     /**
+     * Save a new expense record.
+     *
      * @param Request $request
      * @return JsonResponse
      */
     public function save(Request $request): JsonResponse
     {
-        $inputData = $request->all();
-        $validator = Validator::make($inputData, [
+        // Validate the incoming request to ensure required fields are provided and valid
+        $validator = Validator::make($request->all(), [
             'date' => 'required|date',
-            'category_id' => 'required',
-            'amount' => 'required',
-            'payment_id' => 'required',
+            'category_id' => 'required|integer',
+            'amount' => 'required|numeric',
+            'payment_id' => 'required|integer',
             'shift_sale_id' => 'nullable|integer',
         ]);
+
+        // If validation fails, return a 400 Bad Request response
         if ($validator->fails()) {
-            return response()->json(['status' => 500, 'errors' => $validator->errors()]);
-        }
-        $transaction = Transaction::select(DB::raw('SUM(debit_amount) as debit_amount'), DB::raw('SUM(credit_amount) as credit_amount'))
-            ->where('linked_id', $inputData['payment_id'])
-            ->where('client_company_id', $inputData['session_user']['client_company_id'])
-            ->first();
-        $assetAmount = $transaction['debit_amount'] ?? 0 - $transaction['credit_amount'] ?? 0;
-        if ($assetAmount < $request['amount']) {
-            return response()->json(['payment_id' => 500, 'errors' => ['payment_id' => ['Not enough balance.']]]);
+            return response()->json([
+                'status' => 500,
+                'errors' => $validator->errors()
+            ]);
         }
 
-        $file_path = null;
-        if ($request->file('file')) {
-            $file = $_FILES;
-            $file = $file['file'];
-            $destinationPath = public_path('uploads');
-            $file_path = $request->file('file')->getClientOriginalName();
-            move_uploaded_file($file["tmp_name"], $destinationPath.'/'.$file_path);
+        // Find the destination category
+        $category = Category::find($request->input('category_id'));
+        if (!$category) {
+            return response()->json([
+                'status' => 500,
+                'errors' => ['category_id' => ['Category cannot be found.']]
+            ]);
         }
+
+        // Find the source category
+        $paymentCategory = Category::find($request->input('payment_id'));
+        if (!$paymentCategory) {
+            return response()->json([
+                'status' => 500,
+                'errors' => ['payment_id' => ['Payment category cannot be found.']]
+            ]);
+        }
+
+        // Check if the source category has enough balance
+        $availableBalance = $paymentCategory->checkAvailableBalance($request->input('amount'));
+        if (!$availableBalance) {
+            return response()->json([
+                'status' => 300,
+                'message' => 'Not enough balance in '.$paymentCategory['name'].'.'
+            ]);
+        }
+
+        // Handle file upload
+        $file_path = null;
+        if ($request->hasFile('file')) {
+            $file = $request->file('file');
+            $destinationPath = public_path('uploads');
+            $file_path = time() . '_' . $file->getClientOriginalName(); // Generate a unique file name
+            $file->move($destinationPath, $file_path);
+        }
+
+        // Create and save the expense record
         $sessionUser = SessionUser::getUser();
         $expense = new Expense();
-        $expense->date = \Carbon\Carbon::parse($inputData['date'].' '.date('H:i:s'))->format('Y-m-d H:i:s');
-        $expense->category_id = $inputData['category_id'];
-        $expense->amount = $inputData['amount'];
-        $expense->payment_id = $inputData['payment_id'];
-        $expense->remarks = $inputData['remarks'] ?? null;
-        $expense->shift_sale_id = $inputData['shift_sale_id'] ?? null;
+        $expense->date = Carbon::parse($request->input('date'). date(' H:i:s'), SessionUser::TIMEZONE)->format('Y-m-d H:i:s');
+        $expense->category_id = $request->input('category_id');
+        $expense->amount = $request->input('amount');
+        $expense->payment_id = $request->input('payment_id');
+        $expense->remarks = $request->input('remarks') ?? null;
+        $expense->shift_sale_id = $request->input('shift_sale_id') ?? null;
         $expense->file = $file_path;
         $expense->status = FuelMatixStatus::PENDING;
         $expense->client_company_id = $sessionUser['client_company_id'];
-        $expense->user_id = Auth::user()->id;
+        $expense->user_id = $sessionUser['id'];
+
+        // Save the expense record
         if (!$expense->save()) {
-            return response()->json(['status' => 500, 'message' => 'Cannot save expense.']);
+            return response()->json([
+                'status' => 500,
+                'message' => 'Cannot save expense.'
+            ]);
         }
-        return response()->json(['status' => 200, 'message' => 'Successfully save expense.']);
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'Successfully saved expense.'
+        ]);
     }
+
     /**
+     * Retrieve a paginated list of expenses with optional filtering.
+     *
      * @param Request $request
      * @return JsonResponse
      */
     public function list(Request $request): JsonResponse
     {
+        // Retrieve all input data and set default values
         $inputData = $request->all();
-        $limit = $inputData['limit'] ?? 10;
-        $keyword = $inputData['keyword'] ?? '';
+        $limit = $request->input('limit', 10);
+        $keyword = $request->input('keyword', '');
         $sessionUser = SessionUser::getUser();
 
-        $result = Expense::select('expense.id', 'expense.date', 'expense.amount',  'c.name as expense', 'c1.name as payment', 'expense.status', 'users.name as approve_by', 'expense.file')
+        // Build the query to fetch expenses
+        $result = Expense::select('expense.id', 'expense.date', 'expense.amount', 'c.name as expense', 'c1.name as payment', 'expense.status', 'users.name as approve_by', 'expense.file')
             ->leftJoin('categories as c', 'c.id', 'expense.category_id')
             ->leftJoin('categories as c1', 'c1.id', 'expense.payment_id')
             ->leftJoin('users', 'users.id', '=', 'expense.approve_by')
             ->where('expense.client_company_id', $sessionUser['client_company_id']);
+
+        // Apply keyword filtering if provided
         if (!empty($keyword)) {
             $result->where(function($q) use ($keyword) {
-                $q->where('c.name', 'LIKE', '%'.$keyword.'%');
-                $q->orWhere('c1.name', 'LIKE', '%'.$keyword.'%');
+                $q->where('c.name', 'LIKE', '%'.$keyword.'%')
+                    ->orWhere('c1.name', 'LIKE', '%'.$keyword.'%');
             });
         }
-        $result = $result->orderBy('id', 'DESC')
-            ->paginate($limit);
+
+        // Order by 'id' in descending order and paginate the results
+        $result = $result->orderBy('id', 'DESC')->paginate($limit);
+
+        // Format the results
         foreach ($result as &$data) {
             $data['amount_format'] = number_format($data['amount'], 2);
             $data['date'] = Helpers::formatDate($data['date'], FuelMatixDateTimeFormat::STANDARD_DATE);
         }
-        return response()->json(['status' => 200, 'data' => $result]);
+
+        // Return the results as JSON
+        return response()->json([
+            'status' => 200,
+            'data' => $result
+        ]);
     }
+
     /**
+     * Retrieve a single expense by its ID.
+     *
      * @param Request $request
      * @return JsonResponse
      */
     public function single(Request $request): JsonResponse
     {
-        $inputData = $request->all();
-        $validator = Validator::make($inputData, [
-            'id' => 'required',
+        // Validate the incoming request
+        $validator = Validator::make($request->all(), [
+            'id' => 'required|integer',
         ]);
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
+
+        // Retrieve the expense with the given ID
         $result = Expense::select('id', 'category_id', 'payment_id', 'amount', 'file', 'remarks', 'date', 'shift_sale_id')
-            ->where('id', $inputData['id'])
+            ->where('id', $request->input('id'))
             ->first();
-        $result['date'] = Helpers::formatDate($result['date'], FuelMatixDateTimeFormat::ONLY_DATE);
-        return response()->json(['status' => 200, 'data' => $result]);
+
+        // Format the date
+        if ($result) {
+            $result['date'] = Helpers::formatDate($result['date'], FuelMatixDateTimeFormat::ONLY_DATE);
+        }
+
+        // Return the result as JSON
+        return response()->json([
+            'status' => 200,
+            'data' => $result
+        ]);
     }
     /**
      * @param Request $request
@@ -125,95 +190,215 @@ class ExpenseController extends Controller
      */
     public function update(Request $request): JsonResponse
     {
-        $inputData = $request->all();
-        $validator = Validator::make($inputData, [
-            'id' => 'required',
+        // Validate the incoming request
+        $validator = Validator::make($request->all(), [
+            'id' => 'required|integer',
             'date' => 'required|date',
-            'category_id' => 'required',
-            'amount' => 'required',
-            'payment_id' => 'required',
+            'category_id' => 'required|integer',
+            'amount' => 'required|numeric',
+            'payment_id' => 'required|integer',
             'shift_sale_id' => 'nullable|integer',
         ]);
+
         if ($validator->fails()) {
-            return response()->json(['status' => 500, 'errors' => $validator->errors()]);
+            return response()->json([
+                'status' => 500,
+                'errors' => $validator->errors()
+            ]);
         }
-        $expense = Expense::find($inputData['id']);
-        if (!$expense instanceof Expense) {
-            return response()->json(['status' => 500, 'error' => 'Cannot find expense.']);
+
+        // Retrieve the expense with the given ID
+        $expense = Expense::find($request->input('id'));
+        if (!$expense) {
+            return response()->json([
+                'status' => 500,
+                'error' => 'Cannot find expense.'
+            ]);
         }
+
+        // Find the destination category
+        $category = Category::find($request->input('category_id'));
+        if (!$category) {
+            return response()->json([
+                'status' => 500,
+                'errors' => ['category_id' => ['Category cannot be found.']]
+            ]);
+        }
+
+        // Find the payment category
+        $paymentCategory = Category::find($request->input('payment_id'));
+        if (!$paymentCategory) {
+            return response()->json([
+                'status' => 500,
+                'errors' => ['payment_id' => ['Payment category cannot be found.']]
+            ]);
+        }
+
+        // Check if the payment category has enough balance
+        $availableBalance = $paymentCategory->checkAvailableBalance($request->input('amount'));
+        if (!$availableBalance) {
+            return response()->json([
+                'status' => 300,
+                'message' => 'Not enough balance in ' . $paymentCategory->name . '.'
+            ]);
+        }
+
+        // Handle file upload
         $file_path = $expense->file;
-        if ($request->file('file')) {
-            $file = $_FILES;
-            $file = $file['file'];
+        if ($request->hasFile('file')) {
+            $file = $request->file('file');
             $destinationPath = public_path('uploads');
-            $file_path = $request->file('file')->getClientOriginalName();
-            move_uploaded_file($file["tmp_name"], $destinationPath.'/'.$file_path);
+            $file_path = $file->getClientOriginalName();
+            $file->move($destinationPath, $file_path);
         }
-        $expense->date = \Carbon\Carbon::parse($inputData['date'].' '.date('H:i:s'))->format('Y-m-d H:i:s');
-        $expense->category_id = $inputData['category_id'];
-        $expense->amount = $inputData['amount'];
-        $expense->payment_id = $inputData['payment_id'];
-        $expense->remarks = $inputData['remarks'] ?? null;
-        $expense->shift_sale_id = $inputData['shift_sale_id'] ?? null;
+
+        // Update expense details
+        $expense->date = Carbon::parse($request->input('date') . ' ' . date('H:i:s'), SessionUser::TIMEZONE)->format('Y-m-d H:i:s');
+        $expense->category_id = $request->input('category_id');
+        $expense->amount = $request->input('amount');
+        $expense->payment_id = $request->input('payment_id');
+        $expense->remarks = $request->input('remarks') ?? null;
+        $expense->shift_sale_id = $request->input('shift_sale_id') ?? null;
         $expense->file = $file_path;
+
+        // Save the updated expense
         if (!$expense->save()) {
-            return response()->json(['status' => 500, 'error' => 'Cannot save expense.']);
+            return response()->json([
+                'status' => 500,
+                'error' => 'Cannot save expense.'
+            ]);
         }
-        return response()->json(['status' => 200, 'message' => 'Successfully updated expense.']);
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'Successfully updated expense.'
+        ]);
     }
+
     /**
      * @param Request $request
      * @return JsonResponse
      */
     public function delete(Request $request): JsonResponse
     {
-        $inputData = $request->all();
-        $validator = Validator::make($inputData, [
-            'id' => 'required',
+        // Validate the incoming request
+        $validator = Validator::make($request->all(), [
+            'id' => 'required|integer',
         ]);
+
         if ($validator->fails()) {
-            return response()->json(['status' => 500, 'errors' => $validator->errors()]);
+            return response()->json([
+                'status' => 500,
+                'errors' => $validator->errors()
+            ]);
         }
-        $expense = Expense::find($inputData['id']);
-        if (!$expense instanceof Expense) {
-            return response()->json(['status' => 500, 'message' => 'Cannot find expense..']);
+
+        // Find the expense with the given ID
+        $expense = Expense::find($request->input('id'));
+        if (!$expense) {
+            return response()->json([
+                'status' => 500,
+                'message' => 'Cannot find expense..'
+            ]);
         }
-        if ($expense['status'] == FuelMatixStatus::APPROVE) {
-            return response()->json(['status' => 500, 'message' => 'Cannot delete Expense.']);
+
+        // Check if the expense status is APPROVE
+        if ($expense->status == FuelMatixStatus::APPROVE) {
+            return response()->json([
+                'status' => 500,
+                'message' => 'Cannot delete expense.'
+            ]);
         }
-        Expense::where('id', $inputData['id'])->delete();
-        return response()->json(['status' => 200, 'message' => 'Successfully deleted expenses.']);
+
+        // Delete the expense
+        $expense->delete();
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'Successfully deleted expense.'
+        ]);
     }
+
     /**
+     * Approves an expense.
+     *
      * @param Request $request
      * @return JsonResponse
      */
     public function approve(Request $request): JsonResponse
     {
-        $inputData = $request->all();
-        $validator = Validator::make($inputData, [
-            'id' => 'required',
+        // Validate the incoming request data
+        $validator = Validator::make($request->all(), [
+            'id' => 'required|integer', // 'id' is required and must be an integer
         ]);
+
+        // If validation fails, return error response with validation errors
         if ($validator->fails()) {
-            return response()->json(['status' => 500, 'errors' => $validator->errors()]);
+            return response()->json([
+                'status' => 500,
+                'errors' => $validator->errors()
+            ]);
         }
-        $expense = Expense::find($inputData['id']);
+
+        // Get the currently logged-in user
+        $sessionUser = SessionUser::getUser();
+
+        // Find the expense by ID
+        $expense = Expense::find($request->input('id'));
         if (!$expense instanceof Expense) {
-            return response()->json(['status' => 500, 'error' => 'Cannot find expense.']);
+            // If expense not found, return error response
+            return response()->json([
+                'status' => 500,
+                'error' => 'Cannot find expense.'
+            ]);
         }
+
+        // Check if the expense is already approved
         if ($expense['status'] == FuelMatixStatus::APPROVE) {
-            return response()->json(['status' => 500, 'error' => 'Expense already have been approve.']);
+            return response()->json([
+                'status' => 500,
+                'error' => 'Expense already has been approved.'
+            ]);
         }
-        $data['transaction'] = [
-            ['date' => date('Y-m-d', strtotime($expense['date'])), 'description' => $expense['remarks'], 'account_id' => $expense['payment_id'], 'debit_amount' => $expense['amount'], 'credit_amount' => 0, 'module' => Module::EXPENSE, 'module_id' => $expense['id'], 'file' => $expense['file']]
+
+        // Find the payment category associated with the expense
+        $paymentCategory = Category::find($expense['payment_id']);
+        if (!$paymentCategory) {
+            // If payment category not found, return error response
+            return response()->json([
+                'status' => 500,
+                'errors' => ['payment_id' => ['Payment category cannot be found.']]
+            ]);
+        }
+
+        // Check if the payment category has enough balance to cover the expense
+        $availableBalance = $paymentCategory->checkAvailableBalance($expense['amount']);
+        if (!$availableBalance) {
+            return response()->json([
+                'status' => 300,
+                'message' => 'Not enough balance in ' . $paymentCategory->name . '.'
+            ]);
+        }
+
+        // Prepare transaction data for updating financial records
+        $transactionData = [
+            ['date' => date('Y-m-d', strtotime($expense['date'])), 'account_id' => $expense['category_id'], 'description' => $expense['remarks'], 'debit_amount' => $expense->amount, 'credit_amount' => 0, 'module' => Module::EXPENSE, 'module_id' => $expense->id],
+            ['date' => date('Y-m-d', strtotime($expense['date'])), 'account_id' => $expense['payment_id'], 'description' => $expense['remarks'], 'debit_amount' => 0, 'credit_amount' => $expense->amount, 'module' => Module::EXPENSE, 'module_id' => $expense->id],
         ];
-        $data['linked_id'] = $expense['category_id'];
-        TransactionController::saveTransaction($data);
+        // Save the transaction data
+        TransactionRepository::saveTransaction($transactionData);
+
+        // Update expense status and other details
         $expense->status = FuelMatixStatus::APPROVE;
-        $expense->approve_by = Auth::user()->id;
-        $expense->approve_date = Carbon::now('UTC');
+        $expense->approve_by = $sessionUser['id'];
+        $expense->approve_date = Carbon::now(SessionUser::TIMEZONE);
         $expense->save();
-        return response()->json(['status' => 200, 'message' => 'Successfully approve expense.']);
+
+        // Return success response
+        return response()->json([
+            'status' => 200,
+            'message' => 'Successfully approved expense.'
+        ]);
     }
 
     /**

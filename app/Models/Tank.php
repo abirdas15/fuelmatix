@@ -8,6 +8,7 @@ use App\Common\Module;
 use App\Http\Controllers\TransactionController;
 use App\Repository\CategoryRepository;
 use App\Repository\TankRepository;
+use App\Repository\TransactionRepository;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -82,11 +83,13 @@ class Tank extends Model
                     ->first();
 
                 if ($retainEarning instanceof Category) {
+                    $amount = $this['opening_stock'] * $product['buying_price'];
                     $transactionData['linked_id'] = $stockCategory['id'];
-                    $transactionData['transaction'] = [
-                        ['date' => "1970-01-01", 'account_id' => $retainEarning['id'], 'debit_amount' => $this['opening_stock'] * $product['buying_price'], 'credit_amount' => 0, 'opening_balance' => 1],
+                    $transactionData = [
+                        ['date' => "1970-01-01", 'account_id' => $stockCategory['id'], 'debit_amount' => $amount, 'credit_amount' => 0, 'opening_balance' => 1],
+                        ['date' => "1970-01-01", 'account_id' => $retainEarning['id'], 'debit_amount' => 0, 'credit_amount' => $amount, 'opening_balance' => 1],
                     ];
-                    TransactionController::saveTransaction($transactionData);
+                    TransactionRepository::saveTransaction($transactionData);
                 }
             }
         }
@@ -138,5 +141,44 @@ class Tank extends Model
 
         // Return 0 if no valid height can be calculated
         return 0;
+    }
+
+    /**
+     * Find the volume for a given height and tank ID.
+     *
+     * @param float $height
+     * @return float|int The calculated height corresponding to the given volume.
+     */
+    public function findVolume(float $height)
+    {
+        // Attempt to find an exact match for the volume in the bsti_chart table
+        $bstiChart = BstiChart::where('tank_id', $this['id'])
+            ->where('height', '=', floor($height))
+            ->first();
+        // If an exact match is found, return the corresponding height
+        if ($bstiChart instanceof BstiChart) {
+            return $bstiChart->volume;
+        }
+
+        // Find the closest lower volume entry
+        $lower_result = BstiChart::where('tank_id', $this['id'])
+            ->where('height', '<=', $height)
+            ->orderBy('id', 'DESC')
+            ->first();
+
+        // Find the closest higher volume entry
+        $higher_result = BstiChart::where('tank_id', $this['id'])
+            ->where('height', '>=', $height)
+            ->orderBy('id', 'ASC')
+            ->first();
+
+        // If both lower and higher entries are found, perform linear interpolation
+        if ($lower_result instanceof BstiChart && $higher_result instanceof BstiChart) {
+            $height_fraction = ($height - $lower_result->height) / ($higher_result->height - $lower_result->height);
+            return $lower_result->volume + ($height_fraction * ($higher_result->volume - $lower_result->volume));
+        }
+        // Return 0 if no valid height can be calculated
+        return 0;
+
     }
 }

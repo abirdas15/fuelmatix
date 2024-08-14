@@ -30,10 +30,10 @@
                                                 <div class="invalid-feedback"></div>
                                             </div>
                                             <div class="mb-3 form-group col-md-3">
-                                                <label class="form-label">Select Tank:</label>
-                                                <select class="form-control" name="tank_id" id="tank_id"  v-model="param.tank_id">
+                                                <label class="form-label">Select Product:</label>
+                                                <select class="form-control" name="product_id" id="product_id"  v-model="param.product_id">
                                                     <option value="">Select Tank</option>
-                                                    <option v-for="d in listDataTank" :value="d.id">{{d.tank_name}}</option>
+                                                    <option v-for="d in products" :value="d.id">{{d.name}}</option>
                                                 </select>
                                                 <div class="invalid-feedback"></div>
                                             </div>
@@ -53,131 +53,132 @@
 
                                         </div>
                                     </div>
-                                    <div class="card">
-                                        <div class="card-header">
-                                            <h5 class="card-title">DIP</h5>
-                                        </div>
-                                        <div class="card-body">
-                                            <div class="row align-items-center">
-                                                <div class="mb-3 form-group col-md-3"></div>
-                                                <div class="mb-3 form-group col-md-3">
-                                                    <label class="form-label">Start Reading:</label>
-                                                </div>
-                                                <div class="mb-3 form-group col-md-3">
-                                                    <label class="form-label">End Reading:</label>
-                                                </div>
-                                                <div class="mb-3 form-group col-md-3">
-                                                    <label class="form-label">Tank Volume:</label>
-                                                </div>
-                                                <div class="mb-3 form-group col-md-3"></div>
-                                                <div class="mb-3 form-group col-md-3">
-                                                    <div class="input-group">
-                                                        <input type="text" class="form-control " @input="getBstiChart('start_reading', $event)" name="start_reading" v-model="param.start_reading_mm">
-                                                        <div class="input-group-append">
-                                                            <span class="input-group-text" >mm</span>
-                                                        </div>
-                                                    </div>
-                                                    <div class="invalid-feedback"></div>
-                                                </div>
-                                                <div class="mb-3 form-group col-md-3">
-                                                    <div class="input-group">
-                                                        <input type="text" class="form-control " @input="getBstiChart('end_reading', $event)" name="end_reading" v-model="param.end_reading_mm">
-                                                        <div class="input-group-append">
-                                                            <span class="input-group-text" >mm</span>
-                                                        </div>
-                                                    </div>
-                                                    <div class="invalid-feedback"></div>
-                                                </div>
-                                                <div class="mb-3 form-group col-md-3"></div>
-                                                <div class="mb-3 form-group col-md-3"></div>
-                                                <div class="mb-3 form-group col-md-3">
-                                                    <div class="input-group">
-                                                        <input type="text" class="form-control " disabled name="start_reading" v-model="param.start_reading">
-                                                        <div class="input-group-append">
-                                                            <span class="input-group-text">Liter</span>
-                                                        </div>
-                                                    </div>
-                                                    <div class="invalid-feedback"></div>
-                                                </div>
-                                                <div class="mb-3 form-group col-md-3">
-                                                    <div class="input-group">
-                                                        <input type="text" class="form-control" disabled name="end_reading" v-model="param.end_reading">
-                                                        <div class="input-group-append">
-                                                            <span class="input-group-text">Liter</span>
-                                                        </div>
-                                                    </div>
-                                                    <div class="invalid-feedback"></div>
-                                                </div>
-                                                <div class="mb-3 form-group col-md-3">
-                                                    <div class="input-group">
-                                                        <input type="text" class="form-control " disabled name="dip_sale" v-model="param.dip_sale">
-                                                        <div class="input-group-append">
-                                                            <span class="input-group-text">Liter</span>
-                                                        </div>
-                                                    </div>
-                                                    <div class="invalid-feedback"></div>
-                                                </div>
+                                    <template v-for="(tank,tankIndex) in param.tanks">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5 class="card-title">Tank: {{ tank.tank_name }}</h5>
                                             </div>
-                                        </div>
-                                    </div>
-                                    <div class="card" v-if="param.dispensers.length > 0"
-                                         v-for="(d, dIndex) in param.dispensers">
-                                        <div class="card-header">
-                                            <h5 class="card-title">{{ d.dispenser_name }}</h5>
-                                        </div>
-                                        <div class="card-body" v-if="d.nozzle.length > 0">
-                                            <div class="row align-items-center text-start" v-for="(n, nIndex) in d.nozzle">
-                                                <div class=" col-md-3">
-                                                    <label class="form-label">
-                                                        <p class="m-0">{{ n.name }}</p>
-                                                    </label>
-                                                </div>
-                                                <div class="mb-3 col-md-3">
-                                                    <label>Start Reading </label>
-                                                    <div class="input-group">
-                                                        <input type="text" class="form-control" @input="nozzleTotalSale(n)"
-                                                                 :id="'prReading'+nIndex+dIndex"
-                                                               v-model="n.start_reading">
-                                                        <div class="input-group-append">
-                                                            <span class="input-group-text">Liter</span>
+                                            <div class="card-body">
+                                                <div class="row align-items-center">
+                                                    <div class="mb-3 form-group col-md-3"></div>
+                                                    <div class="mb-3 form-group col-md-3">
+                                                        <label class="form-label">Start Reading:</label>
+                                                    </div>
+                                                    <div class="mb-3 form-group col-md-3">
+                                                        <label class="form-label">End Reading:</label>
+                                                    </div>
+                                                    <div class="mb-3 form-group col-md-3">
+                                                        <label class="form-label">Tank Volume:</label>
+                                                    </div>
+                                                    <div class="mb-3 form-group col-md-3"></div>
+                                                    <div class="mb-3 form-group col-md-3">
+                                                        <div class="input-group">
+                                                            <input type="text" class="form-control" @input="getReading($event, 'start_reading', tankIndex, tank.id)" :name="'tanks.' + tankIndex + '.start_reading_mm'" v-model="tank.start_reading_mm">
+                                                            <div class="input-group-append">
+                                                                <span class="input-group-text" >mm</span>
+                                                            </div>
+                                                            <div class="invalid-feedback"></div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                                <div class="mb-3 col-md-3">
-                                                    <label>End reading </label>
-                                                    <div class="input-group">
-                                                        <input type="text" class="form-control" @input="nozzleTotalSale(n)"
-                                                                 :id="'trReading'+nIndex+dIndex"
-                                                               v-model="n.end_reading">
-                                                        <div class="input-group-append">
-                                                            <span class="input-group-text">Liter</span>
+                                                    <div class="mb-3 form-group col-md-3">
+                                                        <div class="input-group">
+                                                            <input type="text" class="form-control " @input="getReading($event, 'end_reading', tankIndex, tank.id)" :name="'tanks.' + tankIndex + '.end_reading_mm'" v-model="tank.end_reading_mm">
+                                                            <div class="input-group-append">
+                                                                <span class="input-group-text" >mm</span>
+                                                            </div>
+                                                            <div class="invalid-feedback"></div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                                <div class="mb-3 col-md-3">
-                                                    <label>sale on {{ n.name }} </label>
-                                                    <div class="input-group">
-                                                        <input type="text" class="form-control" disabled
-                                                                 :id="'sorReading'+nIndex+dIndex"
-                                                               v-model="n.sale">
-                                                        <div class="input-group-append">
-                                                            <span class="input-group-text">Liter</span>
+                                                    <div class="mb-3 form-group col-md-3"></div>
+                                                    <div class="mb-3 form-group col-md-3"></div>
+                                                    <div class="mb-3 form-group col-md-3">
+                                                        <div class="input-group">
+                                                            <input type="text" class="form-control " disabled  v-model="tank.start_reading">
+                                                            <div class="input-group-append">
+                                                                <span class="input-group-text">Liter</span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="invalid-feedback"></div>
+                                                    </div>
+                                                    <div class="mb-3 form-group col-md-3">
+                                                        <div class="input-group">
+                                                            <input type="text" class="form-control" disabled name="end_reading" v-model="tank.end_reading">
+                                                            <div class="input-group-append">
+                                                                <span class="input-group-text">Liter</span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="invalid-feedback"></div>
+                                                    </div>
+                                                    <div class="mb-3 form-group col-md-3">
+                                                        <div class="input-group">
+                                                            <input type="text" class="form-control " disabled :name="'tanks.' + tankIndex + '.dip_sale'" v-model="tank.dip_sale">
+                                                            <div class="input-group-append">
+                                                                <span class="input-group-text">Liter</span>
+                                                            </div>
+                                                            <div class="invalid-feedback"></div>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
+                                            <div class="card" v-if="tank.dispensers.length > 0"
+                                                 v-for="(d, dIndex) in tank.dispensers">
+                                                <div class="custom-bg">
+                                                    <h5 class="card-title">Dispenser: {{ d.dispenser_name }}</h5>
+                                                </div>
+                                                <div class="card-body" v-if="d.nozzle.length > 0">
+                                                    <div class="row align-items-center text-start" v-for="(n, nIndex) in d.nozzle">
+                                                        <div class=" col-md-3">
+                                                            <label class="form-label">
+                                                                <p class="m-0">{{ n.name }}</p>
+                                                            </label>
+                                                        </div>
+                                                        <div class="mb-3 col-md-3 form-group">
+                                                            <label>Start Reading </label>
+                                                            <div class="input-group">
+                                                                <input type="text" class="form-control" :name="'tanks.' + tankIndex + '.dispensers.' + dIndex + '.nozzle.' + nIndex + '.start_reading'" @input="nozzleTotalSale(n)" :id="'prReading'+nIndex+dIndex" v-model="n.start_reading">
+                                                                <div class="input-group-append">
+                                                                    <span class="input-group-text">Liter</span>
+                                                                </div>
+                                                                <div class="invalid-feedback"></div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="mb-3 col-md-3 form-group">
+                                                            <label>End reading </label>
+                                                            <div class="input-group">
+                                                                <input type="text" class="form-control" @input="nozzleTotalSale(n)" :id="'trReading'+nIndex+dIndex" v-model="n.end_reading" :name="'tanks.' + tankIndex + '.dispensers.' + dIndex + '.nozzle.' + nIndex + '.end_reading'">
+                                                                <div class="input-group-append">
+                                                                    <span class="input-group-text">Liter</span>
+                                                                </div>
+                                                                <div class="invalid-feedback"></div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="mb-3 col-md-3 form-group">
+                                                            <label>sale on {{ n.name }} </label>
+                                                            <div class="input-group">
+                                                                <input type="text" class="form-control" disabled :id="'sorReading'+nIndex+dIndex"  v-model="n.sale" :name="'tanks.' + tankIndex + '.dispensers.' + dIndex + '.nozzle.' + nIndex + '.sale'">
+                                                                <div class="input-group-append">
+                                                                    <span class="input-group-text">Liter</span>
+                                                                </div>
+                                                                <div class="invalid-feedback"></div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
+                                    </template>
+
                                     <div class="row">
                                         <div class="col-sm-8"></div>
                                         <div class="col-sm-4">
-                                            <div class="text-right mb-4">
+                                            <div class="text-right mb-4 form-group">
                                                 <label>Total refill volume</label>
-                                                <input type="text" class="form-control" disabled v-model="param.total_refill_volume">
+                                                <input type="text" class="form-control" name="total_refill_volume" disabled v-model="param.total_refill_volume">
+                                                <div class="invalid-feedback"></div>
                                             </div>
-                                            <div class="text-right">
-                                                <label>Loss/Porfit</label>
-                                                <input type="text" class="form-control" disabled v-model="param.net_profit">
+                                            <div class="text-right" v-if="this.param.net_profit">
+                                                <label>{{ this.param.net_profit > 0 ? 'Net Profit' : 'Net Loss' }}</label>
+                                                <input type="text" class="form-control" disabled :value="Math.abs(param.net_profit)">
                                             </div>
                                         </div>
                                     </div>
@@ -209,19 +210,13 @@ export default {
         return {
             param: {
                 date: '',
-                tank_id: '',
                 pay_order_id: '',
                 quantity: '',
-                start_reading: 0,
-                start_reading_mm: 0,
-                end_reading: 0,
-                end_reading_mm: 0,
-                dip_sale: 0,
                 amount: 0,
                 net_profit: 0,
                 total_refill_volume: 0,
-                tank_height: 0,
-                dispensers: [],
+                product_id: '',
+                tanks: []
             },
             unit_price: 0,
             listDataTank: [],
@@ -230,101 +225,71 @@ export default {
             tankReadingData: [],
             singlePayOrder: [],
             loading: false,
-            bstiChart: []
+            bstiChart: [],
+            products: []
         }
     },
     watch: {
         'param.pay_order_id': function () {
             this.getPayOrderQuantity()
-            this.getDispenserSingle()
         },
-        'param.tank_id': function () {
-            this.getDispenserSingle()
-            this.getTankReading()
-            this.getPayOrderQuantity()
-          //  this.getBstiChart();
+        'param.product_id': function () {
+            this.fetchTankWithLatestReading();
+            this.getPayOrder();
         },
-        'param.end_reading': function() {
-            this.param.dip_sale = parseFloat(this.param.end_reading) - parseFloat(this.param.start_reading);
-            this.param.total_refill_volume = this.getTotalRefillVolume()
-            this.param.net_profit = this.param.total_refill_volume - this.param.quantity
+        'param.total_refill_volume': function() {
+            this.param.net_profit = this.param.total_refill_volume - this.param.quantity;
         },
-        'param.start_reading': function() {
-            this.param.dip_sale = parseFloat(this.param.end_reading) - parseFloat(this.param.start_reading);
-            this.param.total_refill_volume = this.getTotalRefillVolume()
-            this.param.net_profit = this.param.total_refill_volume - this.param.quantity
-        },
+        'param.quantity': function() {
+            this.param.net_profit = this.param.total_refill_volume - this.param.quantity;
+        }
     },
     methods: {
-        getBstiChart: function(field, event) {
-            if (this.param.tank_height <  event.target.value) {
-                this.param[field] = 0;
-                this.param[field + '_mm'] = '';
-                return false;
-            }
-            ApiService.POST(ApiRoutes.TankGetVolume, {tank_id: this.param.tank_id, height: event.target.value}, res => {
+        getReading: function(event, field, index, tank_id) {
+            this.getBstiChart(event.target.value, field, index, tank_id);
+        },
+        getBstiChart: function(height, field, index, tank_id) {
+            ApiService.POST(ApiRoutes.TankGetVolume, {tank_id: tank_id, height: height}, res => {
                 if (parseInt(res.status) === 200) {
-                    this.param[field] =  res.data;
+                    this.param.tanks[index][field] =  res.data;
+                    this.param.tanks[index]['dip_sale'] = this.param.tanks[index]['end_reading'] - this.param.tanks[index]['start_reading'];
+                    this.getTotalRefillVolume();
                 }
             });
         },
         getTotalRefillVolume: function () {
-            let nozzleAmount = 0
-            this.param.dispensers.map(d => {
-                if (d.nozzle.length > 0) {
-                   d.nozzle.map(n => {
-                       nozzleAmount += n.sale
-                   })
-                }
-            })
-            return this.param.dip_sale + nozzleAmount
+            let nozzleAmount = 0;
+            let dipSale = 0;
+            this.param.tanks.map((tank) => {
+                dipSale += parseFloat(tank.dip_sale);
+                tank.dispensers.map(d => {
+                    d.nozzle.map(n => {
+                        nozzleAmount += parseFloat(n.sale)
+                    })
+                })
+            });
+            this.param.total_refill_volume = nozzleAmount + dipSale;
         },
         nozzleTotalSale: function (nozzle) {
             nozzle.sale = parseFloat(nozzle.end_reading) - parseFloat(nozzle.start_reading)
-            this.param.total_refill_volume = this.getTotalRefillVolume()
-            this.param.net_profit = this.param.total_refill_volume - this.param.quantity
+            this.getTotalRefillVolume();
         },
-        getTank: function () {
-            ApiService.POST(ApiRoutes.TankList, {limit: 5000, page: 1},res => {
+        fetchProduct: function () {
+            ApiService.POST(ApiRoutes.ProductList, {limit: 5000, page: 1},res => {
                 if (parseInt(res.status) === 200) {
-                    this.listDataTank = res.data.data;
+                    this.products = res.data.data;
                 }
             });
         },
-        getTankReading: function () {
-            ApiService.POST(ApiRoutes.TankReadingLatest, {type: 'tank refill', tank_id: this.param.tank_id},res => {
+        fetchTankWithLatestReading: function () {
+            ApiService.POST(ApiRoutes.TankWithLatestReading, {type: 'tank refill', product_id: this.param.product_id},res => {
                 if (parseInt(res.status) === 200) {
-                    this.tankDispenserData = res.data;
-                    this.param.start_reading = res.data.start_reading
-                    this.param.start_reading_mm = res.data.start_reading_mm
-                    this.param.end_reading_mm = res.data.end_reading_mm
-                    this.param.end_reading = res.data.end_reading
-                    this.param.dip_sale = res.data.dip_sale;
-                    this.param.tank_height = res.data.tank_height;
-                    if (this.unit_price > 0) {
-                        this.param.buy_price = (this.param.end_reading - this.param.start_reading) * this.unit_price
-                    }
-                }
-            });
-        },
-        getDispenserSingle: function () {
-            this.param.total_refill_volume = 0
-            ApiService.POST(ApiRoutes.TankGetNozzle, {tank_id: this.param.tank_id},res => {
-                if (parseInt(res.status) === 200) {
-                    this.param.dispensers = res.data;
-                    this.param.dispensers.forEach(v => {
-                        v.nozzle.forEach(nozzle => {
-                            nozzle.sale = nozzle.end_reading - nozzle.start_reading
-                            this.param.total_refill_volume += nozzle.sale;
-                        })
-                    })
-                    this.param.total_refill_volume += this.param.dip_sale
-                    this.param.net_profit = this.param.total_refill_volume - this.param.quantity
+                    this.param.tanks = res.data;
                 }
             });
         },
         getPayOrder: function () {
-            ApiService.POST(ApiRoutes.PayOrderLatest, {},res => {
+            ApiService.POST(ApiRoutes.PayOrderLatest, {product_id: this.param.product_id},res => {
                 if (parseInt(res.status) === 200) {
                     this.listDataPayOrder = res.data;
                 }
@@ -332,10 +297,10 @@ export default {
         },
 
         getPayOrderQuantity: function () {
-            if (this.param.tank_id == '' && this.param.pay_order_id == '') {
+            if (this.param.product_id === '' && this.param.pay_order_id === '') {
                 return;
             }
-            ApiService.POST(ApiRoutes.PayOrderQuantity, {tank_id: this.param.tank_id, pay_order_id: this.param.pay_order_id},res => {
+            ApiService.POST(ApiRoutes.PayOrderQuantity, {product_id: this.param.product_id, pay_order_id: this.param.pay_order_id},res => {
                 if (parseInt(res.status) === 200) {
                     this.param.quantity = 0;
                     if (res.data != null) {
@@ -379,7 +344,7 @@ export default {
         },
     },
     created() {
-        this.getTank()
+        this.fetchProduct()
         this.getPayOrder()
     },
     mounted() {

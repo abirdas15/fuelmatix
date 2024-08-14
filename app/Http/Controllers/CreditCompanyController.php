@@ -15,225 +15,402 @@ use Illuminate\Support\Facades\Validator;
 class CreditCompanyController extends Controller
 {
     /**
+     * Save a new account with associated categories.
+     *
      * @param Request $request
      * @return JsonResponse
      */
     public function save(Request $request): JsonResponse
     {
-        $inputData = $request->all();
-        $validator = Validator::make($inputData, [
-            'name' => 'required',
-            'email' => 'required',
-            'phone' => 'required',
+        // Validate incoming request data
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string',
+            'email' => 'required|string|email',
+            'phone' => 'required|string',
             'opening_balance' => 'nullable|numeric',
         ]);
+
+        // Return validation errors if any
         if ($validator->fails()) {
-            return response()->json(['status' => 500, 'errors' => $validator->errors()]);
+            return response()->json([
+                'status' => 500,
+                'errors' => $validator->errors()
+            ]);
         }
+
+        // Prepare additional fields for the 'others' JSON column
         $others = [
-            'email' => $inputData['email'] ?? null,
-            'phone' => $inputData['phone'] ?? null,
-            'address' => $inputData['address'] ?? null,
-            'contact_person' => $inputData['contact_person'] ?? null,
+            'email' => $request->input('email') ?? null,
+            'phone' => $request->input('phone') ?? null,
+            'address' => $request->input('address') ?? null,
+            'contact_person' => $request->input('contact_person') ?? null,
         ];
+
+        // Prepare data for saving the account category
         $data = [
-            'name' => $inputData['name'],
-            'credit_limit' => $inputData['credit_limit'] ?? null,
-            'opening_balance' => $inputData['opening_balance'] ?? null,
+            'name' => $request->input('name'),
+            'credit_limit' => $request->input('credit_limit') ?? null,
+            'opening_balance' => $request->input('opening_balance') ?? null,
             'others' => json_encode($others)
         ];
 
+        // Retrieve the current session user
         $sessionUser = SessionUser::getUser();
-        $category = Category::where('slug', strtolower(AccountCategory::ACCOUNT_RECEIVABLE))->where('client_company_id', $sessionUser['client_company_id'])->first();
+
+        // Find the 'account receivable' category for the current company
+        $category = Category::where('slug', strtolower(AccountCategory::ACCOUNT_RECEIVABLE))
+            ->where('client_company_id', $sessionUser['client_company_id'])
+            ->first();
+
+        // Return an error if the 'account receivable' category is not found
         if (!$category instanceof Category) {
-            return response()->json(['status' => 400, 'message' => 'Cannot find [account receivable] category.']);
+            return response()->json([
+                'status' => 400,
+                'message' => 'Cannot find [account receivable] category.'
+            ]);
         }
+
+        // Save the account receivable category using the prepared data
         $accountReceivableCategory = CategoryRepository::saveCategory($data, $category['id'], null);
+
+        // Return an error if the account receivable category could not be saved
         if (!$accountReceivableCategory instanceof Category) {
-            return response()->json(['status' => 400, 'message' => 'Cannot saved credit company.']);
+            return response()->json([
+                'status' => 400,
+                'message' => 'Cannot save credit company.'
+            ]);
         }
 
-        $deleteResponse = $accountReceivableCategory->deleteOpeningBalance();
-        if ($deleteResponse) {
-            if (!empty($request['opening_balance'])) {
-                $retainEarning = Category::where('client_company_id', $inputData['session_user']['client_company_id'])->where('slug', strtolower(AccountCategory::RETAIN_EARNING))->first();
-                if ($retainEarning instanceof Category) {
-                    $transactionData['linked_id'] = $accountReceivableCategory['id'];
-                    $transactionData['transaction'] = [
-                        ['date' => "1970-01-01",  'account_id' => $retainEarning['id'], 'debit_amount' => $inputData['opening_balance'], 'credit_amount' => 0, 'opening_balance' => 1],
-                    ];
-                    TransactionController::saveTransaction($transactionData);
-                }
-            }
-        }
+        // Add the opening balance to the account receivable category
+        $accountReceivableCategory->addOpeningBalance();
 
+        // Prepare data for the 'driver sale' category
         $data = [
             'name' => $request['name'],
             'module_id' => $accountReceivableCategory['id']
         ];
-        $category = Category::where('slug', strtolower(AccountCategory::DRIVER_SALE))->where('client_company_id', $sessionUser['client_company_id'])->first();
+
+        // Find the 'driver sale' category for the current company
+        $category = Category::where('slug', strtolower(AccountCategory::DRIVER_SALE))
+            ->where('client_company_id', $sessionUser['client_company_id'])
+            ->first();
+
+        // Return an error if the 'driver sale' category is not found
         if (!$category instanceof Category) {
-            return response()->json(['status' => 400, 'message' => 'Cannot find [driver sale] category.']);
+            return response()->json([
+                'status' => 400,
+                'message' => 'Cannot find [driver sale] category.'
+            ]);
         }
 
+        // Save the 'driver sale' category using the prepared data
         $driverSaleCategory = CategoryRepository::saveCategory($data, $category['id'], Module::DRIVER_SALE);
+
+        // Return an error if the 'driver sale' category could not be saved
         if (!$driverSaleCategory instanceof Category) {
-            return response()->json(['status' => 400, 'message' => 'Cannot saved [driver sale] category.']);
-        }
-        $category = Category::where('slug', strtolower(AccountCategory::UN_EARNED_REVENUE))->where('client_company_id', $sessionUser['client_company_id'])->first();
-        if (!$category instanceof Category) {
-            return response()->json(['status' => 400, 'message' => 'Cannot find [un earned revenue] category.']);
-        }
-        $unEarnedRevenueCategory = CategoryRepository::saveCategory($data, $category['id'], Module::UN_EARNED_REVENUE);
-        if (!$unEarnedRevenueCategory instanceof Category) {
-            return response()->json(['status' => 400, 'message' => 'Cannot saved [un earned revenue] category.']);
+            return response()->json([
+                'status' => 400,
+                'message' => 'Cannot save [driver sale] category.'
+            ]);
         }
 
-        $category = Category::where('slug', strtolower(AccountCategory::UN_AUTHORIZED_BILL))->where('client_company_id', $sessionUser['client_company_id'])->first();
+        // Find the 'un earned revenue' category for the current company
+        $category = Category::where('slug', strtolower(AccountCategory::UN_EARNED_REVENUE))
+            ->where('client_company_id', $sessionUser['client_company_id'])
+            ->first();
+
+        // Return an error if the 'un earned revenue' category is not found
         if (!$category instanceof Category) {
-            return response()->json(['status' => 400, 'message' => 'Cannot find [un earned revenue] category.']);
+            return response()->json([
+                'status' => 400,
+                'message' => 'Cannot find [un earned revenue] category.'
+            ]);
         }
+
+        // Save the 'un earned revenue' category using the prepared data
+        $unEarnedRevenueCategory = CategoryRepository::saveCategory($data, $category['id'], Module::UN_EARNED_REVENUE);
+
+        // Return an error if the 'un earned revenue' category could not be saved
+        if (!$unEarnedRevenueCategory instanceof Category) {
+            return response()->json([
+                'status' => 400,
+                'message' => 'Cannot save [un earned revenue] category.'
+            ]);
+        }
+
+        // Find the 'un authorized bill' category for the current company
+        $category = Category::where('slug', strtolower(AccountCategory::UN_AUTHORIZED_BILL))
+            ->where('client_company_id', $sessionUser['client_company_id'])
+            ->first();
+
+        // Return an error if the 'un authorized bill' category is not found
+        if (!$category instanceof Category) {
+            return response()->json([
+                'status' => 400,
+                'message' => 'Cannot find [un authorized bill] category.'
+            ]);
+        }
+
+        // Save the 'un authorized bill' category using the prepared data
         $unAuthorizedBillCategory = CategoryRepository::saveCategory($data, $category['id'], Module::UN_AUTHORIZED_BILL);
+
+        // Return an error if the 'un authorized bill' category could not be saved
         if (!$unAuthorizedBillCategory instanceof Category) {
-            return response()->json(['status' => 400, 'message' => 'Cannot saved [un authorized bill] category.']);
+            return response()->json([
+                'status' => 400,
+                'message' => 'Cannot save [un authorized bill] category.'
+            ]);
         }
-        $category->saveProductPrice($inputData['product_price']);
-        return response()->json(['status' => 200, 'message' => 'Successfully saved credit company.']);
+
+        // Save the product price associated with the category
+        $category->saveProductPrice($request->input('product_price'));
+
+        // Return a success message after all operations are completed
+        return response()->json([
+            'status' => 200,
+            'message' => 'Successfully saved credit company.'
+        ]);
     }
     /**
+     * Retrieve a paginated list of account receivable categories.
+     *
      * @param Request $request
      * @return JsonResponse
      */
     public function list(Request $request): JsonResponse
     {
-        $inputData = $request->all();
-        $limit = $inputData['limit'] ?? 10;
-        $keyword = $inputData['keyword'] ?? '';
-        $order_by = $inputData['order_by'] ?? 'id';
-        $order_mode = $inputData['order_mode'] ?? 'DESC';
-        $accountReceivable = Category::select('id')->where('client_company_id', $inputData['session_user']['client_company_id'])->where('slug', strtolower(AccountCategory::ACCOUNT_RECEIVABLE))->first();
+        // Retrieve query parameters with default values
+        $limit = $request->input('limit', 10);
+        $keyword = $request->input('keyword', '');
+        $order_by = $request->input('order_by', 'id');
+        $order_mode = $request->input('order_mode', 'DESC');
+
+        // Retrieve the current session user
+        $sessionUser = SessionUser::getUser();
+
+        // Find the 'account receivable' category for the current company
+        $accountReceivable = Category::select('id')
+            ->where('client_company_id', $sessionUser['client_company_id'])
+            ->where('slug', strtolower(AccountCategory::ACCOUNT_RECEIVABLE))
+            ->first();
+
+        // Return an error if the 'account receivable' category is not found
         if (!$accountReceivable instanceof Category) {
-            return response()->json(['status' => 400, 'message' => 'Cannot find [account receivable] category.']);
+            return response()->json([
+                'status' => 400,
+                'message' => 'Cannot find [account receivable] category.'
+            ]);
         }
+
+        // Query to select relevant fields from the Category model
         $result = Category::select('id', 'name', 'credit_limit', 'others', 'opening_balance')
-            ->where('client_company_id', $inputData['session_user']['client_company_id'])
+            ->where('client_company_id', $sessionUser['client_company_id'])
             ->where('parent_category', $accountReceivable->id);
+
+        // Apply a keyword filter if provided
         if (!empty($keyword)) {
             $result->where(function($q) use ($keyword) {
-                $q->where('name', 'LIKE', '%'.$keyword.'%');
+                $q->where('name', 'LIKE', '%' . $keyword . '%');
             });
         }
+
+        // Apply ordering to the result set
         $result = $result->orderBy($order_by, $order_mode)
             ->paginate($limit);
+
+        // Process each result to extract the 'others' JSON data
         foreach ($result as &$data) {
             $others = json_decode($data['others']);
             $data['email'] = $others != null ? $others->email : null;
             $data['phone'] = $others != null ? $others->phone : null;
             $data['contact_person'] = $others != null ? $others->contact_person : null;
             $data['address'] = $others != null ? $others->address : null;
-            unset($data['others']);
+            unset($data['others']); // Remove the raw 'others' field from the result
+            $data['opening_balance'] = !empty($data['opening_balance']) ? number_format($data['opening_balance'], 2) : null;
         }
-        return response()->json(['status' => 200, 'data' => $result]);
+
+        // Return the paginated result set as a JSON response
+        return response()->json([
+            'status' => 200,
+            'data' => $result
+        ]);
     }
+
     /**
+     * Retrieve the details of a single category by its ID.
+     *
      * @param Request $request
      * @return JsonResponse
      */
     public function single(Request $request): JsonResponse
     {
-        $inputData = $request->all();
-        $validator = Validator::make($inputData, [
+        // Validate the request to ensure 'id' is provided
+        $validator = Validator::make($request->all(), [
             'id' => 'required'
         ]);
+
+        // Return validation errors if any
         if ($validator->fails()) {
-            return response()->json(['status' => 500, 'errors' => $validator->errors()]);
+            return response()->json([
+                'status' => 500,
+                'errors' => $validator->errors()
+            ]);
         }
-        $result = Category::select('id', 'name', 'others', 'credit_limit', 'opening_balance')->find($inputData['id']);
+
+        // Find the category by ID and select specific fields
+        $result = Category::select('id', 'name', 'others', 'credit_limit', 'opening_balance')
+            ->find($request->input('id'));
+
+        // Decode the 'others' JSON field to extract additional information
         $others = json_decode($result['others']);
         $result['email'] = $others != null ? $others->email : null;
         $result['phone'] = $others != null ? $others->phone : null;
         $result['contact_person'] = $others != null ? $others->contact_person : null;
         $result['address'] = $others != null ? $others->address : null;
+
+        // Remove the raw 'others' field from the result
         unset($result['others']);
-        $result['product_price'] = CompanyProductPrice::select('product_id', 'price')->where('company_id', $inputData['id'])->get()->toArray();
-        return response()->json(['status' => 200, 'data' => $result]);
+
+        // Retrieve product prices associated with the company and category
+        $result['product_price'] = CompanyProductPrice::select('product_id', 'price')
+            ->where('company_id', $request->input('id'))
+            ->get()
+            ->toArray();
+
+        // Return the category details as a JSON response
+        return response()->json([
+            'status' => 200,
+            'data' => $result
+        ]);
     }
     /**
+     * Update a category and related categories based on the provided data.
+     *
      * @param Request $request
      * @return JsonResponse
      */
     public function update(Request $request): JsonResponse
     {
-        $inputData = $request->all();
-        $validator = Validator::make($inputData, [
-            'id' => 'required',
-            'name' => 'required',
-            'email' => 'required',
-            'phone' => 'required',
+        // Validate the incoming request
+        $validator = Validator::make($request->all(), [
+            'id' => 'required|integer',
+            'name' => 'required|string',
+            'email' => 'required|string|email',
+            'phone' => 'required|string',
             'opening_balance' => 'nullable|numeric'
         ]);
+
+        // Return validation errors if any
         if ($validator->fails()) {
-            return response()->json(['status' => 500, 'errors' => $validator->errors()]);
+            return response()->json([
+                'status' => 500,
+                'errors' => $validator->errors()
+            ]);
         }
-        $accountReceivable = Category::where('client_company_id', $inputData['session_user']['client_company_id'])->where('slug', strtolower(AccountCategory::ACCOUNT_RECEIVABLE))->first();
+
+        // Get the currently authenticated user
+        $sessionUser = SessionUser::getUser();
+
+        // Find the 'Account Receivable' category for the user's company
+        $accountReceivable = Category::where('client_company_id', $sessionUser['client_company_id'])
+            ->where('slug', strtolower(AccountCategory::ACCOUNT_RECEIVABLE))
+            ->first();
+
+        // Return an error if the 'Account Receivable' category is not found
         if (!$accountReceivable instanceof Category) {
-            return response()->json(['status' => 400, 'error' => 'Cannot find [account receivable] category.']);
+            return response()->json([
+                'status' => 400,
+                'message' => 'Cannot find [account receivable] category.'
+            ]);
         }
-        $category = Category::find($inputData['id']);
+
+        // Find the category to be updated by ID
+        $category = Category::find($request->input('id'));
         if (!$category instanceof Category) {
-            return response()->json(['status' => 400, 'message' => 'Cannot find [company].']);
+            return response()->json([
+                'status' => 400,
+                'message' => 'Cannot find [company].'
+            ]);
         }
-        $driverSaleCategory =  Category::where('client_company_id', $inputData['session_user']['client_company_id'])->where('module_id', $category['id'])->where('module', Module::DRIVER_SALE)->first();
+
+        // Find related categories (Driver Sale and Un-Earned Revenue)
+        $driverSaleCategory = Category::where('client_company_id', $sessionUser['client_company_id'])
+            ->where('module_id', $category['id'])
+            ->where('module', Module::DRIVER_SALE)
+            ->first();
         if (!$driverSaleCategory instanceof Category) {
-            return response()->json(['status' => 400, 'error' => 'Cannot find [driver sale] category.']);
+            return response()->json([
+                'status' => 400,
+                'error' => 'Cannot find [driver sale] category.'
+            ]);
         }
-        $unEarnRevenueCategory =  Category::where('client_company_id', $inputData['session_user']['client_company_id'])->where('module_id', $category['id'])->where('module', Module::UN_EARNED_REVENUE)->first();
+
+        $unEarnRevenueCategory = Category::where('client_company_id', $sessionUser['client_company_id'])
+            ->where('module_id', $category['id'])
+            ->where('module', Module::UN_EARNED_REVENUE)
+            ->first();
         if (!$unEarnRevenueCategory instanceof Category) {
-            return response()->json(['status' => 400, 'message' => 'Cannot find [un eran revenue] category.']);
+            return response()->json([
+                'status' => 400,
+                'message' => 'Cannot find [un earned revenue] category.'
+            ]);
         }
+
+        // Prepare the 'others' data to be stored as a JSON string
         $others = [
-            'email' => $inputData['email'] ?? null,
-            'phone' => $inputData['phone'] ?? null,
-            'address' => $inputData['address'] ?? null,
-            'contact_person' => $inputData['contact_person'] ?? null,
+            'email' => $request->input('email') ?? null,
+            'phone' => $request->input('phone') ?? null,
+            'address' => $request->input('address') ?? null,
+            'contact_person' => $request->input('contact_person') ?? null,
         ];
+
+        // Prepare the data to update the category
         $data = [
-            'name' => $inputData['name'],
-            'credit_limit' => $inputData['credit_limit'] ?? null,
-            'opening_balance' => $inputData['opening_balance'] ?? null,
+            'name' => $request->input('name'),
+            'credit_limit' => $request->input('credit_limit') ?? null,
+            'opening_balance' => $request->input('opening_balance') ?? null,
             'others' => json_encode($others),
         ];
+
+        // Update the main category
         $updateCategory = CategoryRepository::updateCategory($category, $data);
         if (!$updateCategory instanceof Category) {
-            return response()->json(['status' => 500, 'errors' => 'Cannot updated credit company.']);
-        }
-        $updateCategory->saveProductPrice($inputData['product_price']);
-
-        $deleteResponse = $updateCategory->deleteOpeningBalance();
-        if ($deleteResponse) {
-            if (!empty($request['opening_balance'])) {
-                $retainEarning = Category::where('client_company_id', $inputData['session_user']['client_company_id'])->where('slug', strtolower(AccountCategory::RETAIN_EARNING))->first();
-                if ($retainEarning instanceof Category) {
-                    $transactionData['linked_id'] = $updateCategory['id'];
-                    $transactionData['transaction'] = [
-                        ['date' => "1970-01-01",  'account_id' => $retainEarning['id'], 'debit_amount' => $inputData['opening_balance'], 'credit_amount' => 0, 'opening_balance' => 1],
-                    ];
-                    TransactionController::saveTransaction($transactionData);
-                }
-            }
+            return response()->json([
+                'status' => 500,
+                'errors' => 'Cannot update credit company.'
+            ]);
         }
 
-        $data = [
-            'name' => $inputData['name']
-        ];
+        // Add the opening balance to the category
+        $updateCategory->addOpeningBalance();
+
+        // Save the product prices associated with the category
+        $updateCategory->saveProductPrice($request->input('product_price'));
+
+        // Update the related 'Driver Sale' category
+        $data = ['name' => $request->input('name')];
         $updateCategory = CategoryRepository::updateCategory($driverSaleCategory, $data);
         if (!$updateCategory instanceof Category) {
-            return response()->json(['status' => 500, 'errors' => 'Cannot updated category [driver sale].']);
+            return response()->json([
+                'status' => 400,
+                'message' => 'Cannot update category [driver sale].'
+            ]);
         }
+
+        // Update the related 'Un-Earned Revenue' category
         $updateCategory = CategoryRepository::updateCategory($unEarnRevenueCategory, $data);
         if (!$updateCategory instanceof Category) {
-            return response()->json(['status' => 500, 'errors' => 'Cannot updated category [un eran revenue].']);
+            return response()->json([
+                'status' => 400,
+                'message' => 'Cannot update category [un earned revenue].'
+            ]);
         }
-        return response()->json(['status' => 200, 'message' => 'Successfully updated credit company.']);
+
+        // Return a success message
+        return response()->json([
+            'status' => 200,
+            'message' => 'Successfully updated credit company.'
+        ]);
     }
+
 }

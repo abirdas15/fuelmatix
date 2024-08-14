@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Common\FuelMatixCategoryType;
 use App\Common\FuelMatixDateTimeFormat;
 use App\Helpers\Helpers;
 use App\Helpers\SessionUser;
@@ -94,54 +95,81 @@ class TransactionController extends Controller
     }
 
     /**
+     * Retrieve and return transaction details for a specific category, calculating balances.
+     *
      * @param Request $request
      * @return JsonResponse
      */
     public function single(Request $request): JsonResponse
     {
+        // Get all input data from the request.
         $inputData = $request->all();
+
+        // Validate the input data to ensure 'id' is provided and is an integer.
         $validator = Validator::make($inputData, [
             'id' => 'required|integer'
         ]);
+
+        // If validation fails, return a 500 status with the validation errors.
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
+
+        // Find the category based on the provided 'id'.
         $category = Category::find($inputData['id']);
-        $result = Transaction::select('id', 'created_at', 'account_id', 'debit_amount', 'credit_amount', 'description')
-            ->where('linked_id', $inputData['id'])
-            ->orderBy('created_at', 'ASC')
+
+        // Retrieve the transactions for the given category.
+        // Transactions are selected with linked transaction data (via left join).
+        // Results are ordered by creation date and grouped by transaction ID.
+        $result = Transaction::select(
+            'transactions.id',
+            'transactions.created_at',
+            'transactions.account_id',
+            'transactions.debit_amount',
+            'transactions.credit_amount',
+            'transactions.description',
+            DB::raw('COALESCE(t1.account_id, t2.account_id) as linked_id')
+        )
+            ->leftJoin('transactions as t1', 't1.linked_id', '=', 'transactions.id')
+            ->leftJoin('transactions as t2', 't2.id', '=', 'transactions.linked_id')
+            ->where('transactions.account_id', $inputData['id'])
+            ->orderBy('transactions.created_at', 'ASC')
+            ->groupBy('transactions.id')
             ->get()
             ->toArray();
+
+        // Initialize balance to 0.
+        $balance = 0;
+
+        // Loop through each transaction and calculate the balance.
         foreach ($result as $key => &$data) {
+            // Format the transaction date.
             $data['date'] = Helpers::formatDate($data['created_at'], FuelMatixDateTimeFormat::STANDARD_DATE_TIME);
-            if ($category->type == 'income') {
-                if ($key == 0) {
-                    $data['balance'] = $data['credit_amount'] - $data['debit_amount'];
-                } else {
-                    $data['balance'] = $result[$key - 1]['balance'] + ($data['credit_amount'] - $data['debit_amount']);
-                }
-            } else  if ($category->type == 'expenses') {
-                if ($key == 0) {
-                    $data['balance'] = $data['debit_amount'] - $data['credit_amount'];
-                } else {
-                    $data['balance'] = $result[$key - 1]['balance'] + ($data['debit_amount'] - $data['credit_amount']);
-                }
-            } else  if ($category->type == 'assets') {
-                if ($key == 0) {
-                    $data['balance'] = $data['debit_amount'] - $data['credit_amount'];
-                } else {
-                    $data['balance'] = $result[$key - 1]['balance'] + ($data['debit_amount'] - $data['credit_amount']);
-                }
-            } else  if ($category->type == 'liabilities' || $category->type == 'equity') {
-                if ($key == 0) {
-                    $data['balance'] = $data['credit_amount'] - $data['debit_amount'];
-                } else {
-                    $data['balance'] = $result[$key - 1]['balance'] + ($data['credit_amount'] - $data['debit_amount']);
-                }
+
+            // Calculate the difference between credit and debit amounts.
+            $difference = $data['credit_amount'] - $data['debit_amount'];
+
+            // Determine how to calculate the balance based on the category type.
+            if ($category->type == FuelMatixCategoryType::INCOME) {
+                $balance = $difference;
+            } elseif ($category->type == FuelMatixCategoryType::EXPENSE || $category->type == FuelMatixCategoryType::ASSET) {
+                $balance = -$difference;
+            } elseif ($category->type == FuelMatixCategoryType::LIABILITIES || $category->type == FuelMatixCategoryType::EQUITY) {
+                $balance = $difference;
+            }
+
+            // Set the balance for the first transaction, or add to the previous balance for subsequent transactions.
+            if ($key == 0) {
+                $data['balance'] = $balance;
+            } else {
+                $data['balance'] = $result[$key - 1]['balance'] + $balance;
             }
         }
+
+        // Return the result with a 200 status.
         return response()->json(['status' => 200, 'data' => $result]);
     }
+
     public static function updateTransaction($inputData)
     {
         $transaction = Transaction::find($inputData['id']);

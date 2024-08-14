@@ -5,7 +5,6 @@ namespace App\Repository;
 use App\Common\AccountCategory;
 use App\Common\Module;
 use App\Helpers\SessionUser;
-use App\Http\Controllers\TransactionController;
 use App\Models\Category;
 use Illuminate\Http\JsonResponse;
 
@@ -36,10 +35,10 @@ class InvoiceRepository
                 return response()->json(['status' => 500, 'message' => 'Cannot save advance payable.']);
             }
         }
-        $transactionData['linked_id'] = $data['payment_id'];
-        $transactionData['transaction'] = [
-            ['date' => date('Y-m-d'), 'account_id' => $advancePayable['id'], 'debit_amount' => $data['amount'], 'credit_amount' => 0]
+        $transactionData = [
+            ['date' => date('Y-m-d'), 'account_id' => $data['payment_id'], 'debit_amount' => $data['amount'], 'credit_amount' => 0],
+            ['date' => date('Y-m-d'), 'account_id' => $advancePayable['id'], 'debit_amount' => 0, 'credit_amount' => $data['amount']]
         ];
-        TransactionController::saveTransaction($transactionData);
+        TransactionRepository::saveTransaction($transactionData);
     }
 }

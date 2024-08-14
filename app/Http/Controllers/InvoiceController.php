@@ -18,6 +18,7 @@ use App\Models\ShiftTotal;
 use App\Models\Transaction;
 use App\Repository\CategoryRepository;
 use App\Repository\InvoiceRepository;
+use App\Repository\TransactionRepository;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
@@ -131,39 +132,68 @@ class InvoiceController extends Controller
             }
             $data['date'] = date('d/m/Y', strtotime($data['date']));
             $data['due_date'] = date('d/m/Y', strtotime($data['due_date']));
+            $data['format_amount'] = !empty($data['amount']) ? number_format($data['amount'], 2) : '';
+            $data['format_paid_amount'] = !empty($data['paid_amount']) ? number_format($data['paid_amount'], 2) : '';
+            $data['format_due_amount'] = !empty($data['due_amount']) ? number_format($data['due_amount'], 2) : '';
         }
         return response()->json(['status' => 200, 'data' => $result]);
     }
     /**
+     * Processes a payment for an invoice.
+     *
      * @param Request $request
      * @return JsonResponse
-     * */
+     */
     public function payment(Request $request): JsonResponse
     {
-        $requestData = $request->all();
-        $validator = Validator::make($requestData, [
-            'id' => 'required',
-            'amount' => 'required',
-            'payment_id' => 'required'
+        // Validate the incoming request data
+        $validator = Validator::make($request->all(), [
+            'id' => 'required|integer',
+            'amount' => 'required|numeric|min:0',
+            'payment_id' => 'required|integer'
         ]);
+
+        // If validation fails, return error response with validation errors
         if ($validator->fails()) {
-            return response()->json(['status' => 500, 'errors' => $validator->errors()]);
+            return response()->json([
+                'status' => 500,
+                'errors' => $validator->errors()
+            ]);
         }
-        $invoice = Invoice::find($requestData['id']);
+
+        // Find the invoice by ID
+        $invoice = Invoice::find($request->input('id'));
         if (!$invoice instanceof Invoice) {
-            return response()->json(['status' => 500, 'error' => 'Cannot find invoice.']);
+            // If invoice not found, return error response
+            return response()->json([
+                'status' => 500,
+                'error' => 'Cannot find invoice.'
+            ]);
         }
-        $invoice->paid_amount = $invoice->paid_amount + $requestData['amount'];
+
+        // Update the invoice with the new payment amount
+        $invoice->paid_amount += $request->input('amount');
         $invoice->status = $invoice->amount == $invoice->paid_amount ? 'paid' : 'partial paid';
-        if ($invoice->save()) {
-            $transaction['linked_id'] = $requestData['payment_id'];
-            $transaction['transaction'] = [
-                ['date' => date('Y-m-d'), 'account_id' => $invoice['category_id'], 'debit_amount' => $requestData['amount'], 'credit_amount' => 0, 'module' => Module::INVOICE_PAYMENT, 'module_id' => $invoice->id]
-            ];
-            TransactionController::saveTransaction($transaction);
-            return response()->json(['status' => 200, 'message' => 'Successfully saved payment.']);
+
+        // Save the updated invoice details
+        if (!$invoice->save()) {
+            return response()->json([
+                'status' => 500,
+                'error' => 'Cannot save payment.'
+            ]);
         }
-        return response()->json(['status' => 500, 'error' => 'Cannot saved payment.']);
+
+        $transactionData = [
+            ['date' => date('Y-m-d'), 'account_id' => $request->input('payment_id'), 'debit_amount' => $request->input('amount'), 'credit_amount' => 0, 'module' => Module::INVOICE_PAYMENT, 'module_id' => $invoice['id']],
+            ['date' => date('Y-m-d'), 'account_id' => $invoice['category_id'], 'debit_amount' => 0, 'credit_amount' => $request->input('amount'), 'module' => Module::INVOICE_PAYMENT, 'module_id' => $invoice['id']],
+        ];
+        TransactionRepository::saveTransaction($transactionData);
+
+        // Return success response
+        return response()->json([
+            'status' => 200,
+            'message' => 'Successfully saved payment.'
+        ]);
     }
     /**
      * @param Request $request
@@ -261,69 +291,114 @@ class InvoiceController extends Controller
         $pdf = Pdf::loadView('pdf.invoice', ['data' => $invoice]);
         return $pdf->output();
     }
+
     /**
+     * Processes a global payment for multiple invoices.
+     *
      * @param Request $request
+     * @return JsonResponse
      */
-    public function globalPayment(Request $request)
+    public function globalPayment(Request $request): JsonResponse
     {
-        $requestData = $request->all();
-        $validator = Validator::make($requestData, [
-            'amount' => 'required',
-            'company_id' => 'required',
-            'payment_id' => 'required'
+        // Validate the incoming request data
+        $validator = Validator::make($request->all(), [
+            'amount' => 'required|numeric|min:0', // 'amount' is required, must be numeric and non-negative
+            'company_id' => 'required|integer', // 'company_id' is required and must be an integer
+            'payment_id' => 'required|integer' // 'payment_id' is required and must be an integer
         ]);
+
+        // If validation fails, return error response with validation errors
         if ($validator->fails()) {
-            return response()->json(['status' => 500, 'errors' => $validator->errors()]);
+            return response()->json([
+                'status' => 500,
+                'errors' => $validator->errors()
+            ]);
         }
-        $companyCategory = Category::where('id', $requestData['company_id'])->first();
+
+        // Find the company category by ID
+        $companyCategory = Category::where('id', $request->input('company_id'))->first();
         if (!$companyCategory instanceof Category) {
-            return response()->json(['status' => 500, 'message' => 'Cannot find [company].']);
+            return response()->json([
+                'status' => 400,
+                'message' => 'Cannot find [company].'
+            ]);
         }
-        $paymentCategory = Category::where('id', $requestData['payment_id'])->first();
+
+        // Find the payment category by ID
+        $paymentCategory = Category::where('id', $request->input('payment_id'))->first();
         if (!$paymentCategory instanceof Category) {
-            return response()->json(['status' => 500, 'message' => 'Cannot find [payment].']);
+            return response()->json([
+                'status' => 400,
+                'message' => 'Cannot find [payment].'
+            ]);
         }
+
+        // Get the currently logged-in user
         $sessionUser = SessionUser::getUser();
+
+        // Fetch all unpaid invoices for the user's company
         $invoices = Invoice::where('client_company_id', $sessionUser['client_company_id'])
             ->where('status', '!=', 'paid')
             ->get();
-        $amount = $requestData['amount'];
+
+        $amount = $request->input('amount');
         $totalPaidAmount = 0;
+
+        // Process each invoice
         if (count($invoices) > 0) {
+            // Process each invoice
             foreach ($invoices as $invoice) {
-                if ($invoice['amount'] < $amount) {
-                    $paymentAmount = $invoice['amount'];
-                    $amount = $amount - $paymentAmount;
+                if ($amount <= 0) {
+                    break; // Stop processing if the payment amount is exhausted
+                }
+
+                $dueAmount = $invoice['amount'] - $invoice['paid_amount'];
+                if ($dueAmount <= $amount) {
+                    // Pay the full amount of the invoice
+                    $paymentAmount = $dueAmount;
+                    $amount -= $paymentAmount;
                     $status = 'paid';
                 } else {
+                    // Pay the remaining amount to this invoice
                     $paymentAmount = $amount;
-                    $status = 'partial paid';
                     $amount = 0;
+                    $status = 'partial paid';
                 }
+
                 $totalPaidAmount += $paymentAmount;
-                $invoice->paid_amount = $paymentAmount;
+                $invoice->paid_amount =  $invoice->paid_amount + $paymentAmount;
                 $invoice->status = $status;
                 $invoice->save();
             }
         }
+
+        // If any amount was paid, record the transaction
         if ($totalPaidAmount > 0) {
-            $transaction['linked_id'] = $requestData['payment_id'];
-            $transaction['transaction'] = [
-                ['date' => date('Y-m-d'), 'account_id' => $requestData['company_id'], 'debit_amount' => $totalPaidAmount, 'credit_amount' => 0, 'module' => Module::INVOICE, 'module_id' => $invoice->id]
+            $transactionData = [
+                ['date' => date('Y-m-d'), 'account_id' => $request->input('payment_id'), 'debit_amount' => $totalPaidAmount, 'credit_amount' => 0, 'module' => Module::INVOICE_PAYMENT, 'module_id' => $invoice['id']],
+                ['date' => date('Y-m-d'), 'account_id' => $request->input('company_id'), 'debit_amount' => 0, 'credit_amount' => $totalPaidAmount, 'module' => Module::INVOICE_PAYMENT, 'module_id' => $invoice['id']],
             ];
-            TransactionController::saveTransaction($transaction);
+            TransactionRepository::saveTransaction($transactionData);
         }
+
+        // If there is still remaining amount after processing invoices, handle as advance payment
         if ($amount > 0) {
             $advancePaymentData = [
                 'category' => $companyCategory['category'],
                 'amount' => $amount,
-                'company_id' => $requestData['company_id'],
-                'payment_id' => $requestData['payment_id']
+                'company_id' => $request->input('company_id'),
+                'payment_id' => $request->input('payment_id')
             ];
             InvoiceRepository::advancePayment($advancePaymentData);
         }
-        return response()->json(['status' => 200, 'message' => 'Successfully saved invoice payment.']);
+
+        // Return success response
+        return response()->json([
+            'status' => 200,
+            'message' => 'Successfully saved invoice payment.'
+        ]);
     }
+
     /**
      * @param Request $request
      * @return JsonResponse
