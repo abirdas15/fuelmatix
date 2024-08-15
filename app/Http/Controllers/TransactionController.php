@@ -12,6 +12,7 @@ use App\Models\ClientCompany;
 use App\Models\Stock;
 use App\Models\Transaction;
 use App\Models\Voucher;
+use App\Repository\TransactionRepository;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -21,18 +22,35 @@ use Illuminate\Support\Facades\Validator;
 
 class TransactionController extends Controller
 {
-    public function save(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function save(Request $request): JsonResponse
     {
-        $inputData = $request->all();
-        $validator = Validator::make($inputData, [
-            'transaction' => 'required',
-            'linked_id' => 'required'
+        $validator = Validator::make($request->all(), [
+            'transaction' => 'required|array',
+            'transaction.*.account_id' => 'required|integer',
+            'transaction.*.debit_amount' => 'nullable|numeric',
+            'transaction.*.credit_amount' => 'nullable|numeric',
+            'linked_id' => 'required|integer'
         ]);
         if ($validator->fails()) {
-            return response()->json(['status' => 500, 'errors' => $validator->errors()]);
+            return response()->json([
+                'status' => 500,
+                'errors' => $validator->errors()
+            ]);
         }
-        self::saveTransaction($inputData);
-        return response()->json(['status' => 200, 'message' => 'Successfully save transaction.']);
+        foreach ($request->input('transaction') as $transaction) {
+            TransactionRepository::saveTransaction([
+                ['date' => $transaction['date'], 'account_id' => $request->input('linked_id'), 'debit_amount' => !empty($transaction['debit_amount']) ? $transaction['debit_amount'] : 0, 'credit_amount' => !empty($transaction['credit_amount']) ? $transaction['credit_amount'] : 0, 'description' => $transaction['description']],
+                ['date' => $transaction['date'], 'account_id' => $transaction['account_id'], 'debit_amount' => !empty($transaction['credit_amount']) ? $transaction['credit_amount'] : 0, 'credit_amount' => !empty($transaction['debit_amount']) ? $transaction['debit_amount'] : 0, 'description' => $transaction['description']],
+            ]);
+        }
+        return response()->json([
+            'status' => 200,
+            'message' => 'Successfully save transaction.'
+        ]);
     }
     /**
      * @param array $inputData

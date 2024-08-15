@@ -617,14 +617,15 @@ class ProductController extends Controller
         }
 
         // Retrieve and process tank refill data
-        $tankRefill = TankRefillTotal::select('*');
+        $tankRefill = TankRefillTotal::select('tank_refill_total.*', 'tank_refill.tank_id')
+            ->leftJoin('tank_refill', 'tank_refill.refill_id', '=', 'tank_refill_total.id');
         if ($request->input('status') == 'previous') {
             $tankRefill->where(function($query) use ($date) {
-                $query->where('date', '=', date('Y-m-d', strtotime($date)));
+                $query->where('dtank_refill_total.ate', '=', date('Y-m-d', strtotime($date)));
             });
         } else {
             $tankRefill->where(function($query) use ($shiftSaleId) {
-                $query->where('shift_id', '=', $shiftSaleId);
+                $query->where('tank_refill_total.shift_id', '=', $shiftSaleId);
             });
         }
         $tankRefill = $tankRefill->get()->keyBy('tank_id')->toArray();
@@ -642,7 +643,7 @@ class ProductController extends Controller
 
             $tank['noDIPShow'] = 1;
             if (empty($shiftSaleId)) {
-                $tank['start_reading'] = !empty($tank['end_reading']) ? $tank['end_reading'] : ($tank['opening_stock'] ?? 0);
+                $tank['start_reading'] = $tank['end_reading'] ?? ($tank['opening_stock'] ?? 0);
             }
             $tank['start_reading_mm'] = Tank::findHeight($tank['id'], $tank['start_reading']);
             $tank['end_reading'] = 0;
