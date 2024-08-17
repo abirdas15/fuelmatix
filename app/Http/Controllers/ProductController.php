@@ -617,11 +617,11 @@ class ProductController extends Controller
         }
 
         // Retrieve and process tank refill data
-        $tankRefill = TankRefillTotal::select('tank_refill_total.*', 'tank_refill.tank_id')
+        $tankRefill = TankRefillTotal::select('tank_refill_total.*', 'tank_refill.tank_id', 'tank_refill.dip_sale')
             ->leftJoin('tank_refill', 'tank_refill.refill_id', '=', 'tank_refill_total.id');
         if ($request->input('status') == 'previous') {
             $tankRefill->where(function($query) use ($date) {
-                $query->where('dtank_refill_total.ate', '=', date('Y-m-d', strtotime($date)));
+                $query->where('tank_refill_total.date', '=', date('Y-m-d', strtotime($date)));
             });
         } else {
             $tankRefill->where(function($query) use ($shiftSaleId) {
@@ -648,7 +648,7 @@ class ProductController extends Controller
             $tank['start_reading_mm'] = Tank::findHeight($tank['id'], $tank['start_reading']);
             $tank['end_reading'] = 0;
             $tank['end_reading_mm'] = 0;
-            $tank['tank_refill'] = isset($tankRefill[$tank['id']]) ? $tankRefill[$tank['id']]['total_refill_volume'] : 0;
+            $tank['tank_refill'] = isset($tankRefill[$tank['id']]) ? $tankRefill[$tank['id']]['dip_sale'] : 0;
             $tank['tank_refill_mm'] = 0;
             $tank['adjustment'] = $adjustment;
             $tank['adjustment_mm'] = 0;
