@@ -428,36 +428,13 @@ class ReportController extends Controller
         $endDate = Carbon::parse($request->get('date'), SessionUser::TIMEZONE)->endOfDay();
 
         $shiftSale = ShiftTotal::select(
+            'shift_sale.id',
             'shift_sale.tank_id',
             'shift_summary.nozzle_id',
-            DB::raw('(
-                SELECT start_reading
-                FROM shift_summary ss
-                WHERE ss.shift_sale_id = shift_sale.id
-                ORDER BY ss.id DESC
-                LIMIT 1
-            ) as start_reading'),
-            DB::raw('(
-            SELECT end_reading
-            FROM shift_summary ss
-            WHERE ss.shift_sale_id = shift_sale.id
-            ORDER BY ss.id DESC
-            LIMIT 1
-        ) as end_reading'),
-            DB::raw('(
-            SELECT ss.start_reading
-            FROM shift_sale ss
-            WHERE ss.tank_id = shift_sale.tank_id
-            ORDER BY ss.id ASC
-            LIMIT 1
-        ) as tank_start_reading'),
-            DB::raw('(
-            SELECT ss.end_reading
-            FROM shift_sale ss
-            WHERE ss.tank_id = shift_sale.tank_id
-            ORDER BY ss.id DESC
-            LIMIT 1
-        ) as tank_end_reading')
+            'shift_summary.start_reading',
+            'shift_summary.end_reading',
+            'shift_sale.start_reading as tank_start_reading',
+            'shift_sale.end_reading as tank_end_reading',
         )
             ->leftJoin('shift_sale', 'shift_sale.shift_id', '=', 'shift_total.id')
             ->leftJoin('shift_summary', 'shift_summary.shift_sale_id', '=', 'shift_sale.id')
@@ -465,24 +442,37 @@ class ReportController extends Controller
             ->whereBetween('start_date', [$startDate, $endDate])
             ->where('shift_total.status', FuelMatixStatus::END)
             ->whereNotNull('shift_summary.nozzle_id')
-            ->groupBy('shift_summary.nozzle_id', 'shift_sale.tank_id')
             ->get()
             ->toArray();
         // Initialize arrays to hold the results
         $shiftSaleByNozzleId = [];
         $shiftSaleByTankId = [];
 
-        // Organize the results into two separate arrays
+        // Process the fetched data
         foreach ($shiftSale as $sale) {
             $tankId = $sale['tank_id'];
             $nozzleId = $sale['nozzle_id'];
 
-            // Add to array keyed by nozzle_id
-            $shiftSaleByNozzleId[$nozzleId] = $sale;
+            // Keyed by nozzle_id
+            if (!isset($shiftSaleByNozzleId[$nozzleId])) {
+                $shiftSaleByNozzleId[$nozzleId] = [
+                    'start_reading' => $sale['start_reading'],
+                    'end_reading' => $sale['end_reading']
+                ];
+            } else {
+                // Update end_reading to be the latest end_reading for the nozzle_id
+                $shiftSaleByNozzleId[$nozzleId]['end_reading'] = $sale['end_reading'];
+            }
 
-            // Add to array keyed by tank_id
+            // Keyed by tank_id
             if (!isset($shiftSaleByTankId[$tankId])) {
-                $shiftSaleByTankId[$tankId] = $sale;
+                $shiftSaleByTankId[$tankId] = [
+                    'tank_start_reading' => $sale['tank_start_reading'],
+                    'tank_end_reading' => $sale['tank_end_reading']
+                ];
+            } else {
+                // Update tank_end_reading to be the latest end_reading for the tank_id
+                $shiftSaleByTankId[$tankId]['tank_end_reading'] = $sale['tank_end_reading'];
             }
         }
 
