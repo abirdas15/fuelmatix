@@ -24,32 +24,6 @@
                                         <input type="text" class="form-control date bg-white" name="date" v-model="param.date">
                                     </div>
                                     <div class="mb-3 form-group col-md-6">
-                                        <label class="form-label">Expense:</label>
-                                        <select class="form-control" name="category_id" id="category_id"  v-model="param.category_id">
-                                            <option value="">Select Expense</option>
-                                            <option v-for="d in expenseData" :value="d.id">{{d.name}}</option>
-                                        </select>
-                                        <div class="invalid-feedback"></div>
-                                    </div>
-                                    <div class="mb-3 form-group col-md-6">
-                                        <label class="form-label">Amount:</label>
-                                        <input type="text" class="form-control" name="amount" v-model="param.amount">
-                                        <div class="invalid-feedback"></div>
-                                    </div>
-                                    <div class="mb-3 form-group col-md-6">
-                                        <label class="form-label">Remarks:</label>
-                                        <input type="text" class="form-control" name="remarks" v-model="param.remarks">
-                                        <div class="invalid-feedback"></div>
-                                    </div>
-                                    <div class="mb-3 form-group col-md-6">
-                                        <label class="form-label">Payment:</label>
-                                        <select class="form-control" name="payment_id" id="payment_id"  v-model="param.payment_id">
-                                            <option value="">Select Payment</option>
-                                            <option v-for="d in paymentData" :value="d.id">{{d.name}}</option>
-                                        </select>
-                                        <div class="invalid-feedback"></div>
-                                    </div>
-                                    <div class="mb-3 form-group col-md-6">
                                         <label class="form-label">Shift:</label>
                                         <select class="form-control" name="shift_id" id="payment_id"  v-model="param.shift_sale_id">
                                             <option value="">Select Shift</option>
@@ -57,21 +31,67 @@
                                         </select>
                                         <div class="invalid-feedback"></div>
                                     </div>
-
-                                    <div class="mb-3 form-group col-md-6">
-                                        <div class="input-group">
-                                            <div class="form-file mt-5">
-                                                <input type="file" class="form-file-input form-control"  @change="onFileChange" name="sound_file">
-                                                <div class="invalid-feedback"></div>
-                                            </div>
-                                        </div>
+                                    <div class="row">
+                                        <table class="table table-bordered">
+                                            <thead>
+                                            <tr>
+                                                <th style="width: 20%">Expense Category</th>
+                                                <th style="width: 20%">Amount</th>
+                                                <th style="width: 20%">Payment Category</th>
+                                                <th style="width: 20%">Remarks</th>
+                                                <th style="width: 15%">File</th>
+                                                <th>Action</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr v-for="(each,index) in param.expense">
+                                                    <td>
+                                                        <div class="form-group">
+                                                            <select class="form-control" :name="'expense.' + index + '.category_id'" id="category_id"  v-model="each.category_id">
+                                                                <option value="">Select Expense</option>
+                                                                <option v-for="d in expenseData" :value="d.id">{{d.name}}</option>
+                                                            </select>
+                                                            <div class="invalid-feedback"></div>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="form-group">
+                                                            <input type="text" class="form-control" :name="'expense.' + index + '.amount'" v-model="each.amount">
+                                                            <div class="invalid-feedback"></div>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="form-group">
+                                                            <select class="form-control" :name="'expense.' + index + '.payment_id'" id="payment_id"  v-model="each.payment_id">
+                                                                <option value="">Select Payment</option>
+                                                                <option v-for="d in paymentData" :value="d.id">{{d.name}}</option>
+                                                            </select>
+                                                            <div class="invalid-feedback"></div>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="form-group">
+                                                            <input type="text" class="form-control" name="remarks" v-model="param.remarks">
+                                                            <div class="invalid-feedback"></div>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="form-group">
+                                                            <input type="file" class="form-file-input"  @change="onFileChange($event, index)" name="sound_file">
+                                                            <div class="invalid-feedback"></div>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <button @click="addExpense" v-if="index === 0" type="button" class="btn btn-info">+</button>
+                                                        <button @click="removeExpense(index)" v-if="index !== 0" type="button" class="btn btn-danger">x</button>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
                                     </div>
-
                                 </div>
                                 <div class="row" style="text-align: right;">
-                                    <div class="mb-3 col-md-6">
-
-                                    </div>
+                                    <div class="mb-3 col-md-6"></div>
                                     <div class="mb-3 col-md-6">
                                         <button type="submit" class="btn btn-primary" v-if="!loading">Submit</button>
                                         <button type="button" class="btn btn-primary" v-if="loading">Submitting...</button>
@@ -96,13 +116,17 @@ export default {
     data() {
         return {
             param: {
-                category_id: '',
-                amount: '',
-                remarks: '',
-                payment_id: '',
-                file: '',
                 date: moment().format('YYYY-MM-DD'),
-                shift_sale_id: ''
+                shift_sale_id: '',
+                expense: [
+                    {
+                        category_id: '',
+                        amount: '',
+                        payment_id: '',
+                        file: '',
+                        remarks: ''
+                    }
+                ]
             },
             loading: false,
             expenseData: [],
@@ -116,6 +140,18 @@ export default {
         }
     },
     methods: {
+        removeExpense: function(index) {
+            this.param.expense.splice(index, 1);
+        },
+        addExpense: function() {
+            this.param.expense.push({
+                category_id: '',
+                amount: '',
+                payment_id: '',
+                file: '',
+                remarks: ''
+            });
+        },
         fetchShift: function() {
             ApiService.POST(ApiRoutes.GetShiftByDate, {date: this.param.date}, (res) => {
                 if (parseInt(res.status) === 200) {
@@ -141,23 +177,33 @@ export default {
                 }
             });
         },
-        onFileChange(e) {
+        onFileChange(e, index) {
             let files = e.target.files || e.dataTransfer.files;
             if (!files.length)
                 return;
-            this.param.file = files[0];
+            this.param.expense[index]['file'] = files[0];
         },
         save: function () {
             ApiService.ClearErrorHandler();
             this.loading = true
-            let formData = new FormData()
-            formData.append('category_id', this.param.category_id)
-            formData.append('payment_id', this.param.payment_id)
-            formData.append('amount', this.param.amount)
-            formData.append('remarks', this.param.remarks)
-            formData.append('file', this.param.file)
-            formData.append('date', this.param.date)
-            formData.append('shift_sale_id', this.param.shift_sale_id)
+            let formData = new FormData();
+
+            // Append the common parameters
+            formData.append('date', this.param.date);
+            formData.append('shift_sale_id', this.param.shift_sale_id);
+
+            // Loop through each expense item and append its fields to the formData
+            this.param.expense.forEach((expense, index) => {
+                formData.append(`expense[${index}][category_id]`, expense.category_id);
+                formData.append(`expense[${index}][payment_id]`, expense.payment_id);
+                formData.append(`expense[${index}][amount]`, expense.amount);
+                formData.append(`expense[${index}][remarks]`, expense.remarks);
+
+                // If you have a file, append it as well, ensuring the file is not empty or undefined
+                if (expense.file) {
+                    formData.append(`expense[${index}][file]`, expense.file);
+                }
+            });
             ApiService.POST(ApiRoutes.ExpenseAdd, formData, res => {
                 this.loading = false
                 if (parseInt(res.status) === 200) {

@@ -52,9 +52,12 @@
                                                 <td >{{f.amount.toLocaleString()}}</td>
                                                 <td>
                                                     <div class="d-flex">
-                                                        <a v-if="CheckPermission(Section.PAY_ORDER + '-' + Action.VIEW)"  href="javascript:void(0)"  @click="openPayOrderDetailsModal(f.id)" class="btn btn-primary shadow btn-xs sharp">
+                                                        <a v-if="CheckPermission(Section.PAY_ORDER + '-' + Action.VIEW)"  href="javascript:void(0)"  @click="openPayOrderDetailsModal(f.id)" class="btn btn-success shadow btn-xs sharp me-1">
                                                             <i class="fa fa-eye"></i>
                                                         </a>
+                                                        <router-link :to="{name: 'PayOrderEdit', params: { id: f.id }}" v-if="CheckPermission(Section.PAY_ORDER + '-' + Action.EDIT) && f.tank_refill === null" class="btn btn-primary shadow btn-xs sharp">
+                                                            <i class="fas fa-pencil-alt"></i>
+                                                        </router-link>
                                                     </div>
                                                 </td>
                                             </tr>

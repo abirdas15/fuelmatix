@@ -9,9 +9,14 @@ use App\Helpers\Helpers;
 use App\Helpers\SessionUser;
 use App\Models\Category;
 use App\Models\ClientCompany;
+use App\Models\FuelAdjustment;
+use App\Models\PayOrderData;
+use App\Models\Product;
 use App\Models\ShiftSale;
 use App\Models\ShiftTotal;
+use App\Models\Tank;
 use App\Models\TankRefill;
+use App\Models\TankRefillTotal;
 use App\Models\Transaction;
 use App\Repository\ReportRepository;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -287,7 +292,7 @@ class ReportController extends Controller
         $sessionUser = SessionUser::getUser();
 
         // Calculate the opening balance for the account category before the start date
-        $openingBalance = Transaction::select(DB::raw('SUM(credit_amount - debit_amount) as opening_balance'))
+        $openingBalance = Transaction::select(DB::raw('SUM(debit_amount - credit_amount) as opening_balance'))
             ->where('date', '<', $request['start_date'])
             ->where('account_id', $request['category_id'])
             ->first();
@@ -299,8 +304,8 @@ class ReportController extends Controller
         $result = Transaction::select(
             'date',
             'categories.name as company_name',
-            DB::raw('SUM(credit_amount) as bill_amount'),
-            DB::raw('SUM(debit_amount) as paid_amount')
+            DB::raw('SUM(credit_amount) as paid_amount'),
+            DB::raw('SUM(debit_amount) as bill_amount')
         )
             ->whereBetween('date', [$request['start_date'], $request['end_date']])
             ->leftJoin('categories', 'categories.id', '=', 'transactions.account_id')
@@ -384,5 +389,181 @@ class ReportController extends Controller
             ]
         ]);
 
+    }
+
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function stockSummary(Request $request): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'date' => 'required|date',
+        ]);
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 500,
+                'errors' => $validator->errors()
+            ]);
+        }
+        $sessionUser = SessionUser::getUser();
+        $products = Product::select('products.id', 'products.name as product_name', 'product_types.tank', 'products.selling_price')
+            ->leftJoin('product_types', 'product_types.id', '=', 'products.type_id')
+            ->where('products.client_company_id', $sessionUser['client_company_id'])
+            ->where('product_types.tank', '1')
+            ->with(['tanks' => function($q) {
+                $q->select('id', 'product_id', 'tank_name', 'opening_stock');
+            },'tanks.dispensers' => function($q) {
+                $q->select('id', 'tank_id', 'dispenser_name');
+            }, 'tanks.dispensers.nozzle' => function($q) {
+                $q->select('id', 'dispenser_id', 'name as nozzle_name', 'opening_stock');
+            }])
+            ->get()
+            ->toArray();
+        $productIds = array_column($products, 'id');
+        $startDate = Carbon::parse($request->get('date'), SessionUser::TIMEZONE)->startOfDay();
+        $endDate = Carbon::parse($request->get('date'), SessionUser::TIMEZONE)->endOfDay();
+
+        $shiftSale = ShiftTotal::select(
+            'shift_sale.tank_id',
+            'shift_summary.nozzle_id',
+            DB::raw('MIN(shift_summary.start_reading) as start_reading'),
+            DB::raw('MAX(shift_summary.end_reading) as end_reading'),
+            DB::raw('MIN(shift_sale.start_reading) as tank_start_reading'),
+            DB::raw('MAX(shift_sale.end_reading) as tank_end_reading'),
+        )
+            ->leftJoin('shift_sale', 'shift_sale.shift_id', '=', 'shift_total.id')
+            ->leftJoin('shift_summary', 'shift_summary.shift_sale_id', '=', 'shift_sale.id')
+            ->where('shift_total.client_company_id', $sessionUser['client_company_id'])
+            ->whereBetween('start_date', [$startDate, $endDate])
+            ->where('shift_total.status', FuelMatixStatus::END)
+            ->whereNotNull('shift_summary.nozzle_id')
+            ->groupBy('shift_summary.nozzle_id', 'shift_sale.tank_id')
+            ->get()
+            ->toArray();
+        // Initialize arrays to hold the results
+        $shiftSaleByNozzleId = [];
+        $shiftSaleByTankId = [];
+
+        // Organize the results into two separate arrays
+        foreach ($shiftSale as $sale) {
+            $tankId = $sale['tank_id'];
+            $nozzleId = $sale['nozzle_id'];
+
+            // Add to array keyed by nozzle_id
+            $shiftSaleByNozzleId[$nozzleId] = $sale;
+
+            // Add to array keyed by tank_id
+            $shiftSaleByTankId[$tankId] = $sale;
+        }
+
+
+        $fuelAdjustment = FuelAdjustment::select('fuel_adjustment.product_id', DB::raw('SUM(fuel_adjustment_data.quantity) as total_quantity'))
+            ->leftJoin('fuel_adjustment_data', 'fuel_adjustment_data.fuel_adjustment_id', '=', 'fuel_adjustment.id')
+            ->where('fuel_adjustment.client_company_id', $sessionUser['client_company_id'])
+            ->whereNotNull('nozzle_id')
+            ->whereIn('product_id', $productIds)
+            ->whereBetween('fuel_adjustment.date', [$startDate, $endDate])
+            ->groupBy('fuel_adjustment.product_id')
+            ->get()
+            ->keyBy('product_id')
+            ->toArray();
+
+        $tankRefill = TankRefillTotal::select(DB::raw('SUM(tank_refill.dip_sale) as volume'), 'tank_refill.tank_id')
+            ->leftJoin('tank_refill', 'tank_refill.refill_id', '=', 'tank_refill_total.id')
+            ->where('tank_refill_total.client_company_id', $sessionUser['client_company_id'])
+            ->where('tank_refill_total.date', $request->input('date'))
+            ->get()
+            ->keyBy('tank_id')
+            ->toArray();
+
+        $payOrder = PayOrderData::select(DB::raw('SUM(pay_order_data.quantity) as quantity'), 'pay_order_data.product_id')
+            ->leftJoin('pay_order', 'pay_order.id', '=', 'pay_order_data.pay_order_id')
+            ->where('status', FuelMatixStatus::PENDING)
+            ->where('pay_order.client_company_id', $sessionUser['client_company_id'])
+            ->whereIn('product_id', $productIds)
+            ->groupBy('product_id')
+            ->get()
+            ->keyBy('product_id')
+            ->toArray();
+        foreach ($products as &$product) {
+            $totalSale = 0;
+            $totalEndReading = 0;
+            $totalRefill = 0;
+            $totalAmount = 0;
+            foreach ($product['tanks'] as &$tank) {
+                foreach ($tank['dispensers'] as &$dispenser) {
+                    foreach ($dispenser['nozzle'] as &$nozzle) {
+                        $nozzle['start_reading'] = $shiftSaleByNozzleId[$nozzle['id']]['start_reading'] ?? 0;
+                        $nozzle['end_reading'] = $shiftSaleByNozzleId[$nozzle['id']]['end_reading'] ?? 0;
+                        $nozzle['sale'] = $nozzle['end_reading'] - $nozzle['start_reading'];
+                        $nozzle['start_reading_format'] = $nozzle['start_reading'] > 0 ?  number_format($nozzle['start_reading'], 2) : '-';
+                        $nozzle['end_reading_format'] = $nozzle['end_reading'] > 0 ? number_format($nozzle['end_reading'], 2) : '-';
+                        $nozzle['sale_format'] = $nozzle['sale'] > 0 ? number_format($nozzle['sale'], 2) : '-';
+                        $totalSale += $nozzle['sale'];
+                        $nozzle['unit_price_format'] = number_format($product['selling_price'], 2);
+                        $nozzle['amount'] = $nozzle['sale'] * $product['selling_price'];
+                        $nozzle['amount_format'] = $nozzle['amount'] > 0 ?number_format($nozzle['amount'], 2) : '-';
+                        $totalAmount += $nozzle['amount'];
+                    }
+                }
+                $tank['end_reading'] = $shiftSaleByTankId[$tank['id']]['tank_end_reading'] ?? 0;
+                if (isset($tankRefill[$tank['id']]['volume'])) {
+                    $tank['refill'] = $tankRefill[$tank['id']]['volume'];
+                } else {
+                    $tank['refill'] = 0;
+                }
+                $tank['end_reading_format'] = $tank['end_reading'] > 0 ? number_format($tank['end_reading'], 2) : '-';
+                $totalEndReading += $tank['end_reading'];
+                $totalRefill += $tank['refill'];
+            }
+            $product['total'] = $totalSale > 0 ? number_format($totalSale, 2) : '-';
+            $product['subtotal_amount'] = $totalAmount > 0 ? number_format($totalAmount, 2) : '-';
+            $adjustment = $fuelAdjustment[$product['id']]['total_quantity'] ?? 0;
+            $product['adjustment'] = $adjustment > 0 ? number_format($adjustment, 2) : '-' ;
+            $product['adjustment_amount'] = $adjustment > 0 ? number_format($adjustment * $product['selling_price'], 2) : '-' ;
+
+            $totalQuantity = $totalSale - $adjustment;
+            $product['total_sale'] = $totalQuantity > 0 ? number_format($totalQuantity, 2) : '-';
+            $product['total_amount'] = ($totalAmount - ($adjustment * $product['selling_price'])) > 0 ? number_format($totalAmount - ($adjustment * $product['selling_price']), 2) : '-';
+            $product['end_reading'] = $totalEndReading > 0 ? number_format($totalEndReading, 2) : '-';
+            $product['tank_refill'] = $totalRefill > 0 ? number_format($totalRefill, 2) : '-';
+            $totalByProduct = $totalEndReading + $totalRefill;
+            $product['total_by_product'] = $totalByProduct > 0 ? number_format($totalByProduct, 2) : '-';
+            $payOrderQuantity = $payOrder[$product['id']]['quantity'] ?? 0;
+            $product['pay_order'] = $payOrderQuantity > 0 ? number_format($payOrderQuantity, 2) : '-';
+            $product['closing_balance'] = ($totalEndReading + $payOrderQuantity) > 0 ? number_format($totalEndReading + $payOrderQuantity, 2) : '-';
+            $gainLoss = $totalByProduct != 0 && $totalQuantity != 0 ? ($totalByProduct - $totalQuantity) / $totalQuantity : 0 ;
+            $product['gain_loss'] = $gainLoss;
+            $product['gain_loss_format'] = $gainLoss > 0 ? number_format(abs($gainLoss), 2) .'%' : '-';
+        }
+        $accountReceivable = Category::where('client_company_id', $sessionUser['client_company_id'])->where('slug', strtolower( AccountCategory::ACCOUNT_RECEIVABLE))->first();
+        $transaction = Transaction::select('transactions.account_id as id',  DB::raw("SUM(transactions.debit_amount) as amount"), 'categories.name', DB::raw('SUM(transactions.quantity) as quantity'), 'c1.name as product_name')
+            ->leftJoin('categories', 'categories.id', '=', 'transactions.account_id')
+            ->leftJoin('transactions as t1', 't1.linked_id', '=', 'transactions.id')
+            ->leftJoin('categories as c1', 'c1.id', '=', 't1.account_id')
+            ->where('transactions.date', $request->input('date'))
+            ->where('categories.parent_category', $accountReceivable->id)
+            ->where('transactions.client_company_id', $sessionUser['client_company_id'])
+            ->having('amount', '>', 0)
+            ->groupBy('transactions.id')
+            ->get()
+            ->toArray();
+        $totalQuantity = 0;
+        $totalAmount = 0;
+        foreach ($transaction as &$data) {
+            $data['amount_format'] = number_format($data['amount'], 2);
+            $totalQuantity += $data['quantity'];
+            $totalAmount += $data['amount'];
+        }
+        return response()->json([
+            'status' => 200,
+            'data' => $products,
+            'companySales' => $transaction,
+            'total' => [
+                'quantity' => number_format($totalQuantity, 2),
+                'amount' => number_format($totalAmount, 2)
+            ]
+        ]);
     }
 }

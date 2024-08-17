@@ -39,6 +39,18 @@
                                                 <th class="text-start">Payment Method</th>
                                                 <td class="text-start">{{param.payment_method}}</td>
                                             </tr>
+                                            <tr v-if="param.company_name != null">
+                                                <th class="text-start">Company Name</th>
+                                                <td class="text-start">{{param.company_name}}</td>
+                                            </tr>
+                                            <tr>
+                                                <th class="text-start">Voucher Number</th>
+                                                <td class="text-start">{{param.voucher_number}}</td>
+                                            </tr>
+                                            <tr>
+                                                <th class="text-start">Car Number</th>
+                                                <td class="text-start">{{param.car_number}}</td>
+                                            </tr>
                                             <tr>
                                                 <th class="text-start">Date</th>
                                                 <td class="text-start">{{param.date}}</td>

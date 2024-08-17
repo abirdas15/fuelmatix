@@ -22,11 +22,13 @@ class BstiChartImport implements ToCollection
     {
         $dataArray = [];
         foreach ($rows as $row) {
-            $dataArray[] = [
-                'height' => $row[0],
-                'volume' => $row[1],
-                'tank_id' => $this->tank_id
-            ];
+            if ($row[0] != null && $row[1] != null) {
+                $dataArray[] = [
+                    'height' => $row[0],
+                    'volume' => $row[1],
+                    'tank_id' => $this->tank_id
+                ];
+            }
         }
         if (count($dataArray) > 0) {
             BstiChart::insert($dataArray);

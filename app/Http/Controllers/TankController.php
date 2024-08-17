@@ -26,6 +26,7 @@ use App\Models\TankLog;
 use App\Models\TankRefill;
 use App\Models\TankRefillHistory;
 use App\Models\TankRefillTotal;
+use App\Models\Transaction;
 use App\Models\User;
 use App\Repository\CategoryRepository;
 use App\Repository\NozzleRepository;
@@ -108,6 +109,8 @@ class TankController extends Controller
         // Retrieve the most recent BstiChart for the tank
         $bstiChart = BstiChart::select('volume', 'height')
             ->where('tank_id', $tank['id'])
+            ->whereNotNull('volume')
+            ->whereNotNull('height')
             ->orderBy('id', 'DESC')
             ->first();
 
@@ -242,7 +245,11 @@ class TankController extends Controller
             BstiChart::where('tank_id', $tank['id'])->delete();
             Excel::import(new BstiChartImport($tank['id']), $request->file('file'));
         }
-        $bstiChart = BstiChart::select('volume', 'height')->where('tank_id', $tank['id']) ->orderBy('id', 'DESC')
+        $bstiChart = BstiChart::select('volume', 'height')
+            ->where('tank_id', $inputData['id'])
+            ->whereNotNull('volume')
+            ->whereNotNull('height')
+            ->orderBy('id', 'DESC')
             ->first();
         $tank->capacity =  $bstiChart['volume'] ?? 0;
         $tank->height =  $bstiChart['height'] ?? 0;
@@ -568,13 +575,13 @@ class TankController extends Controller
         $keyword = $inputData['keyword'] ?? '';
         $order_by = $inputData['order_by'] ?? 'tank_refill.id';
         $order_mode = $inputData['order_mode'] ?? 'DESC';
-        $result = TankRefill::select('tank_refill.*', 'tank.tank_name', 'pay_order.amount')
-            ->leftJoin('tank', 'tank.id', 'tank_refill.tank_id')
-            ->leftJoin('pay_order', 'pay_order.id', 'tank_refill.pay_order_id')
-            ->where('tank_refill.client_company_id', $inputData['session_user']['client_company_id']);
+        $result = TankRefillTotal::select('tank_refill_total.*', 'products.name as product_name', 'pay_order.amount')
+            ->leftJoin('products', 'products.id', 'tank_refill_total.product_id')
+            ->leftJoin('pay_order', 'pay_order.id', 'tank_refill_total.pay_order_id')
+            ->where('tank_refill_total.client_company_id', $inputData['session_user']['client_company_id']);
         if (!empty($keyword)) {
             $result->where(function($q) use ($keyword) {
-                $q->where('tank.tank_name', 'LIKE', '%'.$keyword.'%');
+                $q->where('products.product_name', 'LIKE', '%'.$keyword.'%');
             });
         }
         $result = $result->orderBy($order_by, $order_mode)
@@ -684,9 +691,11 @@ class TankController extends Controller
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
-        TankRefill::where('id', $inputData['id'])->delete();
+        TankRefillTotal::where('id', $inputData['id'])->delete();
+        TankRefill::where('refill_id', $inputData['id'])->delete();
         TankRefillHistory::where('tank_refill_id', $inputData['id'])->delete();
         ProductPrice::where('module', 'tank refill')->where('module_id', $inputData['id'])->delete();
+        Transaction::where('module', Module::TANK_REFILL)->where('module_id', $inputData['id'])->delete();
         return response()->json(['status' => 200, 'message' => 'Successfully deleted tank refill.']);
     }
     /**

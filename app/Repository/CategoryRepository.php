@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Common\AccountCategory;
 use App\Helpers\SessionUser;
 use App\Models\Category;
 
@@ -59,6 +60,31 @@ class CategoryRepository
     public static function updateCategory(Category $category, array $data)
     {
         $category->name = $data['name'];
+        $category->others = $data['others'] ?? null;
+        $category->credit_limit = $data['credit_limit'] ?? null;
+        $category->module_id = $data['module_id'] ?? $category['module_id'];
+        $category->opening_balance = $data['opening_balance'] ?? null;
+        if (!$category->save()) {
+            return false;
+        }
+        $category->updateCategory();
+        return $category;
+    }
+    public static function updateAccountReceivableCategory(Category $category, array $data, $parent_id = null)
+    {
+        $sessionUser = SessionUser::getUser();
+        if ($parent_id != null) {
+            $parentCategory = Category::where('id', $parent_id)
+                ->where('client_company_id', $sessionUser['client_company_id'])
+                ->first();
+        } else {
+            $parentCategory = Category::where('slug', strtolower(AccountCategory::ACCOUNT_RECEIVABLE))
+                ->where('client_company_id', $sessionUser['client_company_id'])
+                ->first();
+
+        }
+        $category->name = $data['name'];
+        $category->parent_category = $parentCategory->id;
         $category->others = $data['others'] ?? null;
         $category->credit_limit = $data['credit_limit'] ?? null;
         $category->module_id = $data['module_id'] ?? $category['module_id'];

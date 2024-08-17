@@ -25,6 +25,14 @@
                                         <div class="invalid-feedback"></div>
                                     </div>
                                     <div class="mb-3 form-group col-md-6">
+                                        <label class="form-label">Parent Company:</label>
+                                        <select class="form-control" v-model="param.parent_id">
+                                            <option value="">Select One</option>
+                                            <option v-for="each in companies" :value="each.id" v-text="each.name"></option>
+                                        </select>
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                    <div class="mb-3 form-group col-md-6">
                                         <label class="form-label">Email:</label>
                                         <input type="email" class="form-control" name="email" v-model="param.email">
                                         <div class="invalid-feedback"></div>
@@ -114,7 +122,8 @@ export default {
                 opening_balance: '',
                 product_price: [
                     {product_id: '', price: ''}
-                ]
+                ],
+                parent_id: ''
             },
             listParam: {
                 limit: 5000,
@@ -122,10 +131,18 @@ export default {
             },
             loading: false,
             listData: [],
-            products: []
+            products: [],
+            companies: []
         }
     },
     methods: {
+        fetchCompany: function() {
+            ApiService.POST(ApiRoutes.CreditCompanyList, {limit: 500}, (res) => {
+                if (parseInt(res.status) === 200) {
+                    this.companies = res.data.data;
+                }
+            });
+        },
         fetchProduct: function() {
             ApiService.POST(ApiRoutes.ProductList, {limit: 500}, (res) => {
                 if (parseInt(res.status) === 200) {
@@ -159,6 +176,7 @@ export default {
     },
     created() {
         this.fetchProduct();
+        this.fetchCompany();
     },
     mounted() {
         $('#dashboard_bar').text('Credit Company Add')

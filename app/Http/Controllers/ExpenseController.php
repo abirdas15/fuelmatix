@@ -13,7 +13,7 @@ use App\Repository\TransactionRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class ExpenseController extends Controller
@@ -29,10 +29,15 @@ class ExpenseController extends Controller
         // Validate the incoming request to ensure required fields are provided and valid
         $validator = Validator::make($request->all(), [
             'date' => 'required|date',
-            'category_id' => 'required|integer',
-            'amount' => 'required|numeric',
-            'payment_id' => 'required|integer',
+            'expense' => 'required|array',
+            'expense.*.category_id' => 'required|integer',
+            'expense.*.amount' => 'required|numeric',
+            'expense.*.payment_id' => 'required|numeric',
             'shift_sale_id' => 'nullable|integer',
+        ],[
+            'expense.*.category_id.required' => 'The category field is required.',
+            'expense.*.payment_id.required' => 'The payment field is required.',
+            'expense.*.amount.required' => 'The amount field is required.',
         ]);
 
         // If validation fails, return a 400 Bad Request response
@@ -42,64 +47,73 @@ class ExpenseController extends Controller
                 'errors' => $validator->errors()
             ]);
         }
+        foreach ($request->input('expense') as $key => $expense) {
+            // Find the destination category
+            $category = Category::find($expense['category_id']);
+            if (!$category instanceof Category) {
+                return response()->json([
+                    'status' => 500,
+                    'errors' => [
+                        "expense.$key.category_id" => ['Category cannot be found.']
+                    ]
+                ]);
+            }
 
-        // Find the destination category
-        $category = Category::find($request->input('category_id'));
-        if (!$category) {
-            return response()->json([
-                'status' => 500,
-                'errors' => ['category_id' => ['Category cannot be found.']]
-            ]);
+            // Find the source category
+            $paymentCategory = Category::find($expense['payment_id']);
+            if (!$paymentCategory instanceof Category) {
+                return response()->json([
+                    'status' => 500,
+                    'errors' => [
+                        "expense.$key.payment_id" => ['Payment category cannot be found.']
+                    ]
+                ]);
+            }
+
+            // Check if the source category has enough balance
+            $availableBalance = $paymentCategory->checkAvailableBalance($expense['amount']);
+            if (!$availableBalance) {
+                return response()->json([
+                    'status' => 500,
+                    'errors' => [
+                        "expense.$key.payment_id" => ['Not enough balance in ' . $paymentCategory['name'] . '.']
+                    ]
+                ]);
+            }
         }
+        DB::transaction(function() use ($request) {
+            foreach ($request->input('expense') as $key => $expense) {
+                $file_path = null;
+                if ($request->hasFile("expense.$key.file")) {
+                    $file = $request->file("expense.$key.file"); // Access the file using the request object
 
-        // Find the source category
-        $paymentCategory = Category::find($request->input('payment_id'));
-        if (!$paymentCategory) {
-            return response()->json([
-                'status' => 500,
-                'errors' => ['payment_id' => ['Payment category cannot be found.']]
-            ]);
-        }
-
-        // Check if the source category has enough balance
-        $availableBalance = $paymentCategory->checkAvailableBalance($request->input('amount'));
-        if (!$availableBalance) {
-            return response()->json([
-                'status' => 300,
-                'message' => 'Not enough balance in '.$paymentCategory['name'].'.'
-            ]);
-        }
-
-        // Handle file upload
-        $file_path = null;
-        if ($request->hasFile('file')) {
-            $file = $request->file('file');
-            $destinationPath = public_path('uploads');
-            $file_path = time() . '_' . $file->getClientOriginalName(); // Generate a unique file name
-            $file->move($destinationPath, $file_path);
-        }
-
-        // Create and save the expense record
-        $sessionUser = SessionUser::getUser();
-        $expense = new Expense();
-        $expense->date = Carbon::parse($request->input('date'). date(' H:i:s'), SessionUser::TIMEZONE)->format('Y-m-d H:i:s');
-        $expense->category_id = $request->input('category_id');
-        $expense->amount = $request->input('amount');
-        $expense->payment_id = $request->input('payment_id');
-        $expense->remarks = $request->input('remarks') ?? null;
-        $expense->shift_sale_id = $request->input('shift_sale_id') ?? null;
-        $expense->file = $file_path;
-        $expense->status = FuelMatixStatus::PENDING;
-        $expense->client_company_id = $sessionUser['client_company_id'];
-        $expense->user_id = $sessionUser['id'];
-
-        // Save the expense record
-        if (!$expense->save()) {
-            return response()->json([
-                'status' => 500,
-                'message' => 'Cannot save expense.'
-            ]);
-        }
+                    // Ensure the file is valid
+                    if ($file->isValid()) {
+                        $destinationPath = public_path('uploads');
+                        $file_path = time() . '_' . $file->getClientOriginalName();
+                        $file->move($destinationPath, $file_path);
+                    }
+                }
+                $sessionUser = SessionUser::getUser();
+                $expenseModel = new Expense();
+                $expenseModel->date = Carbon::parse($request->input('date'). date(' H:i:s'), SessionUser::TIMEZONE)->format('Y-m-d H:i:s');
+                $expenseModel->category_id = $expense['category_id'];
+                $expenseModel->amount = $expense['amount'];
+                $expenseModel->payment_id = $expense['payment_id'];
+                $expenseModel->remarks = $expense['remarks'] ?? null;
+                $expenseModel->shift_sale_id = $request->input('shift_sale_id') ?? null;
+                $expenseModel->file = $file_path;
+                $expenseModel->status = FuelMatixStatus::PENDING;
+                $expenseModel->client_company_id = $sessionUser['client_company_id'];
+                $expenseModel->user_id = $sessionUser['id'];
+                if (!$expenseModel->save()) {
+                    return response()->json([
+                        'status' => 500,
+                        'message' => 'Cannot save expense.'
+                    ]);
+                }
+            }
+        });
 
         return response()->json([
             'status' => 200,

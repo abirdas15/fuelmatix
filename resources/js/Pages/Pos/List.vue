@@ -55,7 +55,10 @@
                                             <tr class="text-white" style="background-color: #4886EE;color:#ffffff">
                                                 <th class="text-white" @click="sortData('date')" :class="sortClass('date')">Date</th>
                                                 <th class="text-white" @click="sortData('invoice_number')" :class="sortClass('invoice_number')">Invoice Number</th>
+                                                <th class="text-white" @click="sortData('company_name')" :class="sortClass('company_name')">Company Name</th>
                                                 <th class="text-white" @click="sortData('payment_method')" :class="sortClass('payment_method')">Payment Method</th>
+                                                <th class="text-white" @click="sortData('voucher_number')" :class="sortClass('voucher_number')">Voucher Number</th>
+                                                <th class="text-white" @click="sortData('Car Number')" :class="sortClass('voucher_number')">Car Number</th>
                                                 <th class="text-white" @click="sortData('total_amount')" :class="sortClass('total_amount')">Total </th>
                                                 <th class="text-white" @click="sortData('user_name')" :class="sortClass('user_name')" >User</th>
                                                 <th class="text-white text-end" >Action</th>
@@ -65,7 +68,10 @@
                                             <tr v-for="f in listData">
                                                 <td >{{f.date}}</td>
                                                 <td><a href="javascript:void(0);">{{f.invoice_number}}</a></td>
+                                                <td><a href="javascript:void(0);">{{f.company_name}}</a></td>
                                                 <td><a href="javascript:void(0);">{{f?.payment_method}}</a></td>
+                                                <td><a href="javascript:void(0);">{{f?.voucher_number}}</a></td>
+                                                <td><a href="javascript:void(0);">{{f.car_number}}</a></td>
                                                 <td><a href="javascript:void(0);">{{f.total_amount}}</a></td>
                                                 <td><a href="javascript:void(0);">{{f?.user_name}}</a></td>
                                                 <td>

@@ -57,10 +57,16 @@ class CreditCompanyController extends Controller
         // Retrieve the current session user
         $sessionUser = SessionUser::getUser();
 
-        // Find the 'account receivable' category for the current company
-        $category = Category::where('slug', strtolower(AccountCategory::ACCOUNT_RECEIVABLE))
-            ->where('client_company_id', $sessionUser['client_company_id'])
-            ->first();
+        if (!empty($request->input('parent_id'))) {
+            $category = Category::where('id', $request->input('parent_id'))
+                ->where('client_company_id', $sessionUser['client_company_id'])
+                ->first();
+        } else {
+            // Find the 'account receivable' category for the current company
+            $category = Category::where('slug', strtolower(AccountCategory::ACCOUNT_RECEIVABLE))
+                ->where('client_company_id', $sessionUser['client_company_id'])
+                ->first();
+        }
 
         // Return an error if the 'account receivable' category is not found
         if (!$category instanceof Category) {
@@ -203,14 +209,16 @@ class CreditCompanyController extends Controller
         }
 
         // Query to select relevant fields from the Category model
-        $result = Category::select('id', 'name', 'credit_limit', 'others', 'opening_balance')
-            ->where('client_company_id', $sessionUser['client_company_id'])
-            ->where('parent_category', $accountReceivable->id);
+        $result = Category::select('categories.id', 'categories.name', 'categories.credit_limit', 'categories.others', 'categories.opening_balance', 'c2.name as parent_company', 'categories.parent_category')
+            ->leftJoin('categories as c2', 'c2.id', '=', 'categories.parent_category')
+            ->where('categories.client_company_id', $sessionUser['client_company_id'])
+            ->whereJsonContains('categories.category_ids', $accountReceivable->id)
+            ->where('categories.id', '!=', $accountReceivable->id);
 
         // Apply a keyword filter if provided
         if (!empty($keyword)) {
             $result->where(function($q) use ($keyword) {
-                $q->where('name', 'LIKE', '%' . $keyword . '%');
+                $q->where('categories.name', 'LIKE', '%' . $keyword . '%');
             });
         }
 
@@ -220,6 +228,9 @@ class CreditCompanyController extends Controller
 
         // Process each result to extract the 'others' JSON data
         foreach ($result as &$data) {
+            if ($data['parent_category'] == $accountReceivable->id) {
+                $data['parent_company'] = null;
+            }
             $others = json_decode($data['others']);
             $data['email'] = $others != null ? $others->email : null;
             $data['phone'] = $others != null ? $others->phone : null;
@@ -258,7 +269,7 @@ class CreditCompanyController extends Controller
         }
 
         // Find the category by ID and select specific fields
-        $result = Category::select('id', 'name', 'others', 'credit_limit', 'opening_balance')
+        $result = Category::select('id', 'name', 'others', 'credit_limit', 'opening_balance', 'parent_category as parent_id')
             ->find($request->input('id'));
 
         // Decode the 'others' JSON field to extract additional information
@@ -311,9 +322,8 @@ class CreditCompanyController extends Controller
         // Get the currently authenticated user
         $sessionUser = SessionUser::getUser();
 
-        // Find the 'Account Receivable' category for the user's company
-        $accountReceivable = Category::where('client_company_id', $sessionUser['client_company_id'])
-            ->where('slug', strtolower(AccountCategory::ACCOUNT_RECEIVABLE))
+        $accountReceivable = Category::where('slug', strtolower(AccountCategory::ACCOUNT_RECEIVABLE))
+            ->where('client_company_id', $sessionUser['client_company_id'])
             ->first();
 
         // Return an error if the 'Account Receivable' category is not found
@@ -373,7 +383,7 @@ class CreditCompanyController extends Controller
         ];
 
         // Update the main category
-        $updateCategory = CategoryRepository::updateCategory($category, $data);
+        $updateCategory = CategoryRepository::updateAccountReceivableCategory($category, $data, $request->input('parent_id'));
         if (!$updateCategory instanceof Category) {
             return response()->json([
                 'status' => 500,

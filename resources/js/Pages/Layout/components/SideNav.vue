@@ -145,6 +145,10 @@
                             </router-link>
                         </li>
                         <li>
+                            <router-link :to="{name: 'StockSummary'}" >Sale Stock & Sale Summary
+                            </router-link>
+                        </li>
+                        <li>
                             <router-link :to="{name: 'VendorReport'}" >Vendor Report
                             </router-link>
                         </li>

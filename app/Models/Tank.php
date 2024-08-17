@@ -22,6 +22,10 @@ class Tank extends Model
     {
         return $this->hasOne(TankLog::class, 'tank_id', 'id');
     }
+    public function dispensers()
+    {
+        return $this->hasMany(Dispenser::class, 'tank_id', 'id');
+    }
 
     /**
      * Adds opening stock for the given asset category.

@@ -9,4 +9,5 @@ class FuelMatixStatus
     const COMPLETE = 'complete';
     const END = 'end';
     const START = 'start';
+    const DONE = 'done';
 }

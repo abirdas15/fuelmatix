@@ -49,11 +49,17 @@ class VoucherController extends Controller
     {
         $requestData = $request->all();
         $limit = $requestData['limit'] ?? 10;
+        $keyword = $request->input('keyword', '');
         $sessionUser = SessionUser::getUser();
         $result = Voucher::select('voucher.id', 'voucher.voucher_number', 'voucher.validity', 'voucher.status', 'categories.name as company_name')
             ->leftJoin('categories', 'categories.id', '=', 'voucher.company_id')
-            ->where('voucher.client_company_id', $sessionUser['client_company_id'])
-            ->paginate($limit);
+            ->where('voucher.client_company_id', $sessionUser['client_company_id']);
+        if (!empty($keyword)) {
+            $result->where(function($q) use ($keyword) {
+                $q->where('voucher.voucher_number', 'like', '%' . $keyword . '%');
+            });
+        }
+        $result = $result->paginate($limit);
         foreach ($result as &$data) {
             $data['status'] = ucfirst($data['status']);
             $data['validity'] = date('d/m/Y', strtotime($data['validity']));

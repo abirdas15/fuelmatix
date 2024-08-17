@@ -13,6 +13,10 @@ class Product extends Model
     protected $hidden = [
         'client_company_id'
     ];
+    public function tanks()
+    {
+        return $this->hasMany(Tank::class, 'product_id', 'id');
+    }
 
     /**
      * @param float $quantity

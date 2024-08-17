@@ -38,10 +38,7 @@
                                             <thead>
                                             <tr class="text-white" style="background-color: #4886EE;color:#ffffff">
                                                 <th class="text-white" @click="sortData('date')" :class="sortClass('date')">Date</th>
-                                                <th class="text-white" @click="sortData('tank_name')" :class="sortClass('tank_name')">Tank Name</th>
-                                                <th class="text-white" @click="sortData('start_reading')" :class="sortClass('start_reading')">Before Refill</th>
-                                                <th class="text-white" @click="sortData('end_reading')" :class="sortClass('end_reading')">After Refill</th>
-                                                <th class="text-white" @click="sortData('sale_between')" :class="sortClass('sale_between')">Sale In between</th>
+                                                <th class="text-white" @click="sortData('tank_name')" :class="sortClass('tank_name')">Product</th>
                                                 <th class="text-white" @click="sortData('quantity')" :class="sortClass('quantity')">Ordered Amount</th>
                                                 <th class="text-white" @click="sortData('total_refill_volume')" :class="sortClass('total_refill_volume')">Adjust with sale</th>
                                                 <th class="text-white" @click="sortData('net_profit')" :class="sortClass('net_profit')">Loss/Profit</th>
@@ -51,10 +48,7 @@
                                             <tbody v-if="listData.length > 0 && TableLoading == false">
                                             <tr v-for="f in listData">
                                                 <td >{{f.date}}</td>
-                                                <td >{{f.tank_name}}</td>
-                                                <td >{{f.start_reading}}</td>
-                                                <td >{{f.end_reading}}</td>
-                                                <td >{{f.sale_between}}</td>
+                                                <td >{{f.product_name}}</td>
                                                 <td >{{f.quantity}}</td>
                                                 <td >{{f.total_refill_volume}}</td>
                                                 <td >{{f.net_profit}}</td>

@@ -9,6 +9,7 @@ use App\Models\Category;
 use App\Models\PayOrder;
 use App\Models\PayOrderData;
 use App\Models\Product;
+use App\Models\TankRefillTotal;
 use App\Models\Transaction;
 use App\Repository\TransactionRepository;
 use Illuminate\Http\JsonResponse;
@@ -141,7 +142,8 @@ class PayOrderController extends Controller
         $keyword = $inputData['keyword'] ?? '';
         $order_by = $inputData['order_by'] ?? 'pay_order.id';
         $order_mode = $inputData['order_mode'] ?? 'DESC';
-        $result = PayOrder::select('pay_order.id', 'pay_order.amount', 'pay_order.number', 'bank.name as bank_name', 'vendor.name as vendor_name')
+        $result = PayOrder::select('pay_order.id', 'pay_order.amount', 'pay_order.number', 'bank.name as bank_name', 'vendor.name as vendor_name', 'tank_refill_total.id as tank_refill')
+            ->leftJoin('tank_refill_total', 'tank_refill_total.pay_order_id', '=', 'pay_order.id')
             ->leftJoin('categories as bank', 'bank.id', '=', 'pay_order.bank_id')
             ->leftJoin('categories as vendor', 'vendor.id', '=', 'pay_order.vendor_id')
             ->where('pay_order.client_company_id', $inputData['session_user']['client_company_id']);
@@ -176,33 +178,121 @@ class PayOrderController extends Controller
             ->toArray();
         return response()->json(['status' => 200, 'data' => $result]);
     }
-    public function update(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function update(Request $request): JsonResponse
     {
         $inputData = $request->all();
+
+        // Validate the request data
         $validator = Validator::make($inputData, [
             'id' => 'required|integer',
             'bank_id' => 'required|integer',
             'vendor_id' => 'required|integer',
-            'amount' => 'required|numeric',
             'number' => 'required|string',
-            'quantity' => 'required|numeric'
+            'products' => 'required|array',
+            'products.*.product_id' => 'required|integer',
+            'products.*.quantity' => 'required|numeric',
+            'products.*.unit_price' => 'required|numeric',
+            'products.*.total' => 'required|numeric',
+        ], [
+            'products.*.product_id.required' => 'The product field is required',
+            'products.*.quantity.required' => 'The quantity field is required',
+            'products.*.unit_price.required' => 'The unit price field is required',
+            'products.*.total.required' => 'The total field is required',
         ]);
+
+        // Return validation errors if there are any
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
-        $payOrder = PayOrder::find($inputData['id']);
-        if ($payOrder == null) {
-            return response()->json(['status' => 500, 'error' => 'Cannot find pay order.']);
+
+        // Find the vendor category
+        $vendorCategory = Category::find($request['vendor_id']);
+        if (!$vendorCategory instanceof Category) {
+            return response()->json(['status' => 400, 'message' => 'Cannot find [vendor] category']);
         }
-        $payOrder->bank_id = $inputData['bank_id'];
-        $payOrder->vendor_id = $inputData['vendor_id'];
-        $payOrder->amount = $inputData['amount'];
-        $payOrder->number = $inputData['number'];
-        $payOrder->quantity = $inputData['quantity'];
-        if ($payOrder->save()) {
-            return response()->json(['status' => 200, 'message' => 'Successfully updated pay order.']);
+
+        // If bank_id is provided, find the bank category and check for its existence
+        if (!empty($request['bank_id'])) {
+            $bankCategory = Category::find($request['bank_id']);
+            if (!$bankCategory instanceof Category) {
+                return response()->json(['status' => 400, 'message' => 'Cannot find [bank] category']);
+            }
         }
-        return response()->json(['status' => 500, 'error' => 'Cannot updated pay order.']);
+
+        // Retrieve the currently authenticated user
+        $sessionUser = SessionUser::getUser();
+
+        // Calculate the total amount from the products
+        $amount = array_sum(array_column($inputData['products'], 'total'));
+
+        // Fetch the bank's transaction data
+        $transaction = Transaction::select(DB::raw('SUM(debit_amount) as debit_amount'), DB::raw('SUM(credit_amount) as credit_amount'))
+            ->where('account_id', $request['bank_id'])
+            ->where('client_company_id', $sessionUser['client_company_id'])
+            ->first();
+
+        // Check if the bank has sufficient balance if bank_id is provided
+        if (!empty($request['bank_id'])) {
+            $bankAmount = ($transaction['debit_amount'] ?? 0) - ($transaction['credit_amount'] ?? 0);
+            if ($bankAmount < $amount) {
+                return response()->json(['status' => 500, 'errors' => ['bank_id' => ['Not enough balance in your bank.']]]);
+            }
+        }
+        $tankRefill = TankRefillTotal::where('pay_order_id', $inputData['id'])
+            ->first();
+        if ($tankRefill instanceof TankRefillTotal) {
+            return response()->json(['status' => 400, 'message' => 'Cannot update pay order.']);
+        }
+        DB::transaction(function() use ($inputData, $amount) {
+            PayOrderData::where('pay_order_id', $inputData['id'])->delete();
+            Transaction::where('module', Module::PAY_ORDER)->where('module_id', $inputData['id'])->delete();
+            $payOrder = PayOrder::find($inputData['id']);
+            if (!$payOrder instanceof PayOrder) {
+                return response()->json(['status' => 500, 'error' => 'Cannot find pay order.']);
+            }
+            $payOrder->bank_id = $inputData['bank_id'] ?? null;
+            $payOrder->vendor_id = $inputData['vendor_id'];
+            $payOrder->amount = $amount;
+            $payOrder->number = $inputData['number'];
+
+            if (!$payOrder->save()) {
+                return response()->json(['status' => 400, 'message' => 'Cannot update [pay order].']);
+            }
+
+            // Prepare pay order data for insertion into PayOrderData table
+            $payOrderData = [];
+            foreach ($inputData['products'] as $product) {
+                $payOrderData[] = [
+                    'pay_order_id' => $payOrder['id'],
+                    'product_id' => $product['product_id'],
+                    'unit_price' => $product['unit_price'],
+                    'quantity' => $product['quantity'],
+                    'total' => $product['total']
+                ];
+
+                // Prepare transaction data
+                $transactionData = [
+                    ['date' => date('Y-m-d'), 'account_id' => $inputData['bank_id'], 'debit_amount' => 0, 'credit_amount' => $product['total'], 'module' => Module::PAY_ORDER, 'module_id' => $payOrder->id],
+                    ['date' => date('Y-m-d'), 'account_id' => $inputData['vendor_id'], 'debit_amount' => $product['total'], 'credit_amount' => 0, 'module' => Module::PAY_ORDER, 'module_id' => $payOrder->id],
+                ];
+
+                // Save transaction data
+                TransactionRepository::saveTransaction($transactionData);
+            }
+
+            // Insert pay order data into PayOrderData table
+            PayOrderData::insert($payOrderData);
+        });
+
+        // Return a success response
+        return response()->json([
+            'status' => 200,
+            'message' => 'Successfully updated pay order.'
+        ]);
     }
     /**
      * @param Request $request

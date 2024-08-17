@@ -103,13 +103,19 @@ class SaleController extends Controller
                 return response()->json(['status' => 400, 'message' => 'Cannot find [driver].']);
             }
             if (empty($requestData['advance_sale']) && !empty($requestData['voucher_number'])) {
-                $voucher = Voucher::where('company_id', $requestData['company_id'])
-                    ->where('status', 'pending')
+                $companyIds = Category::where('client_company_id', $sessionUser['client_company_id'])
+                    ->whereJsonContains('category_ids', $requestData['company_id'])
+                    ->pluck('id')
+                    ->toArray();
+                $voucher = Voucher::whereIn('company_id', $companyIds)
                     ->where('validity', '>=', date('Y-m-d'))
                     ->where('voucher_number', $requestData['voucher_number'])
                     ->first();
                 if (!$voucher instanceof Voucher) {
                     return response()->json(['status' => 500, 'errors' => ['voucher_number' => ['The voucher number is not valid.']]]);
+                }
+                if ($voucher->status == FuelMatixStatus::DONE) {
+                    return response()->json(['status' => 500, 'errors' => ['voucher_number' => ['The voucher number is already used.']]]);
                 }
                 $voucherNo = $voucher->voucher_number;
             }
@@ -167,6 +173,8 @@ class SaleController extends Controller
                 if (($transaction['total_debit_amount'] - $transaction['total_credit_amount']) < $request['driver_sale']['price']) {
                     return response()->json(['status' => 400, 'message' => $sessionUser['name']. ' has not enough balance. Minimum blalance is '. $request['driver_sale']['price']]);
                 }
+            } else {
+                $driverId = $requestData['driver_sale']['driver_id'] ?? null;
             }
         }
         if ($requestData['payment_method'] == PaymentMethod::CASH) {
@@ -185,7 +193,7 @@ class SaleController extends Controller
             $payment_category_id = $category['id'];
         }
         $sale = new Sale();
-        DB::transaction(function() use ($requestData, $total_amount, $payment_category_id, $carId, $voucherNo, $voucher, $sale) {
+        DB::transaction(function() use ($requestData, $total_amount, $payment_category_id, $carId, $voucherNo, $voucher, $sale, $driverId) {
             $sale->date = Carbon::parse($requestData['date']. date('H:i:s'))->format('Y-m-d H:i:s');
             $sale->invoice_number = Sale::getInvoiceNumber();
             $sale->total_amount = $total_amount;
@@ -194,6 +202,9 @@ class SaleController extends Controller
             $sale->customer_id = $requestData['payment_method'] == PaymentMethod::COMPANY ? $payment_category_id : null;
             $sale->payment_method = $requestData['payment_method'] ?? null;
             $sale->billed_to = $requestData['billed_to'] ?? null;
+            $sale->voucher_number = $requestData['voucher_number'] ?? null;
+            $sale->car_id = $carId;
+            $sale->driver_id = $driverId;
             $sale->payment_category_id = $payment_category_id;
             $sale->client_company_id = $requestData['session_user']['client_company_id'];
             if (!$sale->save()) {
@@ -320,7 +331,9 @@ class SaleController extends Controller
         $keyword = $inputData['keyword'] ?? '';
         $order_by = $inputData['order_by'] ?? 'sale.id';
         $order_mode = $inputData['order_mode'] ?? 'DESC';
-        $result = Sale::select('sale.id', 'sale.invoice_number', 'sale.date', 'sale.total_amount', 'sale.payment_method', 'users.name as user_name')
+        $result = Sale::select('sale.id', 'sale.invoice_number', 'sale.date', 'sale.total_amount', 'sale.payment_method', 'users.name as user_name', 'sale.voucher_number', 'car.car_number', 'categories.name as company_name')
+            ->leftJoin('car', 'car.id', '=', 'sale.car_id')
+            ->leftJoin('categories', 'categories.id', '=', 'sale.payment_category_id')
             ->leftJoin('users', 'users.id', '=', 'sale.user_id')
             ->where('sale.client_company_id', $inputData['session_user']['client_company_id']);
         if (!empty($keyword)) {
@@ -332,6 +345,9 @@ class SaleController extends Controller
             ->paginate($limit);
         foreach ($result as &$data) {
             $data['date'] = date(FuelMatixDateTimeFormat::STANDARD_DATE_TIME, strtotime($data['date']));
+            if ($data['payment_method'] == PaymentMethod::CASH || $data['payment_method'] == PaymentMethod::CARD) {
+                $data['company_name'] = null;
+            }
         }
         return response()->json(['status' => 200, 'data' => $result]);
     }
@@ -352,7 +368,10 @@ class SaleController extends Controller
         if (!$sessionUser instanceof User) {
             return response()->json(['status' => 400, 'message' => 'Cannot find user.']);
         }
-        $result = Sale::find($inputData['id']);
+        $result = Sale::select('sale.*', 'car.car_number', 'categories.name as company_name')
+            ->leftJoin('car', 'car.id', '=', 'sale.car_id')
+            ->leftJoin('categories', 'categories.id', '=', 'sale.payment_category_id')
+            ->find($inputData['id']);
         $result['date'] = date(FuelMatixDateTimeFormat::STANDARD_DATE_TIME, strtotime($result['date']));
         $result['customer_name'] = $result['billed_to'] ?? 'Walk in Customer';
         $result['payment_method'] = ucfirst($result['payment_method']);
@@ -376,6 +395,9 @@ class SaleController extends Controller
         $result['products'] = $products;
         $result['total_amount'] = number_format($result['total_amount'], 2);
         $result['company'] = ClientCompany::select('id', 'name', 'address', 'email', 'phone_number')->find($sessionUser['client_company_id']);
+        if ($result['payment_method'] == PaymentMethod::CASH ||  $result['payment_method'] == PaymentMethod::CARD) {
+            $result['company_name'] = null;
+        }
         return response()->json(['status' => 200, 'data' => $result]);
     }
     /**
@@ -450,7 +472,7 @@ class SaleController extends Controller
         $orderMode = $requestData['order_mode'] ?? 'DESC';
         $keyword = $requestData['keyword'] ?? '';
         $result = Transaction::select('transactions.id', 'invoice_item.invoice_id',  DB::raw("SUM(transactions.debit_amount) as amount"), 'transactions.created_at', 'invoice_item.date as invoice_created_at', 'transactions.description', 'car.car_number', 'transactions.voucher_no', 'categories.name', 'transactions.module', 'transactions.module_id', 'transactions.linked_id as category_id')
-            ->leftJoin('categories', 'categories.id', '=', 'transactions.linked_id')
+            ->leftJoin('categories', 'categories.id', '=', 'transactions.account_id')
             ->leftJoin('invoice_item', 'invoice_item.transaction_id', 'transactions.id')
             ->leftJoin('car', 'car.id', 'transactions.car_id')
             ->where('categories.parent_category', $accountReceivable->id)

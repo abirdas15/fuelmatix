@@ -265,6 +265,7 @@ Route::group(['middleware' => 'AuthReqCheck'], function() {
         Route::post('windfall', [ReportController::class, 'windfallReport']);
         Route::post('creditCompany', [ReportController::class, 'creditCompanyReport']);
         Route::post('driver', [ReportController::class, 'driverReport']);
+        Route::post('stockSummary', [ReportController::class, 'stockSummary']);
     });
     Route::group(['prefix' => 'user'], function() {
         Route::post('save', [UserController::class, 'save']);

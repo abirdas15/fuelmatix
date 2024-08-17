@@ -714,7 +714,7 @@ class ProductController extends Controller
     {
         // Validate the request to ensure 'product_id' is provided and is a string
         $validator = Validator::make($request->all(), [
-            'product_id' => 'required|string'
+            'product_id' => 'required|integer'
         ]);
 
         // If validation fails, return the validation errors

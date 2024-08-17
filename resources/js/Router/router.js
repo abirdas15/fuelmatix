@@ -107,6 +107,7 @@ import NozzleStatus from "../Pages/NozzleStatus/NozzleStatus.vue";
 import WindfallReport from "../Pages/Report/Windfall.vue";
 import CreditCompanyReport from "../Pages/Report/CreditCompany.vue";
 import DriverReport from "../Pages/Report/Driver.vue";
+import StockSummary from "../Pages/Report/StockSummary.vue";
 
 const ROOT_URL = "";
 const router = new VueRouter({
@@ -574,6 +575,9 @@ const router = new VueRouter({
                     path: ROOT_URL + "/purchase/edit", name: "purchaseEdit", component: purchaseEdit, beforeEnter: (to, from, next) => {
                         CheckPermission(to, from, next, Section.PURCHASE + '-' + Action.EDIT)
                     }
+                },
+                {
+                    path: ROOT_URL + "/report/stockSummary", name: "StockSummary", component: StockSummary
                 },
                 {
                     path: ROOT_URL + "/report/vendor", name: "VendorReport", component: VendorReport
