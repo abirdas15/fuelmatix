@@ -187,42 +187,45 @@ class ReportController extends Controller
 
         // Retrieve optional product filter from the request
         $productId = $request->input('product_id', '');
+        $startDate = Carbon::parse($request->input('start_date'), SessionUser::TIMEZONE)->startOfDay();
+        $endDate = Carbon::parse($request->input('end_date'), SessionUser::TIMEZONE)->endOfDay();
 
         // Query for shift sales data
         $shiftSale = ShiftSale::select(
-            'shift_sale.id',
-            'shift_sale.date',
+            'shift_total.id',
+            DB::raw('DATE(shift_total.start_date) as date'),
             'shift_sale.net_profit',
             'products.name as product_name',
             DB::raw('shift_sale.net_profit_amount as amount'),
             DB::raw("'Shift Sale' as source")
         )
-            ->leftJoin('products', 'products.id', '=', 'shift_sale.product_id')
-            ->whereBetween('shift_sale.date', [$request['start_date'], $request['end_date']])
-            ->whereNotNull('shift_sale.net_profit_amount')
+            ->leftJoin('shift_total', 'shift_total.id', '=', 'shift_sale.shift_id')
+            ->leftJoin('products', 'products.id', '=', 'shift_total.product_id')
+            ->whereBetween('shift_total.start_date', [$startDate, $endDate])
             ->where('shift_sale.net_profit_amount', '!=', 0)
-            ->where('shift_sale.client_company_id', $sessionUser['client_company_id']);
+            ->where('shift_total.client_company_id', $sessionUser['client_company_id']);
 
         // Apply product filter if provided
         if (!empty($productId)) {
-            $shiftSale->where('products.id', $productId);
+            $shiftSale->where('shift_total.product_id', $productId);
         }
 
         // Query for tank refills data
         $tankRefill = TankRefill::select(
-            'tank_refill.id',
-            'tank_refill.date',
+            'tank_refill_total.id',
+            'tank_refill_total.date',
             'tank_refill.net_profit',
             'products.name as product_name',
             DB::raw('tank_refill.net_profit_amount as amount'),
             DB::raw("'Tank Refill' as source")
         )
-            ->whereBetween('tank_refill.date', [$request['start_date'], $request['end_date']])
+            ->leftJoin('tank_refill_total', 'tank_refill_total.id', '=', 'tank_refill.refill_id')
             ->leftJoin('tank', 'tank.id', '=', 'tank_refill.tank_id')
             ->leftJoin('products', 'products.id', '=', 'tank.product_id')
+            ->whereBetween('tank_refill_total.date', [$request['start_date'], $request['end_date']])
             ->whereNotNull('tank_refill.net_profit_amount')
             ->where('tank_refill.net_profit_amount', '!=', 0)
-            ->where('tank_refill.client_company_id', $sessionUser['client_company_id']);
+            ->where('tank_refill_total.client_company_id', $sessionUser['client_company_id']);
 
         // Apply product filter if provided
         if (!empty($productId)) {
