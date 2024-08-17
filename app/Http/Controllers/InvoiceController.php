@@ -41,13 +41,13 @@ class InvoiceController extends Controller
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
-        $transaction = Transaction::select('id','module', 'module_id', 'description', 'linked_id as category_id', 'debit_amount as amount')
+        $transaction = Transaction::select('id','module', 'account_id' ,'module_id', 'description', 'linked_id as category_id', 'debit_amount as amount')
             ->whereIn('id', $requestData['ids'])
             ->get()
             ->toArray();
         $transactionArray = [];
         foreach ($transaction as $data) {
-            $transactionArray[$data['category_id']][] = $data;
+            $transactionArray[$data['account_id']][] = $data;
         }
         $sessionUser = SessionUser::getUser();
         foreach ($transactionArray as $key =>  $data) {
