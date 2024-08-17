@@ -457,7 +457,9 @@ class ReportController extends Controller
             $shiftSaleByNozzleId[$nozzleId] = $sale;
 
             // Add to array keyed by tank_id
-            $shiftSaleByTankId[$tankId] = $sale;
+            if (!isset($shiftSaleByTankId[$tankId])) {
+                $shiftSaleByTankId[$tankId] = $sale;
+            }
         }
 
 
@@ -467,6 +469,7 @@ class ReportController extends Controller
             ->whereNotNull('nozzle_id')
             ->whereIn('product_id', $productIds)
             ->whereBetween('fuel_adjustment.date', [$startDate, $endDate])
+            ->where('fuel_adjustment.client_company_id', $sessionUser['client_company_id'])
             ->groupBy('fuel_adjustment.product_id')
             ->get()
             ->keyBy('product_id')
@@ -511,11 +514,7 @@ class ReportController extends Controller
                     }
                 }
                 $tank['end_reading'] = $shiftSaleByTankId[$tank['id']]['tank_end_reading'] ?? 0;
-                if (isset($tankRefill[$tank['id']]['volume'])) {
-                    $tank['refill'] = $tankRefill[$tank['id']]['volume'];
-                } else {
-                    $tank['refill'] = 0;
-                }
+                $tank['refill'] = $tankRefill[$tank['id']]['volume'] ?? 0;
                 $tank['end_reading_format'] = $tank['end_reading'] > 0 ? number_format($tank['end_reading'], 2) : '-';
                 $totalEndReading += $tank['end_reading'];
                 $totalRefill += $tank['refill'];
