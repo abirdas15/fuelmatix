@@ -166,7 +166,7 @@ class ShiftSaleRepository
         foreach ($initialData['tanks'] as &$tank) {
             if ($tank['noDIPShow'] == 1) {
                 $tank['consumption'] = $tank['total_consumption'];
-                $tank['end_reading'] = $tank['start_reading'] - $tank['consumption'];
+                $tank['end_reading'] = $tank['start_reading'] + $tank['tank_refill'] - $tank['consumption'];
             }
         }
 
