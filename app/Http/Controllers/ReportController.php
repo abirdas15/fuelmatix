@@ -430,10 +430,34 @@ class ReportController extends Controller
         $shiftSale = ShiftTotal::select(
             'shift_sale.tank_id',
             'shift_summary.nozzle_id',
-            DB::raw('MIN(shift_summary.start_reading) as start_reading'),
-            DB::raw('MAX(shift_summary.end_reading) as end_reading'),
-            DB::raw('MIN(shift_sale.start_reading) as tank_start_reading'),
-            DB::raw('MAX(shift_sale.end_reading) as tank_end_reading'),
+            DB::raw('(
+                SELECT start_reading
+                FROM shift_summary ss
+                WHERE ss.shift_sale_id = shift_sale.id
+                ORDER BY ss.id DESC
+                LIMIT 1
+            ) as start_reading'),
+            DB::raw('(
+            SELECT end_reading
+            FROM shift_summary ss
+            WHERE ss.shift_sale_id = shift_sale.id
+            ORDER BY ss.id DESC
+            LIMIT 1
+        ) as end_reading'),
+            DB::raw('(
+            SELECT ss.start_reading
+            FROM shift_sale ss
+            WHERE ss.tank_id = shift_sale.tank_id
+            ORDER BY ss.id ASC
+            LIMIT 1
+        ) as tank_start_reading'),
+            DB::raw('(
+            SELECT ss.end_reading
+            FROM shift_sale ss
+            WHERE ss.tank_id = shift_sale.tank_id
+            ORDER BY ss.id DESC
+            LIMIT 1
+        ) as tank_end_reading')
         )
             ->leftJoin('shift_sale', 'shift_sale.shift_id', '=', 'shift_total.id')
             ->leftJoin('shift_summary', 'shift_summary.shift_sale_id', '=', 'shift_sale.id')
