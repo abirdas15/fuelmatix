@@ -201,7 +201,7 @@ class ShiftSaleRepository
                     'voucher_no' => $eachSale['voucher_no'],
                     'driver_id' => $eachSale['driver_id'],
                     'module' => Module::POS_SALE,
-                    'module_id' => $eachSale->id,
+                    'module_id' => $eachSale['id'],
                 ];
             }
         }
