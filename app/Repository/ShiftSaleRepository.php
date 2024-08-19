@@ -6,6 +6,7 @@ use App\Common\AccountCategory;
 use App\Common\FuelMatixDateTimeFormat;
 use App\Common\FuelMatixStatus;
 use App\Common\Module;
+use App\Common\PaymentMethod;
 use App\Helpers\Helpers;
 use App\Helpers\SessionUser;
 use App\Models\Category;
@@ -185,7 +186,7 @@ class ShiftSaleRepository
                 }
             }
         }
-        $posSale = SaleData::select('sale_data.sale_id', 'sale_data.id', DB::raw('SUM(sale_data.quantity) as quantity'), DB::raw('SUM(sale_data.subtotal) as amount'), 'sale.payment_category_id as category_id', 'sale.voucher_number as voucher_no', 'car_id', 'driver_id')
+        $posSale = SaleData::select('sale_data.sale_id', 'sale_data.id', 'sale.payment_method', DB::raw('SUM(sale_data.quantity) as quantity'), DB::raw('SUM(sale_data.subtotal) as amount'), 'sale.payment_category_id as category_id', 'sale.voucher_number as voucher_no', 'car_id', 'driver_id')
             ->leftJoin('sale', 'sale.id', '=', 'sale_data.sale_id')
             ->where('sale_data.shift_sale_id', $shiftTotal->id)
             ->groupBy('sale.id')
@@ -202,6 +203,7 @@ class ShiftSaleRepository
                     'driver_id' => $eachSale['driver_id'],
                     'module' => Module::POS_SALE,
                     'module_id' => $eachSale['id'],
+                    'payment_method' => $eachSale['payment_method'],
                 ];
             }
         }
@@ -352,10 +354,25 @@ class ShiftSaleRepository
             // Save transactions for each category in initialData
             $shiftSaleTransaction = [];
             foreach ($initialData['categories'] as $category) {
+                $amount = $category['amount'];
+                $paymentCategory = $category['category_id'];
                 $transactionData = [
-                    ['date' => date('Y-m-d', strtotime($initialData['date'])), 'account_id' => $category['category_id'], 'debit_amount' => $category['amount'], 'credit_amount' => 0, 'module' => $category['module'] ?? Module::SHIFT_SALE, 'module_id' => $category['module_id'] ?? $shiftTotal['id'], 'car_id' => $category['car_id'] ?? null, 'voucher_no' => $category['voucher_no'] ?? null, 'driver_id' => $category['driver_id'] ?? null, 'quantity' => $category['liter'] ?? null],
-                    ['date' => date('Y-m-d', strtotime($initialData['date'])), 'account_id' => $incomeCategory['id'], 'debit_amount' => 0, 'credit_amount' => $category['amount'], 'module' =>  $category['module'] ?? Module::SHIFT_SALE, 'module_id' => $category['module_id'] ?? $shiftTotal['id'], 'car_id' => $category['car_id'] ?? null, 'voucher_no' => $category['voucher_no'] ?? null, 'driver_id' => $category['driver_id'] ?? null, 'quantity' => $category['liter'] ?? null]
+                    ['date' => date('Y-m-d', strtotime($initialData['date'])), 'account_id' => $incomeCategory['id'], 'debit_amount' => 0, 'credit_amount' => $amount, 'module' =>  $category['module'] ?? Module::SHIFT_SALE, 'module_id' => $category['module_id'] ?? $shiftTotal['id'], 'car_id' => $category['car_id'] ?? null, 'voucher_no' => $category['voucher_no'] ?? null, 'driver_id' => $category['driver_id'] ?? null, 'quantity' => $category['liter'] ?? null]
                 ];
+                if (isset($category['payment_method']) && ($category['payment_method'] == PaymentMethod::CARD)) {
+                    $posCategory = Category::where('id', $category['category_id'])->first();
+                    if ($posCategory instanceof Category) {
+                        $others = json_decode($posCategory->others);
+                        $expenseCategory = Category::where('module', Module::POS_MACHINE)->where('module_id', $posCategory->id)->first();
+                        if ($expenseCategory instanceof Category) {
+                            $expenseAmount = $category['amount'] *  $others->tds / 100;
+                            $amount = $amount - $expenseAmount;
+                            $transactionData[] = ['date' => date('Y-m-d', strtotime($initialData['date'])), 'account_id' => $expenseCategory->id, 'debit_amount' => $expenseAmount, 'credit_amount' => 0, 'module' => $category['module'] ?? Module::SHIFT_SALE, 'module_id' => $category['module_id'] ?? $shiftTotal['id'], 'car_id' => $category['car_id'] ?? null, 'voucher_no' => $category['voucher_no'] ?? null, 'driver_id' => $category['driver_id'] ?? null, 'quantity' => $category['liter'] ?? null];
+                            $paymentCategory = $others->bank_category_id;
+                        }
+                    }
+                }
+                $transactionData[] = ['date' => date('Y-m-d', strtotime($initialData['date'])), 'account_id' => $paymentCategory, 'debit_amount' => $amount, 'credit_amount' => 0, 'module' => $category['module'] ?? Module::SHIFT_SALE, 'module_id' => $category['module_id'] ?? $shiftTotal['id'], 'car_id' => $category['car_id'] ?? null, 'voucher_no' => $category['voucher_no'] ?? null, 'driver_id' => $category['driver_id'] ?? null, 'quantity' => $category['liter'] ?? null];
                 TransactionRepository::saveTransaction($transactionData);
                 $shiftSaleTransaction[] = [
                     'shift_id' => $shiftTotal['id'],

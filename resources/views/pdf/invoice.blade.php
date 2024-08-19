@@ -65,10 +65,10 @@
     </div>
     <div style="width: 100%; margin-bottom: 50px; margin-top: 50px">
         <div style="margin-bottom: 5px;"><strong>Bill To</strong></div>
-        <div style="margin-bottom: 5px">{{ $data['customer_company']['name'] }}</div>
-        <address style="margin-bottom: 5px">{{ $data['customer_company']['address'] }}</address>
-        <div style="margin-bottom: 5px">Phone: {{ $data['customer_company']['phone'] }}</div>
-        <div style="margin-bottom: 5px">Email: {{ $data['customer_company']['email'] }}</div>
+        <div style="margin-bottom: 5px">{{ $data['customer_company']['name'] ?? '' }}</div>
+        <address style="margin-bottom: 5px">{{ $data['customer_company']['address'] ?? '' }}</address>
+        <div style="margin-bottom: 5px">Phone: {{ $data['customer_company']['phone'] ?? '' }}</div>
+        <div style="margin-bottom: 5px">Email: {{ $data['customer_company']['email'] ?? '' }}</div>
     </div>
     <table class="table" style="width: 95%; margin-bottom: 30px">
         <thead>

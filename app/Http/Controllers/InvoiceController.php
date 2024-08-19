@@ -251,7 +251,7 @@ class InvoiceController extends Controller
             $company = ClientCompany::find($sessionUser['client_company_id']);
         }
         $category = Category::select('others', 'name')->find($invoice['category_id']);
-        $others = json_decode($category['others']);
+        $others = $category != null ?? json_decode($category['others']);
         $category['email'] = $others->email ?? '';
         $category['phone'] = $others->phone ?? '';
         $category['address'] = $others->address ?? '';
@@ -400,35 +400,64 @@ class InvoiceController extends Controller
     }
 
     /**
+     * Handles the retrieval of invoice payment transactions for the currently authenticated user.
+     *
      * @param Request $request
      * @return JsonResponse
      */
     public function invoicePayment(Request $request): JsonResponse
     {
+        // Retrieve all input data from the request.
         $requestData = $request->all();
+
+        // Set the search keyword if provided, otherwise use an empty string.
         $keyword = $requestData['keyword'] ?? '';
+
+        // Set the pagination limit, defaulting to 10 if not provided.
         $limit = $requestData['limit'] ?? 10;
+
+        // Get the current session user details.
         $sessionUser = SessionUser::getUser();
-        $result = Transaction::select('transactions.created_at', 'transactions.debit_amount as amount', 'invoices.invoice_number', 'c1.name as payment_method', 'c2.name as company_name')
+
+        // Build the query to retrieve transaction details related to invoice payments.
+        $result = Transaction::select(
+            'transactions.created_at',
+            'transactions.debit_amount as amount',
+            'invoices.invoice_number',
+            'c1.name as payment_method',
+            'c2.name as company_name'
+        )
             ->leftJoin('invoices', 'invoices.id', 'transactions.module_id')
             ->leftJoin('categories as c1', 'c1.id', '=', 'transactions.linked_id')
             ->leftJoin('categories as c2', 'c2.id', '=', 'transactions.account_id')
-            ->where('transactions.client_company_id', $sessionUser['client_company_id'])
-            ->where('transactions.module', Module::INVOICE_PAYMENT)
-            ->where('debit_amount', '>', 0);
+            ->where('transactions.client_company_id', $sessionUser['client_company_id']) // Filter by client company ID
+            ->where('transactions.module', Module::INVOICE_PAYMENT) // Filter by module type (invoice payment)
+            ->where('debit_amount', '>', 0); // Only include transactions with a positive debit amount
+
+        // Apply search filters if a keyword is provided.
         if (!empty($keyword)) {
             $result->where(function($q) use ($keyword) {
-                $q->where('invoices.invoice_number', 'LIKE', '%'.$keyword.'%');
-                $q->orWhere('c1.name', 'LIKE', '%'.$keyword.'%');
-                $q->orWhere('c2.name', 'LIKE', '%'.$keyword.'%');
+                $q->where('invoices.invoice_number', 'LIKE', '%'.$keyword.'%'); // Search by invoice number
+                $q->orWhere('c1.name', 'LIKE', '%'.$keyword.'%'); // Search by payment method name
+                $q->orWhere('c2.name', 'LIKE', '%'.$keyword.'%'); // Search by company name
             });
         }
+
+        // Order the results by transaction ID in descending order and apply pagination.
         $result = $result->orderBy('transactions.id', 'DESC')
             ->paginate($limit);
+
+        // Format the created_at date and amount for each transaction in the result.
         foreach ($result as &$data) {
-            $data['created_at'] = Helpers::formatDate($data['created_at'], FuelMatixDateTimeFormat::STANDARD_DATE_TIME);
-            $data['amount'] = number_format($data['amount'], 2);
+            $data['created_at'] = Helpers::formatDate($data['created_at'], FuelMatixDateTimeFormat::STANDARD_DATE_TIME); // Format the date
+            $data['amount'] = number_format($data['amount'], 2); // Format the amount to two decimal places
         }
-        return response()->json(['status' => 200, 'data' => $result]);
+
+        // Return the response with the status code and the paginated result data.
+        return response()->json([
+            'status' => 200,
+            'data' => $result
+        ]);
     }
+
 }

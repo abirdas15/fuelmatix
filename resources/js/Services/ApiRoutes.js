@@ -118,6 +118,7 @@ const ApiRoutes = {
     VendorPayment: ApiVersion + '/vendor/payment',
     VendorReport: ApiVersion + '/vendor/report',
     //Pay order
+    PayOrder: ApiVersion + '/pay/order',
     PayOrderAdd: ApiVersion + '/pay/order/save',
     PayOrderEdit: ApiVersion + '/pay/order/update',
     PayOrderDelete: ApiVersion + '/pay/order/delete',
@@ -251,7 +252,8 @@ const ApiRoutes = {
     PurchaseDelete: ApiVersion + '/purchase/delete',
     PurchaseAmount: ApiVersion + '/purchase/amount',
     InvoicePayment: ApiVersion + '/invoice/payment/list',
-    Report: ApiVersion + '/report'
+    Report: ApiVersion + '/report',
+    BulkSale: ApiVersion + '/bulkSale',
 };
 
 export default ApiRoutes;

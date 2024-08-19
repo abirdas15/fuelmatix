@@ -92,25 +92,46 @@ class Category extends Model
     }
 
 
+    /**
+     * Updates the category's hierarchy and ID arrays based on the current category's information.
+     *
+     * @return bool Returns true if the category was successfully updated, otherwise false.
+     */
     public function updateCategory(): bool
     {
-        $category_hericy = [];
-        $category_ids = [];
+        // Initialize arrays to hold category hierarchy and IDs
+        $categoryHierarchy = [];
+        $categoryIds = [];
+
+        // Check if there is a parent category and retrieve its data
         if (!empty($this->parent_category)) {
             $parentCategory = Category::where('id', $this->parent_category)->first();
-            $category_hericy = json_decode($parentCategory['category_hericy']);
-            $category_ids = json_decode($parentCategory['category_ids']);
+
+            if ($parentCategory) {
+                $categoryHierarchy = json_decode($parentCategory->category_hericy, true) ?? [];
+                $categoryIds = json_decode($parentCategory->category_ids, true) ?? [];
+            }
         }
-        $category_hericy[] = $this->name;
-        $category_ids[] = $this->id;
+
+        // Add the current category's name and ID to the arrays
+        $categoryHierarchy[] = $this->name;
+        $categoryIds[] = $this->id;
+
+        // Find the current category by ID and update its fields
         $category = Category::find($this->id);
-        $category->category_hericy = $category_hericy;
-        $category->category_ids = $category_ids;
-        if ($category->save()) {
-            return true;
+        if ($category) {
+            $category->category_hericy = json_encode($categoryHierarchy);
+            $category->category_ids = json_encode($categoryIds);
+
+            // Save the updated category and return true if successful
+            return $category->save();
         }
+
+        // Return false if the category was not found
         return false;
     }
+
+
 
     /**
      * Deletes the opening balance for the account.
@@ -247,4 +268,36 @@ class Category extends Model
     {
         return $this->hasMany(CompanyProductPrice::class, 'company_id', 'id');
     }
+
+    /**
+     * Saves a subcategory under the current category and updates its hierarchy.
+     *
+     * This method inserts a new subcategory into the `categories` table and returns
+     * the newly created category with its hierarchy updated.
+     *
+     * @param Category $category The subcategory object to be saved.
+     * @return Category The saved subcategory with updated hierarchy.
+     */
+    public function saveSubCategory(Category $category): Category
+    {
+        // Insert the new subcategory and get its ID
+        $lastInsertedId = DB::table('categories')->insertGetId([
+            'name' => $category->name,
+            'slug' => strtolower($category->name),
+            'parent_category' => $this['id'],
+            'type' => $this['type'],
+            'module' => $category['module'] ?? null,
+            'module_id' => $category['id'] ?? null,
+        ]);
+
+        // Retrieve the newly inserted category by its ID
+        $category = Category::where('id', $lastInsertedId)->first();
+
+        // Update the hierarchy and category IDs for the new subcategory
+        $category->updateCategory();
+
+        // Return the saved subcategory
+        return $category;
+    }
+
 }

@@ -41,6 +41,7 @@ use App\Http\Controllers\FuelAdjustmentController;
 use App\Http\Controllers\CompanyBillController;
 use App\Http\Controllers\CarController;
 use App\Http\Controllers\PurchaseController;
+use App\Http\Controllers\BulkSaleController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -199,6 +200,7 @@ Route::group(['middleware' => 'AuthReqCheck'], function() {
         Route::post('delete', [PayOrderController::class, 'delete']);
         Route::post('latest', [PayOrderController::class, 'latest']);
         Route::post('quantity', [PayOrderController::class, 'getQuantity']);
+        Route::post('product', [PayOrderController::class, 'payOrderProduct']);
     });
     Route::group(['prefix' => 'sale'], function() {
         Route::post('save', [SaleController::class, 'save']);
@@ -331,6 +333,10 @@ Route::group(['middleware' => 'AuthReqCheck'], function() {
         Route::post('save', [PurchaseController::class, 'save']);
         Route::post('list', [PurchaseController::class, 'list']);
         Route::post('pay', [PurchaseController::class, 'pay']);
+    });
+    Route::group(['prefix' => 'bulkSale'], function() {
+        Route::post('save', [BulkSaleController::class, 'save']);
+        Route::post('list', [BulkSaleController::class, 'list']);
     });
 });
 

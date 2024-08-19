@@ -108,6 +108,8 @@ import WindfallReport from "../Pages/Report/Windfall.vue";
 import CreditCompanyReport from "../Pages/Report/CreditCompany.vue";
 import DriverReport from "../Pages/Report/Driver.vue";
 import StockSummary from "../Pages/Report/StockSummary.vue";
+import BulkSaleAdd from "../Pages/BulkSale/Add.vue";
+import BulkSale from "../Pages/BulkSale/List.vue";
 
 const ROOT_URL = "";
 const router = new VueRouter({
@@ -593,6 +595,12 @@ const router = new VueRouter({
                 },
                 {
                     path: ROOT_URL + "/report/driver", name: "DriverReport", component: DriverReport
+                },
+                {
+                    path: ROOT_URL + "/bulkSale/add", name: "BulkSaleAdd", component: BulkSaleAdd
+                },
+                {
+                    path: ROOT_URL + "/bulkSale", name: "BulkSale", component: BulkSale
                 }
             ],
         },

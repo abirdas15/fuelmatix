@@ -400,4 +400,31 @@ class PayOrderController extends Controller
             'data' => $payOrderData
         ]);
     }
+
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function payOrderProduct(Request $request): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'pay_order_id' => 'required|integer',
+        ]);
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 500,
+                'errors' => $validator->errors()
+            ]);
+        }
+        $result = PayOrderData::select('pay_order_data.id', 'quantity as order_quantity', 'products.id as product_id', 'products.name as product_name', 'products.selling_price')
+            ->leftJoin('products', 'products.id', '=', 'pay_order_data.product_id')
+            ->where('pay_order_id', $request->input('pay_order_id'))
+            ->where('status', FuelMatixStatus::PENDING)
+            ->get()
+            ->toArray();
+        return response()->json([
+            'status' => 200,
+            'data' => $result
+        ]);
+    }
 }

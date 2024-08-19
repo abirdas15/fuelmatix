@@ -31,5 +31,7 @@ class Module
     const PURCHASE_PAYMENT = 'purchase payment';
     const INVOICE_PAYMENT = 'invoice payment';
     const VENDOR_PAYMENT = 'vendor payment';
+    const POS_MACHINE = 'pos machine';
+    const BULK_SALE = 'bulk sale';
 
 }
