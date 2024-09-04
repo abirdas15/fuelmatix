@@ -315,7 +315,7 @@ class TransactionController extends Controller
         if ($company['voucher_check'] == 1) {
             $voucherError = [];
             foreach ($requestData['data'] as $key => $data) {
-                $voucher = Voucher::where('voucher_number', $data['voucher_number'])->where('company_id', $transaction['linked_id'])->where('status', 'pending')->first();
+                $voucher = Voucher::where('voucher_number', $data['voucher_number'])->where('company_id', $transaction['account_id'])->where('status', 'pending')->first();
                 if (!$voucher instanceof Voucher) {
                     $voucherError['data.'. $key . '.voucher_number'][0] = 'Voucher is not valid.';
                 }
@@ -353,7 +353,7 @@ class TransactionController extends Controller
         Transaction::where('id', $requestData['id'])->delete();
         if ($company['voucher_check'] == 1) {
             foreach ($requestData['data'] as  $data) {
-                $voucher = Voucher::where('voucher_number', $data['voucher_number'])->where('company_id', $transaction['linked_id'])->where('status', 'pending')->first();
+                $voucher = Voucher::where('voucher_number', $data['voucher_number'])->where('company_id', $transaction['account_id'])->where('status', 'pending')->first();
                 $voucher->status = 'done';
                 $voucher->save();
             }
