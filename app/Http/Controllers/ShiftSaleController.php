@@ -311,7 +311,7 @@ class ShiftSaleController extends Controller
         $resultArray = [];
         foreach ($result as &$data) {
             $data['selected'] = false;
-            if ($data['slug'] != strtolower(AccountCategory::ACCOUNT_RECEIVABLE)) {
+            if ($data['slug'] != strtolower(AccountCategory::ACCOUNT_RECEIVABLE) && $data['slug'] != strtolower(AccountCategory::POS_MACHINE) && $data['slug'] != strtolower(AccountCategory::CASH_IN_HAND)) {
                 if ($data['name'] == AccountCategory::CASH) {
                     $data['selected'] = true;
                 }
