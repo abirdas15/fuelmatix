@@ -7,6 +7,7 @@ use App\Common\FuelMatixDateTimeFormat;
 use App\Common\Module;
 use App\Helpers\Helpers;
 use App\Helpers\SessionUser;
+use App\Models\BulkSaleItem;
 use App\Models\Category;
 use App\Models\ClientCompany;
 use App\Models\Invoice;
@@ -76,6 +77,18 @@ class InvoiceController extends Controller
                         $shiftSale['transaction_id'] = $row['id'];
                         $shiftSale = $shiftSale->toArray();
                         $invoiceItem[] = $shiftSale;
+                    }
+                } if ($row['module'] == Module::BULK_SALE) {
+                    $bulkSale = BulkSaleItem::select('bulk_sale_items.product_id', 'bulk_sales.date', 'bulk_sale_items.quantity', 'bulk_sale_items.selling_price as price', DB::raw('(bulk_sale_items.selling_price * bulk_sale_items.quantity) as subtotal'))
+                        ->leftJoin('bulk_sales', 'bulk_sales.id','=', 'bulk_sale_items.bulk_sale_id')
+                        ->where('bulk_sale_items.bulk_sale_id', $row['module_id'])
+                        ->get()
+                        ->toArray();
+                    foreach ($bulkSale as &$sale) {
+                        $sale['price'] =
+                        $sale['transaction_id'] = $row['id'];
+                        $sale['description'] = $row['description'] ?? null;
+                        $invoiceItem[] = $sale;
                     }
                 }
             }

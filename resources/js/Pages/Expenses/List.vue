@@ -15,10 +15,20 @@
                             <h4 class="card-title">Expense List</h4>
                         </div>
                         <div class="card-body">
-                            <div class="col-xl-3 mb-3">
-                                <div class="example">
-                                    <p class="mb-1">Select Date</p>
-                                    <input class="form-control input-daterange-datepicker date" type="text">
+                            <div class="row">
+                                <div class="col-xl-3 mb-3">
+                                    <div class="example">
+                                        <input class="form-control input-daterange-datepicker date" type="text" placeholder="Select Date">
+                                    </div>
+                                </div>
+                                <div class="col-xl-3 mb-3">
+                                    <button type="button" class="btn btn-rounded btn-white border" @click="list">
+                                        <span class="btn-icon-start text-info"><i class="fa fa-filter color-white"></i></span>Filter
+                                    </button>
+                                </div>
+                                <div class="col-xl-3 mb-3" v-if="Param.ids.length > 0">
+                                    <button class="btn btn-primary" v-if="!loadingFile" @click="downloadPdf"><i class="fa fa-print" aria-hidden="true"></i>&nbsp;Print</button>
+                                    <button class="btn btn-primary" v-if="loadingFile"><i class="fa fa-print" aria-hidden="true"></i>&nbsp;Print...</button>
                                 </div>
                             </div>
                             <div class="row mt-4">
@@ -43,6 +53,9 @@
                                         <table class="display  dataTable no-footer" style="min-width: 845px">
                                             <thead>
                                             <tr class="text-white" style="background-color: #4886EE;color:#ffffff">
+                                                <th>
+                                                    <input type="checkbox" class="form-check-input" @change="selectAll($event)">
+                                                </th>
                                                 <th class="text-white" @click="sortData('date')" :class="sortClass('date')">Date</th>
                                                 <th class="text-white" @click="sortData('name')" :class="sortClass('expense')">Expense</th>
                                                 <th class="text-white" @click="sortData('dispenser_name')" :class="sortClass('amount')">Amount</th>
@@ -55,6 +68,9 @@
                                             </thead>
                                             <tbody v-if="listData.length > 0 && TableLoading === false">
                                             <tr v-for="(f,index) in listData">
+                                                <td>
+                                                    <input type="checkbox" :checked="isExist(f.id)" class="form-check-input" @change="selectIds($event, f.id)">
+                                                </td>
                                                 <td >{{f.date}}</td>
                                                 <td >{{f.expense}}</td>
                                                 <td>{{f.amount_format}}</td>
@@ -139,10 +155,14 @@ export default {
                 order_by: 'id',
                 order_mode: 'DESC',
                 page: 1,
+                start_date: '',
+                end_date: '',
+                ids: []
             },
             Loading: false,
             TableLoading: false,
             listData: [],
+            loadingFile: false,
         };
     },
     watch: {
@@ -151,6 +171,21 @@ export default {
         },
     },
     created() {
+        setTimeout(() => {
+            $('.date').flatpickr({
+                altInput: true,
+                altFormat: "d/m/Y",
+                dateFormat: "Y-m-d",
+                mode: 'range',
+                onChange: (date, dateStr) => {
+                    let dateArr = dateStr.split('to')
+                    if (dateArr.length === 2) {
+                        this.Param.start_date = dateArr[0]
+                        this.Param.end_date = dateArr[1]
+                    }
+                }
+            })
+        }, 1000);
         this.list();
     },
     computed: {
@@ -165,6 +200,39 @@ export default {
         },
     },
     methods: {
+        downloadPdf: function() {
+            this.loadingFile = true
+            ApiService.ClearErrorHandler();
+            ApiService.DOWNLOAD(ApiRoutes.Expense + '/list/export', this.Param,'',(res) => {
+                this.loadingFile = false
+                let blob = new Blob([res], {type: 'pdf'});
+                const link = document.createElement('a');
+                link.href = window.URL.createObjectURL(blob);
+                link.download = 'Expense.pdf';
+                link.click();
+            });
+        },
+        isExist: function (id) {
+            let index = this.Param.ids.indexOf(id)
+            return index > -1;
+        },
+        selectAll: function (e) {
+            if (e.target.checked) {
+                this.listData.map(v => {
+                    this.Param.ids.push(v.id);
+                });
+            } else {
+                this.Param.ids = []
+            }
+        },
+        selectIds: function (e, id) {
+            console.log(id);
+            if (e.target.checked) {
+                this.Param.ids.push(id)
+            } else {
+                this.Param.ids.splice(this.Param.ids.indexOf(id), 1)
+            }
+        },
         printPdf: function(id) {
             $('.expense'+ id).toggle();
             ApiService.DOWNLOAD(ApiRoutes.Expense + '/export/pdf', {id: id},'',(res) => {

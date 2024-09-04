@@ -188,6 +188,7 @@ class ShiftSaleRepository
         }
         $posSale = SaleData::select('sale_data.sale_id', 'sale_data.id', 'sale.payment_method', DB::raw('SUM(sale_data.quantity) as quantity'), DB::raw('SUM(sale_data.subtotal) as amount'), 'sale.payment_category_id as category_id', 'sale.voucher_number as voucher_no', 'car_id', 'driver_id')
             ->leftJoin('sale', 'sale.id', '=', 'sale_data.sale_id')
+            ->whereNotNull('sale.id')
             ->where('sale_data.shift_sale_id', $shiftTotal->id)
             ->groupBy('sale.id')
             ->get()

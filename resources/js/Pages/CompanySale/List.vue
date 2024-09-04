@@ -62,7 +62,7 @@
                                                 <td><a href="javascript:void(0);">{{f.voucher_no}}</a></td>
                                                 <td><a href="javascript:void(0);">{{f?.amount_format}}</a></td>
                                                 <td>
-                                                    <template v-if="f.module == 'shift sale' && CheckPermission(Section.COMPANY_SALE + '-' + Action.CREATE)">
+                                                    <template v-if="f.module === 'shift sale' || f.module === 'bulk sale' && CheckPermission(Section.COMPANY_SALE + '-' + Action.CREATE)">
                                                         <button class="btn btn-sm btn-primary" v-if="!f.invoice_id"  @click="tableAction('expand', f)">Expand</button>
                                                     </template>
                                                     <router-link v-if="CheckPermission(Section.INVOICE + '-' + Action.VIEW) && f.invoice_id" :to="{name: 'InvoicesView', params: { id: f.invoice_id }}" class="btn btn-sm btn-info" @click="tableAction('view', f)">View Invoices</router-link>
@@ -96,71 +96,73 @@
             </div>
         </div>
         <div class="popup-wrapper-modal createExpand d-none">
-            <form @submit.prevent="expand" class="popup-box" style="max-width: 800px">
-                <button type="button" class=" btn  closeBtn"><i class="fas fa-times"></i></button>
-                <div class="row align-items-center">
-                    <div class="col-sm-3">
-                        <div class="input-wrapper form-group">
-                            <label for="description"><strong>Car Number</strong></label>
+            <div style="height: 500px; overflow: auto">
+                <form @submit.prevent="expand" class="popup-box" style="max-width: 800px">
+                    <button type="button" class=" btn  closeBtn"><i class="fas fa-times"></i></button>
+                    <div class="row align-items-center">
+                        <div class="col-sm-3">
+                            <div class="input-wrapper form-group">
+                                <label for="description"><strong>Car Number</strong></label>
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="input-wrapper form-group">
+                                <label for="description"><strong>Voucher Number</strong></label>
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="input-wrapper form-group">
+                                <label for="description"><strong>Amount</strong></label>
+                            </div>
+                        </div>
+                        <div class="col-sm-2">
+                            <div class="input-wrapper form-group">
+                                <label for="description"><strong>Action</strong></label>
+                            </div>
                         </div>
                     </div>
-                    <div class="col-sm-3">
-                        <div class="input-wrapper form-group">
-                            <label for="description"><strong>Voucher Number</strong></label>
+                    <div class="row align-items-center" v-for="(e, i) in expandParam.data">
+                        <div class="col-sm-3">
+                            <div class="input-wrapper form-group mb-3">
+                                <select class="form-control" v-model="e.description" :name="'description.' + i">
+                                    <option value="">Select Car</option>
+                                    <option v-for="each in cars" :value="each.car_number" v-text="each.car_number"></option>
+                                </select>
+                                <small class="invalid-feedback"></small>
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="input-wrapper form-group mb-3">
+                                <input type="text" class="w-100 form-control" :name="'data.' + i + '.voucher_number'" id="description"
+                                       v-model="e.voucher_number" placeholder="Voucher Number">
+                                <small class="invalid-feedback"></small>
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="input-wrapper form-group mb-3">
+                                <input type="text" class="w-100 form-control" :name="'data.' + i + '.amount'" id="amount"
+                                       v-model="e.amount" placeholder="Amount here">
+                                <small class="invalid-feedback"></small>
+                            </div>
+                        </div>
+                        <div class="col-sm-2">
+                            <button type="button" v-if="i == 0" class="btn btn-primary" @click="addMore">+</button>
+                            <button v-else class="btn btn-danger"  style="height: 54px" type="button" @click="spliceData(i)">
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
                         </div>
                     </div>
-                    <div class="col-sm-3">
-                        <div class="input-wrapper form-group">
-                            <label for="description"><strong>Amount</strong></label>
-                        </div>
+                    <div class="align-items-center offset-6 col-sm-3">
+                        <label class="mb-0"><strong>Total: {{ totalAmount.toLocaleString() }}</strong></label>
                     </div>
-                    <div class="col-sm-2">
-                        <div class="input-wrapper form-group">
-                            <label for="description"><strong>Action</strong></label>
-                        </div>
+                    <div class="align-items-center offset-6 col-sm-3">
+                        <label class="text-danger"><strong>Missing: {{ missingAmount.toLocaleString() }}</strong></label>
                     </div>
-                </div>
-                <div class="row align-items-center" v-for="(e, i) in expandParam.data">
-                    <div class="col-sm-3">
-                        <div class="input-wrapper form-group mb-3">
-                            <select class="form-control" v-model="e.description" :name="'description.' + i">
-                                <option value="">Select Car</option>
-                                <option v-for="each in cars" :value="each.car_number" v-text="each.car_number"></option>
-                            </select>
-                            <small class="invalid-feedback"></small>
-                        </div>
-                    </div>
-                    <div class="col-sm-3">
-                        <div class="input-wrapper form-group mb-3">
-                            <input type="text" class="w-100 form-control" :name="'data.' + i + '.voucher_number'" id="description"
-                                   v-model="e.voucher_number" placeholder="Voucher Number">
-                            <small class="invalid-feedback"></small>
-                        </div>
-                    </div>
-                    <div class="col-sm-3">
-                        <div class="input-wrapper form-group mb-3">
-                            <input type="text" class="w-100 form-control" :name="'data.' + i + '.amount'" id="amount"
-                                   v-model="e.amount" placeholder="Amount here">
-                            <small class="invalid-feedback"></small>
-                        </div>
-                    </div>
-                    <div class="col-sm-2">
-                        <button type="button" v-if="i == 0" class="btn btn-primary" @click="addMore">+</button>
-                        <button v-else class="btn btn-danger"  style="height: 54px" type="button" @click="spliceData(i)">
-                            <i class="fa-solid fa-xmark"></i>
-                        </button>
-                    </div>
-                </div>
-                <div class="align-items-center offset-6 col-sm-3">
-                    <label class="mb-0"><strong>Total: {{ totalAmount.toLocaleString() }}</strong></label>
-                </div>
-                <div class="align-items-center offset-6 col-sm-3">
-                    <label class="text-danger"><strong>Missing: {{ missingAmount.toLocaleString() }}</strong></label>
-                </div>
 
-                <button type="submit" class="btn btn-primary " v-if="!Loading">Submit</button>
-                <button type="button" class="btn btn-primary " disabled v-if="Loading">Submitting...</button>
-            </form>
+                    <button type="submit" class="btn btn-primary " v-if="!Loading">Submit</button>
+                    <button type="button" class="btn btn-primary " disabled v-if="Loading">Submitting...</button>
+                </form>
+            </div>
         </div>
     </div>
 </template>

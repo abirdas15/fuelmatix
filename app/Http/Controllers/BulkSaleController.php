@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Common\AccountCategory;
 use App\Common\FuelMatixCategoryType;
 use App\Common\FuelMatixDateTimeFormat;
 use App\Common\Module;
@@ -10,6 +11,7 @@ use App\Helpers\SessionUser;
 use App\Models\BulkSale;
 use App\Models\BulkSaleItem;
 use App\Models\Category;
+use App\Models\PayOrder;
 use App\Models\PayOrderData;
 use App\Repository\TransactionRepository;
 use Carbon\Carbon;
@@ -34,7 +36,7 @@ class BulkSaleController extends Controller
             'company_id' => 'required|integer',
             'products' => 'required|array',
             'products.*.id' => 'required|integer',
-            'products.*.sale_quantity' => 'nullable|integer',
+            'products.*.sale_quantity' => 'nullable|integer|min:1',
         ]);
 
         // If validation fails, return the errors
@@ -44,9 +46,32 @@ class BulkSaleController extends Controller
                 'errors' => $validator->messages(),
             ]);
         }
+        $payOrderData = PayOrder::where('id', $request->get('pay_order_id'))->first();
+
+        $errors = [];
+
+        foreach ($request->products as $index => $product) {
+            $payOrder = PayOrderData::where('product_id', $product['product_id'])
+                ->where('pay_order_id', $request->get('pay_order_id'))
+                ->first();
+
+            if ($product['sale_quantity'] > $payOrder->quantity) {
+                $errors["products.$index.sale_quantity"] = ['Quantity is greater than pay order quantity'];
+            }
+        }
+
+        // If there are any validation errors, return them
+        if (!empty($errors)) {
+            return response()->json([
+                'status' => 500,
+                'errors' => $errors,
+            ]);
+        }
+
+
 
         // Begin a database transaction
-        DB::transaction(function() use ($request) {
+        DB::transaction(function() use ($request, $payOrderData) {
             // Retrieve the session user
             $sessionUser = SessionUser::getUser();
 
@@ -97,10 +122,21 @@ class BulkSaleController extends Controller
                         continue;
                     }
 
+                    $category = Category::where('slug', strtolower(AccountCategory::COST_OF_GOOD_SOLD))
+                        ->where('client_company_id', $sessionUser['client_company_id'])
+                        ->first();
+                    $costOfGoodSoldCategory = Category::where('parent_category', $category['id'])
+                        ->where('module', 'product')
+                        ->where('module_id', $product['product_id'])
+                        ->where('client_company_id', $sessionUser['client_company_id'])
+                        ->first();
+
                     // Prepare the transaction data for debit and credit entries
                     $transactionData = [
                         ['date' => date('Y-m-d'), 'account_id' => $request->input('company_id'), 'debit_amount' => $amount, 'credit_amount' => 0, 'module' => Module::BULK_SALE, 'module_id' => $bulkSale->id],
                         ['date' => date('Y-m-d'), 'account_id' => $incomeCategory->id, 'debit_amount' => 0, 'credit_amount' => $amount, 'module' => Module::BULK_SALE, 'module_id' => $bulkSale->id],
+                        ['date' => date('Y-m-d'), 'account_id' => $payOrderData['vendor_id'], 'debit_amount' => 0, 'credit_amount' => $amount, 'module' => Module::BULK_SALE, 'module_id' => $bulkSale->id],
+                        ['date' => date('Y-m-d'), 'account_id' => $costOfGoodSoldCategory->id, 'debit_amount' => $amount, 'credit_amount' => 0, 'module' => Module::BULK_SALE, 'module_id' => $bulkSale->id],
                     ];
 
                     // Save the transaction using the repository

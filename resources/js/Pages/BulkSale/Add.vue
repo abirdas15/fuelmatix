@@ -70,7 +70,7 @@
                                             </td>
                                             <td>
                                                 <div class="form-group">
-                                                    <input type="text" :name="'products.' + index + '.total'" @input="calculatePrice(index)" v-model="each.sale_quantity" class="form-control">
+                                                    <input type="text" :name="'products.' + index + '.sale_quantity'" @input="calculatePrice(index)" v-model="each.sale_quantity" class="form-control">
                                                     <div class="invalid-feedback"></div>
                                                 </div>
                                             </td>

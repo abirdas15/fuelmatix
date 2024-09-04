@@ -28,9 +28,16 @@ class VoucherController extends Controller
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
-        $arrayVoucher = [];
         $sessionUser = SessionUser::getUser();
+        $arrayVoucher = [];
         for ($i = $requestData['from_number']; $i <= $requestData['to_number']; $i++) {
+            $voucherNumber = Voucher::where('company_id', $requestData['company_id'])
+                ->where('voucher_number', $i)
+                ->where('client_company_id', $sessionUser['client_company_id'])
+                ->first();
+            if ($voucherNumber instanceof Voucher) {
+                continue;
+            }
             $arrayVoucher[] = [
                 'company_id' => $requestData['company_id'],
                 'voucher_number' => $i,

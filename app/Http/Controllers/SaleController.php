@@ -488,7 +488,7 @@ class SaleController extends Controller
             ->paginate($limit);
         foreach ($result as &$data) {
             if (!empty($data['invoice_id'])) {
-                $data['created_at'] = Helpers::formatDate($data['invoice_created_at'], FuelMatixDateTimeFormat::STANDARD_DATE_TIME);
+                $data['created_at'] = !empty($data['invoice_created_at']) ? Helpers::formatDate($data['invoice_created_at'], FuelMatixDateTimeFormat::STANDARD_DATE_TIME) : '';
                 $data['car_number'] = '';
                 $data['voucher_no'] = '';
             } else {

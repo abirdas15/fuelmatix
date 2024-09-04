@@ -11,6 +11,7 @@ use App\Models\Category;
 use App\Models\ClientCompany;
 use App\Models\Expense;
 use App\Models\User;
+use App\Repository\ExpenseRepository;
 use App\Repository\TransactionRepository;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\JsonResponse;
@@ -136,37 +137,49 @@ class ExpenseController extends Controller
         $inputData = $request->all();
         $limit = $request->input('limit', 10);
         $keyword = $request->input('keyword', '');
-        $sessionUser = SessionUser::getUser();
 
-        // Build the query to fetch expenses
-        $result = Expense::select('expense.id', 'expense.date', 'expense.amount', 'c.name as expense', 'c1.name as payment', 'expense.status', 'users.name as approve_by', 'expense.file')
-            ->leftJoin('categories as c', 'c.id', 'expense.category_id')
-            ->leftJoin('categories as c1', 'c1.id', 'expense.payment_id')
-            ->leftJoin('users', 'users.id', '=', 'expense.approve_by')
-            ->where('expense.client_company_id', $sessionUser['client_company_id']);
-
-        // Apply keyword filtering if provided
-        if (!empty($keyword)) {
-            $result->where(function($q) use ($keyword) {
-                $q->where('c.name', 'LIKE', '%'.$keyword.'%')
-                    ->orWhere('c1.name', 'LIKE', '%'.$keyword.'%');
-            });
-        }
-
-        // Order by 'id' in descending order and paginate the results
-        $result = $result->orderBy('id', 'DESC')->paginate($limit);
-
-        // Format the results
-        foreach ($result as &$data) {
-            $data['amount_format'] = number_format($data['amount'], 2);
-            $data['date'] = Helpers::formatDate($data['date'], FuelMatixDateTimeFormat::STANDARD_DATE);
-        }
-
+        $response = ExpenseRepository::list([
+            'limit' => $limit,
+            'keyword' => $keyword,
+            'start_date' => $inputData['start_date'],
+            'end_date' => $inputData['end_date'],
+        ]);
         // Return the results as JSON
         return response()->json([
             'status' => 200,
-            'data' => $result
+            'data' => $response
         ]);
+    }
+    /**
+     * @param Request $request
+     * @return string
+     */
+    public function listExport(Request $request): string
+    {
+        // Retrieve all input data and set default values
+        $inputData = $request->all();
+        $limit = $request->input('limit', 10);
+        $keyword = $request->input('keyword', '');
+
+        $response = ExpenseRepository::list([
+            'limit' => $limit,
+            'keyword' => $keyword,
+            'start_date' => $inputData['start_date'] ?? '',
+            'end_date' => $inputData['end_date'] ?? '',
+            'ids' => $inputData['ids'],
+            'page' => 1
+        ]);
+        $sessionUser = SessionUser::getUser();
+        $company = ClientCompany::where('id', $sessionUser['client_company_id'])->first();
+        $startDate = !empty($inputData['start_date']) ? Carbon::parse($inputData['start_date'])->format(FuelMatixDateTimeFormat::STANDARD_DATE) : null;
+        $endDate = !empty($inputData['start_date']) ? Carbon::parse($inputData['end_date'])->format(FuelMatixDateTimeFormat::STANDARD_DATE) : null;
+        $pdf = Pdf::loadView('pdf.expense-list', [
+            'data' => $response,
+            'date' => $startDate.'-'.$endDate,
+            'company' => $company,
+            'print_at' => Carbon::now()->format('F j, Y h:i A')
+        ]);
+        return $pdf->output();
     }
 
     /**
