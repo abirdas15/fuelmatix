@@ -21,7 +21,6 @@
         <table class="print-details">
             <tr>
                 <th>Date</th>
-                <th>Company Name</th>
                 <th>Bill</th>
                 <th>Paid Amount</th>
                 <th>Due Amount</th>
@@ -36,14 +35,13 @@
             @foreach($data['data'] as $each)
                 <tr>
                     <td>{{ $each['date'] }}</td>
-                    <td>{{ $each['company_name'] }}</td>
                     <td style="text-align: right">{{ $each['bill_amount'] }}</td>
                     <td style="text-align: right">{{ $each['paid_amount'] }}</td>
                     <td style="text-align: right">{{ $each['due_amount'] }}</td>
                 </tr>
             @endforeach
             <tr>
-                <th colspan="4">Closing Balance</th>
+                <th colspan="3">Closing Balance</th>
                 <th style="text-align: right">{{ $data['data'][count($data['data']) - 1]['due_amount'] }}</th>
             </tr>
         </table>
