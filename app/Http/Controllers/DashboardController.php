@@ -91,7 +91,7 @@ class DashboardController extends Controller
     {
         $sessionUser = SessionUser::getUser();
         $receivableCategory = Category::where('client_company_id', $sessionUser['client_company_id'])->where('slug', strtolower(AccountCategory::ACCOUNT_RECEIVABLE))->first();
-        $queryResult = Transaction::select('categories.name', DB::raw('SUM(credit_amount - debit_amount) as amount'))
+        $queryResult = Transaction::select('categories.name', DB::raw('SUM(debit_amount - credit_amount) as amount'))
             ->leftJoin('categories', 'categories.id', '=', 'transactions.account_id')
             ->where('categories.parent_category', $receivableCategory->id)
             ->where('transactions.client_company_id', $sessionUser['client_company_id'])

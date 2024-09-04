@@ -41,6 +41,10 @@
                                         <span class="btn-icon-start text-info"><i class="fa fa-filter color-white"></i></span>Filter...
                                     </button>
                                 </div>
+                                <div class="col-xl-3 mb-3">
+                                    <button class="btn btn-primary" v-if="!loadingFile" @click="downloadPdf"><i class="fa fa-print" aria-hidden="true"></i>&nbsp;Print</button>
+                                    <button class="btn btn-primary" v-if="loadingFile"><i class="fa fa-print" aria-hidden="true"></i>&nbsp;Print...</button>
+                                </div>
                             </div>
 
                             <div class=" mt-4">
@@ -106,9 +110,22 @@ export default {
             loading: false,
             summary: [],
             total: {},
+            loadingFile: false,
         }
     },
     methods: {
+        downloadPdf: function() {
+            this.loadingFile = true
+            ApiService.ClearErrorHandler();
+            ApiService.DOWNLOAD(ApiRoutes.Report + '/driver/export/pdf', this.param,'',(res) => {
+                this.loadingFile = false
+                let blob = new Blob([res], {type: 'pdf'});
+                const link = document.createElement('a');
+                link.href = window.URL.createObjectURL(blob);
+                link.download = 'Driver.pdf';
+                link.click();
+            });
+        },
         fetchDriverReport: function () {
             this.loading = true;
             ApiService.POST(ApiRoutes.Report + '/driver', this.param, (res) => {

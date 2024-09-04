@@ -234,7 +234,7 @@ export default {
         totalAmount: function() {
             let total = 0;
             this.expandParam.data.map((v) => {
-                if (v.amount != '') {
+                if (v.amount !== '') {
                     total += parseFloat(v.amount);
                 }
             });

@@ -139,6 +139,7 @@ Route::group(['middleware' => 'AuthReqCheck'], function() {
         Route::post('delete', [ShiftSaleController::class, 'delete']);
         Route::post('getCategory', [ShiftSaleController::class, 'getCategory']);
         Route::post('getShiftByDate', [ShiftSaleController::class, 'getShiftByDate']);
+        Route::post('tankReading', [ShiftSaleController::class, 'tankReading']);
     });
     Route::group(['prefix' => 'expense'], function() {
         Route::post('save', [ExpenseController::class, 'save']);
@@ -148,6 +149,7 @@ Route::group(['middleware' => 'AuthReqCheck'], function() {
         Route::post('delete', [ExpenseController::class, 'delete']);
         Route::post('approve', [ExpenseController::class, 'approve']);
         Route::post('report', [ExpenseController::class, 'report']);
+        Route::post('export/pdf', [ExpenseController::class, 'exportPdf']);
     });
     Route::group(['prefix' => 'tank'], function() {
         Route::post('save', [TankController::class, 'save']);
@@ -264,10 +266,25 @@ Route::group(['middleware' => 'AuthReqCheck'], function() {
             Route::post('export/pdf', [ReportController::class, 'dailyLogExportPdf']);
         });
         Route::post('sales', [ReportController::class, 'salesReport']);
-        Route::post('windfall', [ReportController::class, 'windfallReport']);
-        Route::post('creditCompany', [ReportController::class, 'creditCompanyReport']);
-        Route::post('driver', [ReportController::class, 'driverReport']);
-        Route::post('stockSummary', [ReportController::class, 'stockSummary']);
+        Route::group(['prefix' => 'windfall'], function() {
+            Route::post('/', [ReportController::class, 'windfallReport']);
+            Route::post('export/pdf', [ReportController::class, 'windfallReportPDF']);
+        });
+        Route::group(['prefix' => 'creditCompany'], function() {
+            Route::post('/', [ReportController::class, 'creditCompanyReport']);
+            Route::post('export/pdf', [ReportController::class, 'creditCompanyReportExportPDF']);
+        });
+        Route::group(['prefix' => 'driver'], function() {
+            Route::post('/', [ReportController::class, 'driverReport']);
+            Route::post('export/pdf', [ReportController::class, 'driverReportExportPDF']);
+        });
+        Route::group(['prefix' => 'stockSummary'], function() {
+            Route::post('/', [ReportController::class, 'stockSummary']);
+            Route::post('export/pdf', [ReportController::class, 'stockSummaryExportPDF']);
+        });
+        Route::group(['prefix' => 'vendor'], function() {
+            Route::post('export/pdf', [ReportController::class, 'vendorReportExportPDF']);
+        });
     });
     Route::group(['prefix' => 'user'], function() {
         Route::post('save', [UserController::class, 'save']);

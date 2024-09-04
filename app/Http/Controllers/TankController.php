@@ -526,7 +526,7 @@ class TankController extends Controller
         if (!$shiftSale instanceof ShiftTotal) {
             return response()->json(['status' => 400, 'message' => 'Please start shift sale first.']);
         }
-        $payOrder = PayOrderData::select('pay_order_data.*')
+        $payOrder = PayOrderData::select('pay_order_data.*', 'pay_order.vendor_id')
             ->where('product_id', $request->input('product_id'))
             ->leftJoin('pay_order', 'pay_order.id', '=', 'pay_order_data.pay_order_id')
             ->where('pay_order_id', $inputData['pay_order_id'])

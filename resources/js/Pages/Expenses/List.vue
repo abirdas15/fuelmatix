@@ -15,6 +15,12 @@
                             <h4 class="card-title">Expense List</h4>
                         </div>
                         <div class="card-body">
+                            <div class="col-xl-3 mb-3">
+                                <div class="example">
+                                    <p class="mb-1">Select Date</p>
+                                    <input class="form-control input-daterange-datepicker date" type="text">
+                                </div>
+                            </div>
                             <div class="row mt-4">
                                 <div class="table-responsive">
                                     <div class="dataTables_wrapper no-footer">
@@ -47,8 +53,8 @@
                                                 <th class="text-white" >Action</th>
                                             </tr>
                                             </thead>
-                                            <tbody v-if="listData.length > 0 && TableLoading == false">
-                                            <tr v-for="f in listData">
+                                            <tbody v-if="listData.length > 0 && TableLoading === false">
+                                            <tr v-for="(f,index) in listData">
                                                 <td >{{f.date}}</td>
                                                 <td >{{f.expense}}</td>
                                                 <td>{{f.amount_format}}</td>
@@ -65,13 +71,21 @@
                                                     <span v-else class="text-success">Approved</span>
                                                 </td>
                                                 <td>
-                                                    <div class="d-flex justify-content-end" v-if="f.status == 'pending'">
-                                                        <router-link v-if="CheckPermission(Section.EXPENSE + '-' + Action.EDIT)"  :to="{name: 'ExpenseEdit', params: { id: f.id }}" class=" btn btn-primary shadow btn-xs sharp me-1">
-                                                            <i class="fas fa-pencil-alt"></i>
-                                                        </router-link>
-                                                        <a  v-if="CheckPermission(Section.EXPENSE + '-' + Action.DELETE)"  href="javascript:void(0)"  @click="openModalDelete(f)" class="btn btn-danger shadow btn-xs sharp">
-                                                            <i class="fa fa-trash"></i>
+                                                    <div class="d-flex justify-content-end">
+                                                        <a  href="javascript:void(0)" :class="'expense' + f.id" @click="printPdf(f.id)" class="btn btn-primary shadow btn-xs sharp  me-1">
+                                                            <i class="fa fa-print"></i>
                                                         </a>
+                                                        <a style="display: none" :class="'expense' + f.id" class="btn btn-primary shadow btn-xs sharp  me-1">
+                                                            <i class="fa fa-spinner fa-spin"></i>
+                                                        </a>
+                                                        <template v-if="f.status === 'pending'">
+                                                            <router-link v-if="CheckPermission(Section.EXPENSE + '-' + Action.EDIT)"  :to="{name: 'ExpenseEdit', params: { id: f.id }}" class=" btn btn-primary shadow btn-xs sharp me-1">
+                                                                <i class="fas fa-pencil-alt"></i>
+                                                            </router-link>
+                                                            <a  v-if="CheckPermission(Section.EXPENSE + '-' + Action.DELETE)"  href="javascript:void(0)"  @click="openModalDelete(f)" class="btn btn-danger shadow btn-xs sharp">
+                                                                <i class="fa fa-trash"></i>
+                                                            </a>
+                                                        </template>
                                                     </div>
                                                 </td>
                                             </tr>
@@ -151,6 +165,18 @@ export default {
         },
     },
     methods: {
+        printPdf: function(id) {
+            $('.expense'+ id).toggle();
+            ApiService.DOWNLOAD(ApiRoutes.Expense + '/export/pdf', {id: id},'',(res) => {
+                $('.expense'+ id).toggle();
+                this.loadingFile = false
+                let blob = new Blob([res], {type: 'pdf'});
+                const link = document.createElement('a');
+                link.href = window.URL.createObjectURL(blob);
+                link.download = 'Expense.pdf';
+                link.click();
+            });
+        },
         approveExpense: function(id) {
             ApiService.POST(ApiRoutes.ExpenseApprove, {id: id },res => {
                 if (parseInt(res.status) === 200) {

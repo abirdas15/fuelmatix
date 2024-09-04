@@ -10,6 +10,7 @@ use App\Helpers\SessionUser;
 use App\Models\Category;
 use App\Models\Transaction;
 use App\Repository\CategoryRepository;
+use App\Repository\ReportRepository;
 use App\Repository\TransactionRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -369,65 +370,16 @@ class VendorController extends Controller
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
+        $filter = [
+            'start_date' => $request->input('start_date'),
+            'end_date' => $request->input('end_date'),
+            'vendor_id' => $request->input('vendor_id')
+        ];
 
-        // Retrieve and aggregate transactions within the specified date range for the given vendor
-        $result = Transaction::select('transactions.id','date',
-            DB::raw('SUM(credit_amount) as bill'),
-            DB::raw('SUM(debit_amount) as paid'),
-            'categories.name as product')
-            ->leftJoin('categories', 'categories.id', '=', 'transactions.account_id')
-            ->whereBetween('date', [$request->input('start_date'), $request->input('end_date')])
-            ->where('account_id', $request->input('vendor_id'))
-            ->groupBy('account_id')
-            ->orderBy('transactions.id', 'ASC')
-            ->get()
-            ->toArray();
-
-        // Initialize total counters and balance tracker
-        $total['bill'] = 0;
-        $total['paid'] = 0;
-        $total['balance'] = 0;
-        $balance  = 0;
-
-        // Loop through each transaction to calculate balances and format data
-        foreach ($result as $key => &$data) {
-            $data['product_name'] = '';
-            $data['payment_method'] = '';
-
-            // Determine if the transaction is a bill or a payment and label accordingly
-            if ($data['bill'] > 0) {
-                $data['product_name'] = $data['product'];
-            } else if ($data['paid'] > 0) {
-                $data['payment_method'] = $data['product'];
-            }
-
-            // Update balance with the difference between bill and payment amounts
-            $balance =  $balance + $data['bill'] - $data['paid'];
-            $data['balance'] = $balance;
-
-            // Accumulate totals for bills, payments, and balances
-            $total['bill'] += $data['bill'];
-            $total['paid'] += $data['paid'];
-            $total['balance'] += $data['balance'];
-
-            // Format date and amounts for display
-            $data['date'] = Helpers::formatDate($data['date'], FuelMatixDateTimeFormat::STANDARD_DATE);
-            $data['bill'] = number_format($data['bill'], 2);
-            $data['paid'] = number_format($data['paid'], 2);
-            $data['balance'] = number_format($data['balance'], 2);
-        }
-
-        // Format total amounts for display
-        $total['bill'] = number_format($total['bill'], 2);
-        $total['paid'] = number_format($total['paid'], 2);
-        $total['balance'] = number_format($balance, 2);
+        $result = ReportRepository::vendorReport($filter);
 
         // Return the formatted report data and totals in the response
-        return response()->json([
-            'status' => 200,
-            'data' => $result,
-            'total' => $total
-        ]);
+        return response()->json($result);
     }
 
 }

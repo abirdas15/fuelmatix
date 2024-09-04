@@ -19,7 +19,7 @@
                         <div class="basic-form">
                             <form @submit.prevent="save">
                                 <div class="row">
-                                    <div class="mb-3 form-group col-md-4">
+                                    <div class="mb-3 form-group col-md-3">
                                         <label class="form-label">Bank:</label>
                                         <select class="form-control" name="bank_id" id="bank_id"  v-model="param.bank_id">
                                             <option value="">Select Bank</option>
@@ -27,7 +27,7 @@
                                         </select>
                                         <div class="invalid-feedback"></div>
                                     </div>
-                                    <div class="mb-3 form-group col-md-4">
+                                    <div class="mb-3 form-group col-md-3">
                                         <label class="form-label">Vendor:</label>
                                         <select class="form-control" name="vendor_id" id="vendor_id"  v-model="param.vendor_id">
                                             <option value="">Select Vendor</option>
@@ -35,9 +35,14 @@
                                         </select>
                                         <div class="invalid-feedback"></div>
                                     </div>
-                                    <div class="mb-3 form-group col-md-4">
+                                    <div class="mb-3 form-group col-md-3">
                                         <label class="form-label">Pay Order Number:</label>
                                         <input type="text" class="form-control" name="number" v-model="param.number">
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                    <div class="mb-3 form-group col-md-3">
+                                        <label class="form-label">Remarks:</label>
+                                        <input type="text" class="form-control" name="number" v-model="param.remarks">
                                         <div class="invalid-feedback"></div>
                                     </div>
                                 </div>
@@ -131,7 +136,8 @@ export default {
                         expense_category_id: '',
                         stock_category_id: ''
                     }
-                ]
+                ],
+                remarks: '',
             },
             listParam: {
                 limit: 5000,

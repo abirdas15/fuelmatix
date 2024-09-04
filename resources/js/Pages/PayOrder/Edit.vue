@@ -19,7 +19,7 @@
                         <div class="basic-form">
                             <form @submit.prevent="save">
                                 <div class="row">
-                                    <div class="mb-3 form-group col-md-4">
+                                    <div class="mb-3 form-group col-md-3">
                                         <label class="form-label">Bank:</label>
                                         <select class="form-control" name="bank_id" id="bank_id"  v-model="param.bank_id">
                                             <option value="">Select Bank</option>
@@ -27,7 +27,7 @@
                                         </select>
                                         <div class="invalid-feedback"></div>
                                     </div>
-                                    <div class="mb-3 form-group col-md-4">
+                                    <div class="mb-3 form-group col-md-3">
                                         <label class="form-label">Vendor:</label>
                                         <select class="form-control" name="vendor_id" id="vendor_id"  v-model="param.vendor_id">
                                             <option value="">Select Vendor</option>
@@ -35,9 +35,14 @@
                                         </select>
                                         <div class="invalid-feedback"></div>
                                     </div>
-                                    <div class="mb-3 form-group col-md-4">
+                                    <div class="mb-3 form-group col-md-3">
                                         <label class="form-label">Amount:</label>
                                         <input type="text" class="form-control" name="amount" v-model="param.amount">
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                    <div class="mb-3 form-group col-md-3">
+                                        <label class="form-label">Remarks:</label>
+                                        <input type="text" class="form-control" name="number" v-model="param.remarks">
                                         <div class="invalid-feedback"></div>
                                     </div>
                                 </div>
@@ -130,7 +135,7 @@ export default {
         total() {
             let total = 0;
             this.param.products.map((v) => {
-                if (v.total != '') {
+                if (v.total !== '') {
                     total += parseFloat(v.total);
                 }
             });
@@ -140,7 +145,7 @@ export default {
     methods: {
         calculatePrice: function(index) {
             let total = '';
-            if (this.param.products[index].unit_price != '' && this.param.products[index].quantity != '') {
+            if (this.param.products[index].unit_price !== '' && this.param.products[index].quantity !== '') {
                 total = this.param.products[index].unit_price * this.param.products[index].quantity;
             }
             this.param.products[index].total = total;
@@ -149,7 +154,7 @@ export default {
             let id = event.target.value;
             let selectedProductIndex;
             this.products.map((v, i) => {
-                if (v.id == id) {
+                if (v.id === id) {
                     selectedProductIndex = i;
                 }
             });

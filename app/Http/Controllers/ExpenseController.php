@@ -8,8 +8,11 @@ use App\Common\Module;
 use App\Helpers\Helpers;
 use App\Helpers\SessionUser;
 use App\Models\Category;
+use App\Models\ClientCompany;
 use App\Models\Expense;
+use App\Models\User;
 use App\Repository\TransactionRepository;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -33,7 +36,6 @@ class ExpenseController extends Controller
             'expense.*.category_id' => 'required|integer',
             'expense.*.amount' => 'required|numeric',
             'expense.*.payment_id' => 'required|numeric',
-            'shift_sale_id' => 'nullable|integer',
         ],[
             'expense.*.category_id.required' => 'The category field is required.',
             'expense.*.payment_id.required' => 'The payment field is required.',
@@ -101,6 +103,7 @@ class ExpenseController extends Controller
                 $expenseModel->amount = $expense['amount'];
                 $expenseModel->payment_id = $expense['payment_id'];
                 $expenseModel->remarks = $expense['remarks'] ?? null;
+                $expenseModel->paid_to = $expense['paid_to'] ?? null;
                 $expenseModel->shift_sale_id = $request->input('shift_sale_id') ?? null;
                 $expenseModel->file = $file_path;
                 $expenseModel->status = FuelMatixStatus::PENDING;
@@ -211,7 +214,6 @@ class ExpenseController extends Controller
             'category_id' => 'required|integer',
             'amount' => 'required|numeric',
             'payment_id' => 'required|integer',
-            'shift_sale_id' => 'nullable|integer',
         ]);
 
         if ($validator->fails()) {
@@ -271,6 +273,7 @@ class ExpenseController extends Controller
         $expense->category_id = $request->input('category_id');
         $expense->amount = $request->input('amount');
         $expense->payment_id = $request->input('payment_id');
+        $expense->paid_to = $request->input('paid_to') ?? null;
         $expense->remarks = $request->input('remarks') ?? null;
         $expense->shift_sale_id = $request->input('shift_sale_id') ?? null;
         $expense->file = $file_path;
@@ -471,5 +474,45 @@ class ExpenseController extends Controller
             $data['amount'] = number_format($data['amount'], 2);
         }
         return response()->json(['status' => 200, 'data' => $result, 'total' => number_format($total, 2)]);
+    }
+    /**
+     * @param Request $request
+     * @return string
+     */
+    public function exportPdf(Request $request): string
+    {
+        $validator = Validator::make($request->all(), [
+            'id' => 'required|numeric',
+        ]);
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 500,
+                'errors' => $validator->errors()
+            ]);
+        }
+        $data = Expense::where('id', $request->input('id'))->first();
+        $data['amount_format'] = number_format($data['amount'], 2);
+        $data['number_text'] = Helpers::convertNumberToWord($data['amount']);
+        $data['date'] = Helpers::formatDate($data['date'], FuelMatixDateTimeFormat::STANDARD_DATE);
+        $category = Category::where('id', $data['category_id'])->first();
+        $sessionUser = SessionUser::getUser();
+        $company = ClientCompany::where('id', $sessionUser['client_company_id'])->first();
+        $paymentCategory = Category::where('id', $data['payment_id'])->first();
+
+        $approve_date = !empty($data['approve_date']) ? Helpers::formatDate($data['approve_date'], FuelMatixDateTimeFormat::STANDARD_DATE) : '';
+        $approve_by = '';
+        $user = User::where('id', $data['approve_by'])->first();
+        if ($user instanceof User) {
+            $approve_by = $user->name;
+        }
+        $pdf = Pdf::loadView('pdf.expense-memo', [
+            'company' => $company,
+            'data' => $data,
+            'category_name' => $category['name'],
+            'payment_method' => $paymentCategory['name'],
+            'approve_date' => $approve_date,
+            'approve_by' => $approve_by,
+        ]);
+        return $pdf->output();
     }
 }

@@ -35,6 +35,7 @@ class PayOrderController extends Controller
             'bank_id' => 'required|integer',
             'vendor_id' => 'required|integer',
             'number' => 'required|string',
+            'remarks' => 'nullable|string',
             'products' => 'required|array',
             'products.*.product_id' => 'required|integer',
             'products.*.quantity' => 'required|numeric',
@@ -87,42 +88,44 @@ class PayOrderController extends Controller
                 return response()->json(['status' => 500, 'errors' => ['bank_id' => ['Not enough balance in your bank.']]]);
             }
         }
+        DB::transaction(function() use ($amount, $inputData, $sessionUser) {
+            // Create and save a new pay order
+            $payOrder = new PayOrder();
+            $payOrder->bank_id = $inputData['bank_id'] ?? null;
+            $payOrder->vendor_id = $inputData['vendor_id'];
+            $payOrder->amount = $amount;
+            $payOrder->number = $inputData['number'];
+            $payOrder->remarks = $inputData['remarks'] ?? null;
+            $payOrder->client_company_id = $sessionUser['client_company_id'];
 
-        // Create and save a new pay order
-        $payOrder = new PayOrder();
-        $payOrder->bank_id = $inputData['bank_id'] ?? null;
-        $payOrder->vendor_id = $inputData['vendor_id'];
-        $payOrder->amount = $amount;
-        $payOrder->number = $inputData['number'];
-        $payOrder->client_company_id = $sessionUser['client_company_id'];
+            if (!$payOrder->save()) {
+                return response()->json(['status' => 400, 'message' => 'Cannot save [pay order].']);
+            }
 
-        if (!$payOrder->save()) {
-            return response()->json(['status' => 400, 'message' => 'Cannot save [pay order].']);
-        }
+            // Prepare pay order data for insertion into PayOrderData table
+            $payOrderData = [];
+            foreach ($inputData['products'] as $product) {
+                $payOrderData[] = [
+                    'pay_order_id' => $payOrder['id'],
+                    'product_id' => $product['product_id'],
+                    'unit_price' => $product['unit_price'],
+                    'quantity' => $product['quantity'],
+                    'total' => $product['total']
+                ];
 
-        // Prepare pay order data for insertion into PayOrderData table
-        $payOrderData = [];
-        foreach ($inputData['products'] as $product) {
-            $payOrderData[] = [
-                'pay_order_id' => $payOrder['id'],
-                'product_id' => $product['product_id'],
-                'unit_price' => $product['unit_price'],
-                'quantity' => $product['quantity'],
-                'total' => $product['total']
-            ];
+                // Prepare transaction data
+                $transactionData = [
+                    ['date' => date('Y-m-d'), 'account_id' => $inputData['bank_id'], 'debit_amount' => 0, 'credit_amount' => $product['total'], 'module' => Module::PAY_ORDER, 'module_id' => $payOrder->id],
+                    ['date' => date('Y-m-d'), 'account_id' => $inputData['vendor_id'], 'debit_amount' => $product['total'], 'credit_amount' => 0, 'module' => Module::PAY_ORDER, 'module_id' => $payOrder->id],
+                ];
 
-            // Prepare transaction data
-            $transactionData = [
-                ['date' => date('Y-m-d'), 'account_id' => $request->input('bank_id'), 'debit_amount' => 0, 'credit_amount' => $product['total'], 'module' => Module::PAY_ORDER, 'module_id' => $payOrder->id],
-                ['date' => date('Y-m-d'), 'account_id' => $request->input('vendor_id'), 'debit_amount' => $product['total'], 'credit_amount' => 0, 'module' => Module::PAY_ORDER, 'module_id' => $payOrder->id],
-            ];
+                // Save transaction data
+                TransactionRepository::saveTransaction($transactionData);
+            }
 
-            // Save transaction data
-            TransactionRepository::saveTransaction($transactionData);
-        }
-
-        // Insert pay order data into PayOrderData table
-        PayOrderData::insert($payOrderData);
+            // Insert pay order data into PayOrderData table
+            PayOrderData::insert($payOrderData);
+        });
 
         // Return a success response
         return response()->json([
@@ -191,6 +194,7 @@ class PayOrderController extends Controller
             'id' => 'required|integer',
             'bank_id' => 'required|integer',
             'vendor_id' => 'required|integer',
+            'remarks' => 'nullable|string',
             'number' => 'required|string',
             'products' => 'required|array',
             'products.*.product_id' => 'required|integer',
@@ -258,6 +262,7 @@ class PayOrderController extends Controller
             $payOrder->vendor_id = $inputData['vendor_id'];
             $payOrder->amount = $amount;
             $payOrder->number = $inputData['number'];
+            $payOrder->remarks = $inputData['remarks'] ?? null;
 
             if (!$payOrder->save()) {
                 return response()->json(['status' => 400, 'message' => 'Cannot update [pay order].']);

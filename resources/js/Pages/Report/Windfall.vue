@@ -40,6 +40,10 @@
                                         <span class="btn-icon-start text-info"><i class="fa fa-filter color-white"></i></span>Filter...
                                     </button>
                                 </div>
+                                <div class="col-xl-3 mb-3">
+                                    <button class="btn btn-primary" v-if="!loadingFile" @click="downloadPdf"><i class="fa fa-print" aria-hidden="true"></i>&nbsp;Print</button>
+                                    <button class="btn btn-primary" v-if="loadingFile"><i class="fa fa-print" aria-hidden="true"></i>&nbsp;Print...</button>
+                                </div>
                             </div>
 
                             <div class=" mt-4">
@@ -61,8 +65,8 @@
                                                 <td v-text="each.product_name"></td>
                                                 <td v-text="each.source"></td>
                                                 <td v-text="each.status"></td>
-                                                <td v-text="each.quantity"></td>
-                                                <td v-text="each.amount"></td>
+                                                <td class="text-center" v-text="each.quantity"></td>
+                                                <td class="text-end" v-text="each.amount"></td>
                                             </tr>
                                         </tbody>
                                         <tbody v-if="summary.length === 0">
@@ -74,7 +78,7 @@
                                             <tr>
                                                 <th colspan="3">Total</th>
                                                 <th colspan="2" v-text="total.status"></th>
-                                                <th v-text="total.amount"></th>
+                                                <th class="text-end" v-text="total.amount"></th>
                                             </tr>
                                         </tfoot>
                                     </table>
@@ -102,10 +106,22 @@ export default {
             },
             loading: false,
             summary: [],
-            total: {}
+            total: {},
+            loadingFile: false,
         }
     },
     methods: {
+        downloadPdf: function () {
+            this.loadingFile = true
+            ApiService.DOWNLOAD(ApiRoutes.Report + '/windfall/export/pdf', this.param,'',(res) => {
+                this.loadingFile = false
+                let blob = new Blob([res], {type: 'pdf'});
+                const link = document.createElement('a');
+                link.href = window.URL.createObjectURL(blob);
+                link.download = 'WindfallReport.pdf';
+                link.click();
+            });
+        },
         fetchWindfallReport: function() {
             this.loading = true;
             ApiService.POST(ApiRoutes.Report + '/windfall', this.param, (res) => {

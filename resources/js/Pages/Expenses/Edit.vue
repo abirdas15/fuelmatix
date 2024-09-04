@@ -37,6 +37,11 @@
                                         <div class="invalid-feedback"></div>
                                     </div>
                                     <div class="mb-3 form-group col-md-6">
+                                        <label class="form-label">Paid To:</label>
+                                        <input type="text" class="form-control" name="paid_to" v-model="param.paid_to">
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                    <div class="mb-3 form-group col-md-6">
                                         <label class="form-label">Remarks:</label>
                                         <input type="text" class="form-control" name="remarks" v-model="param.remarks">
                                         <div class="invalid-feedback"></div>
@@ -162,10 +167,25 @@ export default {
             });
         },
         save: function () {
+            let formData = new FormData();
+
+            // Append the common parameters
+            formData.append('id', this.param.id);
+            formData.append('date', this.param.date);
+            formData.append('shift_sale_id', this.param.shift_sale_id);
+            formData.append('category_id',  this.param.category_id);
+            formData.append('payment_id',  this.param.payment_id);
+            formData.append('amount',  this.param.amount);
+            formData.append('remarks',  this.param.remarks);
+            formData.append('paid_to',  this.param.paid_to);
+
+            if (this.param.file) {
+                formData.append('file',  this.param.file);
+            }
             ApiService.ClearErrorHandler();
             this.loading = true
             this.param.status = this.$route.params.status;
-            ApiService.POST(ApiRoutes.ExpenseEdit, this.param,res => {
+            ApiService.POST(ApiRoutes.ExpenseEdit,formData,res => {
                 this.loading = false
                 if (parseInt(res.status) === 200) {
                     this.$router.push({

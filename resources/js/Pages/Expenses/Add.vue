@@ -36,9 +36,10 @@
                                             <thead>
                                             <tr>
                                                 <th style="width: 20%">Expense Category</th>
-                                                <th style="width: 20%">Amount</th>
+                                                <th style="width: 15%">Amount</th>
                                                 <th style="width: 20%">Payment Category</th>
-                                                <th style="width: 20%">Remarks</th>
+                                                <th style="width: 15%">Paid To</th>
+                                                <th style="width: 15%">Remarks</th>
                                                 <th style="width: 15%">File</th>
                                                 <th>Action</th>
                                             </tr>
@@ -71,7 +72,13 @@
                                                     </td>
                                                     <td>
                                                         <div class="form-group">
-                                                            <input type="text" class="form-control" name="remarks" v-model="param.remarks">
+                                                            <input type="text" class="form-control" name="paid_to" v-model="each.paid_to">
+                                                            <div class="invalid-feedback"></div>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="form-group">
+                                                            <input type="text" class="form-control" name="remarks" v-model="each.remarks">
                                                             <div class="invalid-feedback"></div>
                                                         </div>
                                                     </td>
@@ -124,6 +131,7 @@ export default {
                         amount: '',
                         payment_id: '',
                         file: '',
+                        paid_to: '',
                         remarks: ''
                     }
                 ]
@@ -149,7 +157,8 @@ export default {
                 amount: '',
                 payment_id: '',
                 file: '',
-                remarks: ''
+                remarks: '',
+                paid_to: '',
             });
         },
         fetchShift: function() {
@@ -198,6 +207,7 @@ export default {
                 formData.append(`expense[${index}][payment_id]`, expense.payment_id);
                 formData.append(`expense[${index}][amount]`, expense.amount);
                 formData.append(`expense[${index}][remarks]`, expense.remarks);
+                formData.append(`expense[${index}][paid_to]`, expense.paid_to);
 
                 // If you have a file, append it as well, ensuring the file is not empty or undefined
                 if (expense.file) {

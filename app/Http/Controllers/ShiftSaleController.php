@@ -8,11 +8,13 @@ use App\Helpers\Helpers;
 use App\Helpers\SessionUser;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\ProductType;
 use App\Models\ShiftSale;
 use App\Models\ShiftSummary;
 use App\Models\ShiftTotal;
 use App\Models\User;
 use App\Repository\ShiftSaleRepository;
+use App\Services\TankReadingService;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -21,6 +23,16 @@ use Illuminate\Support\Facades\Validator;
 
 class ShiftSaleController extends Controller
 {
+
+    /**
+     * @var TankReadingService
+     */
+    private $tankReadingService;
+
+    public function __construct(TankReadingService $tankReadingService)
+    {
+        $this->tankReadingService = $tankReadingService;
+    }
     /**
      * Save method to handle the start and end of a shift sale.
      *
@@ -279,25 +291,34 @@ class ShiftSaleController extends Controller
      */
     public function getCategory(Request $request): JsonResponse
     {
+
         $inputData = $request->all();
         $categoryId = Category::select('id')
             ->whereIn('slug', [strtolower(AccountCategory::CASH_IN_HAND), strtolower(AccountCategory::ACCOUNT_RECEIVABLE),  strtolower(AccountCategory::POS_MACHINE)])
             ->where('client_company_id', $inputData['session_user']['client_company_id'])
             ->pluck('id')
             ->toArray();
-        $result = Category::select('id', 'name')
+        $result = Category::select('id', 'name', 'slug')
             ->with('product_price')
-            ->whereIn('parent_category', $categoryId)
+            ->where(function ($query) use ($categoryId) {
+                foreach ($categoryId as $id) {
+                    $query->orWhereJsonContains('category_ids', $id);
+                }
+            })
             ->orderBy('parent_category', 'ASC')
             ->get()
             ->toArray();
+        $resultArray = [];
         foreach ($result as &$data) {
             $data['selected'] = false;
-            if ($data['name'] == AccountCategory::CASH) {
-                $data['selected'] = true;
+            if ($data['slug'] != strtolower(AccountCategory::ACCOUNT_RECEIVABLE)) {
+                if ($data['name'] == AccountCategory::CASH) {
+                    $data['selected'] = true;
+                }
+                $resultArray[] = $data;
             }
         }
-        return response()->json(['status' => 200, 'data' => $result]);
+        return response()->json(['status' => 200, 'data' => $resultArray]);
     }
     /**
      * Retrieves shift information for a given date.
@@ -353,4 +374,65 @@ class ShiftSaleController extends Controller
             'data' => $result
         ]);
     }
+    /**
+     * Handles the tank reading request, validating inputs and retrieving necessary data.
+     *
+     * This method processes a request to obtain tank readings for a specified product. It performs input validation,
+     * retrieves the relevant product and product type, and then uses a service to gather and return the tank reading data.
+     *
+     * @param Request $request - The incoming HTTP request containing parameters for tank reading.
+     *
+     * @return JsonResponse - Returns a JSON response with either error messages or the requested data.
+     */
+    public function tankReading(Request $request): JsonResponse
+    {
+        // Validate required input parameters
+        $validator = Validator::make($request->all(), [
+            'product_id' => 'required|integer',
+        ]);
+
+        // Return validation errors if any
+        if ($validator->fails()) {
+            return response()->json(['status' => 500, 'errors' => $validator->errors()]);
+        }
+
+        // Retrieve the session user
+        $sessionUser = SessionUser::getUser();
+
+        // Retrieve the product by ID and validate its existence within the user's client company
+        $product = Product::where('id', $request->input('product_id'))
+            ->where('client_company_id', $sessionUser['client_company_id'])
+            ->first();
+
+        if (!$product instanceof Product) {
+            return response()->json([
+                'status' => 500,
+                'error' => 'Cannot find product.'
+            ]);
+        }
+
+        // Retrieve the product type associated with the product
+        $productType = ProductType::where('id', $product['type_id'])->first();
+
+        if (!$productType instanceof ProductType) {
+            return response()->json([
+                'status' => 500,
+                'error' => 'Cannot find product type.'
+            ]);
+        }
+
+        // Call the tank reading service to get the tank reading data
+        $response = $this->tankReadingService->tankReading([
+            'status' => $request->input('status', ''),
+            'shift_id' => $request->input('shift_id', 0),
+            'date' => $request->input('date', '')
+        ], $product);
+
+        // Return the data in a successful JSON response
+        return response()->json([
+            'status' => 200,
+            'data' => $response
+        ]);
+    }
+
 }

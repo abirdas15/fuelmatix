@@ -23,8 +23,15 @@
                                                 <span class="input-group-text">
                                                     <i class="fa-regular fa-user"></i>
                                                 </span>
-                                            <v-select class="form-control form-control-sm" :options="creditCompany" placeholder="Choose Company" label="name" v-model="company_id"
-                                                      :reduce="(option) => option.id"></v-select>
+                                            <v-select
+                                                class="form-control form-control-sm"
+                                                :options="creditCompany"
+                                                placeholder="Choose Company"
+                                                label="name"
+                                                v-model="company_id"
+                                                :reduce="(option) => option.id"
+                                                :searchable="true"
+                                            ></v-select>
                                         </div>
                                     </div>
                                 </div>

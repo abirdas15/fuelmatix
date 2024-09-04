@@ -23,10 +23,10 @@
                             <button class="btn btn-primary" v-if="!loading" @click="getReport">Filter</button>
                             <button class="btn btn-primary" v-if="loading">Filtering....</button>
                         </div>
-<!--                        <div class="col-sm-2 ms-auto">-->
-<!--                            <button class="btn btn-primary" v-if="!loadingFile" @click="downloadPdf">Download PDF</button>-->
-<!--                            <button class="btn btn-primary" v-if="loadingFile">Downloading PDF...</button>-->
-<!--                        </div>-->
+                        <div class="col-sm-2 ms-auto">
+                            <button class="btn btn-primary" v-if="!loadingFile" @click="downloadPdf"><i class="fa fa-print" aria-hidden="true"></i>&nbsp;Print</button>
+                            <button class="btn btn-primary" v-if="loadingFile"><i class="fa fa-print" aria-hidden="true"></i>&nbsp;Print...</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -102,7 +102,7 @@
                                 <th>Previous Balance</th>
                                 <th>Receive</th>
                                 <th>Total</th>
-                                <th class="text-center">{{ product.gain >= 0 ? 'Gain' : 'Loss' }} Ratio</th>
+                                <th class="text-center">{{ product.gain_loss >= 0 ? 'Gain' : 'Loss' }} Ratio</th>
                             </tr>
                             </tbody>
                             <tbody>
@@ -173,6 +173,33 @@
                     </table>
                 </div>
             </div>
+            <div class="card" v-if="expenses.length > 0">
+                <div class="text-center mt-2"><h2>Expense</h2></div>
+                <div class="card-body mt-0">
+                    <table class="table table-bordered">
+                        <tbody>
+                        <tr>
+                            <th>Expense Category</th>
+                            <th>Payment Type</th>
+                            <th class="text-end">Amount</th>
+                        </tr>
+                        </tbody>
+                        <tbody>
+                        <tr v-for="each in expenses">
+                            <td v-text="each.expense_type"></td>
+                            <td class="" v-text="each.payment_method"></td>
+                            <td class="text-end" v-text="each.amount_format"></td>
+                        </tr>
+                        </tbody>
+                        <tbody>
+                        <tr>
+                            <th colspan="2" class="text-end">Total:</th>
+                            <th class="text-end" v-text="total.expense"></th>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 </template>
@@ -193,17 +220,26 @@ export default {
             },
             data: null,
             companySales: [],
+            expenses: [],
             total: {},
             loadingFile: false,
             loading: false,
+            shifts: []
         }
     },
     watch:{
         'param.date': function() {
-
+            //this.fetchShift();
         }
     },
     methods: {
+        fetchShift: function() {
+            ApiService.POST(ApiRoutes.GetShiftByDate, {date: this.param.date}, (res) => {
+                if (parseInt(res.status) === 200) {
+                    this.shifts = res.data;
+                }
+            });
+        },
         getReport: function () {
             this.loading = true
             if (this.param.date === '') {
@@ -214,19 +250,19 @@ export default {
                 if (parseInt(res.status) === 200) {
                     this.data = res.data;
                     this.companySales = res.companySales;
+                    this.expenses = res.expenses;
                     this.total = res.total;
                 }
             });
         },
         downloadPdf: function () {
             this.loadingFile = true
-            ApiService.DOWNLOAD(ApiRoutes.dailyLogPdf, this.param,'',(res) => {
-                console.log(res);
+            ApiService.DOWNLOAD(ApiRoutes.Report + '/stockSummary/export/pdf', this.param,'',(res) => {
                 this.loadingFile = false
                 let blob = new Blob([res], {type: 'pdf'});
                 const link = document.createElement('a');
                 link.href = window.URL.createObjectURL(blob);
-                link.download = 'Daily Log.pdf';
+                link.download = 'StockSummary.pdf';
                 link.click();
             });
         }

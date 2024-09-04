@@ -471,7 +471,7 @@ class SaleController extends Controller
         $orderBy = $requestData['order_by'] ?? 'transactions.id';
         $orderMode = $requestData['order_mode'] ?? 'DESC';
         $keyword = $requestData['keyword'] ?? '';
-        $result = Transaction::select('transactions.id', 'invoice_item.invoice_id',  DB::raw("SUM(transactions.debit_amount) as amount"), 'transactions.created_at', 'invoice_item.date as invoice_created_at', 'transactions.description', 'car.car_number', 'transactions.voucher_no', 'categories.name', 'transactions.module', 'transactions.module_id', 'transactions.linked_id as category_id')
+        $result = Transaction::select('transactions.id', 'invoice_item.invoice_id',  DB::raw("SUM(transactions.debit_amount) as amount"), 'transactions.created_at', 'invoice_item.date as invoice_created_at', 'transactions.description', 'car.car_number', 'transactions.voucher_no', 'categories.name', 'transactions.module', 'transactions.module_id', 'transactions.account_id as category_id')
             ->leftJoin('categories', 'categories.id', '=', 'transactions.account_id')
             ->leftJoin('invoice_item', 'invoice_item.transaction_id', 'transactions.id')
             ->leftJoin('car', 'car.id', 'transactions.car_id')
