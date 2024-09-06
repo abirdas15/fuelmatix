@@ -66,7 +66,7 @@ class InvoiceController extends Controller
                         $invoiceItem[] = $sale;
                     }
                 } else if ($row['module'] == Module::SHIFT_SALE) {
-                    $shiftSale = ShiftTotal::select('shift_sale.product_id', 'products.selling_price as price', 'shift_sale.date')
+                    $shiftSale = ShiftTotal::select('shift_total.product_id', 'products.selling_price as price', 'shift_sale.date')
                         ->leftJoin('shift_sale', 'shift_total.id', 'shift_sale.shift_id')
                         ->leftJoin('products', 'products.id', '=', 'shift_total.product_id')
                         ->where('shift_total.id', $row['module_id'])
@@ -270,7 +270,6 @@ class InvoiceController extends Controller
         $category['address'] = $others->address ?? '';
         $invoice['customer_company'] = $category;
         $invoice['company'] = $company;
-        $invoice['amount'] = number_format($invoice['amount'], 2);
         $invoiceItem = InvoiceItem::select('invoice_item.id', 'invoice_item.date', 'car.car_number', 'transactions.voucher_no', 'invoice_item.quantity', 'invoice_item.price', 'invoice_item.subtotal', 'products.name as product_name')
             ->leftJoin('transactions', 'transactions.id', 'invoice_item.transaction_id')
             ->leftJoin('car', 'car.id', 'transactions.car_id')
@@ -278,12 +277,15 @@ class InvoiceController extends Controller
             ->where('invoice_item.invoice_id', $invoice['id'])
             ->get()
             ->toArray();
+        $totalAmount = 0;
         foreach ($invoiceItem as &$item) {
+            $totalAmount += $item['quantity'] * $item['price'];
             $item['price'] = number_format($item['price'], 2);
             $item['subtotal'] = number_format($item['subtotal'], 2);
             $item['quantity'] = number_format($item['quantity'], 2);
             $item['date'] = !empty($item['date']) ? Helpers::formatDate($item['date'], FuelMatixDateTimeFormat::STANDARD_DATE) : '';
         }
+        $invoice['amount'] = number_format($totalAmount, 2);
         $invoice['invoice_item'] = $invoiceItem;
         return $invoice;
     }

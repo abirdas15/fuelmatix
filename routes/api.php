@@ -286,6 +286,14 @@ Route::group(['middleware' => 'AuthReqCheck'], function() {
         Route::group(['prefix' => 'vendor'], function() {
             Route::post('export/pdf', [ReportController::class, 'vendorReportExportPDF']);
         });
+        Route::group(['prefix' => 'company/summary'], function() {
+            Route::post('/', [ReportController::class, 'companySummary']);
+            Route::post('export/pdf', [ReportController::class, 'companySummaryExportPDF']);
+            Route::group(['prefix' => 'details'], function() {
+                Route::post('/', [ReportController::class, 'companySummaryDetails']);
+                Route::post('export/pdf', [ReportController::class, 'companySummaryDetailsExportPDF']);
+            });
+        });
     });
     Route::group(['prefix' => 'user'], function() {
         Route::post('save', [UserController::class, 'save']);

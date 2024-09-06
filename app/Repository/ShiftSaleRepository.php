@@ -317,8 +317,8 @@ class ShiftSaleRepository
                         if ($lossCategory instanceof Category) {
                             $description = 'Shift ID: ' . $shiftSale['id'] . ', Product: ' . $product['name'] . ', Loss: ' . abs($netProfit);
                             $transactionData = [
-                                ['date' => date('Y-m-d', strtotime($initialData['date'])), 'description' => $description, 'account_id' => $lossCategory['id'], 'debit_amount' => abs($lossAmount), 'credit_amount' => 0],
-                                ['date' => date('Y-m-d', strtotime($initialData['date'])), 'description' => $description, 'account_id' => $stockCategory['id'], 'debit_amount' => 0, 'credit_amount' => abs($lossAmount)],
+                                ['date' => date('Y-m-d', strtotime($shiftTotal['start_date'])), 'description' => $description, 'account_id' => $lossCategory['id'], 'debit_amount' => abs($lossAmount), 'credit_amount' => 0],
+                                ['date' => date('Y-m-d', strtotime($shiftTotal['start_date'])), 'description' => $description, 'account_id' => $stockCategory['id'], 'debit_amount' => 0, 'credit_amount' => abs($lossAmount)],
                             ];
                             TransactionRepository::saveTransaction($transactionData);
                         }
@@ -326,8 +326,8 @@ class ShiftSaleRepository
                         // Handle profit amount transaction
                         $description = 'Shift ID: ' . $shiftSale['id'] . ', Product: ' . $product['name'] . ', Windfall: ' . abs($netProfit);
                         $transactionData = [
-                            ['date' => date('Y-m-d', strtotime($initialData['date'])), 'description' => $description, 'account_id' =>$stockCategory['id'], 'debit_amount' => abs($lossAmount), 'credit_amount' => 0],
-                            ['date' => date('Y-m-d', strtotime($initialData['date'])), 'description' => $description, 'account_id' => $incomeCategory['id'], 'debit_amount' => 0, 'credit_amount' => abs($lossAmount)],
+                            ['date' => date('Y-m-d', strtotime($shiftTotal['start_date'])), 'description' => $description, 'account_id' =>$stockCategory['id'], 'debit_amount' => abs($lossAmount), 'credit_amount' => 0],
+                            ['date' => date('Y-m-d', strtotime($shiftTotal['start_date'])), 'description' => $description, 'account_id' => $incomeCategory['id'], 'debit_amount' => 0, 'credit_amount' => abs($lossAmount)],
                         ];
                         TransactionRepository::saveTransaction($transactionData);
                     }
@@ -344,8 +344,8 @@ class ShiftSaleRepository
 
                         // Save transaction for cost of goods sold
                         $transactionData = [
-                            ['date' => date('Y-m-d', strtotime($initialData['date'])), 'account_id' => $costOfGoodSoldCategory['id'], 'debit_amount' => $buyingPrice, 'credit_amount' => 0, 'module' => 'shift sale', 'module_id' => $shiftTotal['id']],
-                            ['date' => date('Y-m-d', strtotime($initialData['date'])), 'account_id' => $linkedId, 'debit_amount' => 0, 'credit_amount' => $buyingPrice, 'module' => 'shift sale', 'module_id' => $shiftTotal['id']]
+                            ['date' => date('Y-m-d', strtotime($shiftTotal['start_date'])), 'account_id' => $costOfGoodSoldCategory['id'], 'debit_amount' => $buyingPrice, 'credit_amount' => 0, 'module' => 'shift sale', 'module_id' => $shiftTotal['id']],
+                            ['date' => date('Y-m-d', strtotime($shiftTotal['start_date'])), 'account_id' => $linkedId, 'debit_amount' => 0, 'credit_amount' => $buyingPrice, 'module' => 'shift sale', 'module_id' => $shiftTotal['id']]
                         ];
                         TransactionRepository::saveTransaction($transactionData);
                     }
@@ -358,7 +358,7 @@ class ShiftSaleRepository
                 $amount = $category['amount'];
                 $paymentCategory = $category['category_id'];
                 $transactionData = [
-                    ['date' => date('Y-m-d', strtotime($initialData['date'])), 'account_id' => $incomeCategory['id'], 'debit_amount' => 0, 'credit_amount' => $amount, 'module' =>  $category['module'] ?? Module::SHIFT_SALE, 'module_id' => $category['module_id'] ?? $shiftTotal['id'], 'car_id' => $category['car_id'] ?? null, 'voucher_no' => $category['voucher_no'] ?? null, 'driver_id' => $category['driver_id'] ?? null, 'quantity' => $category['liter'] ?? null]
+                    ['date' => date('Y-m-d', strtotime($shiftTotal['start_date'])), 'account_id' => $incomeCategory['id'], 'debit_amount' => 0, 'credit_amount' => $amount, 'module' =>  $category['module'] ?? Module::SHIFT_SALE, 'module_id' => $category['module_id'] ?? $shiftTotal['id'], 'car_id' => $category['car_id'] ?? null, 'voucher_no' => $category['voucher_no'] ?? null, 'driver_id' => $category['driver_id'] ?? null, 'quantity' => $category['liter'] ?? null]
                 ];
                 if (isset($category['payment_method']) && ($category['payment_method'] == PaymentMethod::CARD)) {
                     $posCategory = Category::where('id', $category['category_id'])->first();
@@ -368,12 +368,12 @@ class ShiftSaleRepository
                         if ($expenseCategory instanceof Category) {
                             $expenseAmount = $category['amount'] *  $others->tds / 100;
                             $amount = $amount - $expenseAmount;
-                            $transactionData[] = ['date' => date('Y-m-d', strtotime($initialData['date'])), 'account_id' => $expenseCategory->id, 'debit_amount' => $expenseAmount, 'credit_amount' => 0, 'module' => $category['module'] ?? Module::SHIFT_SALE, 'module_id' => $category['module_id'] ?? $shiftTotal['id'], 'car_id' => $category['car_id'] ?? null, 'voucher_no' => $category['voucher_no'] ?? null, 'driver_id' => $category['driver_id'] ?? null, 'quantity' => $category['liter'] ?? null];
+                            $transactionData[] = ['date' => date('Y-m-d', strtotime($shiftTotal['start_date'])), 'account_id' => $expenseCategory->id, 'debit_amount' => $expenseAmount, 'credit_amount' => 0, 'module' => $category['module'] ?? Module::SHIFT_SALE, 'module_id' => $category['module_id'] ?? $shiftTotal['id'], 'car_id' => $category['car_id'] ?? null, 'voucher_no' => $category['voucher_no'] ?? null, 'driver_id' => $category['driver_id'] ?? null, 'quantity' => $category['liter'] ?? null];
                             $paymentCategory = $others->bank_category_id;
                         }
                     }
                 }
-                $transactionData[] = ['date' => date('Y-m-d', strtotime($initialData['date'])), 'account_id' => $paymentCategory, 'debit_amount' => $amount, 'credit_amount' => 0, 'module' => $category['module'] ?? Module::SHIFT_SALE, 'module_id' => $category['module_id'] ?? $shiftTotal['id'], 'car_id' => $category['car_id'] ?? null, 'voucher_no' => $category['voucher_no'] ?? null, 'driver_id' => $category['driver_id'] ?? null, 'quantity' => $category['liter'] ?? null];
+                $transactionData[] = ['date' => date('Y-m-d', strtotime($shiftTotal['start_date'])), 'account_id' => $paymentCategory, 'debit_amount' => $amount, 'credit_amount' => 0, 'module' => $category['module'] ?? Module::SHIFT_SALE, 'module_id' => $category['module_id'] ?? $shiftTotal['id'], 'car_id' => $category['car_id'] ?? null, 'voucher_no' => $category['voucher_no'] ?? null, 'driver_id' => $category['driver_id'] ?? null, 'quantity' => $category['liter'] ?? null];
                 TransactionRepository::saveTransaction($transactionData);
                 $shiftSaleTransaction[] = [
                     'shift_id' => $shiftTotal['id'],

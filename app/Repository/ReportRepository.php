@@ -657,8 +657,8 @@ class ReportRepository
         }
         $accountReceivable = Category::where('client_company_id', $sessionUser['client_company_id'])->where('slug', strtolower( AccountCategory::ACCOUNT_RECEIVABLE))->first();
         $transaction = Transaction::select('transactions.account_id as id',  DB::raw("SUM(transactions.debit_amount) as amount"), 'categories.name', DB::raw('SUM(transactions.quantity) as quantity'), 'c1.name as product_name')
+            ->leftJoin('transactions as t1', 't1.id', '=', 'transactions.linked_id')
             ->leftJoin('categories', 'categories.id', '=', 'transactions.account_id')
-            ->leftJoin('transactions as t1', 't1.linked_id', '=', 'transactions.id')
             ->leftJoin('categories as c1', 'c1.id', '=', 't1.account_id')
             ->where('transactions.date', $date)
             ->where('categories.parent_category', $accountReceivable->id)
@@ -939,6 +939,153 @@ class ReportRepository
                 'bill' => number_format($totalBill, 2),
                 'quantity' => number_format($totalQuantity, 2),
             ]
+        ];
+    }
+
+    /**
+     * @param array $filter
+     * @return array
+     */
+    public static function companySummary(array $filter): array
+    {
+        $sessionUser = SessionUser::getUser();
+        $transactions = Transaction::select(
+            'transactions.account_id as account_id',
+            'categories.name as company_name',
+            'c1.id as product_id',
+            'c1.name as product_name',
+            DB::raw('SUM(transactions.debit_amount) as amount')
+        )
+            ->leftJoin('transactions as t1', 't1.id', '=', 'transactions.linked_id')
+            ->leftJoin('categories', 'categories.id', '=', 'transactions.account_id')
+            ->leftJoin('categories as c1', 'c1.id', '=', 't1.account_id')
+            ->whereJsonContains('categories.category_ids', $filter['company_id'])
+            ->whereBetween('transactions.date', [$filter['start_date'], $filter['end_date']])
+            ->where('transactions.client_company_id', $sessionUser['client_company_id'])
+            ->groupBy('transactions.account_id', 'categories.name', 'c1.id', 'c1.name')
+            ->get()
+            ->toArray();
+        $groupedResults = [];
+
+        $products = [];
+        $productTotals = [];
+        foreach ($transactions as $transaction) {
+            $accountId = $transaction['account_id'];
+            $companyName = $transaction['company_name'];
+
+            // Check if the account_id and company_name already exist in the array
+            if (!isset($groupedResults[$accountId])) {
+                $groupedResults[$accountId] = [
+                    'account_id' => $accountId,
+                    'company_name' => $companyName,
+                    'products' => []
+                ];
+            }
+
+            $groupedResults[$accountId]['products'][] = [
+                'id' => $transaction['product_id'],
+                'name' => $transaction['product_name'],
+                'amount' => number_format($transaction['amount'], 2)
+            ];
+            $products[$transaction['product_id']] = [
+                'id' => $transaction['product_id'],
+                'name' =>  $transaction['product_name'],
+            ];
+            if (!isset($productTotals[$transaction['product_id']])) {
+                $productTotals[$transaction['product_id']] = 0;
+            }
+
+            // Add amount to the product total
+            $productTotals[$transaction['product_id']] += $transaction['amount'];
+        }
+        $finalResults = array_values($groupedResults);
+        $products = array_values($products);
+        foreach ($productTotals as $productId => $total) {
+            $productTotals[$productId] = number_format($total, 2);
+        }
+
+        // Convert associative array to indexed array for consistent output
+        $productTotals = array_values($productTotals);
+        return [
+            'status' => 200,
+            'products' => $products,
+            'data' => $finalResults,
+            'total' => $productTotals
+        ];
+    }
+    public static function companySummaryDetails($filter)
+    {
+        $sessionUser = SessionUser::getUser();
+        $transactions = Transaction::select(
+            'transactions.account_id as account_id',
+            'categories.name as company_name',
+            'c1.id as product_id',
+            'c1.name as product_name',
+            'transactions.quantity as quantity',
+            'car.car_number',
+            DB::raw('SUM(transactions.debit_amount) as amount')
+        )
+            ->leftJoin('transactions as t1', 't1.id', '=', 'transactions.linked_id')
+            ->leftJoin('categories', 'categories.id', '=', 'transactions.account_id')
+            ->leftJoin('categories as c1', 'c1.id', '=', 't1.account_id')
+            ->leftJoin('car', 'car.id', '=', 'transactions.car_id')
+            ->where('transactions.account_id', $filter['company_id'])
+            ->whereBetween('transactions.date', [$filter['start_date'], $filter['end_date']])
+            ->where('transactions.client_company_id', $sessionUser['client_company_id'])
+            ->groupBy('transactions.car_id')
+            ->get()
+            ->toArray();
+        $groupedResults = [];
+
+        $products = [];
+        $productTotals = [];
+        foreach ($transactions as $transaction) {
+            $accountId = $transaction['account_id'];
+
+            // Check if the account_id and company_name already exist in the array
+            if (!isset($groupedResults[$accountId])) {
+                $groupedResults[$accountId] = [
+                    'account_id' => $accountId,
+                    'car_number' => $transaction['car_number'],
+                    'products' => []
+                ];
+            }
+
+            $groupedResults[$accountId]['products'][] = [
+                'id' => $transaction['product_id'],
+                'name' => $transaction['product_name'],
+                'unit_price' => !empty($transaction['amount']) && !empty($transaction['quantity']) ? number_format($transaction['amount'] / $transaction['quantity'], 2) : '',
+                'quantity' => $transaction['quantity'],
+                'amount' => number_format($transaction['amount'], 2)
+            ];
+
+            $products[$transaction['product_id']] = [
+                'id' => $transaction['product_id'],
+                'name' =>  $transaction['product_name'],
+            ];
+            if (!isset($productTotals[$transaction['product_id']])) {
+                $productTotals[$transaction['product_id']] = 0;
+            }
+
+            // Add amount to the product total
+            $productTotals[$transaction['product_id']] += $transaction['amount'];
+        }
+        $finalResults = array_values($groupedResults);
+        $products = array_values($products);
+        $grandTotal = 0;
+        foreach ($productTotals as $productId => $total) {
+            $grandTotal += $total;
+            $productTotals[$productId] = number_format($total, 2);
+        }
+
+        // Convert associative array to indexed array for consistent output
+        $productTotals = array_values($productTotals);
+        return [
+            'status' => 200,
+            'products' => $products,
+            'data' => $finalResults,
+            'total' => $productTotals,
+            'grandTotal' => number_format($grandTotal, 2),
         ];
     }
 

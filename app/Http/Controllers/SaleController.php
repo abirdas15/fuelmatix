@@ -233,7 +233,7 @@ class SaleController extends Controller
                 $saleData->quantity = $product['quantity'];
                 $saleData->price = $product['price'];
                 $saleData->subtotal = $product['subtotal'];
-                $saleData->shift_sale_id = $product['shift_sale_id'];
+                $saleData->shift_sale_id = $product['shift_sale_id'] ?? null;
                 $saleData->save();
                 if ($productType['inventory'] == 1) {
                     $transactionData = [
@@ -285,28 +285,6 @@ class SaleController extends Controller
                     TransactionRepository::saveTransaction($transactionData);
                 }
             }
-//        if (!empty($requestData['is_driver_sale'])) {
-//            $transactionData = [];
-//            $transactionData['linked_id'] = $cash_in_hand_category_id;
-//            $transactionData['transaction'] = [
-//                ['date' => date('Y-m-d'), 'account_id' => $driverId, 'debit_amount' => 0, 'credit_amount' => $requestData['driver_sale']['price'], 'module' => Module::POS_SALE, 'module_id' => $sale->id],
-//            ];
-//            TransactionController::saveTransaction($transactionData);
-//
-//            $transactionData = [];
-//            $transactionData['linked_id'] = $requestData['products'][0]['stock_category_id'];
-//            $transactionData['transaction'] = [
-//                ['date' => date('Y-m-d'), 'account_id' => $requestData['products'][0]['expense_category_id'], 'debit_amount' => $requestData['driver_sale']['buying_price'], 'credit_amount' => 0, 'module' => Module::POS_SALE, 'module_id' => $sale->id],
-//            ];
-//            TransactionController::saveTransaction($transactionData);
-//        }
-//        if (!empty($requestData['advance_sale'])) {
-//            $transactionData['linked_id'] = $requestData['company_id'];
-//            $transactionData['transaction'] = [
-//                ['date' => date('Y-m-d'), 'account_id' => $driverLiabilityId, 'debit_amount' => 0, 'credit_amount' => $total_amount, 'module' => Module::POS_SALE, 'module_id' => $sale->id],
-//            ];
-//            TransactionController::saveTransaction($transactionData);
-//        }
             if ($voucher instanceof Voucher) {
                 $voucher->status = 'done';
                 $voucher->save();

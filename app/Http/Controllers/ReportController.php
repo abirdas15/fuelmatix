@@ -461,4 +461,111 @@ class ReportController extends Controller
         ]);
         return $pdf->output();
     }
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function companySummary(Request $request): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'start_date' => 'required|date|string',
+            'end_date' => 'required|date|string',
+            'company_id' => 'required|integer'
+        ]);
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 500,
+                'errors' => $validator->errors()
+            ]);
+        }
+        $response = ReportRepository::companySummary([
+            'start_date' => $request->input('start_date'),
+            'end_date' => $request->input('end_date'),
+            'company_id' => $request->input('company_id')
+        ]);
+        return response()->json($response);
+    }
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function companySummaryExportPDF(Request $request): string
+    {
+        $validator = Validator::make($request->all(), [
+            'start_date' => 'required|date|string',
+            'end_date' => 'required|date|string',
+            'company_id' => 'required|integer'
+        ]);
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 500,
+                'errors' => $validator->errors()
+            ]);
+        }
+        $response = ReportRepository::companySummary([
+            'start_date' => $request->input('start_date'),
+            'end_date' => $request->input('end_date'),
+            'company_id' => $request->input('company_id')
+        ]);
+        $sessionUser = SessionUser::getUser();
+        $company = ClientCompany::where('id', $sessionUser['client_company_id'])->first();
+        $pdf = Pdf::loadView('pdf.company-summary', [
+            'data' => $response,
+            'date' => Carbon::parse($request->input('start_date'))->format('F j, Y').' - '.Carbon::parse($request->input('end_date'))->format('F j, Y'),
+            'company' => $company,
+            'print_at' => Carbon::now()->format('F j, Y h:i A'),
+        ]);
+        return $pdf->output();
+    }
+    public function companySummaryDetails(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'start_date' => 'required|date|string',
+            'end_date' => 'required|date|string',
+            'company_id' => 'required|integer'
+        ]);
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 500,
+                'errors' => $validator->errors()
+            ]);
+        }
+        $response = ReportRepository::companySummaryDetails([
+            'start_date' => $request->input('start_date'),
+            'end_date' => $request->input('end_date'),
+            'company_id' => $request->input('company_id')
+        ]);
+        return response()->json($response);
+    }
+    public function companySummaryDetailsExportPDF(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'start_date' => 'required|date|string',
+            'end_date' => 'required|date|string',
+            'company_id' => 'required|integer'
+        ]);
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 500,
+                'errors' => $validator->errors()
+            ]);
+        }
+        $creditCompany = Category::where('id', $request->input('company_id'))->first();
+        $response = ReportRepository::companySummaryDetails([
+            'start_date' => $request->input('start_date'),
+            'end_date' => $request->input('end_date'),
+            'company_id' => $request->input('company_id')
+        ]);
+        $sessionUser = SessionUser::getUser();
+        $company = ClientCompany::where('id', $sessionUser['client_company_id'])->first();
+        $pdf = Pdf::loadView('pdf.company-summary-details', [
+            'data' => $response,
+            'date' => Carbon::parse($request->input('start_date'))->format('F j, Y').' - '.Carbon::parse($request->input('end_date'))->format('F j, Y'),
+            'company' => $company,
+            'print_at' => Carbon::now()->format('F j, Y h:i A'),
+            'name' => $creditCompany->name
+        ]);
+        return $pdf->output();
+    }
+
 }

@@ -122,21 +122,10 @@ class BulkSaleController extends Controller
                         continue;
                     }
 
-                    $category = Category::where('slug', strtolower(AccountCategory::COST_OF_GOOD_SOLD))
-                        ->where('client_company_id', $sessionUser['client_company_id'])
-                        ->first();
-                    $costOfGoodSoldCategory = Category::where('parent_category', $category['id'])
-                        ->where('module', 'product')
-                        ->where('module_id', $product['product_id'])
-                        ->where('client_company_id', $sessionUser['client_company_id'])
-                        ->first();
-
                     // Prepare the transaction data for debit and credit entries
                     $transactionData = [
-                        ['date' => date('Y-m-d'), 'account_id' => $request->input('company_id'), 'debit_amount' => $amount, 'credit_amount' => 0, 'module' => Module::BULK_SALE, 'module_id' => $bulkSale->id],
-                        ['date' => date('Y-m-d'), 'account_id' => $incomeCategory->id, 'debit_amount' => 0, 'credit_amount' => $amount, 'module' => Module::BULK_SALE, 'module_id' => $bulkSale->id],
-                        ['date' => date('Y-m-d'), 'account_id' => $payOrderData['vendor_id'], 'debit_amount' => 0, 'credit_amount' => $amount, 'module' => Module::BULK_SALE, 'module_id' => $bulkSale->id],
-                        ['date' => date('Y-m-d'), 'account_id' => $costOfGoodSoldCategory->id, 'debit_amount' => $amount, 'credit_amount' => 0, 'module' => Module::BULK_SALE, 'module_id' => $bulkSale->id],
+                        ['date' => date('Y-m-d'), 'account_id' => $request->input('company_id'), 'debit_amount' => $amount, 'credit_amount' => 0, 'module' => Module::BULK_SALE, 'module_id' => $bulkSale->id, 'quantity' => $product['sale_quantity']],
+                        ['date' => date('Y-m-d'), 'account_id' => $incomeCategory->id, 'debit_amount' => 0, 'credit_amount' => $amount, 'module' => Module::BULK_SALE, 'module_id' => $bulkSale->id, 'quantity' => $product['sale_quantity']],
                     ];
 
                     // Save the transaction using the repository

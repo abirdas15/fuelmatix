@@ -15,6 +15,7 @@ use App\Models\TankRefill;
 use App\Models\TankRefillHistory;
 use App\Models\TankRefillTotal;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class TankRepository
 {
@@ -105,32 +106,33 @@ class TankRepository
         // Create a new TankRefillTotal instance and populate its fields.
         $date = $initialData['date'];
         $tankRefillTotal = new TankRefillTotal();
-        $tankRefillTotal->date = $date;
-        $tankRefillTotal->time = date('H:i:s');
-        $tankRefillTotal->product_id = $initialData['product_id'];
-        $tankRefillTotal->pay_order_id = $initialData['pay_order_id'];
-        $tankRefillTotal->quantity = $initialData['quantity'];
-        $tankRefillTotal->total_refill_volume = $initialData['total_refill_volume'];
-        $tankRefillTotal->net_profit = $initialData['net_profit'] ?? 0;
-        $tankRefillTotal->net_profit_amount = $initialData['net_profit'] * $product['buying_price'] ?? 0;
-        $tankRefillTotal->shift_id = $initialData['shift_id'];
-        $tankRefillTotal->user_id = $sessionUser['id'];
-        $tankRefillTotal->client_company_id = $sessionUser['client_company_id'];
+        DB::transaction(function() use ($date, $initialData, $sessionUser, $product, $lossCategory, $incomeCategory, $tankRefillTotal) {
+           $tankRefillTotal->date = $date;
+           $tankRefillTotal->time = date('H:i:s');
+           $tankRefillTotal->product_id = $initialData['product_id'];
+           $tankRefillTotal->pay_order_id = $initialData['pay_order_id'];
+           $tankRefillTotal->quantity = $initialData['quantity'];
+           $tankRefillTotal->total_refill_volume = $initialData['total_refill_volume'];
+           $tankRefillTotal->net_profit = $initialData['net_profit'] ?? 0;
+           $tankRefillTotal->net_profit_amount = $initialData['net_profit'] * $product['buying_price'] ?? 0;
+           $tankRefillTotal->shift_id = $initialData['shift_id'];
+           $tankRefillTotal->user_id = $sessionUser['id'];
+           $tankRefillTotal->client_company_id = $sessionUser['client_company_id'];
 
-        // Save the TankRefillTotal instance and check for errors.
-        if (!$tankRefillTotal->save()) {
-            return [
-                'status' => 400,
-                'message' => 'Cannot save tank refill.'
-            ];
-        }
+           // Save the TankRefillTotal instance and check for errors.
+           if (!$tankRefillTotal->save()) {
+               return [
+                   'status' => 400,
+                   'message' => 'Cannot save tank refill.'
+               ];
+           }
 
-        // Calculate per volume profit if applicable.
-        $totalNetProfit = $initialData['net_profit'];
-        $perVolumeProfit = 0;
-        if ($totalNetProfit != 0 && $initialData['total_refill_volume'] != 0) {
-            $perVolumeProfit = $totalNetProfit / $initialData['total_refill_volume'];
-        }
+           // Calculate per volume profit if applicable.
+           $totalNetProfit = $initialData['net_profit'];
+           $perVolumeProfit = 0;
+           if ($totalNetProfit != 0 && $initialData['total_refill_volume'] != 0) {
+               $perVolumeProfit = $totalNetProfit / $initialData['total_refill_volume'];
+           }
 
 
         // Process each tank in the initial data.
@@ -139,88 +141,89 @@ class TankRepository
             $netProfit = $perVolumeProfit * $dipSale;
             $netProfitAmount = $netProfit * $product['buying_price'];
 
-            // Create and save a new TankRefill instance.
-            $tankRefill = new TankRefill();
-            $tankRefill->refill_id = $tankRefillTotal->id;
-            $tankRefill->tank_id = $tank['id'];
-            $tankRefill->start_reading = $tank['start_reading'] ?? 0;
-            $tankRefill->end_reading = $tank['end_reading'] ?? 0;
-            $tankRefill->dip_sale = $dipSale;
-            $tankRefill->net_profit = $netProfit;
-            $tankRefill->net_profit_amount = $netProfitAmount;
+               // Create and save a new TankRefill instance.
+               $tankRefill = new TankRefill();
+               $tankRefill->refill_id = $tankRefillTotal->id;
+               $tankRefill->tank_id = $tank['id'];
+               $tankRefill->start_reading = $tank['start_reading'] ?? 0;
+               $tankRefill->end_reading = $tank['end_reading'] ?? 0;
+               $tankRefill->dip_sale = $dipSale;
+               $tankRefill->net_profit = $netProfit;
+               $tankRefill->net_profit_amount = $netProfitAmount;
 
-            if (!$tankRefill->save()) {
-                TankRefillTotal::where('id', $tankRefillTotal->id)->delete();
-                return [
-                    'status' => 400,
-                    'message' => 'Cannot save tank refill.'
-                ];
-            }
+               if (!$tankRefill->save()) {
+                   TankRefillTotal::where('id', $tankRefillTotal->id)->delete();
+                   return [
+                       'status' => 400,
+                       'message' => 'Cannot save tank refill.'
+                   ];
+               }
 
-            // Process each dispenser for the tank.
-            foreach ($tank['dispensers'] as $dispenser) {
-                foreach ($dispenser['nozzle'] as $nozzle) {
-                    $tankRefillHistory = new TankRefillHistory();
-                    $tankRefillHistory->tank_refill_id = $tankRefill->id;
-                    $tankRefillHistory->nozzle_id = $nozzle['id'];
-                    $tankRefillHistory->start_reading = $nozzle['start_reading'];
-                    $tankRefillHistory->end_reading = $nozzle['end_reading'];
-                    $tankRefillHistory->sale = $nozzle['sale'];
+               // Process each dispenser for the tank.
+               foreach ($tank['dispensers'] as $dispenser) {
+                   foreach ($dispenser['nozzle'] as $nozzle) {
+                       $tankRefillHistory = new TankRefillHistory();
+                       $tankRefillHistory->tank_refill_id = $tankRefill->id;
+                       $tankRefillHistory->nozzle_id = $nozzle['id'];
+                       $tankRefillHistory->start_reading = $nozzle['start_reading'];
+                       $tankRefillHistory->end_reading = $nozzle['end_reading'];
+                       $tankRefillHistory->sale = $nozzle['sale'];
 
-                    if (!$tankRefillHistory->save()) {
-                        TankRefillHistory::where('tank_refill_id', $tankRefill->id)->delete();
-                        TankRefill::where('id', $tankRefill->id)->delete();
-                        TankRefillTotal::where('id', $tankRefillTotal->id)->delete();
-                        return [
-                            'status' => 400,
-                            'message' => 'Cannot save tank refill.'
-                        ];
-                    }
+                       if (!$tankRefillHistory->save()) {
+                           TankRefillHistory::where('tank_refill_id', $tankRefill->id)->delete();
+                           TankRefill::where('id', $tankRefill->id)->delete();
+                           TankRefillTotal::where('id', $tankRefillTotal->id)->delete();
+                           return [
+                               'status' => 400,
+                               'message' => 'Cannot save tank refill.'
+                           ];
+                       }
 
-                    NozzleRepository::readingSave([
-                        'date' => date('Y-m-d'),
-                        'nozzle_id' => $date,
-                        'reading' => $nozzle['end_reading'],
-                        'type' => 'tank refill',
-                    ]);
-                }
-            }
+                       NozzleRepository::readingSave([
+                           'date' => date('Y-m-d'),
+                           'nozzle_id' => $date,
+                           'reading' => $nozzle['end_reading'],
+                           'type' => 'tank refill',
+                       ]);
+                   }
+               }
 
-            // Save tank reading data.
-            TankRepository::readingSave([
-                'tank_id' => $tank['id'],
-                'date' => $date,
-                'height' => $tank['end_reading_mm'] ?? 0,
-                'volume' => $tank['end_reading'] ?? 0,
-                'type' => 'tank refill',
-            ]);
+               // Save tank reading data.
+               TankRepository::readingSave([
+                   'tank_id' => $tank['id'],
+                   'date' => $date,
+                   'height' => $tank['end_reading_mm'] ?? 0,
+                   'volume' => $tank['end_reading'] ?? 0,
+                   'type' => 'tank refill',
+               ]);
 
-            // Retrieve stock category and save transaction data.
-            $stockCategory = Category::where('module', Module::TANK)
-                ->where('module_id', $tank['id'])
-                ->where('client_company_id', $sessionUser['client_company_id'])
-                ->first();
+               // Retrieve stock category and save transaction data.
+               $stockCategory = Category::where('module', Module::TANK)
+                   ->where('module_id', $tank['id'])
+                   ->where('client_company_id', $sessionUser['client_company_id'])
+                   ->first();
 
-            $stockAmount = $dipSale * $product['buying_price'];
-            if ($stockCategory instanceof Category && !empty($stockAmount)) {
-                $transactionData = [
-                    ['date' => $date, 'account_id' => $stockCategory['id'], 'debit_amount' => $stockAmount,  'credit_amount' => 0, 'module' => Module::TANK_REFILL, 'module_id' => $tankRefill['id']]
-                ];
-                // Add the vendor's transaction entry
-                $creditAmount = $stockAmount;
-                if ($netProfitAmount < 0) {
-                    $creditAmount += abs($netProfitAmount);
-                    $transactionData[] = ['date' => $date, 'account_id' => $lossCategory['id'], 'debit_amount' => abs($netProfitAmount), 'credit_amount' => 0, 'module' => Module::TANK_REFILL, 'module_id' => $tankRefill['id']];
-                } else if ($netProfitAmount > 0) {
-                    $creditAmount -= abs($netProfitAmount);
-                    $transactionData[] = ['date' => $date, 'account_id' => $incomeCategory['id'], 'debit_amount' => 0, 'credit_amount' => abs($netProfitAmount), 'module' => Module::TANK_REFILL, 'module_id' => $tankRefill['id']];
-                }
+               $stockAmount = $dipSale * $product['buying_price'];
+               if ($stockCategory instanceof Category && !empty($stockAmount)) {
+                   $transactionData = [
+                       ['date' => $date, 'account_id' => $stockCategory['id'], 'debit_amount' => $stockAmount,  'credit_amount' => 0, 'module' => Module::TANK_REFILL, 'module_id' => $tankRefill['id']]
+                   ];
+                   // Add the vendor's transaction entry
+                   $creditAmount = $stockAmount;
+                   if ($netProfitAmount < 0) {
+                       $creditAmount += abs($netProfitAmount);
+                       $transactionData[] = ['date' => $date, 'account_id' => $lossCategory['id'], 'debit_amount' => abs($netProfitAmount), 'credit_amount' => 0, 'module' => Module::TANK_REFILL, 'module_id' => $tankRefill['id']];
+                   } else if ($netProfitAmount > 0) {
+                       $creditAmount -= abs($netProfitAmount);
+                       $transactionData[] = ['date' => $date, 'account_id' => $incomeCategory['id'], 'debit_amount' => 0, 'credit_amount' => abs($netProfitAmount), 'module' => Module::TANK_REFILL, 'module_id' => $tankRefill['id']];
+                   }
 
-                $transactionData[] = ['date' => $date, 'account_id' => $initialData['vendor_id'], 'debit_amount' => 0, 'credit_amount' => $creditAmount, 'module' => Module::TANK_REFILL, 'module_id' => $tankRefill['id']];
-                // Save the transaction data
-                TransactionRepository::saveTransaction($transactionData);
-            }
-        }
+                   $transactionData[] = ['date' => $date, 'account_id' => $initialData['vendor_id'], 'debit_amount' => 0, 'credit_amount' => $creditAmount, 'module' => Module::TANK_REFILL, 'module_id' => $tankRefill['id']];
+                   // Save the transaction data
+                   TransactionRepository::saveTransaction($transactionData);
+               }
+           }
+       });
 
         return $tankRefillTotal;
     }
