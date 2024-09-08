@@ -627,18 +627,13 @@ class ProductController extends Controller
         }
 
         // Retrieve and process tank refill data
-        $tankRefill = TankRefillTotal::select('tank_refill_total.*', 'tank_refill.tank_id', 'tank_refill.dip_sale')
-            ->leftJoin('tank_refill', 'tank_refill.refill_id', '=', 'tank_refill_total.id');
-        if ($request->input('status') == 'previous') {
-            $tankRefill->where(function($query) use ($date) {
-                $query->where('tank_refill_total.date', '=', date('Y-m-d', strtotime($date)));
-            });
-        } else {
-            $tankRefill->where(function($query) use ($shiftSaleId) {
-                $query->where('tank_refill_total.shift_id', '=', $shiftSaleId);
-            });
-        }
-        $tankRefill = $tankRefill->get()->keyBy('tank_id')->toArray();
+        $tankRefill = TankRefillTotal::select('tank_refill_total.*', 'tank_refill.tank_id', DB::raw('SUM(dip_sale) as dip_sale'))
+            ->leftJoin('tank_refill', 'tank_refill.refill_id', '=', 'tank_refill_total.id')
+            ->where('tank_refill_total.shift_id', '=', $shiftSaleId)
+            ->groupBy('tank_id')
+            ->get()
+            ->keyBy('tank_id')
+            ->toArray();
 
         // Process tank data
         foreach ($tanks as &$tank) {
