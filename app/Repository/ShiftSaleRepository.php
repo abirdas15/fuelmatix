@@ -394,6 +394,7 @@ class ShiftSaleRepository
      */
     public static function getSingleShiftSale(int $id)
     {
+        $sessionUser = SessionUser::getUser();
         // Fetch the shift total details along with associated product and product type details
         $result = ShiftTotal::select('shift_total.*', 'products.name as product_name', 'product_types.tank', 'product_types.unit')
             ->leftJoin('products', 'products.id', '=', 'shift_total.product_id')
@@ -485,9 +486,11 @@ class ShiftSaleRepository
         $result['tanks'] = $formattedShiftSale;
 
         // Fetch category details associated with the shift sale
-        $categories = ShiftSaleTransaction::select('shift_sale_transaction.category_id', 'shift_sale_transaction.amount', 'categories.name')
+        $categories = ShiftSaleTransaction::select('shift_sale_transaction.category_id', DB::raw('SUM(shift_sale_transaction.amount) as amount'), 'categories.name')
             ->leftJoin('categories', 'categories.id', '=', 'shift_sale_transaction.category_id')
             ->where('shift_id', $id)
+            ->where('client_company_id', $sessionUser['client_company_id'])
+            ->groupBy('shift_sale_transaction.category_id')
             ->get()
             ->toArray();
 

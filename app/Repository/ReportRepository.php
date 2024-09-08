@@ -1044,14 +1044,14 @@ class ReportRepository
 
             // Check if the account_id and company_name already exist in the array
             if (!isset($groupedResults[$accountId])) {
-                $groupedResults[$accountId] = [
+                $groupedResults[$transaction['car_number']] = [
                     'account_id' => $accountId,
                     'car_number' => $transaction['car_number'],
                     'products' => []
                 ];
             }
 
-            $groupedResults[$accountId]['products'][] = [
+            $groupedResults[$transaction['car_number']]['products'][] = [
                 'id' => $transaction['product_id'],
                 'name' => $transaction['product_name'],
                 'unit_price' => !empty($transaction['amount']) && !empty($transaction['quantity']) ? number_format($transaction['amount'] / $transaction['quantity'], 2) : '',

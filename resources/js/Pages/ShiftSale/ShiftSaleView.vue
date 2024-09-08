@@ -16,7 +16,7 @@
                             <h4 class="card-title">Shift Sale View</h4>
                         </div>
                         <div class="card-body">
-                            <div class="process-wrapper">
+                            <div class="">
                                 <div id="progress-bar-container">
                                     <div class="fs-18">Start Date: {{ shiftSale.start_date_format }}</div>
                                     <div class="fs-18">End Date: {{ shiftSale.end_date_format }}</div>
