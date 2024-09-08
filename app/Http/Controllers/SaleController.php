@@ -453,7 +453,7 @@ class SaleController extends Controller
             ->leftJoin('categories', 'categories.id', '=', 'transactions.account_id')
             ->leftJoin('invoice_item', 'invoice_item.transaction_id', 'transactions.id')
             ->leftJoin('car', 'car.id', 'transactions.car_id')
-            ->where('categories.parent_category', $accountReceivable->id)
+            ->whereJsonContains('categories.category_ids', $accountReceivable->id)
             ->where('transactions.debit_amount', '>', 0)
             ->where('transactions.client_company_id', $sessionUser['client_company_id'])
             ->groupBy(DB::raw('CASE WHEN invoice_item.invoice_id IS NULL THEN transactions.id ELSE invoice_item.invoice_id END, CASE WHEN invoice_item.invoice_id IS NULL THEN transactions.module_id ELSE 0 END'));
