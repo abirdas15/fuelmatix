@@ -18,20 +18,41 @@
                         <form @submit.prevent="submit">
                             <div class="card-body">
                                 <div class="">
-                                    <div id="progress-bar-container" v-if="listData.length > 0">
-                                        <ul>
-                                            <li class="step step01" :class="{'active': p.id == product_id}"
-                                                v-for="(p, pIndex) in listData" @click="product_id = p.id; productIndex = pIndex; getProductDispenser()">
-                                                <div class="step-inner">{{ p.name }}</div>
-                                            </li>
-                                        </ul>
-
-                                        <div id="line">
-                                            <div id="line-progress" :style="{'width': calculateLineProgress() + '%'}"></div>
+                                    <div class="row align-items-center mb-3">
+                                        <div class="col-md-3 form-group">
+                                            <label>Select Date</label>
+                                            <input type="text" class="form-control date bg-white" name="date" v-model="date">
+                                            <div class="invalid-feedback"></div>
+                                        </div>
+                                        <div class="col-md-3 form-group">
+                                            <label>Select Product</label>
+                                            <select class="form-control" v-model="product_id" name="product_id">
+                                                <option :value="p.id" v-for="(p, pIndex) in listData">{{ p.name }}</option>
+                                            </select>
+                                            <div class="invalid-feedback"></div>
+                                        </div>
+                                        <div class="col-2">
+                                            <button class="btn btn-primary mt-4" type="button" @click="searchDispenser()">Search</button>
                                         </div>
                                     </div>
-                                    <div class="text-center" v-else>No Product Found</div>
-                                    <template v-if="listDispenser">
+                                    <template v-if="apiLoading">
+                                        <div :style="{ width: '100%', height: '100px' }" class="mb-2">
+                                            <SkeletonLoaderVue animation="fade" />
+                                        </div>
+                                        <div :style="{ width: '100%', height: '100px' }" class="mb-2">
+                                            <SkeletonLoaderVue animation="fade" />
+                                        </div>
+                                        <div :style="{ width: '100%', height: '100px' }" class="mb-2">
+                                            <SkeletonLoaderVue animation="fade" />
+                                        </div>
+                                        <div :style="{ width: '100%', height: '100px' }" class="mb-2">
+                                            <SkeletonLoaderVue animation="fade" />
+                                        </div>
+                                        <div :style="{ width: '100%', height: '100px' }" class="mb-2">
+                                            <SkeletonLoaderVue animation="fade" />
+                                        </div>
+                                    </template>
+                                    <template v-if="listDispenser && !apiLoading">
                                         <div class="card" v-for="(tank,tankIndex) in listDispenser.tanks">
                                             <div class="card-header">
                                                 <h5 class="card-title w-100">
@@ -233,9 +254,6 @@
                                             </div>
                                         </div>
                                     </template>
-                                    <template v-else>
-                                        <div class="text-center">Please Select any product</div>
-                                    </template>
                                 </div>
                                 <template v-if="listDispenser && listDispenser.status !== 'start'">
                                     <div class="">
@@ -337,7 +355,7 @@
                                         <button type="submit" class="btn btn-primary" v-if="!loading && listDispenser?.status === 'start'">Start</button>
                                         <button type="submit" class="btn btn-primary" v-if="!loading && listDispenser?.status === 'end'">End</button>
                                         <button type="button" class="btn btn-primary" v-if="loading">Submitting...</button>
-                                        <router-link :to="{name: 'ShiftSaleList'}" type="button" class="btn btn-danger">Cancel</router-link>
+                                        <router-link v-if="!loading && listDispenser?.status === 'start' || !loading && listDispenser?.status === 'end'" :to="{name: 'ShiftSaleList'}" type="button" class="btn btn-danger">Cancel</router-link>
                                     </div>
                                 </div>
                             </div>
@@ -354,8 +372,11 @@
 import ApiService from "../../Services/ApiService";
 import ApiRoutes from "../../Services/ApiRoutes";
 import Swal from 'sweetalert2/dist/sweetalert2.js'
+import moment from "moment";
+import SkeletonLoaderVue  from 'skeleton-loader-vue';
 
 export default {
+    components: { SkeletonLoaderVue  },
     data() {
         return {
             loading: false,
@@ -371,7 +392,9 @@ export default {
             oilStock: false,
             noDIPShow: true,
             mismatchAllow: null,
-            bstiChart: []
+            bstiChart: [],
+            date: moment().format('YYYY-MM-DD'),
+            apiLoading: false,
         }
     },
     computed: {
@@ -539,15 +562,33 @@ export default {
                 }
             });
         },
+        searchDispenser: function() {
+            const currentQuery = this.$route.query;
+
+            // Check if the current route and query are the same
+            if (currentQuery.product_id !== this.product_id || currentQuery.date !== this.date) {
+                this.$router.replace({
+                    name: 'ShiftSaleAdd',
+                    query: { product_id: this.product_id, date: this.date }
+                });
+            }
+
+            // Call your method to fetch the product dispenser data
+            this.getProductDispenser();
+        },
         getProductDispenser: function () {
             this.totalSale = 0
             this.totalAmount = 0
-            ApiService.POST(ApiRoutes.ProductDispenser, {product_id: this.product_id}, res => {
-                this.TableLoading = false
+            ApiService.ClearErrorHandler();
+            this.apiLoading = true;
+            ApiService.POST(ApiRoutes.ProductDispenser, {product_id: this.product_id, date: this.date}, res => {
+                this.apiLoading = false;
                 if (parseInt(res.status) === 200) {
                     this.listDispenser = res.data;
                     this.getCategory()
                     this.updateOilStock();
+                } else {
+                    ApiService.ErrorHandler(res.errors);
                 }
                 this.getTotalSale()
             });
@@ -662,13 +703,23 @@ export default {
         this.getSingleMitchMatch()
     },
     mounted() {
-        if (this.$route.query.product_id != undefined) {
-            this.product_id = this.$route.query.product_id
-            this.getProduct()
-            this.getProductDispenser()
-           // this.getBstiChart();
+        if (this.$route.query.product_id !== undefined && this.$route.query.date !== undefined) {
+            this.product_id = this.$route.query.product_id;
+            this.date = this.$route.query.date;
+            this.getProductDispenser();
         }
+        this.getProduct()
         $('#dashboard_bar').text('Shift Sale Start')
+        setTimeout(() => {
+            $('.date').flatpickr({
+                altInput: true,
+                altFormat: "d/m/Y",
+                dateFormat: "Y-m-d",
+                onChange: (date, dateStr) => {
+                    this.date = dateStr
+                }
+            })
+        }, 1000)
     }
 }
 </script>
@@ -693,5 +744,8 @@ export default {
 }
 .card-header {
     padding: 10px !important;
+}
+.animation--fade {
+    width: 100% !important;
 }
 </style>

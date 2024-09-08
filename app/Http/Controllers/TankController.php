@@ -857,6 +857,7 @@ class TankController extends Controller
             $tank['end_reading'] = $tank['start_reading'];
             $tank['end_reading_mm'] = $tank['start_reading_mm'];
             $tank['dip_sale'] = 0;
+            $tank['dip_sale_mm'] = 0;
             unset($tank['opening_stock']);
             // Attach the dispensers to the tank
             $tank['dispensers'] = $dispenserArray[$tank['id']] ?? [];

@@ -16,6 +16,8 @@ class Nozzle extends Model
     ];
     public function latestShiftSummary()
     {
-        return $this->hasOne(ShiftSummary::class)->latestOfMany();
+        return $this->hasMany(ShiftSummary::class, 'nozzle_id'); // Define the foreign key explicitly if needed
     }
+
+
 }

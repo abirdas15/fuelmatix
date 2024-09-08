@@ -56,7 +56,7 @@
                                                 <td class="text-capitalize">{{f.status}}</td>
                                                 <td>
                                                     <div class="d-flex justify-content-end">
-                                                        <router-link v-if="CheckPermission(Section.SHIFT_SALE + '-' + Action.EDIT) && f.status === 'start'" :to="{name: 'ShiftSaleAdd', query: { product_id: f.product_id }}" class=" btn btn-primary shadow btn-xs sharp me-1">
+                                                        <router-link v-if="CheckPermission(Section.SHIFT_SALE + '-' + Action.EDIT) && f.status === 'start'" :to="{name: 'ShiftSaleAdd', query: { product_id: f.product_id, date: f.database_date.trim() }}" class=" btn btn-primary shadow btn-xs sharp me-1">
                                                             <i class="fas fa-eye"></i>
                                                         </router-link>
                                                         <router-link v-if="CheckPermission(Section.SHIFT_SALE + '-' + Action.VIEW) && f.status === 'end'" :to="{name: 'ShiftSaleView', params: { id: f.id }}" class=" btn btn-primary shadow btn-xs sharp me-1">

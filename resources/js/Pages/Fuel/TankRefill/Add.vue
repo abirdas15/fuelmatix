@@ -89,7 +89,15 @@
                                                             <div class="invalid-feedback"></div>
                                                         </div>
                                                     </div>
-                                                    <div class="mb-3 form-group col-md-3"></div>
+                                                    <div class="mb-3 form-group col-md-3">
+                                                        <div class="input-group">
+                                                            <input type="text" class="form-control " @input="getReading($event, 'dip_sale', tankIndex, tank.id)" :name="'tanks.' + tankIndex + '.dip_sale_mm'" v-model="tank.dip_sale_mm">
+                                                            <div class="input-group-append">
+                                                                <span class="input-group-text" >mm</span>
+                                                            </div>
+                                                            <div class="invalid-feedback"></div>
+                                                        </div>
+                                                    </div>
                                                     <div class="mb-3 form-group col-md-3"></div>
                                                     <div class="mb-3 form-group col-md-3">
                                                         <div class="input-group">
@@ -246,14 +254,22 @@ export default {
     },
     methods: {
         getReading: function(event, field, index, tank_id) {
-            this.getBstiChart(event.target.value, field, index, tank_id);
+            this.getValue(event.target.value, field, index, tank_id);
+        },
+        getValue: function(value, field, index, tank_id) {
+            this.getBstiChart(value, field, index, tank_id);
         },
         getBstiChart: function(height, field, index, tank_id) {
             ApiService.POST(ApiRoutes.TankGetVolume, {tank_id: tank_id, height: height}, res => {
                 if (parseInt(res.status) === 200) {
                     this.param.tanks[index][field] =  res.data;
-                    this.param.tanks[index]['dip_sale'] = this.param.tanks[index]['end_reading'] - this.param.tanks[index]['start_reading'];
-                    this.getTotalRefillVolume();
+                    if (field === 'dip_sale') {
+                        this.param.tanks[index]['end_reading_mm'] = parseFloat(this.param.tanks[index]['start_reading_mm']) + parseFloat(this.param.tanks[index]['dip_sale_mm']);
+                        this.getValue(this.param.tanks[index]['end_reading_mm'], 'end_reading', index, tank_id);
+                    } else {
+                        this.param.tanks[index]['dip_sale'] = this.param.tanks[index]['end_reading'] - this.param.tanks[index]['start_reading'];
+                        this.getTotalRefillVolume();
+                    }
                 }
             });
         },

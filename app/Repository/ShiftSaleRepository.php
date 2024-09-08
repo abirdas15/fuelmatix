@@ -172,20 +172,20 @@ class ShiftSaleRepository
         }
 
         // Check if tanks have enough fuel if tank check is enabled
-        if (!empty($initialData['tank']) && $initialData['tank'] == 1) {
-            foreach ($initialData['tanks'] as $item) {
-                $tankLog = TankLog::select('id', 'tank_id', 'height', 'water_height', 'volume')
-                    ->where('tank_id', $item['id'])
-                    ->orderBy('id', 'DESC')
-                    ->first();
-                if ($tankLog instanceof TankLog && $tankLog['volume'] < $item['total_consumption']) {
-                    return [
-                        'status' => 400,
-                        'message' => 'Your tank has not enough fuel. Please refill your tank.'
-                    ];
-                }
-            }
-        }
+//        if (!empty($initialData['tank']) && $initialData['tank'] == 1) {
+//            foreach ($initialData['tanks'] as $item) {
+//                $tankLog = TankLog::select('id', 'tank_id', 'height', 'water_height', 'volume')
+//                    ->where('tank_id', $item['id'])
+//                    ->orderBy('id', 'DESC')
+//                    ->first();
+//                if ($tankLog instanceof TankLog && $tankLog['volume'] < $item['total_consumption']) {
+//                    return [
+//                        'status' => 400,
+//                        'message' => 'Your tank has not enough fuel. Please refill your tank.'
+//                    ];
+//                }
+//            }
+//        }
         $posSale = SaleData::select('sale_data.sale_id', 'sale_data.id', 'sale.payment_method', DB::raw('SUM(sale_data.quantity) as quantity'), DB::raw('SUM(sale_data.subtotal) as amount'), 'sale.payment_category_id as category_id', 'sale.voucher_number as voucher_no', 'car_id', 'driver_id')
             ->leftJoin('sale', 'sale.id', '=', 'sale_data.sale_id')
             ->whereNotNull('sale.id')

@@ -180,6 +180,8 @@ class ShiftSaleController extends Controller
             $data['amount'] = !empty($data['amount']) ? number_format($data['amount'], 2) : '';
             // Format consumption
             $data['consumption'] = !empty($data['consumption']) ? number_format($data['consumption'], 2) : '';
+
+            $data['database_date'] = Helpers::formatDate($data['start_date'], FuelMatixDateTimeFormat::ONLY_DATE);
             // Format date
             $data['date'] = Helpers::formatDate($data['start_date'], FuelMatixDateTimeFormat::STANDARD_DATE_TIME);
         }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Common\AccountCategory;
 use App\Common\Module;
 use App\Helpers\SessionUser;
+use App\Models\Car;
 use App\Models\Category;
 use App\Models\Dispenser;
 use App\Models\FuelAdjustment;
@@ -491,11 +492,15 @@ class ProductController extends Controller
         // Validate required input
         $validator = Validator::make($inputData, [
             'product_id' => 'required',
+            'date' => 'required'
         ]);
 
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
+
+        // Determine the date for querying
+        $date = Carbon::parse($inputData['date']. date(' H:i:s'));
 
         $sessionUser = SessionUser::getUser();
 
@@ -515,8 +520,6 @@ class ProductController extends Controller
             return response()->json(['status' => 500, 'error' => 'Cannot find product type.']);
         }
 
-        // Determine the date for querying
-        $date = Carbon::now(SessionUser::TIMEZONE);
 
         if ($request->has('status') && $request->input('status') == 'previous') {
             $date = Carbon::parse($request->input('date'), SessionUser::TIMEZONE)->endOfDay();
@@ -533,24 +536,30 @@ class ProductController extends Controller
             $shiftSaleId = $shiftSale->id;
             $date = Carbon::parse($shiftSale->start_date, SessionUser::TIMEZONE);
         }
-
         // Query tanks with the most recent shift sale details
         $tanks = Tank::select(
             'tank.id',
             'tank.tank_name',
             'shift_sale.start_reading',
             'shift_sale.end_reading',
-            'tank.opening_stock'
+            'tank.opening_stock',
+            'shift_sale.id as shift_sale_id'
         )
             ->leftJoin('shift_sale', function ($join) use ($date) {
                 $join->on('tank.id', '=', 'shift_sale.tank_id')
-                    ->whereRaw('shift_sale.id = (
-                SELECT MAX(ss.id)
-                FROM shift_sale ss
-                JOIN shift_total st ON ss.shift_id = st.id
-                WHERE ss.tank_id = tank.id
-                AND st.start_date <= ?
-            )', [$date]);
+                    ->whereRaw('shift_sale.shift_id = (
+            SELECT ss.shift_id
+            FROM shift_sale ss
+            JOIN shift_total st ON ss.shift_id = st.id
+            WHERE ss.tank_id = tank.id
+            AND st.start_date = (
+                SELECT MAX(st2.start_date)
+                FROM shift_total st2
+                JOIN shift_sale ss2 ON ss2.shift_id = st2.id
+                WHERE ss2.tank_id = tank.id
+                AND st2.start_date <= ?
+            )
+        )', [$date]);
             })
             ->leftJoin('shift_total', 'shift_sale.shift_id', '=', 'shift_total.id')
             ->where('tank.product_id', $request['product_id'])
@@ -567,12 +576,13 @@ class ProductController extends Controller
                         $subQuery->select('shift_summary.id', 'shift_summary.nozzle_id', 'shift_summary.start_reading', 'shift_summary.end_reading')
                             ->join('shift_sale', 'shift_summary.shift_sale_id', '=', 'shift_sale.id')
                             ->join('shift_total', 'shift_sale.shift_id', '=', 'shift_total.id')
-                            ->where('shift_total.start_date', '<=', $date)
-                            ->whereColumn('shift_sale.shift_id', 'shift_total.id');
+                            ->where('shift_total.start_date', '<=', $date) // Filter by date here
+                            ->orderBy('shift_total.start_date', 'desc');
                     }]);
             }])
             ->get()
             ->toArray();
+
 
         // Retrieve fuel adjustments based on status and date
         $fuelAdjustment = FuelAdjustment::select('id', 'loss_quantity');
@@ -604,7 +614,7 @@ class ProductController extends Controller
 
                 $nozzle['start_reading'] =  $nozzle['opening_stock'] ?? 0;
                 if (!empty($nozzle['latest_shift_summary'])) {
-                    $nozzle['start_reading'] = !empty($nozzle['latest_shift_summary']['end_reading']) ? $nozzle['latest_shift_summary']['end_reading'] : $nozzle['latest_shift_summary']['start_reading'];
+                    $nozzle['start_reading'] = !empty($nozzle['latest_shift_summary'][0]['end_reading']) ? $nozzle['latest_shift_summary'][0]['end_reading'] : $nozzle['latest_shift_summary'][0]['start_reading'];
                 }
                 $nozzle['end_reading'] = 0;
                 $nozzle['adjustment'] = $adjustment;
