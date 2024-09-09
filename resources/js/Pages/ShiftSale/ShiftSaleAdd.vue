@@ -618,7 +618,7 @@ export default {
                     })
                 });
                 let totalSale = parseFloat(this.listDispenser.total_pos_sale_liter) + parseFloat(this.totalLiter);
-                if (parseFloat(this.totalSale).toFixed(2) !== parseFloat(totalSale).toFixed(2)) {
+                if (parseInt(this.totalSale) !== parseInt(totalSale)) {
                     this.$toast.error('Total sale and total liter does not match');
                     return;
                 }
