@@ -732,28 +732,27 @@ class TankController extends Controller
     {
         $requestData = $request->all();
         $validator = Validator::make($requestData, [
-            'height' => 'required'
+            'tank_id' => 'required',
         ]);
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
-        $tank_id = $requestData['tank_id'] ?? null;
-        if (!empty($requestData['product_id'])) {
-            $tank = Tank::where('product_id', $requestData['product_id'])->first();
-            if ($tank instanceof Tank) {
-                $tank_id = $tank['id'];
-            }
-        }
-        $tank = Tank::where('id', $tank_id)->first();
+        $tank = Tank::where('id', $request->input('tank_id'))->first();
         if (!$tank instanceof Tank) {
             return response()->json([
                 'status' => 400,
                 'message' => 'Cannot find [tank].'
             ]);
         }
+        $data = null;
+        if ($request->has('height')) {
+            $data = $tank->findVolume($request->input('height'));
+        } else  if ($request->has('volume')) {
+            $data = Tank::findHeight($tank->id, $request->input('volume'));
+        }
         return response()->json([
             'status' => 200,
-            'data' => $tank->findVolume($request->input('height'))
+            'data' => $data
         ]);
     }
     /**

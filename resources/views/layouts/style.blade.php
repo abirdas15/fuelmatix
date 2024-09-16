@@ -59,4 +59,18 @@
         padding: 10px;
         font-size: 12px;
     }
+    .table-striped-row {
+        background-color: #f3f5ef;
+    }
+    .table th, .table td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+    }
+    .table th {
+        background-color: #f2f2f2;
+    }
+    .table-striped-row:nth-child(even) {
+        background-color: #f9f9f9;
+    }
 </style>

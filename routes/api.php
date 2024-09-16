@@ -266,7 +266,10 @@ Route::group(['middleware' => 'AuthReqCheck'], function() {
             Route::post('/', [ReportController::class, 'dailyLog']);
             Route::post('export/pdf', [ReportController::class, 'dailyLogExportPdf']);
         });
-        Route::post('sales', [ReportController::class, 'salesReport']);
+        Route::group(['prefix' => 'sales'], function() {
+            Route::post('/', [ReportController::class, 'salesReport']);
+            Route::post('export/pdf', [ReportController::class, 'salesReportReportPDF']);
+        });
         Route::group(['prefix' => 'windfall'], function() {
             Route::post('/', [ReportController::class, 'windfallReport']);
             Route::post('export/pdf', [ReportController::class, 'windfallReportPDF']);

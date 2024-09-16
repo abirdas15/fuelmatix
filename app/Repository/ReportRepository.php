@@ -11,11 +11,13 @@ use App\Models\Category;
 use App\Models\Expense;
 use App\Models\FuelAdjustment;
 use App\Models\Invoice;
+use App\Models\Nozzle;
 use App\Models\PayOrderData;
 use App\Models\Product;
 use App\Models\Sale;
 use App\Models\ShiftSale;
 use App\Models\ShiftTotal;
+use App\Models\Tank;
 use App\Models\TankLog;
 use App\Models\TankRefill;
 use App\Models\TankRefillTotal;
@@ -1087,6 +1089,179 @@ class ReportRepository
             'total' => $productTotals,
             'grandTotal' => number_format($grandTotal, 2),
         ];
+    }
+
+    /**
+     * @param array $filter
+     * @param Product $product
+     * @return array
+     */
+    public static function salesReport(array $filter, Product $product): array
+    {
+        $startDate = Carbon::parse($filter['start_date'], SessionUser::TIMEZONE)->startOfDay();
+        $endDate = Carbon::parse($filter['end_date'], SessionUser::TIMEZONE)->endOfDay();
+        $sessionUser = SessionUser::getUser();
+
+
+        $tanks = Tank::select('id', 'tank_name')
+            ->with(['dispensers' => function($q) {
+                $q->select('id', 'dispenser_name as name', 'tank_id');
+            }, 'dispensers.nozzle' => function($q) {
+                $q->select('id', 'name', 'dispenser_id');
+            }])
+            ->where('product_id', $product['id'])
+            ->where('client_company_id', $sessionUser['client_company_id'])
+            ->get()
+            ->toArray();
+        $nozzleIds = [];
+        $tanksId = array_column($tanks, 'id');
+        foreach ($tanks as $tank) {
+            foreach ($tank['dispensers'] as $dispenser) {
+                foreach ($dispenser['nozzle'] as $nozzle) {
+                    $nozzleIds[] = $nozzle['id'];
+                }
+            }
+        }
+
+        // Fetch first and last IDs per tank per day
+        $tankReading = ShiftSale::join('shift_total', 'shift_total.id', '=', 'shift_sale.shift_id')
+            ->join('shift_summary', 'shift_summary.shift_sale_id', '=', 'shift_sale.id')
+            ->select(
+                'shift_sale.tank_id',
+                'shift_summary.nozzle_id',
+                DB::raw('DATE(shift_total.start_date) as reading_date'),
+                DB::raw('MIN(CASE WHEN shift_sale.id = min_ids_table.min_id THEN shift_sale.start_reading ELSE NULL END) as start_reading'),
+                DB::raw('MAX(CASE WHEN shift_sale.id = max_ids_table.max_id THEN shift_sale.end_reading ELSE NULL END) as end_reading')
+            )
+            ->leftJoin(DB::raw('(SELECT s.tank_id, DATE(st.start_date) as reading_date, MIN(s.id) as min_id
+                 FROM shift_sale s
+                 JOIN shift_total st ON st.id = s.shift_id
+                 GROUP BY s.tank_id, DATE(st.start_date)
+                ) as min_ids_table'),
+                function ($join) {
+                    $join->on('shift_sale.tank_id', '=', 'min_ids_table.tank_id')
+                        ->on(DB::raw('DATE(shift_total.start_date)'), '=', 'min_ids_table.reading_date')
+                        ->on('shift_sale.id', '=', 'min_ids_table.min_id');
+                }
+            )
+            ->leftJoin(DB::raw('(SELECT s.tank_id, DATE(st.start_date) as reading_date, MAX(s.id) as max_id
+                 FROM shift_sale s
+                 JOIN shift_total st ON st.id = s.shift_id
+                 GROUP BY s.tank_id, DATE(st.start_date)
+                ) as max_ids_table'),
+                function ($join) {
+                    $join->on('shift_sale.tank_id', '=', 'max_ids_table.tank_id')
+                        ->on(DB::raw('DATE(shift_total.start_date)'), '=', 'max_ids_table.reading_date')
+                        ->on('shift_sale.id', '=', 'max_ids_table.max_id');
+                }
+            )
+            ->whereBetween('shift_total.start_date', [$startDate, $endDate])
+            ->whereIn('shift_sale.tank_id', $tanksId)
+            ->groupBy('shift_sale.tank_id', 'shift_summary.nozzle_id', DB::raw('DATE(shift_total.start_date)'))
+            ->get();
+        $nozzleReadings = DB::table('shift_sale')
+            ->join('shift_total', 'shift_total.id', '=', 'shift_sale.shift_id')
+            ->join('shift_summary', 'shift_summary.shift_sale_id', '=', 'shift_sale.id')
+            ->select(
+                'shift_summary.nozzle_id',
+                DB::raw('DATE(shift_total.start_date) as reading_date'),
+                DB::raw('MIN(CASE WHEN shift_sale.id = min_ids_table.min_id THEN shift_summary.start_reading ELSE NULL END) as start_reading'),
+                DB::raw('MAX(CASE WHEN shift_sale.id = max_ids_table.max_id THEN shift_summary.end_reading ELSE NULL END) as end_reading')
+            )
+            ->leftJoin(DB::raw('(SELECT ss.nozzle_id, DATE(st.start_date) as reading_date, MIN(s.id) as min_id
+                         FROM shift_sale s
+                         JOIN shift_total st ON st.id = s.shift_id
+                         JOIN shift_summary ss ON ss.shift_sale_id = s.id
+                         GROUP BY ss.nozzle_id, DATE(st.start_date)
+                        ) as min_ids_table'),
+                function ($join) {
+                    $join->on('shift_summary.nozzle_id', '=', 'min_ids_table.nozzle_id')
+                        ->on(DB::raw('DATE(shift_total.start_date)'), '=', 'min_ids_table.reading_date')
+                        ->on('shift_sale.id', '=', 'min_ids_table.min_id');
+                }
+            )
+            ->leftJoin(DB::raw('(SELECT ss.nozzle_id, DATE(st.start_date) as reading_date, MAX(s.id) as max_id
+                         FROM shift_sale s
+                         JOIN shift_total st ON st.id = s.shift_id
+                         JOIN shift_summary ss ON ss.shift_sale_id = s.id
+                         GROUP BY ss.nozzle_id, DATE(st.start_date)
+                        ) as max_ids_table'),
+                function ($join) {
+                    $join->on('shift_summary.nozzle_id', '=', 'max_ids_table.nozzle_id')
+                        ->on(DB::raw('DATE(shift_total.start_date)'), '=', 'max_ids_table.reading_date')
+                        ->on('shift_sale.id', '=', 'max_ids_table.max_id');
+                }
+            )
+            ->whereBetween('shift_total.start_date', [$startDate, $endDate])
+            ->whereIn('shift_summary.nozzle_id', $nozzleIds)
+            ->groupBy('shift_summary.nozzle_id', DB::raw('DATE(shift_total.start_date)'))
+            ->get()
+            ->toArray();
+
+        $tankRefill = TankRefillTotal::select(DB::raw('SUM(tank_refill.dip_sale) as volume'), 'tank_refill.tank_id', 'tank_refill_total.date')
+            ->leftJoin('tank_refill', 'tank_refill.refill_id', '=', 'tank_refill_total.id')
+            ->where('tank_refill_total.client_company_id', $sessionUser['client_company_id'])
+            ->whereIn('tank_refill.tank_id', $tanksId)
+            ->whereBetween('tank_refill_total.date', [$startDate, $endDate])
+            ->groupBy('tank_refill.tank_id', 'tank_refill_total.date')
+            ->get();
+
+        $result = [];
+        while ($startDate->lessThanOrEqualTo($endDate)) {
+            $date = Carbon::parse($startDate)->format('Y-m-d');
+            foreach ($tanks as &$tank) {
+                $tankReadingCollection = collect($tankReading)->where('tank_id', $tank['id'])->where('reading_date', $date)->first();
+                $tankRefillCollection = collect($tankRefill)->where('tank_id', $tank['id'])->where('date', $date)->first();
+                $tank['start_reading'] = 0;
+                $tank['end_reading'] = 0;
+                $tank['refill'] = 0;
+                $tank['selling_price'] = $product['selling_price'];
+                if (!empty($tankReadingCollection)) {
+                    $tank['start_reading'] = $tankReadingCollection->start_reading;
+                    $tank['end_reading'] = $tankReadingCollection->end_reading;
+                }
+                if (!empty($tankRefillCollection)) {
+                    $tank['refill'] = $tankRefillCollection->volume;
+                }
+                $totalSale = 0;
+                $totalAmount = 0;
+                foreach ($tank['dispensers'] as &$dispenser) {
+                    foreach ($dispenser['nozzle'] as &$nozzle) {
+                        $nozzle['start_reading'] = 0;
+                        $nozzle['end_reading'] = 0;
+                        $nozzle['sale'] = 0;
+                        $nozzleReadingCollection = collect($nozzleReadings)->where('nozzle_id', $nozzle['id'])->where('reading_date', $date)->first();
+                        if (!empty($nozzleReadingCollection)) {
+                            $nozzle['start_reading'] = $nozzleReadingCollection->start_reading;
+                            $nozzle['end_reading'] = $nozzleReadingCollection->end_reading;
+                            $nozzle['sale'] = $nozzle['end_reading'] - $nozzle['start_reading'];
+                            $nozzle['amount'] = $nozzle['sale'] * $product['selling_price'];
+                            $totalSale += $nozzle['sale'];
+                            $totalAmount += $nozzle['amount'];
+                        }
+                        $nozzle['start_reading_format'] = !empty($nozzle['start_reading']) ? number_format($nozzle['start_reading'], 2) : '--';
+                        $nozzle['end_reading_format'] = !empty($nozzle['end_reading']) ? number_format($nozzle['end_reading'], 2) : '--';
+                        $nozzle['sale_format'] = !empty($nozzle['sale']) ? number_format($nozzle['sale'], 2) : '--';
+                        $nozzle['amount_format'] = !empty($nozzle['amount']) ? number_format($nozzle['amount'], 2) : '--';
+                    }
+                }
+                $tank['total_sale'] = $totalSale;
+                $tank['total_amount'] = $totalAmount;
+                $tank['refill_format'] = !empty($tank['refill']) ? number_format($tank['refill'], 2) : '--';
+                $tank['start_reading_format'] = !empty($tank['start_reading']) ? number_format($tank['start_reading'], 2) : '--';
+                $tank['end_reading_format'] = !empty($tank['end_reading']) ? number_format($tank['end_reading'], 2) : '--';
+                $tank['total_sale_format'] = !empty($tank['total_sale']) ? number_format($tank['total_sale'], 2) : '--';
+                $tank['total_amount_format'] = !empty($tank['total_amount']) ? number_format($tank['total_amount'], 2) : '--';
+                $tank['selling_price_format'] = !empty($tank['selling_price']) ? number_format($tank['selling_price'], 2) : '--';
+            }
+            $result[] = [
+                'date' => $date,
+                'tanks' => $tanks,
+            ];
+            $startDate->addDays(1);
+        }
+        return $result;
+
     }
 
 }

@@ -33,24 +33,6 @@
                                             </select>
                                         </div>
                                     </div>
-                                    <div class="col-xl-2 mb-3">
-                                        <div class="example">
-                                            <p class="mb-1">Select Dispenser </p>
-                                            <select class="me-sm-2 form-control wide" id="inlineFormCustomSelect" v-model="Param.dispenser_id">
-                                                <option value="">Select Dispenser</option>
-                                                <option v-for="t of dispensers" :value="t.id">{{t.dispenser_name}}</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-xl-2 mb-3">
-                                        <div class="example">
-                                            <p class="mb-1">Select Nozzle </p>
-                                            <select class="me-sm-2 form-control wide" id="inlineFormCustomSelect" v-model="Param.nozzle_id">
-                                                <option value="">Select Type</option>
-                                                <option v-for="t of nozzles" :value="t.id">{{t.name}}</option>
-                                            </select>
-                                        </div>
-                                    </div>
 
                                     <div class="col-xl-2 mb-3">
                                         <button type="button" class="btn btn-rounded btn-white border" @click="getSalesReport"><span
@@ -58,36 +40,62 @@
 											</span>Filter</button>
 
                                     </div>
+                                    <div class="col-xl-3 mb-3">
+                                        <button class="btn btn-primary" v-if="!loadingFile" @click="downloadPdf"><i class="fa fa-print" aria-hidden="true"></i>&nbsp;Print</button>
+                                        <button class="btn btn-primary" v-if="loadingFile"><i class="fa fa-print" aria-hidden="true"></i>&nbsp;Print...</button>
+                                    </div>
                                 </div>
                             </div>
                             <div class=" mt-4">
                                 <div class="table-responsive">
-                                    <table class="table table-striped table-responsive-sm">
+                                    <table class="table table-bordered">
                                         <thead>
-                                        <tr class="text-white" style="background-color: #20c997;color:#ffffff">
-
-                                            <th class="text-white">Date </th>
-                                            <th class="text-white">Product</th>
-                                            <th class="text-white">Quantity</th>
-                                            <th class="text-white">Amount</th>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Tank</th>
+                                            <th>Opening Balance (Tank)</th>
+                                            <th>Stock In</th>
+                                            <th>Nozzle</th>
+                                            <th>Opening Meter</th>
+                                            <th>Closing Meter</th>
+                                            <th>Sale</th>
+                                            <th>Total Sale</th>
+                                            <th>Rate</th>
+                                            <th>Amount</th>
+                                            <th>Total Amount</th>
+                                            <th>Closing Balance (Tank)</th>
                                         </tr>
                                         </thead>
                                         <tbody>
-                                        <tr v-for="each in listData">
-                                            <td v-text="each.date"></td>
-
-                                            <td v-text="each.product_name">Octane</td>
-                                            <td v-text="each.quantity"></td>
-                                            <td v-text="formatPrice(each.amount)"></td>
-                                        </tr>
+                                        <!-- Loop through each sale by date -->
+                                        <template v-for="(sale, dateIndex) in sales">
+                                            <!-- Apply the striping based on dateIndex -->
+                                            <template v-for="(tank, tankIndex) in sale.tanks">
+                                                <template v-for="(dispenser, dispenserIndex) in tank.dispensers">
+                                                    <template v-for="(nozzle, nozzleIndex) in dispenser.nozzle">
+                                                        <tr :class="{ 'table-striped-row': dateIndex % 2 === 0 }">
+                                                            <!-- Only show date for the first tank and dispenser of the sale -->
+                                                            <td v-if="tankIndex === 0 && dispenserIndex === 0 && nozzleIndex === 0" :rowspan="calculateRowSpan(sale.tanks)">{{ sale.date }}</td>
+                                                            <td v-if="dispenserIndex === 0 && nozzleIndex === 0" :rowspan="calculateDispenserRowSpan(tank.dispensers)">{{ tank.tank_name }}</td>
+                                                            <td v-if="nozzleIndex === 0">{{ tank.start_reading_format }}</td>
+                                                            <td v-if="nozzleIndex === 0">{{ tank.refill_format }}</td>
+                                                            <td>{{ nozzle.name }}</td>
+                                                            <td>{{ nozzle.start_reading_format }}</td>
+                                                            <td>{{ nozzle.end_reading_format }}</td>
+                                                            <td>{{ nozzle.sale_format }}</td>
+                                                            <td v-if="dispenserIndex === 0 && nozzleIndex === 0" :rowspan="calculateDispenserRowSpan(tank.dispensers)">{{ tank.total_sale_format }}</td>
+                                                            <td v-if="dispenserIndex === 0 && nozzleIndex === 0" :rowspan="calculateDispenserRowSpan(tank.dispensers)">{{ tank.selling_price_format }}</td>
+                                                            <td>{{ nozzle.amount_format }}</td>
+                                                            <td v-if="dispenserIndex === 0 && nozzleIndex === 0" :rowspan="calculateDispenserRowSpan(tank.dispensers)">{{ tank.total_amount_format }}</td>
+                                                            <td v-if="dispenserIndex === 0 && nozzleIndex === 0" :rowspan="calculateDispenserRowSpan(tank.dispensers)">{{ tank.end_reading_format }}</td>
+                                                        </tr>
+                                                    </template>
+                                                </template>
+                                            </template>
+                                        </template>
                                         </tbody>
-                                        <tfoot v-if="total > 0">
-                                            <tr>
-                                                <th colspan="3" class="text-end">Total</th>
-                                                <th>{{ formatPrice(total) }}</th>
-                                            </tr>
-                                        </tfoot>
                                     </table>
+
                                 </div>
                             </div>
                         </div>
@@ -105,8 +113,10 @@ import ApiRoutes from "../../Services/ApiRoutes";
 import Pagination from "../../Helpers/Pagination";
 import Section from "../../Helpers/Section";
 import Action from "../../Helpers/Action";
+import Table from "../../admin/Pages/Common/Table.vue";
 export default {
     components: {
+        Table,
         Pagination,
     },
     data() {
@@ -126,10 +136,11 @@ export default {
             },
             Loading: false,
             TableLoading: false,
-            listData: [],
+            sales: [],
             products: [],
             dispensers: [],
-            nozzles: []
+            nozzles: [],
+            loadingFile: false,
         };
     },
     watch: {
@@ -158,13 +169,39 @@ export default {
         },
         total: function() {
             let total = 0;
-            this.listData.map((v) => {
+            this.sales.map((v) => {
                 total += parseFloat(v.amount);
             });
             return total;
         },
     },
     methods: {
+        downloadPdf: function() {
+            this.loadingFile = true
+            ApiService.ClearErrorHandler();
+            ApiService.DOWNLOAD(ApiRoutes.SalesReport + '/export/pdf', this.Param,'',(res) => {
+                this.loadingFile = false
+                let blob = new Blob([res], {type: 'pdf'});
+                const link = document.createElement('a');
+                link.href = window.URL.createObjectURL(blob);
+                link.download = 'SalesReport.pdf';
+                link.click();
+            });
+        },
+        calculateDispenserRowSpan(dispensers) {
+            let total = 0;
+            dispensers.forEach((tank) => {
+                total += tank.nozzle.length;
+            });
+            return total;
+        },
+        calculateRowSpan(tanks) {
+            let total = 0;
+            tanks.forEach((tank) => {
+                total += tank.dispensers.length;
+            });
+            return total;
+        },
         fetchNozzle: function() {
             ApiService.POST(ApiRoutes.NozzleList, {dispenser_id: this.Param.dispenser_id}, res => {
                 if (parseInt(res.status) === 200) {
@@ -191,7 +228,7 @@ export default {
             ApiService.POST(ApiRoutes.SalesReport, this.Param,res => {
                 this.TableLoading = false
                 if (parseInt(res.status) === 200) {
-                    this.listData = res.data;
+                    this.sales = res.data;
                 } else {
                     ApiService.ErrorHandler(res.error);
                 }
@@ -236,6 +273,8 @@ export default {
 }
 </script>
 
-<style scoped>
-
+<style lang="scss">
+.table-striped-row {
+    background-color: #f3f5ef;
+}
 </style>

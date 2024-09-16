@@ -73,35 +73,35 @@
                                                     <div class="mb-3 form-group col-md-3"></div>
                                                     <div class="mb-3 form-group col-md-3">
                                                         <div class="input-group">
-                                                            <input type="text" class="form-control" @input="getReading($event, 'start_reading', tankIndex, tank.id)" :name="'tanks.' + tankIndex + '.start_reading_mm'" v-model="tank.start_reading_mm">
-                                                            <div class="input-group-append">
-                                                                <span class="input-group-text" >mm</span>
-                                                            </div>
+                                                            <input type="text" class="form-control" @blur="getReading($event, 'start_reading', tankIndex, tank.id, 'mm')" :name="'tanks.' + tankIndex + '.start_reading_mm'" v-model="tank.start_reading_mm">
+                                                            <span class="input-group-text" style="padding: 6px 15px">
+                                                                <button class="btn btn-primary btn-sm" type="button">mm</button>
+                                                            </span>
                                                             <div class="invalid-feedback"></div>
                                                         </div>
                                                     </div>
                                                     <div class="mb-3 form-group col-md-3">
                                                         <div class="input-group">
-                                                            <input type="text" class="form-control " @input="getReading($event, 'end_reading', tankIndex, tank.id)" :name="'tanks.' + tankIndex + '.end_reading_mm'" v-model="tank.end_reading_mm">
-                                                            <div class="input-group-append">
-                                                                <span class="input-group-text" >mm</span>
-                                                            </div>
+                                                            <input type="text" class="form-control " @blur="getReading($event, 'end_reading', tankIndex, tank.id, 'mm')" :name="'tanks.' + tankIndex + '.end_reading_mm'" v-model="tank.end_reading_mm">
+                                                            <span class="input-group-text" style="padding: 6px 15px">
+                                                                <button class="btn btn-primary btn-sm" type="button">mm</button>
+                                                            </span>
                                                             <div class="invalid-feedback"></div>
                                                         </div>
                                                     </div>
                                                     <div class="mb-3 form-group col-md-3">
                                                         <div class="input-group">
-                                                            <input type="text" class="form-control " @input="getReading($event, 'dip_sale', tankIndex, tank.id)" :name="'tanks.' + tankIndex + '.dip_sale_mm'" v-model="tank.dip_sale_mm">
-                                                            <div class="input-group-append">
-                                                                <span class="input-group-text" >mm</span>
-                                                            </div>
+                                                            <input type="text" class="form-control " disabled :name="'tanks.' + tankIndex + '.dip_sale_mm'" v-model="tank.dip_sale_mm">
+                                                            <span class="input-group-text" >
+                                                                mm
+                                                            </span>
                                                             <div class="invalid-feedback"></div>
                                                         </div>
                                                     </div>
                                                     <div class="mb-3 form-group col-md-3"></div>
                                                     <div class="mb-3 form-group col-md-3">
                                                         <div class="input-group">
-                                                            <input type="text" class="form-control " disabled  v-model="tank.start_reading">
+                                                            <input type="text" class="form-control" v-model="tank.start_reading">
                                                             <div class="input-group-append">
                                                                 <span class="input-group-text">Liter</span>
                                                             </div>
@@ -119,9 +119,11 @@
                                                     </div>
                                                     <div class="mb-3 form-group col-md-3">
                                                         <div class="input-group">
-                                                            <input type="text" class="form-control " disabled :name="'tanks.' + tankIndex + '.dip_sale'" v-model="tank.dip_sale">
+                                                            <input type="text" class="form-control"  @blur="getReading($event, 'dip_sale_mm', tankIndex, tank.id, 'liter')" :name="'tanks.' + tankIndex + '.dip_sale'" v-model="tank.dip_sale">
                                                             <div class="input-group-append">
-                                                                <span class="input-group-text">Liter</span>
+                                                                <span class="input-group-text" style="padding: 6px 15px">
+                                                                    <button class="btn btn-primary btn-sm" type="button">Liter</button>
+                                                                </span>
                                                             </div>
                                                             <div class="invalid-feedback"></div>
                                                         </div>
@@ -253,22 +255,48 @@ export default {
         }
     },
     methods: {
-        getReading: function(event, field, index, tank_id) {
-            this.getValue(event.target.value, field, index, tank_id);
+        getReading: function(event, field, index, tank_id, type) {
+            this.getValue(event.target.value, field, index, tank_id, type);
         },
-        getValue: function(value, field, index, tank_id) {
-            this.getBstiChart(value, field, index, tank_id);
+        getValue: function(value, field, index, tank_id, type) {
+            this.getBstiChart(value, field, index, tank_id, type);
         },
-        getBstiChart: function(height, field, index, tank_id) {
-            ApiService.POST(ApiRoutes.TankGetVolume, {tank_id: tank_id, height: height}, res => {
+        getBstiChart: function(value, field, index, tank_id, type) {
+            let data = null;
+            if (type === 'mm') {
+                data = {
+                    tank_id: tank_id,
+                    height: value,
+                };
+            } else if (type === 'liter') {
+                data = {
+                    tank_id: tank_id,
+                    volume: value,
+                };
+            }
+            ApiService.POST(ApiRoutes.TankGetVolume, data, res => {
                 if (parseInt(res.status) === 200) {
                     this.param.tanks[index][field] =  res.data;
-                    if (field === 'dip_sale') {
-                        this.param.tanks[index]['end_reading_mm'] = parseFloat(this.param.tanks[index]['start_reading_mm']) + parseFloat(this.param.tanks[index]['dip_sale_mm']);
-                        this.getValue(this.param.tanks[index]['end_reading_mm'], 'end_reading', index, tank_id);
-                    } else {
-                        this.param.tanks[index]['dip_sale'] = this.param.tanks[index]['end_reading'] - this.param.tanks[index]['start_reading'];
-                        this.getTotalRefillVolume();
+                    if (type === 'mm') {
+                        if (field === 'dip_sale') {
+                            this.param.tanks[index]['end_reading_mm'] = parseFloat(this.param.tanks[index]['start_reading_mm']) + parseFloat(this.param.tanks[index]['dip_sale_mm']);
+                            setTimeout(() => {
+                                this.getValue(this.param.tanks[index]['end_reading_mm'], 'end_reading', index, tank_id, type);
+                            }, 500);
+                        }  else {
+                            this.param.tanks[index]['dip_sale'] = this.param.tanks[index]['end_reading'] - this.param.tanks[index]['start_reading'];
+                            this.getTotalRefillVolume();
+                        }
+                    } else if (type === 'liter') {
+                        if (field === 'dip_sale_mm') {
+                            this.param.tanks[index]['end_reading'] = parseFloat(this.param.tanks[index]['start_reading']) + parseFloat(this.param.tanks[index]['dip_sale']);
+                            setTimeout(() => {
+                                this.getValue(this.param.tanks[index]['end_reading'], 'end_reading_mm', index, tank_id, type);
+                            }, 500);
+                        } else {
+                            this.param.tanks[index]['dip_sale_mm'] = this.param.tanks[index]['end_reading_mm'] - this.param.tanks[index]['start_reading_mm'];
+                            this.getTotalRefillVolume();
+                        }
                     }
                 }
             });
