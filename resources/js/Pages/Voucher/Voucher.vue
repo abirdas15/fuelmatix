@@ -92,10 +92,15 @@
                     <div class="col-sm-12">
                         <div class="input-wrapper form-group mb-3">
                             <label for="company_id">Company</label>
-                            <select class="form-control form-select" v-model="voucherParam.company_id" name="company_id">
-                                <option value="">Select Company</option>
-                                <option v-for="m in allCompany" :value="m.id">{{m.name}}</option>
-                            </select>
+                            <v-select
+                                class="form-control form-control-sm"
+                                :options="allCompany"
+                                placeholder="Choose Company"
+                                label="name"
+                                v-model="voucherParam.company_id"
+                                :reduce="(option) => option.id"
+                                :searchable="true"
+                            ></v-select>
                             <small class="invalid-feedback"></small>
                         </div>
                     </div>
