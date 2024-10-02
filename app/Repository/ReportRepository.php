@@ -663,7 +663,7 @@ class ReportRepository
             ->leftJoin('categories', 'categories.id', '=', 'transactions.account_id')
             ->leftJoin('categories as c1', 'c1.id', '=', 't1.account_id')
             ->where('transactions.date', $date)
-            ->where('categories.parent_category', $accountReceivable->id)
+            ->whereJsonContains('categories.category_ids', $accountReceivable->id)
             ->where('transactions.client_company_id', $sessionUser['client_company_id'])
             ->having('amount', '>', 0)
             ->groupBy('transactions.id')
