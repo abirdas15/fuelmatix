@@ -693,6 +693,7 @@ class ProductController extends Controller
             $posSale = SaleData::select('sale_data.sale_id', 'sale_data.id', DB::raw('SUM(sale_data.quantity) as quantity'), DB::raw('SUM(sale_data.subtotal) as amount'), 'sale.payment_category_id as category_id')
                 ->leftJoin('sale', 'sale.id', '=', 'sale_data.sale_id')
                 ->where('shift_sale_id', $shiftSale->id)
+                ->where('client_company_id', $sessionUser['client_company_id'])
                 ->whereNotNull('sale.id')
                 ->groupBy('sale.payment_category_id')
                 ->get()
