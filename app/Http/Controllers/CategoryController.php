@@ -45,6 +45,7 @@ class CategoryController extends Controller
      */
     public static function updateCategoryBalance(array $categories, array $transactions): array
     {
+        $sessionUser = SessionUser::getUser();
         foreach ($categories as &$category) {
             foreach ($transactions as $transaction) {
                 $categoryIds = json_decode($transaction['category_ids']);
@@ -62,6 +63,7 @@ class CategoryController extends Controller
                             $balance = $transaction['credit_amount'] - $transaction['debit_amount'];
                         }
                         $category['balance'] =  $category['balance'] + $balance;
+                        $category['balance_format'] = number_format($category['balance'], $sessionUser['currency_precision']);
                     }
                 }
             }

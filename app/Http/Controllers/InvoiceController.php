@@ -57,7 +57,7 @@ class InvoiceController extends Controller
                 if ($row['module'] == Module::POS_SALE) {
                     $posSale = SaleData::select('sale_data.product_id', 'sale_data.quantity', 'sale_data.price', 'sale_data.subtotal', 'sale.date')
                         ->leftJoin('sale', 'sale.id', 'sale_data.sale_id')
-                        ->where('sale_data.sale_id', $row['module_id'])
+                        ->where('sale_data.id', $row['module_id'])
                         ->get()
                         ->toArray();
                     foreach ($posSale as &$sale) {

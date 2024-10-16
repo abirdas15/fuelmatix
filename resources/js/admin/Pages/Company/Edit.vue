@@ -65,6 +65,20 @@
                                 </div>
                             </div>
                             <div class="form-group row mb-3">
+                                <label class="col-md-4">Currency Precision</label>
+                                <div class="col-md-8">
+                                    <input type="text" class="form-control" v-model="params.currency_precision" name="currency_precision">
+                                    <div class="invalid-feedback"></div>
+                                </div>
+                            </div>
+                            <div class="form-group row mb-3">
+                                <label class="col-md-4" for="headerText">Quantity Precision</label>
+                                <div class="col-md-8">
+                                    <input type="text" class="form-control" v-model="params.quantity_precision" name="quantity_precision">
+                                    <div class="invalid-feedback"></div>
+                                </div>
+                            </div>
+                            <div class="form-group row mb-3">
                                 <label class="col-md-4" for="headerText">Header Text</label>
                                 <div class="col-md-8">
                                     <div class="form-check form-switch">

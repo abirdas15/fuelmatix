@@ -65,12 +65,17 @@
                                 </div>
                             </div>
                             <div class="form-group row mb-3">
-                                <label class="col-md-4" for="headerText">Header Text</label>
+                                <label class="col-md-4">Currency Precision</label>
                                 <div class="col-md-8">
-                                    <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox" id="headerText" v-model="params.company.header_text">
-                                        <div class="invalid-feedback"></div>
-                                    </div>
+                                    <input type="text" class="form-control" v-model="params.company.currency_precision" name="company.currency_precision">
+                                    <div class="invalid-feedback"></div>
+                                </div>
+                            </div>
+                            <div class="form-group row mb-3">
+                                <label class="col-md-4" for="headerText">Quantity Precision</label>
+                                <div class="col-md-8">
+                                    <input type="text" class="form-control" v-model="params.company.quantity_precision" name="company.quantity_precision">
+                                    <div class="invalid-feedback"></div>
                                 </div>
                             </div>
                             <div class="form-group row mb-3">
@@ -173,6 +178,8 @@ export default {
                     footer_text: false,
                     expense_approve: '',
                     voucher_check: false,
+                    currency_precision: '',
+                    quantity_precision: ''
                 },
                 user: {
                     name: '',

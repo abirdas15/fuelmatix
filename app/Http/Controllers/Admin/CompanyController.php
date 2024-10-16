@@ -54,6 +54,8 @@ class CompanyController extends Controller
             'company.phone_number' => 'required|string|max:255',
             'company.sale_mismatch_allow' => 'nullable|numeric',
             'company.expense_approve' => 'nullable|numeric',
+            'company.currency_precision' => 'nullable|numeric',
+            'company.quantity_precision' => 'nullable|numeric',
             'user.name' => 'required|string|max:255',
             'user.email' => 'required|string|email|max:255',
             'user.password' => 'required|string|min:6|confirmed',
@@ -108,6 +110,8 @@ class CompanyController extends Controller
         $clientCompany->phone_number = $request->input('company.phone_number');
         $clientCompany->sale_mismatch_allow = $request->input('company.sale_mismatch_allow');
         $clientCompany->expense_approve = $request->input('company.expense_approve');
+        $clientCompany->currency_precision = $request->input('company.currency_precision');
+        $clientCompany->quantity_precision = $request->input('company.quantity_precision');
         $clientCompany->header_text = $request->input('company.header_text');
         $clientCompany->footer_text = $request->input('company.footer_text');
         $clientCompany->voucher_check = $request->input('company.voucher_check');
@@ -186,6 +190,8 @@ class CompanyController extends Controller
             'phone_number' => 'required|string|max:255',
             'sale_mismatch_allow' => 'nullable|numeric',
             'expense_approve' => 'nullable|numeric',
+            'currency_precision' => 'nullable|numeric',
+            'quantity_precision' => 'nullable|numeric',
         ]);
         if ($validator->fails()) {
             return response()->json([
@@ -206,6 +212,8 @@ class CompanyController extends Controller
         $company->phone_number = $request->input('phone_number');
         $company->sale_mismatch_allow = $request->input('sale_mismatch_allow');
         $company->expense_approve = $request->input('expense_approve');
+        $company->currency_precision = $request->input('currency_precision');
+        $company->quantity_precision = $request->input('quantity_precision');
         $company->voucher_check = $request->input('voucher_check');
         $company->header_text = $request->input('header_text');
         $company->footer_text = $request->input('footer_text');

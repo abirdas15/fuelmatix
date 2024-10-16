@@ -621,13 +621,13 @@ class ReportRepository
                         $nozzle['start_reading'] = $shiftSaleByNozzleId[$nozzle['id']]['start_reading'] ?? 0;
                         $nozzle['end_reading'] = $shiftSaleByNozzleId[$nozzle['id']]['end_reading'] ?? 0;
                         $nozzle['sale'] = $nozzle['end_reading'] - $nozzle['start_reading'];
-                        $nozzle['start_reading_format'] = $nozzle['start_reading'] > 0 ?  number_format($nozzle['start_reading'], 2) : '-';
-                        $nozzle['end_reading_format'] = $nozzle['end_reading'] > 0 ? number_format($nozzle['end_reading'], 2) : '-';
-                        $nozzle['sale_format'] = $nozzle['sale'] > 0 ? number_format($nozzle['sale'], 2) : '-';
+                        $nozzle['start_reading_format'] = $nozzle['start_reading'] > 0 ?  number_format($nozzle['start_reading'], $sessionUser['quantity_precision']) : '-';
+                        $nozzle['end_reading_format'] = $nozzle['end_reading'] > 0 ? number_format($nozzle['end_reading'], $sessionUser['quantity_precision']) : '-';
+                        $nozzle['sale_format'] = $nozzle['sale'] > 0 ? number_format($nozzle['sale'], $sessionUser['quantity_precision']) : '-';
                         $totalSale += $nozzle['sale'];
-                        $nozzle['unit_price_format'] = number_format($product['selling_price'], 2);
+                        $nozzle['unit_price_format'] = number_format($product['selling_price'], $sessionUser['currency_precision']);
                         $nozzle['amount'] = $nozzle['sale'] * $product['selling_price'];
-                        $nozzle['amount_format'] = $nozzle['amount'] > 0 ?number_format($nozzle['amount'], 2) : '-';
+                        $nozzle['amount_format'] = $nozzle['amount'] > 0 ?number_format($nozzle['amount'], $sessionUser['currency_precision']) : '-';
                         $totalAmount += $nozzle['amount'];
                     }
                 }
@@ -637,25 +637,25 @@ class ReportRepository
                 $totalEndReading += $tank['end_reading'];
                 $totalRefill += $tank['refill'];
             }
-            $product['total'] = $totalSale > 0 ? number_format($totalSale, 2) : '-';
-            $product['subtotal_amount'] = $totalAmount > 0 ? number_format($totalAmount, 2) : '-';
+            $product['total'] = $totalSale > 0 ? number_format($totalSale, $sessionUser['quantity_precision']) : '-';
+            $product['subtotal_amount'] = $totalAmount > 0 ? number_format($totalAmount, $sessionUser['currency_precision']) : '-';
             $adjustment = $fuelAdjustment[$product['id']]['total_quantity'] ?? 0;
-            $product['adjustment'] = $adjustment > 0 ? number_format($adjustment, 2) : '-' ;
-            $product['adjustment_amount'] = $adjustment > 0 ? number_format($adjustment * $product['selling_price'], 2) : '-' ;
+            $product['adjustment'] = $adjustment > 0 ? number_format($adjustment, $sessionUser['quantity_precision']) : '-' ;
+            $product['adjustment_amount'] = $adjustment > 0 ? number_format($adjustment * $product['selling_price'], $sessionUser['currency_precision']) : '-' ;
 
             $totalQuantity = $totalSale - $adjustment;
-            $product['total_sale'] = $totalQuantity > 0 ? number_format($totalQuantity, 2) : '-';
+            $product['total_sale'] = $totalQuantity > 0 ? number_format($totalQuantity, $sessionUser['quantity_precision']) : '-';
             $product['total_amount'] = ($totalAmount - ($adjustment * $product['selling_price'])) > 0 ? number_format($totalAmount - ($adjustment * $product['selling_price']), 2) : '-';
-            $product['end_reading'] = $totalEndReading > 0 ? number_format($totalEndReading, 2) : '-';
-            $product['tank_refill'] = $totalRefill > 0 ? number_format($totalRefill, 2) : '-';
+            $product['end_reading'] = $totalEndReading > 0 ? number_format($totalEndReading, $sessionUser['quantity_precision']) : '-';
+            $product['tank_refill'] = $totalRefill > 0 ? number_format($totalRefill, $sessionUser['quantity_precision']) : '-';
             $totalByProduct = $totalEndReading + $totalRefill;
-            $product['total_by_product'] = $totalByProduct > 0 ? number_format($totalByProduct, 2) : '-';
+            $product['total_by_product'] = $totalByProduct > 0 ? number_format($totalByProduct, $sessionUser['quantity_precision']) : '-';
             $payOrderQuantity = $payOrder[$product['id']]['quantity'] ?? 0;
-            $product['pay_order'] = $payOrderQuantity > 0 ? number_format($payOrderQuantity, 2) : '-';
-            $product['closing_balance'] = ($totalEndReading + $payOrderQuantity) > 0 ? number_format($totalEndReading + $payOrderQuantity, 2) : '-';
+            $product['pay_order'] = $payOrderQuantity > 0 ? number_format($payOrderQuantity, $sessionUser['quantity_precision']) : '-';
+            $product['closing_balance'] = ($totalEndReading + $payOrderQuantity) > 0 ? number_format($totalEndReading + $payOrderQuantity, $sessionUser['quantity_precision']) : '-';
             $gainLoss = $totalByProduct != 0 && $totalQuantity != 0 ? ($totalByProduct - $totalQuantity) / $totalQuantity : 0 ;
             $product['gain_loss'] = $gainLoss;
-            $product['gain_loss_format'] = $gainLoss > 0 ? number_format(abs($gainLoss), 2) .'%' : '-';
+            $product['gain_loss_format'] = $gainLoss > 0 ? number_format(abs($gainLoss), $sessionUser['quantity_precision']) .'%' : '-';
         }
         $accountReceivable = Category::where('client_company_id', $sessionUser['client_company_id'])->where('slug', strtolower( AccountCategory::ACCOUNT_RECEIVABLE))->first();
         $transaction = Transaction::select('transactions.account_id as id',  DB::raw("SUM(transactions.debit_amount) as amount"), 'categories.name', DB::raw('SUM(transactions.quantity) as quantity'), 'c1.name as product_name')
@@ -672,8 +672,9 @@ class ReportRepository
         $totalQuantity = 0;
         $totalAmount = 0;
         foreach ($transaction as &$data) {
-            $data['amount_format'] = number_format($data['amount'], 2);
+            $data['amount_format'] = number_format($data['amount'], $sessionUser['currency_precision']);
             $totalQuantity += $data['quantity'];
+            $data['quantity'] = number_format($data['quantity'], $sessionUser['quantity_precision']);
             $totalAmount += $data['amount'];
         }
         $expenses = Expense::select('expense.id', 'expense.date', 'c1.name as expense_type', 'c2.name as payment_method', 'expense.amount', 'expense.remarks', 'expense.approve_date', 'u1.name as approve_by', 'u2.name as request_by')
@@ -689,7 +690,7 @@ class ReportRepository
         $totalExpense = 0;
         foreach ($expenses as &$expense) {
             $totalExpense += $expense['amount'];
-            $expense['amount_format'] = number_format($expense['amount'], 2);
+            $expense['amount_format'] = number_format($expense['amount'], $sessionUser['currency_precision']);
         }
         return [
             'status' => 200,
@@ -697,9 +698,9 @@ class ReportRepository
             'companySales' => $transaction,
             'expenses' => $expenses,
             'total' => [
-                'quantity' => number_format($totalQuantity, 2),
-                'amount' => number_format($totalAmount, 2),
-                'expense' => number_format($totalExpense, 2),
+                'quantity' => number_format($totalQuantity, $sessionUser['quantity_precision']),
+                'amount' => number_format($totalAmount, $sessionUser['currency_precision']),
+                'expense' => number_format($totalExpense, $sessionUser['currency_precision']),
             ]
         ];
     }
@@ -767,17 +768,17 @@ class ReportRepository
         // Format results and calculate total amount
         foreach ($queryResult as &$result) {
             $result['status'] = $result['net_profit'] > 0 ? 'Profit' : 'Loss';
-            $result['quantity'] = number_format(abs($result['net_profit']), 2);
+            $result['quantity'] = number_format(abs($result['net_profit']), $sessionUser['quantity_precision']);
             $result['date'] = date('d/m/Y', strtotime($result['date']));
             $total += $result['amount'];
-            $result['amount'] = number_format(abs($result['amount']), 2);
+            $result['amount'] = number_format(abs($result['amount']), $sessionUser['currency_precision']);
         }
         return [
             'status' => 200,
             'data' => $queryResult,
             'total' => [
                 'status' => $total > 0 ? 'Profit' : 'Loss',
-                'amount' => number_format(abs($total), 2)
+                'amount' => number_format(abs($total), $sessionUser['currency_precision'])
             ]
         ];
     }
@@ -787,6 +788,7 @@ class ReportRepository
      */
     public static function vendorReport(array $filter): array
     {
+        $sessionUser = SessionUser::getUser();
         // Retrieve and aggregate transactions within the specified date range for the given vendor
         $result = Transaction::select('transactions.id','transactions.date', 't1.id as t1id',
             DB::raw('SUM(transactions.credit_amount) as bill'),
@@ -830,15 +832,15 @@ class ReportRepository
 
             // Format date and amounts for display
             $data['date'] = Helpers::formatDate($data['date'], FuelMatixDateTimeFormat::STANDARD_DATE);
-            $data['bill'] = number_format($data['bill'], 2);
-            $data['paid'] = number_format($data['paid'], 2);
-            $data['balance'] = number_format($data['balance'], 2);
+            $data['bill'] = number_format($data['bill'], $sessionUser['currency_precision']);
+            $data['paid'] = number_format($data['paid'], $sessionUser['currency_precision']);
+            $data['balance'] = number_format($data['balance'], $sessionUser['currency_precision']);
         }
 
         // Format total amounts for display
-        $total['bill'] = number_format($total['bill'], 2);
-        $total['paid'] = number_format($total['paid'], 2);
-        $total['balance'] = number_format($balance, 2);
+        $total['bill'] = number_format($total['bill'], $sessionUser['currency_precision']);
+        $total['paid'] = number_format($total['paid'], $sessionUser['currency_precision']);
+        $total['balance'] = number_format($balance, $sessionUser['currency_precision']);
         return [
             'status' => 200,
             'data' => $result,
@@ -884,9 +886,9 @@ class ReportRepository
         foreach ($result as &$item) {
             $dueAmount += $item['bill_amount'] - $item['paid_amount'];
             $item['due_amount'] = $dueAmount;
-            $item['bill_amount'] = !empty($item['bill_amount']) ? number_format($item['bill_amount'], 2) : '';
-            $item['paid_amount'] = !empty($item['paid_amount']) ? number_format($item['paid_amount'], 2) : '';
-            $item['due_amount'] = !empty($item['due_amount']) ? number_format($item['due_amount'], 2) : '';
+            $item['bill_amount'] = !empty($item['bill_amount']) ? number_format($item['bill_amount'], $sessionUser['currency_precision']) : '';
+            $item['paid_amount'] = !empty($item['paid_amount']) ? number_format($item['paid_amount'], $sessionUser['currency_precision']) : '';
+            $item['due_amount'] = !empty($item['due_amount']) ? number_format($item['due_amount'], $sessionUser['currency_precision']) : '';
             $item['date'] = Helpers::formatDate($item['date'], FuelMatixDateTimeFormat::STANDARD_DATE);
         }
         return [
@@ -931,15 +933,15 @@ class ReportRepository
             $totalBill += $item['bill'];
             $totalQuantity += $item['quantity'];
             $item['date'] = date('d/m/Y', strtotime($item['date']));
-            $item['bill'] = !empty($item['bill']) ? number_format($item['bill'], 2) : '';
-            $item['quantity'] = !empty($item['quantity']) ? number_format($item['quantity'], 2) : '';
+            $item['bill'] = !empty($item['bill']) ? number_format($item['bill'], $sessionUser['currency_precision']) : '';
+            $item['quantity'] = !empty($item['quantity']) ? number_format($item['quantity'], $sessionUser['quantity_precision']) : '';
         }
         return [
             'status' => 200,
             'data' => $result,
             'total'=> [
-                'bill' => number_format($totalBill, 2),
-                'quantity' => number_format($totalQuantity, 2),
+                'bill' => number_format($totalBill, $sessionUser['currency_precision']),
+                'quantity' => number_format($totalQuantity, $sessionUser['quantity_precision']),
             ]
         ];
     }
@@ -987,7 +989,7 @@ class ReportRepository
             $groupedResults[$accountId]['products'][] = [
                 'id' => $transaction['product_id'],
                 'name' => $transaction['product_name'],
-                'amount' => number_format($transaction['amount'], 2)
+                'amount' => number_format($transaction['amount'], $sessionUser['currency_precision'])
             ];
             $products[$transaction['product_id']] = [
                 'id' => $transaction['product_id'],
@@ -1003,7 +1005,7 @@ class ReportRepository
         $finalResults = array_values($groupedResults);
         $products = array_values($products);
         foreach ($productTotals as $productId => $total) {
-            $productTotals[$productId] = number_format($total, 2);
+            $productTotals[$productId] = number_format($total, $sessionUser['currency_precision']);
         }
 
         // Convert associative array to indexed array for consistent output
@@ -1239,20 +1241,20 @@ class ReportRepository
                             $totalSale += $nozzle['sale'];
                             $totalAmount += $nozzle['amount'];
                         }
-                        $nozzle['start_reading_format'] = !empty($nozzle['start_reading']) ? number_format($nozzle['start_reading'], 2) : '--';
-                        $nozzle['end_reading_format'] = !empty($nozzle['end_reading']) ? number_format($nozzle['end_reading'], 2) : '--';
-                        $nozzle['sale_format'] = !empty($nozzle['sale']) ? number_format($nozzle['sale'], 2) : '--';
-                        $nozzle['amount_format'] = !empty($nozzle['amount']) ? number_format($nozzle['amount'], 2) : '--';
+                        $nozzle['start_reading_format'] = !empty($nozzle['start_reading']) ? number_format($nozzle['start_reading'], $sessionUser['quantity_precision']) : '--';
+                        $nozzle['end_reading_format'] = !empty($nozzle['end_reading']) ? number_format($nozzle['end_reading'], $sessionUser['quantity_precision']) : '--';
+                        $nozzle['sale_format'] = !empty($nozzle['sale']) ? number_format($nozzle['sale'], $sessionUser['quantity_precision']) : '--';
+                        $nozzle['amount_format'] = !empty($nozzle['amount']) ? number_format($nozzle['amount'], $sessionUser['currency_precision']) : '--';
                     }
                 }
                 $tank['total_sale'] = $totalSale;
                 $tank['total_amount'] = $totalAmount;
-                $tank['refill_format'] = !empty($tank['refill']) ? number_format($tank['refill'], 2) : '--';
-                $tank['start_reading_format'] = !empty($tank['start_reading']) ? number_format($tank['start_reading'], 2) : '--';
-                $tank['end_reading_format'] = !empty($tank['end_reading']) ? number_format($tank['end_reading'], 2) : '--';
-                $tank['total_sale_format'] = !empty($tank['total_sale']) ? number_format($tank['total_sale'], 2) : '--';
-                $tank['total_amount_format'] = !empty($tank['total_amount']) ? number_format($tank['total_amount'], 2) : '--';
-                $tank['selling_price_format'] = !empty($tank['selling_price']) ? number_format($tank['selling_price'], 2) : '--';
+                $tank['refill_format'] = !empty($tank['refill']) ? number_format($tank['refill'], $sessionUser['quantity_precision']) : '--';
+                $tank['start_reading_format'] = !empty($tank['start_reading']) ? number_format($tank['start_reading'], $sessionUser['quantity_precision']) : '--';
+                $tank['end_reading_format'] = !empty($tank['end_reading']) ? number_format($tank['end_reading'], $sessionUser['quantity_precision']) : '--';
+                $tank['total_sale_format'] = !empty($tank['total_sale']) ? number_format($tank['total_sale'], $sessionUser['quantity_precision']) : '--';
+                $tank['total_amount_format'] = !empty($tank['total_amount']) ? number_format($tank['total_amount'], $sessionUser['currency_precision']) : '--';
+                $tank['selling_price_format'] = !empty($tank['selling_price']) ? number_format($tank['selling_price'], $sessionUser['currency_precision']) : '--';
             }
             $result[] = [
                 'date' => $date,
