@@ -29,6 +29,7 @@ class ProfitLossController extends Controller
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
+        $sessionUser = SessionUser::getUser();
         $total_revenue = self::getTotalRevenue($inputData['start_date'], $inputData['end_date']);
 
         $expenses = ReportRepository::getAllExpense([
@@ -40,7 +41,7 @@ class ProfitLossController extends Controller
         $result = [
             'total_revenue' => $total_revenue,
             'expenses' => $expenses,
-            'total_expense' => number_format($totalExpense, 2),
+            'total_expense' => number_format($totalExpense, $sessionUser['currency_precision']),
             'net_income' => $net_income
         ];
         return response()->json(['status' => 200, 'data' => $result]);

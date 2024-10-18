@@ -480,13 +480,14 @@ class ExpenseController extends Controller
             ->get()
             ->toArray();
         $total = 0;
+        $sessionUser = SessionUser::getUser();
         foreach ($result as &$data) {
             $total += $data['amount'];
             $data['date'] = Helpers::formatDate($data['date'], FuelMatixDateTimeFormat::STANDARD_DATE);
             $data['approve_date'] = Helpers::formatDate($data['approve_date'], FuelMatixDateTimeFormat::STANDARD_DATE_TIME);
-            $data['amount'] = number_format($data['amount'], 2);
+            $data['amount'] = number_format($data['amount'], $sessionUser['currency_precision']);
         }
-        return response()->json(['status' => 200, 'data' => $result, 'total' => number_format($total, 2)]);
+        return response()->json(['status' => 200, 'data' => $result, 'total' => number_format($total, $sessionUser['currency_precision'])]);
     }
     /**
      * @param Request $request
@@ -503,8 +504,9 @@ class ExpenseController extends Controller
                 'errors' => $validator->errors()
             ]);
         }
+        $sessionUser = SessionUser::getUser();
         $data = Expense::where('id', $request->input('id'))->first();
-        $data['amount_format'] = number_format($data['amount'], 2);
+        $data['amount_format'] = number_format($data['amount'], $sessionUser['currency_precision']);
         $data['number_text'] = Helpers::convertNumberToWord($data['amount']);
         $data['date'] = Helpers::formatDate($data['date'], FuelMatixDateTimeFormat::STANDARD_DATE);
         $category = Category::where('id', $data['category_id'])->first();

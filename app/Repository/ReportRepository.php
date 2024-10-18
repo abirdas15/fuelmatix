@@ -35,6 +35,7 @@ class ReportRepository
      */
     public static function dailyLog(array $filter): array
     {
+        $sessionUser = SessionUser::getUser();
         // Retrieve shift sale data using the filter
         $shiftSale = self::getShiftSale($filter);
 
@@ -67,7 +68,7 @@ class ReportRepository
         $result['asset_balance']['bank'] = self::getAssetBalance($filter['date'], AccountCategory::BANK);
 
         // Calculate the total sale amount by summing shift sale and POS sale totals, formatted to 2 decimal places
-        $result['total']['sale'] = number_format($shiftSale['total'] + $posSale['total'], 2);
+        $result['total']['sale'] = number_format($shiftSale['total'] + $posSale['total'], $sessionUser['currency_precision']);
 
         // Return the compiled daily log data
         return $result;
@@ -118,7 +119,7 @@ class ReportRepository
         foreach ($result as &$data) {
             $total += $data['amount'];
             $data['time'] = Helpers::formatDate($data['date'], FuelMatixDateTimeFormat::STANDARD_DATE_TIME);
-            $data['amount'] = number_format($data['amount'], 2);
+            $data['amount'] = number_format($data['amount'], $sessionUser['currency_precision']);
         }
 
         // Return the formatted POS sale data along with the total amount
@@ -172,7 +173,7 @@ class ReportRepository
 
         // Format the asset balance data
         foreach ($transaction as &$data) {
-            $data['amount'] = number_format($data['amount'], 2); // Format the amount
+            $data['amount'] = number_format($data['amount'], $sessionUser['currency_precision']); // Format the amount
         }
 
         // Return the formatted asset balance data
@@ -209,7 +210,7 @@ class ReportRepository
 
         // Format the due invoices data
         foreach ($result as &$data) {
-            $data['amount'] = number_format($data['amount'], 2); // Format the amount
+            $data['amount'] = number_format($data['amount'], $sessionUser['currency_precision']); // Format the amount
         }
 
         // Return the formatted due invoices data
@@ -253,7 +254,7 @@ class ReportRepository
 
         // Format the due payments data
         foreach ($transaction as &$data) {
-            $data['amount'] = number_format($data['amount'], 2); // Format the amount
+            $data['amount'] = number_format($data['amount'], $sessionUser['currency_precision']); // Format the amount
         }
 
         // Return the formatted due payments data
@@ -293,7 +294,7 @@ class ReportRepository
 
         // Format the COGS expense data
         foreach ($transaction as &$data) {
-            $data['amount'] = number_format($data['amount'], 2); // Format the amount
+            $data['amount'] = number_format($data['amount'], $sessionUser['currency_precision']); // Format the amount
         }
 
         // Return the formatted COGS expense data
@@ -350,7 +351,7 @@ class ReportRepository
         // Format the expense data
         foreach ($transaction as &$data) {
             $data['_amount'] = $data['amount']; // Store the original amount
-            $data['amount'] = number_format($data['amount'], 2); // Format the amount
+            $data['amount'] = number_format($data['amount'], $sessionUser['currency_precision']); // Format the amount
         }
 
         // Return the formatted expense data
@@ -489,7 +490,7 @@ class ReportRepository
                 'time' => 'Shift('.Helpers::formatDate($data['start_date'], FuelMatixDateTimeFormat::STANDARD_TIME).' - '.Helpers::formatDate($data['end_date'], FuelMatixDateTimeFormat::STANDARD_TIME).')',
                 'quantity' => $data['consumption'],
                 'unit' => $data['unit'],
-                'amount' => number_format($data['amount'], 2)
+                'amount' => number_format($data['amount'], $sessionUser['currency_precision'])
             ];
         }
 
@@ -633,7 +634,7 @@ class ReportRepository
                 }
                 $tank['end_reading'] = $shiftSaleByTankId[$tank['id']]['tank_end_reading'] ?? 0;
                 $tank['refill'] = $tankRefill[$tank['id']]['volume'] ?? 0;
-                $tank['end_reading_format'] = $tank['end_reading'] > 0 ? number_format($tank['end_reading'], 2) : '-';
+                $tank['end_reading_format'] = $tank['end_reading'] > 0 ? number_format($tank['end_reading'], $sessionUser['quantity_precision']) : '-';
                 $totalEndReading += $tank['end_reading'];
                 $totalRefill += $tank['refill'];
             }
@@ -645,7 +646,7 @@ class ReportRepository
 
             $totalQuantity = $totalSale - $adjustment;
             $product['total_sale'] = $totalQuantity > 0 ? number_format($totalQuantity, $sessionUser['quantity_precision']) : '-';
-            $product['total_amount'] = ($totalAmount - ($adjustment * $product['selling_price'])) > 0 ? number_format($totalAmount - ($adjustment * $product['selling_price']), 2) : '-';
+            $product['total_amount'] = ($totalAmount - ($adjustment * $product['selling_price'])) > 0 ? number_format($totalAmount - ($adjustment * $product['selling_price']), $sessionUser['currency_precision']) : '-';
             $product['end_reading'] = $totalEndReading > 0 ? number_format($totalEndReading, $sessionUser['quantity_precision']) : '-';
             $product['tank_refill'] = $totalRefill > 0 ? number_format($totalRefill, $sessionUser['quantity_precision']) : '-';
             $totalByProduct = $totalEndReading + $totalRefill;

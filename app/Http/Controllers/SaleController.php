@@ -366,12 +366,12 @@ class SaleController extends Controller
             ->get()
             ->toArray();
         foreach ($products as &$product) {
-            $product['price'] = number_format($product['price'], 2);
-            $product['quantity'] = number_format($product['quantity'], 2);
-            $product['subtotal'] = number_format($product['subtotal'], 2);
+            $product['price'] = number_format($product['price'], $sessionUser['currency_precision']);
+            $product['quantity'] = number_format($product['quantity'], $sessionUser['quantity_precision']);
+            $product['subtotal'] = number_format($product['subtotal'], $sessionUser['currency_precision']);
         }
         $result['products'] = $products;
-        $result['total_amount'] = number_format($result['total_amount'], 2);
+        $result['total_amount'] = number_format($result['total_amount'], $sessionUser['currency_precision']);
         $result['company'] = ClientCompany::select('id', 'name', 'address', 'email', 'phone_number')->find($sessionUser['client_company_id']);
         if ($result['payment_method'] == PaymentMethod::CASH ||  $result['payment_method'] == PaymentMethod::CARD) {
             $result['company_name'] = null;
@@ -472,7 +472,7 @@ class SaleController extends Controller
             } else {
                 $data['created_at'] = !empty($data['created_at']) ? Helpers::formatDate($data['created_at'], FuelMatixDateTimeFormat::STANDARD_DATE_TIME) : '';
             }
-            $data['amount_format'] = number_format($data['amount'], 2);
+            $data['amount_format'] = number_format($data['amount'], $sessionUser['currency_precision']);
         }
         return response()->json(['status' => 200, 'data' => $result]);
     }
@@ -509,7 +509,7 @@ class SaleController extends Controller
             ->paginate($limit);
         foreach ($result as &$data) {
             $data['created_at'] = Helpers::formatDate($data['created_at'], FuelMatixDateTimeFormat::STANDARD_DATE_TIME);
-            $data['amount'] = number_format($data['amount'], 2);
+            $data['amount'] = number_format($data['amount'], $sessionUser['currency_precision']);
         }
         return response()->json(['status' => 200, 'data' => $result]);
     }

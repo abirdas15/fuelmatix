@@ -183,10 +183,10 @@ class TankController extends Controller
             $data['water_percent'] = 0;
             if ($data['last_reading'] != null) {
                 if ($data['capacity'] > 0 && $data['last_reading']['height'] > 0) {
-                    $data['fuel_percent'] = number_format(($data['last_reading']['height'] / $data['height']) * 100, 2);
+                    $data['fuel_percent'] = number_format(($data['last_reading']['height'] / $data['height']) * 100, $sessionUser['quantity_precision']);
                 }
                 if ($data['capacity'] > 0 && $data['last_reading']['water_height'] > 0) {
-                    $data['water_percent'] = number_format(($data['last_reading']['water_height'] / $data['height']) * 100, 2);
+                    $data['water_percent'] = number_format(($data['last_reading']['water_height'] / $data['height']) * 100, $sessionUser['quantity_precision']);
                 }
             }
         }

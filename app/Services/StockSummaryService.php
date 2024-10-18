@@ -186,49 +186,52 @@ class StockSummaryService
 
     protected function calculateNozzleSales(&$product, &$nozzle, &$totalSale, &$totalAmount)
     {
+        $sessionUser = SessionUser::getUser();
         $nozzle['start_reading'] = $this->shiftSaleByNozzleId[$nozzle['id']]['start_reading'] ?? 0;
         $nozzle['end_reading'] = $this->shiftSaleByNozzleId[$nozzle['id']]['end_reading'] ?? 0;
         $nozzle['sale'] = $nozzle['end_reading'] - $nozzle['start_reading'];
-        $nozzle['start_reading_format'] = $nozzle['start_reading'] > 0 ?  number_format($nozzle['start_reading'], 2) : '-';
-        $nozzle['end_reading_format'] = $nozzle['end_reading'] > 0 ? number_format($nozzle['end_reading'], 2) : '-';
-        $nozzle['sale_format'] = $nozzle['sale'] > 0 ? number_format($nozzle['sale'], 2) : '-';
+        $nozzle['start_reading_format'] = $nozzle['start_reading'] > 0 ?  number_format($nozzle['start_reading'], $sessionUser['quantity_precision']) : '-';
+        $nozzle['end_reading_format'] = $nozzle['end_reading'] > 0 ? number_format($nozzle['end_reading'], $sessionUser['quantity_precision']) : '-';
+        $nozzle['sale_format'] = $nozzle['sale'] > 0 ? number_format($nozzle['sale'], $sessionUser['quantity_precision']) : '-';
         $totalSale += $nozzle['sale'];
-        $nozzle['unit_price_format'] = number_format($product['selling_price'], 2);
+        $nozzle['unit_price_format'] = number_format($product['selling_price'], $sessionUser['currency_precision']);
         $nozzle['amount'] = $nozzle['sale'] * $product['selling_price'];
-        $nozzle['amount_format'] = $nozzle['amount'] > 0 ? number_format($nozzle['amount'], 2) : '-';
+        $nozzle['amount_format'] = $nozzle['amount'] > 0 ? number_format($nozzle['amount'], $sessionUser['currency_precision']) : '-';
         $totalAmount += $nozzle['amount'];
     }
 
     protected function calculateTankData(&$tank, &$totalEndReading, &$totalRefill)
     {
+        $sessionUser = SessionUser::getUser();
         $tank['end_reading'] = $this->shiftSaleByTankId[$tank['id']]['tank_end_reading'] ?? 0;
-        $tank['end_reading_format'] = $tank['end_reading'] > 0 ? number_format($tank['end_reading'], 2) : '-';
+        $tank['end_reading_format'] = $tank['end_reading'] > 0 ? number_format($tank['end_reading'], $sessionUser['quantity_precision']) : '-';
         $tank['refill_volume'] = $this->tankRefill[$tank['id']]['volume'] ?? 0;
-        $tank['refill_volume_format'] = $tank['refill_volume'] > 0 ? number_format($tank['refill_volume'], 2) : '-';
+        $tank['refill_volume_format'] = $tank['refill_volume'] > 0 ? number_format($tank['refill_volume'], $sessionUser['quantity_precision']) : '-';
         $totalEndReading += $tank['end_reading'];
         $totalRefill += $tank['refill_volume'];
     }
 
     protected function calculateProductData(&$product, $totalSale, $totalEndReading, $totalRefill, $totalAmount)
     {
-        $product['total'] = $totalSale > 0 ? number_format($totalSale, 2) : '-';
-        $product['subtotal_amount'] = $totalAmount > 0 ? number_format($totalAmount, 2) : '-';
+        $sessionUser = SessionUser::getUser();
+        $product['total'] = $totalSale > 0 ? number_format($totalSale, $sessionUser['quantity_precision']) : '-';
+        $product['subtotal_amount'] = $totalAmount > 0 ? number_format($totalAmount, $sessionUser['currency_precision']) : '-';
         $adjustment = $this->fuelAdjustment[$product['id']]['total_quantity'] ?? 0;
-        $product['adjustment'] = $adjustment > 0 ? number_format($adjustment, 2) : '-' ;
-        $product['adjustment_amount'] = $adjustment > 0 ? number_format($adjustment * $product['selling_price'], 2) : '-' ;
+        $product['adjustment'] = $adjustment > 0 ? number_format($adjustment, $sessionUser['quantity_precision']) : '-' ;
+        $product['adjustment_amount'] = $adjustment > 0 ? number_format($adjustment * $product['selling_price'], $sessionUser['currency_precision']) : '-' ;
 
         $totalQuantity = $totalSale - $adjustment;
-        $product['total_sale'] = $totalQuantity > 0 ? number_format($totalQuantity, 2) : '-';
-        $product['total_amount'] = ($totalAmount - ($adjustment * $product['selling_price'])) > 0 ? number_format($totalAmount - ($adjustment * $product['selling_price']), 2) : '-';
-        $product['end_reading'] = $totalEndReading > 0 ? number_format($totalEndReading, 2) : '-';
-        $product['tank_refill'] = $totalRefill > 0 ? number_format($totalRefill, 2) : '-';
+        $product['total_sale'] = $totalQuantity > 0 ? number_format($totalQuantity, $sessionUser['quantity_precision']) : '-';
+        $product['total_amount'] = ($totalAmount - ($adjustment * $product['selling_price'])) > 0 ? number_format($totalAmount - ($adjustment * $product['selling_price']), $sessionUser['currency_precision']) : '-';
+        $product['end_reading'] = $totalEndReading > 0 ? number_format($totalEndReading, $sessionUser['quantity_precision']) : '-';
+        $product['tank_refill'] = $totalRefill > 0 ? number_format($totalRefill, $sessionUser['quantity_precision']) : '-';
         $totalByProduct = $totalEndReading + $totalRefill;
-        $product['total_by_product'] = $totalByProduct > 0 ? number_format($totalByProduct, 2) : '-';
+        $product['total_by_product'] = $totalByProduct > 0 ? number_format($totalByProduct, $sessionUser['currency_precision']) : '-';
         $payOrderQuantity = $this->payOrder[$product['id']]['quantity'] ?? 0;
-        $product['pay_order'] = $payOrderQuantity > 0 ? number_format($payOrderQuantity, 2) : '-';
-        $product['closing_balance'] = ($totalEndReading + $payOrderQuantity) > 0 ? number_format($totalEndReading + $payOrderQuantity, 2) : '-';
+        $product['pay_order'] = $payOrderQuantity > 0 ? number_format($payOrderQuantity, $sessionUser['quantity_precision']) : '-';
+        $product['closing_balance'] = ($totalEndReading + $payOrderQuantity) > 0 ? number_format($totalEndReading + $payOrderQuantity, $sessionUser['quantity_precision']) : '-';
         $gainLoss = $totalByProduct != 0 && $totalQuantity != 0 ? ($totalByProduct - $totalQuantity) / $totalQuantity : 0 ;
         $product['gain_loss'] = $gainLoss;
-        $product['gain_loss_format'] = $gainLoss > 0 ? number_format(abs($gainLoss), 2) .'%' : '-';
+        $product['gain_loss_format'] = $gainLoss > 0 ? number_format(abs($gainLoss), $sessionUser['quantity_precision']) .'%' : '-';
     }
 }

@@ -237,7 +237,7 @@ class CreditCompanyController extends Controller
             $data['contact_person'] = $others != null ? $others->contact_person : null;
             $data['address'] = $others != null ? $others->address : null;
             unset($data['others']); // Remove the raw 'others' field from the result
-            $data['opening_balance'] = !empty($data['opening_balance']) ? number_format($data['opening_balance'], 2) : null;
+            $data['opening_balance'] = !empty($data['opening_balance']) ? number_format($data['opening_balance'], $sessionUser['currency_precision']) : null;
         }
 
         // Return the paginated result set as a JSON response

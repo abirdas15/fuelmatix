@@ -139,8 +139,8 @@ class VendorController extends Controller
 
         // Format the amount field for each result item
         foreach ($result as &$data) {
-            $data['amount_format'] = !empty($data['amount']) ? number_format($data['amount'], 2) : null;
-            $data['opening_balance'] = !empty($data['opening_balance']) ? number_format($data['opening_balance'], 2) : null;
+            $data['amount_format'] = !empty($data['amount']) ? number_format($data['amount'], $sessionUser['currency_precision']) : null;
+            $data['opening_balance'] = !empty($data['opening_balance']) ? number_format($data['opening_balance'], $sessionUser['quantity_precision']) : null;
         }
 
         // Return a successful JSON response with the data

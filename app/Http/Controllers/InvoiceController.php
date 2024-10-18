@@ -145,9 +145,9 @@ class InvoiceController extends Controller
             }
             $data['date'] = date('d/m/Y', strtotime($data['date']));
             $data['due_date'] = date('d/m/Y', strtotime($data['due_date']));
-            $data['format_amount'] = !empty($data['amount']) ? number_format($data['amount'], 2) : '';
-            $data['format_paid_amount'] = !empty($data['paid_amount']) ? number_format($data['paid_amount'], 2) : '';
-            $data['format_due_amount'] = !empty($data['due_amount']) ? number_format($data['due_amount'], 2) : '';
+            $data['format_amount'] = !empty($data['amount']) ? number_format($data['amount'], $sessionUser['currency_precision']) : '';
+            $data['format_paid_amount'] = !empty($data['paid_amount']) ? number_format($data['paid_amount'], $sessionUser['currency_precision']) : '';
+            $data['format_due_amount'] = !empty($data['due_amount']) ? number_format($data['due_amount'], $sessionUser['currency_precision']) : '';
         }
         return response()->json(['status' => 200, 'data' => $result]);
     }
@@ -280,12 +280,12 @@ class InvoiceController extends Controller
         $totalAmount = 0;
         foreach ($invoiceItem as &$item) {
             $totalAmount += $item['quantity'] * $item['price'];
-            $item['price'] = number_format($item['price'], 2);
-            $item['subtotal'] = number_format($item['subtotal'], 2);
-            $item['quantity'] = number_format($item['quantity'], 2);
+            $item['price'] = number_format($item['price'], $sessionUser['currency_precision']);
+            $item['subtotal'] = number_format($item['subtotal'], $sessionUser['currency_precision']);
+            $item['quantity'] = number_format($item['quantity'], $sessionUser['currency_precision']);
             $item['date'] = !empty($item['date']) ? Helpers::formatDate($item['date'], FuelMatixDateTimeFormat::STANDARD_DATE) : '';
         }
-        $invoice['amount'] = number_format($totalAmount, 2);
+        $invoice['amount'] = number_format($totalAmount, $sessionUser['currency_precision']);
         $invoice['invoice_item'] = $invoiceItem;
         return $invoice;
     }
@@ -465,7 +465,7 @@ class InvoiceController extends Controller
         // Format the created_at date and amount for each transaction in the result.
         foreach ($result as &$data) {
             $data['created_at'] = Helpers::formatDate($data['created_at'], FuelMatixDateTimeFormat::STANDARD_DATE_TIME); // Format the date
-            $data['amount'] = number_format($data['amount'], 2); // Format the amount to two decimal places
+            $data['amount'] = number_format($data['amount'], $sessionUser['currency_precision']); // Format the amount to two decimal places
         }
 
         // Return the response with the status code and the paginated result data.

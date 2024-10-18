@@ -174,12 +174,13 @@ class ShiftSaleController extends Controller
             ->orderBy($order_by, $order_mode)  // Order the results
             ->paginate($limit);  // Paginate the results
 
+        $sessionUser = SessionUser::getUser();
         // Format the results
         foreach ($result as &$data) {
             // Format amount
-            $data['amount'] = !empty($data['amount']) ? number_format($data['amount'], 2) : '';
+            $data['amount'] = !empty($data['amount']) ? number_format($data['amount'], $sessionUser['currency_precision']) : '';
             // Format consumption
-            $data['consumption'] = !empty($data['consumption']) ? number_format($data['consumption'], 2) : '';
+            $data['consumption'] = !empty($data['consumption']) ? number_format($data['consumption'], $sessionUser['quantity_precision']) : '';
 
             $data['database_date'] = Helpers::formatDate($data['start_date'], FuelMatixDateTimeFormat::ONLY_DATE);
             // Format date

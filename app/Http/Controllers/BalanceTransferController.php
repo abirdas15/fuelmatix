@@ -130,7 +130,7 @@ class BalanceTransferController extends Controller
         // Format the date and amount for each item in the result
         foreach ($result as &$data) {
             $data['date'] = Helpers::formatDate($data['date'], FuelMatixDateTimeFormat::STANDARD_DATE_TIME);
-            $data['amount_format'] = number_format($data['amount'], 2);
+            $data['amount_format'] = number_format($data['amount'], $sessionUser['currency_precision']);
         }
 
         // Return the paginated result as JSON

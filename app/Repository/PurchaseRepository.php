@@ -73,13 +73,13 @@ class PurchaseRepository
         $queryResult = $queryResult->orderBy($paginatedFilter['order_by'], $paginatedFilter['order_mode'])
             ->paginate($paginatedFilter['limit']);
         foreach ($queryResult as &$data) {
-            $data['total_amount'] = number_format($data['total_amount'], 2);
-            $data['paid'] = number_format($data['paid'], 2);
-            $data['due'] = number_format($data['due'], 2);
+            $data['total_amount'] = number_format($data['total_amount'], $sessionUser['currency_precision']);
+            $data['paid'] = number_format($data['paid'], $sessionUser['currency_precision']);
+            $data['due'] = number_format($data['due'], $sessionUser['currency_precision']);
             foreach ($data['purchase_item'] as &$purchase_item) {
-                $purchase_item['unit_price'] = number_format($purchase_item['unit_price'], 2);
-                $purchase_item['quantity'] = number_format($purchase_item['quantity'], 0);
-                $purchase_item['total'] = number_format($purchase_item['total'], 2);
+                $purchase_item['unit_price'] = number_format($purchase_item['unit_price'], $sessionUser['currency_precision']);
+                $purchase_item['quantity'] = number_format($purchase_item['quantity'], $sessionUser['quantity_precision']);
+                $purchase_item['total'] = number_format($purchase_item['total'], $sessionUser['currency_precision']);
             }
             $data['date'] = Helpers::formatDate($data['date'], FuelMatixDateTimeFormat::STANDARD_DATE_TIME);
         }

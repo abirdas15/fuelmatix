@@ -38,7 +38,7 @@ class ExpenseRepository
 
         // Format the results
         foreach ($result as &$data) {
-            $data['amount_format'] = number_format($data['amount'], 2);
+            $data['amount_format'] = number_format($data['amount'], $sessionUser['currency_precision']);
             $data['date'] = Helpers::formatDate($data['date'], FuelMatixDateTimeFormat::STANDARD_DATE);
         }
         return $result->toArray();

@@ -443,11 +443,11 @@ class ShiftSaleRepository
                     'id' => $sale['id'],
                     'tank_id' => $tankId,
                     'tank_name' => $sale['tank_name'],
-                    'start_reading' => !empty($sale['start_reading']) ? number_format($sale['start_reading'], 2) : '',
-                    'end_reading' => !empty($sale['end_reading']) ? number_format($sale['end_reading'], 2) : '',
-                    'tank_refill' => !empty($sale['tank_refill']) ? number_format($sale['tank_refill'], 2) : '',
-                    'adjustment' => !empty($sale['adjustment']) ? number_format($sale['adjustment'], 2) : '',
-                    'consumption' => !empty($sale['consumption']) ? number_format($sale['consumption'], 2) : '',
+                    'start_reading' => !empty($sale['start_reading']) ? number_format($sale['start_reading'], $sessionUser['quantity_precision']) : '',
+                    'end_reading' => !empty($sale['end_reading']) ? number_format($sale['end_reading'], $sessionUser['quantity_precision']) : '',
+                    'tank_refill' => !empty($sale['tank_refill']) ? number_format($sale['tank_refill'], $sessionUser['quantity_precision']) : '',
+                    'adjustment' => !empty($sale['adjustment']) ? number_format($sale['adjustment'], $sessionUser['quantity_precision']) : '',
+                    'consumption' => !empty($sale['consumption']) ? number_format($sale['consumption'], $sessionUser['quantity_precision']) : '',
                     'amount' => $sale['amount'],
                     'net_profit' => $sale['net_profit'],
                     'dispensers' => []
@@ -473,10 +473,10 @@ class ShiftSaleRepository
                 // Add nozzle details to the dispenser entry
                 $formattedShiftSale[$tankIndex]['dispensers'][$dispenserIndex]['nozzles'][] = [
                     'nozzle_name' => $summary['nozzle_name'],
-                    'start_reading' => !empty($summary['start_reading']) ? number_format($summary['start_reading'], 2) : '',
-                    'end_reading' => !empty($summary['end_reading']) ? number_format($summary['end_reading'], 2) : '',
-                    'adjustment' => !empty($summary['adjustment']) ? number_format($summary['adjustment'], 2) : '',
-                    'consumption' => !empty($summary['consumption']) ? number_format($summary['consumption'], 2) : '',
+                    'start_reading' => !empty($summary['start_reading']) ? number_format($summary['start_reading'], $sessionUser['quantity_precision']) : '',
+                    'end_reading' => !empty($summary['end_reading']) ? number_format($summary['end_reading'], $sessionUser['quantity_precision']) : '',
+                    'adjustment' => !empty($summary['adjustment']) ? number_format($summary['adjustment'], $sessionUser['quantity_precision']) : '',
+                    'consumption' => !empty($summary['consumption']) ? number_format($summary['consumption'], $sessionUser['quantity_precision']) : '',
                     'amount' => $summary['amount']
                 ];
             }
@@ -496,7 +496,7 @@ class ShiftSaleRepository
 
         // Format the category amounts
         foreach ($categories as &$category) {
-            $category['amount'] = number_format($category['amount'], 2);
+            $category['amount'] = number_format($category['amount'], $sessionUser['currency_precision']);
         }
 
         // Add the formatted category data to the result
@@ -507,8 +507,8 @@ class ShiftSaleRepository
         $result['end_date_format'] = Helpers::formatDate($result['end_date'], FuelMatixDateTimeFormat::STANDARD_DATE_TIME);
 
         // Format the consumption and amount fields
-        $result['consumption'] = !empty($result['consumption']) ? number_format($result['consumption'], 2) : '';
-        $result['amount'] = !empty($result['amount']) ? number_format($result['amount'], 2) : '';
+        $result['consumption'] = !empty($result['consumption']) ? number_format($result['consumption'], $sessionUser['currency_precision']) : '';
+        $result['amount'] = !empty($result['amount']) ? number_format($result['amount'], $sessionUser['currency_precision']) : '';
 
         // Return the result with all formatted data
         return $result;
