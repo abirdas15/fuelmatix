@@ -20,6 +20,30 @@
                         <div class="card-body">
                             <div class="row mt-4">
                                 <div class="table-responsive">
+                                    <div class="row">
+                                        <div class="col-xl-3 mb-3 form-group">
+                                            <div class="example">
+                                                <p class="mb-1">Select Date</p>
+                                                <input class="form-control input-daterange-datepicker date" name="start_date" type="text">
+                                                <div class="invalid-feedback"></div>
+                                            </div>
+                                        </div>
+                                        <div class="col-xl-3 mb-3 form-group">
+                                            <div class="example">
+                                                <p class="mb-1">Company</p>
+                                                <v-select
+                                                    class="form-control form-control-sm"
+                                                    :options="companies"
+                                                    placeholder="Choose Company"
+                                                    label="name"
+                                                    v-model="Param.company_id"
+                                                    :reduce="(option) => option.id"
+                                                    :searchable="true"
+                                                ></v-select>
+                                                <div class="invalid-feedback"></div>
+                                            </div>
+                                        </div>
+                                    </div>
                                     <div class="dataTables_wrapper no-footer">
                                         <div class="dataTables_length">
                                             <label class="d-flex align-items-center">Show
@@ -188,6 +212,9 @@ export default {
                 order_by: 'transactions.id',
                 order_mode: 'DESC',
                 page: 1,
+                company_id: '',
+                start_date: '',
+                end_date: ''
             },
             Loading: false,
             generateLoading: false,
@@ -205,12 +232,16 @@ export default {
                 ]
             },
             selectedIDs: [],
-            cars: []
+            cars: [],
+            companies: [],
 
         };
     },
     watch: {
         'Param.keyword': function () {
+            this.list()
+        },
+        'Param.company_id': function () {
             this.list()
         },
     },
@@ -244,6 +275,13 @@ export default {
         },
     },
     methods: {
+        fetchCreditCompany: function () {
+            ApiService.POST(ApiRoutes.CreditCompanyList, {limit: 500}, (res) => {
+                if (parseInt(res.status) === 200) {
+                    this.companies = res.data.data;
+                }
+            });
+        },
         fetchCar: function() {
             ApiService.POST(ApiRoutes.CarList, {company_id:  this.selectedData.category_id, limit: 500}, (res) => {
                 if (parseInt(res.status) === 200) {
@@ -380,6 +418,23 @@ export default {
     },
     mounted() {
         $('#dashboard_bar').text('Company Sale')
+        setTimeout(() => {
+            $('.date').flatpickr({
+                altInput: true,
+                altFormat: "d/m/Y",
+                dateFormat: "Y-m-d",
+                mode: 'range',
+                onChange: (date, dateStr) => {
+                    let dateArr = dateStr.split('to')
+                    if (dateArr.length === 2) {
+                        this.Param.start_date = dateArr[0]
+                        this.Param.end_date = dateArr[1]
+                        this.list();
+                    }
+                }
+            })
+        }, 1000);
+        this.fetchCreditCompany();
     }
 }
 </script>

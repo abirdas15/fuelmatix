@@ -57,9 +57,9 @@
                                                         <router-link v-if="CheckPermission(Section.TANK + '-' + Action.EDIT)" :to="{name: 'TankEdit', params: { id: f.id }}" class=" btn btn-primary shadow btn-xs sharp me-1">
                                                             <i class="fas fa-pencil-alt"></i>
                                                         </router-link>
-                                                        <a v-if="CheckPermission(Section.TANK + '-' + Action.DELETE)"  href="javascript:void(0)"  @click="openModalDelete(f)" class="btn btn-danger shadow btn-xs sharp">
-                                                            <i class="fa fa-trash"></i>
-                                                        </a>
+<!--                                                        <a v-if="CheckPermission(Section.TANK + '-' + Action.DELETE)"  href="javascript:void(0)"  @click="openModalDelete(f)" class="btn btn-danger shadow btn-xs sharp">-->
+<!--                                                            <i class="fa fa-trash"></i>-->
+<!--                                                        </a>-->
                                                     </div>
                                                 </td>
                                             </tr>

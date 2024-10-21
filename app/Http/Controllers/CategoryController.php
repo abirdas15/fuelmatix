@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Common\FuelMatixCategoryType;
 use App\Helpers\SessionUser;
 use App\Models\Category;
 use App\Models\Transaction;
@@ -87,6 +88,12 @@ class CategoryController extends Controller
                 $q->where('type', $inputData['type']);
             });
         }
+        if (!empty($inputData['equity'])) {
+            $result->orWhere(function($q) use ($inputData) {
+                $q->where('type', FuelMatixCategoryType::EQUITY)
+                    ->where('client_company_id', $inputData['session_user']['client_company_id']);
+            });
+        }
         $result = $result->get()
             ->toArray();
         foreach ($result as &$data) {
@@ -97,7 +104,10 @@ class CategoryController extends Controller
         usort($result, function ($item1, $item2) {
             return $item1['name'] <=> $item2['name'];
         });
-        return response()->json(['status' => 200, 'data' => $result]);
+        return response()->json([
+            'status' => 200,
+            'data' => $result
+        ]);
     }
 
     /**

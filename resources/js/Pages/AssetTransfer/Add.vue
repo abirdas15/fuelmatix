@@ -112,7 +112,7 @@ export default {
             });
         },
         getParentCategory() {
-            ApiService.POST(ApiRoutes.CategoryParent, {type: 'assets'},res => {
+            ApiService.POST(ApiRoutes.CategoryParent, {type: 'assets', equity: true},res => {
                 this.loading = false
                 if (parseInt(res.status) === 200) {
                     this.categories = res.data

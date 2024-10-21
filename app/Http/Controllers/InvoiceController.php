@@ -270,7 +270,7 @@ class InvoiceController extends Controller
         $category['address'] = $others->address ?? '';
         $invoice['customer_company'] = $category;
         $invoice['company'] = $company;
-        $invoiceItem = InvoiceItem::select('invoice_item.id', 'invoice_item.date', 'car.car_number', 'transactions.voucher_no', 'invoice_item.quantity', 'invoice_item.price', 'invoice_item.subtotal', 'products.name as product_name')
+        $invoiceItem = InvoiceItem::select('invoice_item.id', 'invoice_item.transaction_id', 'invoice_item.date', 'car.car_number', 'transactions.voucher_no', 'invoice_item.quantity', 'invoice_item.price', 'invoice_item.subtotal', 'products.name as product_name')
             ->leftJoin('transactions', 'transactions.id', 'invoice_item.transaction_id')
             ->leftJoin('car', 'car.id', 'transactions.car_id')
             ->leftJoin('products', 'products.id', 'invoice_item.product_id')
@@ -472,6 +472,46 @@ class InvoiceController extends Controller
         return response()->json([
             'status' => 200,
             'data' => $result
+        ]);
+    }
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function changeInvoiceNumber(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'invoice_number' => 'required|string',
+            'item_id' => 'required|integer'
+        ]);
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 500,
+                'errors' => $validator->errors()
+            ]);
+        }
+        $sessionUser = SessionUser::getUser();
+        $invoice = Invoice::where('invoice_number', $request->input('invoice_number'))
+            ->where('client_company_id', $sessionUser['client_company_id'])
+            ->first();
+        if (!$invoice instanceof Invoice) {
+            return response()->json([
+                'status' => 500,
+                'errors' => ['invoice_number' => ['The invoice number is not valid.']]
+            ]);
+        }
+        $invoiceItem = InvoiceItem::where('id', $request->input('item_id'))->first();
+        if (!$invoiceItem instanceof InvoiceItem) {
+            return response()->json([
+                'status' => 400,
+                'message' => 'Cannot find invoice item.'
+            ]);
+        }
+        $invoiceItem->invoice_id = $invoice->id;
+        $invoiceItem->save();
+        return response()->json([
+            'status' => 200,
+            'message' => 'Successfully changed invoice number.'
         ]);
     }
 

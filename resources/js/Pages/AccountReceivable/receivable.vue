@@ -13,16 +13,16 @@
                     <div class="d-flex align-items-center justify-content-between line" v-for="expense in balance">
                         <div>{{ expense.category }}</div>
                         <div>
-                            <span v-if="expense.balance < 0" class="text-danger">({{formatPrice(Math.abs(expense.balance))}})</span>
-                            <span v-else>{{formatPrice(expense.balance)}}</span>
+                            <span v-if="expense.balance < 0" class="text-danger">({{expense.balance_format}})</span>
+                            <span v-else>{{ expense.balance_format }}</span>
                         </div>
                     </div>
                     <hr>
                     <div class="d-flex align-items-center justify-content-between line">
                         <strong>Total</strong>
                         <strong>
-                            <span v-if="total < 0" class="text-danger">({{formatPrice(Math.abs(total))}})</span>
-                            <span v-else>{{formatPrice(total)}}</span>
+                            <span v-if="total < 0" class="text-danger">({{ total_format }})</span>
+                            <span v-else>{{ total_format }}</span>
                         </strong>
                     </div>
                 </div>
@@ -42,6 +42,7 @@ export default {
         return {
             balance: {},
             total: 0,
+            total_format: 0,
             param: {
                 start_date: '',
                 end_date: ''
@@ -57,6 +58,7 @@ export default {
                 if (parseInt(res.status) === 200) {
                     this.balance = res.data;
                     this.total = res.total;
+                    this.total_format = res.total_format;
                 }
             });
         },

@@ -24,18 +24,24 @@ class ReceivableController extends Controller
         }
         $sessionUser = SessionUser::getUser();
         $receivableCategory = Category::where('client_company_id', $sessionUser['client_company_id'])->where('slug', strtolower(AccountCategory::ACCOUNT_RECEIVABLE))->first();
-        $result = Transaction::select('categories.name as category', DB::raw('SUM(credit_amount - debit_amount) as balance'))
+        $result = Transaction::select('categories.name as category', DB::raw('SUM(debit_amount - credit_amount) as balance'))
             ->whereBetween('date', [$inputData['start_date'], $inputData['end_date']])
             ->leftJoin('categories', 'categories.id', '=', 'transactions.account_id')
-            ->where('categories.parent_category', $receivableCategory['id'])
+            ->whereJsonContains('categories.category_ids', $receivableCategory->id)
             ->where('transactions.client_company_id', $sessionUser['client_company_id'])
             ->groupBy('account_id')
             ->get()
             ->toArray();
         $total = 0;
-        foreach ($result as $data) {
-            $total = $total + $data['balance'];
+        foreach ($result as &$data) {
+            $total += $data['balance'];
+            $data['balance_format'] = number_format(abs($data['balance']), $sessionUser['currency_precision']);
         }
-        return response()->json(['status' => 200, 'data' => $result, 'total' => $total]);
+        return response()->json([
+            'status' => 200,
+            'data' => $result,
+            'total_format' => number_format(abs($total), $sessionUser['currency_precision']),
+            'total' => $total,
+        ]);
     }
 }

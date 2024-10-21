@@ -7,6 +7,7 @@ use App\Common\FuelMatixDateTimeFormat;
 use App\Common\FuelMatixStatus;
 use App\Helpers\Helpers;
 use App\Helpers\SessionUser;
+use App\Models\BalanceTransfer;
 use App\Models\Category;
 use App\Models\Expense;
 use App\Models\FuelAdjustment;
@@ -15,6 +16,7 @@ use App\Models\Nozzle;
 use App\Models\PayOrderData;
 use App\Models\Product;
 use App\Models\Sale;
+use App\Models\SaleData;
 use App\Models\ShiftSale;
 use App\Models\ShiftTotal;
 use App\Models\Tank;
@@ -693,15 +695,55 @@ class ReportRepository
             $totalExpense += $expense['amount'];
             $expense['amount_format'] = number_format($expense['amount'], $sessionUser['currency_precision']);
         }
+        $posSales = SaleData::select(
+            DB::raw('SUM(sale_data.quantity) as quantity'),
+            DB::raw('SUM(sale_data.subtotal) as amount'),
+            'price',
+            'products.name as product_name'
+        )
+            ->leftJoin('sale', 'sale.id', '=', 'sale_data.sale_id')
+            ->leftJoin('products', 'products.id', '=', 'sale_data.product_id')
+            ->where('sale.client_company_id', $sessionUser['client_company_id'])
+            ->whereBetween('sale.date', [$startDate, $endDate])
+            ->groupBy('sale_data.product_id')
+            ->get()
+            ->toArray();
+        $posSaleTotalAmount = 0;
+        foreach ($posSales as &$posSale) {
+            $posSaleTotalAmount += $posSale['amount'];
+            $posSale['amount'] = number_format($posSale['amount'], $sessionUser['currency_precision']);
+            $posSale['price'] = number_format($posSale['price'], $sessionUser['currency_precision']);
+            $posSale['quantity'] = number_format($posSale['quantity'], $sessionUser['quantity_precision']);
+        }
+        $assetTransfer = BalanceTransfer::select(
+            'balance_transfer.amount',
+            'c1.name as from_category',
+            'c2.name as to_category',
+        )
+            ->leftJoin('categories as c1', 'c1.id', '=', 'balance_transfer.from_category_id')
+            ->leftJoin('categories as c2', 'c2.id', '=', 'balance_transfer.to_category_id')
+            ->whereBetween('balance_transfer.date', [$startDate, $endDate])
+            ->where('balance_transfer.client_company_id', $sessionUser['client_company_id'])
+            ->get()
+            ->toArray();
+        $totalTransferAmount = 0;
+        foreach ($assetTransfer as &$transfer) {
+            $totalTransferAmount += $transfer['amount'];
+            $transfer['amount'] = number_format($transfer['amount'], $sessionUser['currency_precision']);
+        }
         return [
             'status' => 200,
             'data' => $products,
             'companySales' => $transaction,
             'expenses' => $expenses,
+            'posSales' => $posSales,
+            'assetTransfer' => $assetTransfer,
             'total' => [
                 'quantity' => number_format($totalQuantity, $sessionUser['quantity_precision']),
                 'amount' => number_format($totalAmount, $sessionUser['currency_precision']),
                 'expense' => number_format($totalExpense, $sessionUser['currency_precision']),
+                'posSaleTotalAmount' => number_format($posSaleTotalAmount, $sessionUser['currency_precision']),
+                'totalTransferAmount' => number_format($totalTransferAmount, $sessionUser['currency_precision']),
             ]
         ];
     }
@@ -920,7 +962,7 @@ class ReportRepository
 
         if (!empty($companyId)) {
             $result->where(function($q) use ($companyId){
-                $q->where('transactions.linked_id', $companyId);
+                $q->where('transactions.account_id', $companyId);
             });
         }
         $result = $result->groupBy('transactions.date')

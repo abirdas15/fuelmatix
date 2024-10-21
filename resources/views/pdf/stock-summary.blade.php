@@ -132,25 +132,65 @@
                 <td style="text-align: right">{{ $data['total']['amount'] }}</td>
             </tr>
         </table>
-            <div class="text-center"><h2>Expense</h2></div>
-            <table class="print-details">
+        <div class="text-center"><h2>Expense</h2></div>
+        <table class="print-details">
+            <tr>
+                <th>Expense Category</th>
+                <th>Payment Type</th>
+                <th>Amount</th>
+            </tr>
+            @foreach($data['expenses'] as $expense)
                 <tr>
-                    <th>Expense Category</th>
-                    <th>Payment Type</th>
-                    <th>Amount</th>
+                    <td>{{ $expense['expense_type'] }}</td>
+                    <td>{{ $expense['payment_method'] }}</td>
+                    <td style="text-align: right">{{ $expense['amount_format'] }}</td>
                 </tr>
-                @foreach($data['expenses'] as $expense)
-                    <tr>
-                        <td>{{ $expense['expense_type'] }}</td>
-                        <td>{{ $expense['payment_method'] }}</td>
-                        <td style="text-align: right">{{ $expense['amount_format'] }}</td>
-                    </tr>
-                @endforeach
+            @endforeach
+            <tr>
+                <th colspan="2" style="text-align: right">Total:</th>
+                <td style="text-align: right">{{ $data['total']['expense'] }}</td>
+            </tr>
+        </table>
+        <div class="text-center"><h2>Pos Sale</h2></div>
+        <table class="print-details">
+            <tr>
+                <th>Product Name</th>
+                <th style="text-align: center">Quantity</th>
+                <th style="text-align: right">Unit Price</th>
+                <th style="text-align: right">Amount</th>
+            </tr>
+            @foreach($data['posSales'] as $posSale)
                 <tr>
-                    <th colspan="2" style="text-align: right">Total:</th>
-                    <td style="text-align: right">{{ $data['total']['expense'] }}</td>
+                    <td>{{ $posSale['product_name'] }}</td>
+                    <td style="text-align: center">{{ $posSale['quantity'] }}</td>
+                    <td style="text-align: right">{{ $posSale['price'] }}</td>
+                    <td style="text-align: right">{{ $posSale['amount'] }}</td>
                 </tr>
-            </table>
+            @endforeach
+            <tr>
+                <th colspan="3" style="text-align: right">Total:</th>
+                <td style="text-align: right">{{ $data['total']['posSaleTotalAmount'] }}</td>
+            </tr>
+        </table>
+        <div class="text-center"><h2>Asset Transfer</h2></div>
+        <table class="print-details">
+            <tr>
+                <th>From</th>
+                <th>To</th>
+                <th style="text-align: right">Amount</th>
+            </tr>
+            @foreach($data['assetTransfer'] as $assetTransfer)
+                <tr>
+                    <td>{{ $assetTransfer['from_category'] }}</td>
+                    <td>{{ $assetTransfer['to_category'] }}</td>
+                    <td style="text-align: right">{{ $assetTransfer['amount'] }}</td>
+                </tr>
+            @endforeach
+            <tr>
+                <th colspan="2" style="text-align: right">Total:</th>
+                <td style="text-align: right">{{ $data['total']['totalTransferAmount'] }}</td>
+            </tr>
+        </table>
     </div>
 </div>
 <!-- Footer Section -->

@@ -449,6 +449,9 @@ class SaleController extends Controller
         $orderBy = $requestData['order_by'] ?? 'transactions.id';
         $orderMode = $requestData['order_mode'] ?? 'DESC';
         $keyword = $requestData['keyword'] ?? '';
+        $companyId = $requestData['company_id'] ?? '';
+        $startDate  = $requestData['start_date'] ?? '';
+        $endDate  = $requestData['end_date'] ?? '';
         $result = Transaction::select('transactions.id', 'invoice_item.invoice_id',  DB::raw("SUM(transactions.debit_amount) as amount"), 'transactions.created_at', 'invoice_item.date as invoice_created_at', 'transactions.description', 'car.car_number', 'transactions.voucher_no', 'categories.name', 'transactions.module', 'transactions.module_id', 'transactions.account_id as category_id')
             ->leftJoin('categories', 'categories.id', '=', 'transactions.account_id')
             ->leftJoin('invoice_item', 'invoice_item.transaction_id', 'transactions.id')
@@ -460,6 +463,18 @@ class SaleController extends Controller
         if (!empty($keyword)) {
             $result->where(function($q) use ($keyword) {
                 $q->where('categories.name', 'LIKE', '%'.$keyword.'%');
+                $q->orWhere('transactions.voucher_no', 'LIKE', '%'.$keyword.'%');
+                $q->orWhere('car.car_number', 'LIKE', '%'.$keyword.'%');
+            });
+        }
+        if (!empty($companyId)) {
+            $result->where(function($q) use ($companyId) {
+                $q->where('transactions.account_id', $companyId);
+            });
+        }
+        if (!empty($startDate) && !empty($endDate)) {
+            $result->where(function($q) use ($startDate, $endDate) {
+                $q->whereBetween('transactions.date', [$startDate, $endDate]);
             });
         }
         $result = $result->orderBy($orderBy, $orderMode)

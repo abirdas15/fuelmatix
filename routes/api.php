@@ -157,7 +157,7 @@ Route::group(['middleware' => 'AuthReqCheck'], function() {
         Route::post('list', [TankController::class, 'list']);
         Route::post('single', [TankController::class, 'single']);
         Route::post('update', [TankController::class, 'update']);
-        Route::post('delete', [TankController::class, 'delete']);
+//        Route::post('delete', [TankController::class, 'delete']);
         Route::post('get/nozzle', [TankController::class, 'getNozzle']);
         Route::post('byProduct', [TankController::class, 'getTankByProduct']);
         Route::post('getVolume', [TankController::class, 'getVolume']);
@@ -257,6 +257,7 @@ Route::group(['middleware' => 'AuthReqCheck'], function() {
         Route::post('single', [InvoiceController::class, 'single']);
         Route::post('download/pdf', [InvoiceController::class, 'downloadPdf']);
         Route::post('payment/list', [InvoiceController::class, 'invoicePayment']);
+        Route::post('change-number', [InvoiceController::class, 'changeInvoiceNumber']);
     });
     Route::group(['prefix' => 'dashboard'], function() {
         Route::post('get', [DashboardController::class, 'get']);

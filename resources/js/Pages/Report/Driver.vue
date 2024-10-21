@@ -26,10 +26,15 @@
                                 <div class="col-xl-3 mb-3 form-group">
                                     <div class="example">
                                         <p class="mb-1">Company</p>
-                                        <select class="form-control" v-model="param.company_id" name="category_id">
-                                            <option value="">Choose...</option>
-                                            <option v-for="each in companies" :value="each.id"  v-text="each.name"></option>
-                                        </select>
+                                        <v-select
+                                            class="form-control form-control-sm"
+                                            :options="companies"
+                                            placeholder="Choose Company"
+                                            label="name"
+                                            v-model="param.company_id"
+                                            :reduce="(option) => option.id"
+                                            :searchable="true"
+                                        ></v-select>
                                         <div class="invalid-feedback"></div>
                                     </div>
                                 </div>

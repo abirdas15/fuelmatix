@@ -211,17 +211,17 @@ class ShiftSaleRepository
         DB::transaction(function() use ($shiftTotal, $product, $initialData, $sessionUser, $nozzleTotalConsumption, $incomeCategory, $costOfGoodSoldCategory) {
             // Set shift end details and save
             if ($initialData['status'] == 'previous') {
-                $shiftTotal->product_id = $initialData['product_id'];
                 $shiftTotal->start_date = Carbon::parse($initialData['date'], SessionUser::TIMEZONE)->startOfDay();
                 $shiftTotal->end_date = Carbon::parse($initialData['date'], SessionUser::TIMEZONE)->endOfDay();
-                $shiftTotal->user_id = $sessionUser['id'];
-                $shiftTotal->client_company_id = $sessionUser['client_company_id'];
             } else {
                 $shiftTotal->end_date = Carbon::now(SessionUser::TIMEZONE);
             }
+            $shiftTotal->product_id = $initialData['product_id'];
             $shiftTotal->status = FuelMatixStatus::END;
             $shiftTotal->consumption = $nozzleTotalConsumption;
             $shiftTotal->amount = $nozzleTotalConsumption * $product['selling_price'];
+            $shiftTotal->user_id = $sessionUser['id'];
+            $shiftTotal->client_company_id = $sessionUser['client_company_id'];
             $shiftTotal->save();
 
             // Process each tank's shift sale details

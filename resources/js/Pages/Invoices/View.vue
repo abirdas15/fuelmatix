@@ -76,6 +76,7 @@
                                                 <th style="background-color: rgba(134,183,255,0.9)" class="text-center">Quantity</th>
                                                 <th style="background-color: rgba(134,183,255,0.9)" class="text-end">Unit Price</th>
                                                 <th style="background-color: rgba(134,183,255,0.9)" class="text-end">Subtotal</th>
+                                                <th style="background-color: rgba(134,183,255,0.9)">Action</th>
                                             </tr>
                                             </thead>
                                             <tbody>
@@ -87,11 +88,16 @@
                                                 <td class="text-center">{{item.quantity}}</td>
                                                 <td class="text-end">{{item.price}}</td>
                                                 <td class="text-end">{{item.subtotal}}</td>
+                                                <td>
+                                                    <button class="btn btn-primary btn-sm" type="button" @click="openModal(item.id)">
+                                                        <i class="fa fa-pencil"></i>
+                                                    </button>
+                                                </td>
                                             </tr>
-                                            <tr>
-                                                <th colspan="6" class="text-end"><strong>Total</strong></th>
-                                                <th class="text-end">{{param.amount}}</th>
-                                            </tr>
+                                                <tr>
+                                                    <th colspan="6" class="text-end"><strong>Total</strong></th>
+                                                    <th class="text-end">{{param.amount}}</th>
+                                                </tr>
                                             </tbody>
                                         </table>
                                     </div>
@@ -101,6 +107,22 @@
                     </div>
                 </div>
             </div>
+        </div>
+        <div class="popup-wrapper-modal invoiceModal d-none">
+            <form @submit.prevent="changeInvoiceNumber" class="popup-box" style="max-width: 800px">
+                <button type="button" class=" btn  closeBtn"><i class="fas fa-times"></i></button>
+                <div class="row align-items-center">
+                    <div class="col-sm-12">
+                        <div class="input-wrapper form-group mb-3">
+                            <label for="description">Invoice Number</label>
+                            <input type="text" class="form-control" v-model="invoice_number" name="invoice_number">
+                            <small class="invalid-feedback"></small>
+                        </div>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary " v-if="!Loading">Submit</button>
+                <button type="button" class="btn btn-primary " disabled v-if="Loading">Submitting...</button>
+            </form>
         </div>
     </div>
 </template>
@@ -117,12 +139,39 @@ export default {
             id: '',
             listData: [],
             listDataTank: [],
+            companies: [],
+            company_id: '',
+            Loading: false,
+            selectedItemId: '',
+            invoice_number: ''
         }
     },
     watch: {
 
     },
     methods: {
+        changeInvoiceNumber() {
+            this.Loading = true;
+            ApiService.POST(ApiRoutes.invoice + '/change-number', {invoice_number: this.invoice_number, item_id: this.selectedItemId}, (res) => {
+                this.Loading = false;
+                if (parseInt(res.status) === 200) {
+                    this.$toast.success(res.message);
+                    this.getSingle();
+                    $('.invoiceModal').addClass('d-none');
+                } else {
+                    ApiService.ErrorHandler(res.errors);
+                }
+            });
+        },
+        openModal(id) {
+            this.selectedItemId = id;
+            $('.invoiceModal').removeClass('d-none');
+        },
+        getCreditCompany() {
+            ApiService.POST(ApiRoutes.CreditCompanyList, {limit: 500}, (res) => {
+                this.companies = res.data.data;
+            });
+        },
         getSingle: function () {
             ApiService.POST(ApiRoutes.invoiceSingle, {id: this.id},res => {
                 if (parseInt(res.status) === 200) {
@@ -145,6 +194,7 @@ export default {
     created() {
         this.id = this.$route.params.id
         this.getSingle()
+        this.getCreditCompany();
     },
     mounted() {
         $('#dashboard_bar').text('Invoice View')

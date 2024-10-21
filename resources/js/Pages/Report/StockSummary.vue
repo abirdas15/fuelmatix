@@ -200,6 +200,62 @@
                     </table>
                 </div>
             </div>
+            <div class="card" v-if="posSales.length > 0">
+                <div class="text-center mt-2"><h2>Pos Sale</h2></div>
+                <div class="card-body mt-0">
+                    <table class="table table-bordered">
+                        <tbody>
+                        <tr>
+                            <th>Product Name</th>
+                            <th class="text-center">Quantity</th>
+                            <th class="text-end">Unit Price</th>
+                            <th class="text-end">Amount</th>
+                        </tr>
+                        </tbody>
+                        <tbody>
+                        <tr v-for="each in posSales">
+                            <td v-text="each.product_name"></td>
+                            <td class="text-center" v-text="each.quantity"></td>
+                            <td class="text-end" v-text="each.price"></td>
+                            <td class="text-end" v-text="each.amount"></td>
+                        </tr>
+                        </tbody>
+                        <tbody>
+                        <tr>
+                            <th colspan="3" class="text-end">Total:</th>
+                            <th class="text-end" v-text="total.posSaleTotalAmount"></th>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card" v-if="assetTransfer.length > 0">
+                <div class="text-center mt-2"><h2>Asset Transfer</h2></div>
+                <div class="card-body mt-0">
+                    <table class="table table-bordered">
+                        <tbody>
+                        <tr>
+                            <th>From</th>
+                            <th>To</th>
+                            <th class="text-end">Amount</th>
+                        </tr>
+                        </tbody>
+                        <tbody>
+                        <tr v-for="each in assetTransfer">
+                            <td v-text="each.from_category"></td>
+                            <td v-text="each.to_category"></td>
+                            <td class="text-end" v-text="each.amount"></td>
+                        </tr>
+                        </tbody>
+                        <tbody>
+                        <tr>
+                            <th colspan="2" class="text-end">Total:</th>
+                            <th class="text-end" v-text="total.totalTransferAmount"></th>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 </template>
@@ -220,7 +276,9 @@ export default {
             },
             data: null,
             companySales: [],
+            posSales: [],
             expenses: [],
+            assetTransfer: [],
             total: {},
             loadingFile: false,
             loading: false,
@@ -250,7 +308,9 @@ export default {
                 if (parseInt(res.status) === 200) {
                     this.data = res.data;
                     this.companySales = res.companySales;
+                    this.posSales = res.posSales;
                     this.expenses = res.expenses;
+                    this.assetTransfer = res.assetTransfer;
                     this.total = res.total;
                 }
             });

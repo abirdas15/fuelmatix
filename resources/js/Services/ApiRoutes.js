@@ -169,7 +169,9 @@ const ApiRoutes = {
     companySaleDelete: ApiVersion + '/companySale/delete',
     companySaleList: ApiVersion + '/companySale/list',
     companySaleGetCategory: ApiVersion + '/companySale/getCategory',
-    //Invoice
+
+    //invoice
+    invoice: ApiVersion + '/invoice',
     invoiceGenerate: ApiVersion + '/invoice/generate',
     invoicePayment: ApiVersion + '/invoice/payment',
     invoiceGlobalPayment: ApiVersion + '/invoice/global/payment',
