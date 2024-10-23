@@ -500,7 +500,7 @@ class ProductController extends Controller
         }
 
         // Determine the date for querying
-        $date = Carbon::parse($inputData['date']. date(' H:i:s'));
+        $date = Carbon::parse($inputData['date']. date(' H:i:s'))->endOfDay();
 
         $sessionUser = SessionUser::getUser();
 
@@ -571,7 +571,7 @@ class ProductController extends Controller
             ->where('product_id', $inputData['product_id'])
             ->where('client_company_id', $sessionUser['client_company_id'])
             ->with(['nozzle' => function ($query) use ($date) {
-                $query->select('id', 'dispenser_id', 'name', 'opening_stock', 'pf', 'max_value')
+                $query->select('id', 'dispenser_id', 'name', 'opening_stock', 'pf', 'max_value', 'mac')
                     ->with(['latestShiftSummary' => function ($subQuery) use ($date) {
                         $subQuery->select('shift_summary.id', 'shift_summary.nozzle_id', 'shift_summary.start_reading', 'shift_summary.end_reading')
                             ->join('shift_sale', 'shift_summary.shift_sale_id', '=', 'shift_sale.id')

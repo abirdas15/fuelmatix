@@ -154,14 +154,14 @@
         <div class="text-center"><h2>Pos Sale</h2></div>
         <table class="print-details">
             <tr>
-                <th>Product Name</th>
+                <th>Name</th>
                 <th style="text-align: center">Quantity</th>
                 <th style="text-align: right">Unit Price</th>
                 <th style="text-align: right">Amount</th>
             </tr>
             @foreach($data['posSales'] as $posSale)
                 <tr>
-                    <td>{{ $posSale['product_name'] }}</td>
+                    <td>{{ $posSale['category_name'] }}</td>
                     <td style="text-align: center">{{ $posSale['quantity'] }}</td>
                     <td style="text-align: right">{{ $posSale['price'] }}</td>
                     <td style="text-align: right">{{ $posSale['amount'] }}</td>

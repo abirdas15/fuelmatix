@@ -202,18 +202,35 @@
                                                                     </div>
 
                                                                 </div>
-                                                                <div class="mb-3 col-md-2"  v-if="listDispenser.status === 'end'">
+                                                                <div class="mb-3 col-md-3"  v-if="listDispenser.status === 'end'">
                                                                     <label>End Reading </label>
                                                                     <div class="input-group">
-                                                                        <input type="text" class="form-control text-end" @blur="disableInput('frReading'+nIndex+dIndex)"
-                                                                               v-if="listDispenser.status === 'end'"
-                                                                               v-model="n.end_reading" @click="enableInput('frReading'+nIndex+dIndex)"
-                                                                               @input="calculateAmountNozzle(dIndex, nIndex, tankIndex) ">
-                                                                        <div class="input-group-append">
-                                                                            <span class="input-group-text" >{{ listDispenser.unit }}</span>
-                                                                        </div>
-                                                                    </div>
+                                                                        <input
+                                                                            type="text"
+                                                                            class="form-control text-end"
+                                                                            @blur="disableInput('frReading'+nIndex+dIndex)"
+                                                                            v-if="listDispenser.status === 'end'"
+                                                                            v-model="n.end_reading"
+                                                                            @click="enableInput('frReading'+nIndex+dIndex)"
+                                                                            @input="calculateAmountNozzle(dIndex, nIndex, tankIndex)">
 
+                                                                        <template v-if="n.mac !== null">
+                                                                            <button
+                                                                                type="button"
+                                                                                class="btn btn-primary btn-sm"
+                                                                                :class="'nozzle' + n.id"
+                                                                                @click="getNozzleLatestReading(tankIndex, dIndex, nIndex, n.id)">
+                                                                                Get
+                                                                            </button>
+                                                                            <button style="display: none" :class="'nozzle' + n.id"  class="btn btn-primary btn-sm">
+                                                                                <i class="fa fa-spinner fa-spin"></i>
+                                                                            </button>
+                                                                        </template>
+
+                                                                        <span class="input-group-text">
+                                                                            {{ listDispenser.unit }}
+                                                                        </span>
+                                                                    </div>
                                                                     <!--                                                            <input class="form-control" value="0" v-if="listDispenser.status == 'start'" disabled>-->
                                                                 </div>
                                                                 <div class="mb-3 col-md-2" v-if="listDispenser.status === 'end'">
@@ -234,7 +251,6 @@
                                                                     <label class="text-center">PF </label>
                                                                     <input type="text" disabled class="form-control" v-model="n.pf">
                                                                 </div>
-                                                                <div class="col-md-2 mb-3" v-else></div>
                                                                 <div class="mb-3 col-md-2"  v-if="listDispenser.status === 'end'">
                                                                     <label>Consumption </label>
                                                                     <div class="input-group">
@@ -422,6 +438,15 @@ export default {
         }
     },
     methods: {
+        getNozzleLatestReading(tankIndex, dispenserIndex, nozzleIndex, nozzleId) {
+            $('.nozzle'+ nozzleId).toggle();
+            ApiService.POST(ApiRoutes.ShiftSale + '/getNozzleLatestReading', {nozzle_id: nozzleId}, (res) => {
+                $('.nozzle'+ nozzleId).toggle();
+                if (parseInt(res.status) === 200) {
+                    this.listDispenser.tanks[tankIndex]['dispensers'][dispenserIndex]['nozzle'][nozzleIndex]['end_reading'] =  res.data.liters;
+                }
+            });
+        },
         getReading: function(event, field, index, tank_id) {
             this.getBstiChart(event.target.value, field, index, tank_id);
         },

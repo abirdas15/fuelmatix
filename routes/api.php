@@ -140,6 +140,7 @@ Route::group(['middleware' => 'AuthReqCheck'], function() {
         Route::post('getCategory', [ShiftSaleController::class, 'getCategory']);
         Route::post('getShiftByDate', [ShiftSaleController::class, 'getShiftByDate']);
         Route::post('tankReading', [ShiftSaleController::class, 'tankReading']);
+        Route::post('getNozzleLatestReading', [ShiftSaleController::class, 'getNozzleLatestReading']);
     });
     Route::group(['prefix' => 'expense'], function() {
         Route::post('save', [ExpenseController::class, 'save']);

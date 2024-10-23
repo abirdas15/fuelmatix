@@ -64,6 +64,7 @@ const ApiRoutes = {
     NozzleReadingList: ApiVersion + '/nozzle/reading/list',
     NozzleReadingSingle: ApiVersion + '/nozzle/reading/single',
     //Shift Sale
+    ShiftSale: ApiVersion + '/shift/sale',
     ShiftSaleAdd: ApiVersion + '/shift/sale/save',
     ShiftSaleEdit: ApiVersion + '/shift/sale/update',
     ShiftSaleDelete: ApiVersion + '/shift/sale/delete',

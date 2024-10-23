@@ -38,7 +38,14 @@
                                         <div class="invalid-feedback"></div>
                                     </div>
                                 </div>
-                                <div class="col-xl-3 mb-3">
+                                <div class="col-xl-2 mb-3 form-group">
+                                    <div class="example">
+                                        <p class="mb-1">Car Number</p>
+                                        <input class="form-control" name="car_number" type="text">
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                </div>
+                                <div class="col-xl-2 mb-3">
                                     <button v-if="!loading" type="button" class="btn btn-rounded btn-white border" @click="fetchDriverReport">
                                         <span class="btn-icon-start text-info"><i class="fa fa-filter color-white"></i></span>Filter
                                     </button>
@@ -46,7 +53,7 @@
                                         <span class="btn-icon-start text-info"><i class="fa fa-filter color-white"></i></span>Filter...
                                     </button>
                                 </div>
-                                <div class="col-xl-3 mb-3">
+                                <div class="col-xl-2 mb-3">
                                     <button class="btn btn-primary" v-if="!loadingFile" @click="downloadPdf"><i class="fa fa-print" aria-hidden="true"></i>&nbsp;Print</button>
                                     <button class="btn btn-primary" v-if="loadingFile"><i class="fa fa-print" aria-hidden="true"></i>&nbsp;Print...</button>
                                 </div>
@@ -110,7 +117,8 @@ export default {
             param: {
                 start_date: '',
                 end_date: '',
-                company_id: ''
+                company_id: '',
+                car_number: ''
             },
             loading: false,
             summary: [],

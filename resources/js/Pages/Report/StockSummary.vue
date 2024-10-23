@@ -206,7 +206,7 @@
                     <table class="table table-bordered">
                         <tbody>
                         <tr>
-                            <th>Product Name</th>
+                            <th>Name</th>
                             <th class="text-center">Quantity</th>
                             <th class="text-end">Unit Price</th>
                             <th class="text-end">Amount</th>
@@ -214,7 +214,7 @@
                         </tbody>
                         <tbody>
                         <tr v-for="each in posSales">
-                            <td v-text="each.product_name"></td>
+                            <td v-text="each.category_name"></td>
                             <td class="text-center" v-text="each.quantity"></td>
                             <td class="text-end" v-text="each.price"></td>
                             <td class="text-end" v-text="each.amount"></td>

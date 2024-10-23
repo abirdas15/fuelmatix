@@ -534,6 +534,13 @@ class ReportRepository
         $startDate = Carbon::parse($date, SessionUser::TIMEZONE)->startOfDay();
         $endDate = Carbon::parse($date, SessionUser::TIMEZONE)->endOfDay();
 
+        $shiftId = ShiftTotal::select('id')
+            ->where('client_company_id', $sessionUser['client_company_id'])
+            ->whereBetween('start_date', [$startDate, $endDate])
+            ->get()
+            ->pluck('id')
+            ->toArray();
+
         $shiftSale = ShiftTotal::select(
             'shift_sale.id',
             'shift_sale.tank_id',
@@ -695,17 +702,26 @@ class ReportRepository
             $totalExpense += $expense['amount'];
             $expense['amount_format'] = number_format($expense['amount'], $sessionUser['currency_precision']);
         }
+        $posMachine = Category::where('client_company_id', $sessionUser['client_company_id'])
+            ->where('slug', strtolower(AccountCategory::POS_MACHINE))
+            ->first();
+        $posMachineCategory = Category::where('parent_category', $posMachine->id ?? 0)
+            ->get()
+            ->pluck('id')
+            ->toArray();
         $posSales = SaleData::select(
             DB::raw('SUM(sale_data.quantity) as quantity'),
             DB::raw('SUM(sale_data.subtotal) as amount'),
             'price',
-            'products.name as product_name'
+            'categories.name as category_name',
         )
             ->leftJoin('sale', 'sale.id', '=', 'sale_data.sale_id')
             ->leftJoin('products', 'products.id', '=', 'sale_data.product_id')
+            ->leftJoin('categories', 'categories.id', '=', 'sale.payment_category_id')
             ->where('sale.client_company_id', $sessionUser['client_company_id'])
-            ->whereBetween('sale.date', [$startDate, $endDate])
-            ->groupBy('sale_data.product_id')
+            ->whereIn('sale_data.shift_sale_id', $shiftId)
+            ->whereIn('sale.payment_category_id', $posMachineCategory)
+            ->groupBy('sale.payment_category_id')
             ->get()
             ->toArray();
         $posSaleTotalAmount = 0;
@@ -963,6 +979,11 @@ class ReportRepository
         if (!empty($companyId)) {
             $result->where(function($q) use ($companyId){
                 $q->where('transactions.account_id', $companyId);
+            });
+        }
+        if (!empty($filter['car_number'])) {
+            $result->where(function($q) use ($filter) {
+                $q->where('car.car_number', $filter['car_number']);
             });
         }
         $result = $result->groupBy('transactions.date')

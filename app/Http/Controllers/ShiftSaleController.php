@@ -437,5 +437,42 @@ class ShiftSaleController extends Controller
             'data' => $response
         ]);
     }
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function getNozzleLatestReading(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'nozzle_id' => 'required|integer'
+        ]);
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 500,
+                'errors' => $validator->errors()
+            ]);
+        }
+        $curl = curl_init();
+
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => env('INFRMATX_API').'/nozzle_mqtt_total.php?nozzle_id='.$request->input('nozzle_id'),
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'GET',
+        ));
+
+        $response = curl_exec($curl);
+
+        curl_close($curl);
+        $jsonDecode = json_decode($response, true);
+        return response()->json([
+            'status' => 200,
+            'data' => $jsonDecode
+        ]);
+    }
 
 }
