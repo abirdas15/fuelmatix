@@ -981,9 +981,9 @@ class ReportRepository
                 $q->where('transactions.account_id', $companyId);
             });
         }
-        if (!empty($filter['car_id'])) {
+        if (!empty($filter['car_number'])) {
             $result->where(function($q) use ($filter) {
-                $q->where('car.id', $filter['car_id']);
+                $q->where('car.id', $filter['car_number']);
             });
         }
         $result = $result->groupBy('transactions.date')
