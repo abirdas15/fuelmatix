@@ -63,9 +63,9 @@ class ShiftSaleRepository
             $shiftSale->start_reading = $tank['start_reading'];
             $shiftSale->end_reading = 0;
             $shiftSale->consumption = 0;
-            $shiftTotal->client_company_id = $sessionUser['client_company_id'];
-            $shiftTotal->user_id = $sessionUser['id'];
-            $shiftTotal->product_id = $initialData['product_id'];
+            $shiftSale->client_company_id = $sessionUser['client_company_id'];
+            $shiftSale->user_id = $sessionUser['id'];
+            $shiftSale->product_id = $initialData['product_id'];
 
             // Save the ShiftSale object to the database
             if (!$shiftSale->save()) {
