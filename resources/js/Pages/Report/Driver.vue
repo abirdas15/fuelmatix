@@ -45,7 +45,7 @@
                                             class="form-control form-control-sm"
                                             :options="cars"
                                             placeholder="Choose Car"
-                                            label="name"
+                                            label="car_number"
                                             v-model="param.car_number"
                                             :reduce="(option) => option.id"
                                             :searchable="true"
