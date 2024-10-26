@@ -66,9 +66,16 @@ class CarController extends Controller
         $limit = $requestData['limit'] ?? 10;
         $company_id = $requestData['company_id'] ?? '';
         $sessionUser = SessionUser::getUser();
+        $keyword = $request['keyword'] ?? '';
         $result = Car::select('car.id', 'car.car_number', 'categories.name as company_name')
             ->leftJoin('categories', 'categories.id', '=', 'car.company_id')
             ->where('car.client_company_id', $sessionUser['client_company_id']);
+        if (!empty($keyword)) {
+            $result->where(function($q) use ($keyword) {
+                $q->where('car.car_number', 'LIKE', '%'.$keyword.'%');
+                $q->orWhere('categories.name', 'LIKE', '%'.$keyword.'%');
+            });
+        }
         if (!empty($company_id)) {
             $result->where(function($q) use ($company_id) {
                $q->where('company_id', $company_id);

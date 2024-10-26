@@ -97,13 +97,16 @@
                     <template v-for="product in data">
                         <table class="table table-bordered">
                             <tbody>
-                            <tr>
-                                <th>U/Tank Name</th>
-                                <th>Previous Balance</th>
-                                <th>Receive</th>
-                                <th>Total</th>
-                                <th class="text-center">{{ product.gain_loss >= 0 ? 'Gain' : 'Loss' }} Ratio</th>
-                            </tr>
+                                <tr class="bg-custom">
+                                    <th colspan="5" class="text-center" v-text="product.product_name + ' Under Tank'"></th>
+                                </tr>
+                                <tr>
+                                    <th>U/Tank Name</th>
+                                    <th>Previous Balance</th>
+                                    <th>Receive</th>
+                                    <th>Total</th>
+                                    <th class="text-center">{{ product.gain_loss >= 0 ? 'Gain' : 'Loss' }} Ratio</th>
+                                </tr>
                             </tbody>
                             <tbody>
                             <tr>
@@ -117,9 +120,6 @@
                         </table>
                         <table class="table table-bordered">
                             <tbody>
-                            <tr class="bg-custom">
-                                <th colspan="4" class="text-center" v-text="product.product_name + ' Under Tank'"></th>
-                            </tr>
                             <tr>
                                 <th>U/Tank Name</th>
                                 <th class="text-center">U/Tank as per DIP</th>

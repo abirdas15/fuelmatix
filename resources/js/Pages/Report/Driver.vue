@@ -41,7 +41,15 @@
                                 <div class="col-xl-2 mb-3 form-group">
                                     <div class="example">
                                         <p class="mb-1">Car Number</p>
-                                        <input class="form-control" name="car_number" type="text">
+                                        <v-select
+                                            class="form-control form-control-sm"
+                                            :options="cars"
+                                            placeholder="Choose Car"
+                                            label="name"
+                                            v-model="param.car_number"
+                                            :reduce="(option) => option.id"
+                                            :searchable="true"
+                                        ></v-select>
                                         <div class="invalid-feedback"></div>
                                     </div>
                                 </div>
@@ -118,15 +126,28 @@ export default {
                 start_date: '',
                 end_date: '',
                 company_id: '',
-                car_number: ''
+                car_id: ''
             },
             loading: false,
             summary: [],
             total: {},
             loadingFile: false,
+            cars: []
+        }
+    },
+    watch: {
+        'param.company_id': function() {
+            this.fetchCar();
         }
     },
     methods: {
+        fetchCar() {
+            ApiService.POST(ApiRoutes.CarList, {company_id: this.param.company_id}, (res) => {
+                if (parseFloat(res.status) === 200) {
+                    this.cars = res.data.data;
+                }
+            });
+        },
         downloadPdf: function() {
             this.loadingFile = true
             ApiService.ClearErrorHandler();

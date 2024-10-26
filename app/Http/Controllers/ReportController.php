@@ -291,7 +291,7 @@ class ReportController extends Controller
             'start_date' => $request->input('start_date'),
             'end_date' => $request->input('end_date'),
             'company_id' => $request->input('company_id', ''),
-            'car_number' => $request->input('car_number', '')
+            'car_id' => $request->input('car_id', '')
         ];
         $result = ReportRepository::driverReport($filter);
         return response()->json($result);
