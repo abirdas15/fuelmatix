@@ -676,7 +676,7 @@ class ReportRepository
             ->whereJsonContains('categories.category_ids', $accountReceivable->id)
             ->where('transactions.client_company_id', $sessionUser['client_company_id'])
             ->having('amount', '>', 0)
-            ->groupBy('transactions.id')
+            ->groupBy('transactions.account_id')
             ->get()
             ->toArray();
         $totalQuantity = 0;
