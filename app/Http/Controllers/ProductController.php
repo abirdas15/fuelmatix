@@ -558,7 +558,11 @@ class ProductController extends Controller
                 JOIN shift_sale ss2 ON ss2.shift_id = st2.id
                 WHERE ss2.tank_id = tank.id
                 AND st2.start_date <= ?
+                ORDER BY st2.start_date DESC
+                LIMIT 1
             )
+            ORDER BY st.start_date DESC
+            LIMIT 1
         )', [$date]);
             })
             ->leftJoin('shift_total', 'shift_sale.shift_id', '=', 'shift_total.id')
