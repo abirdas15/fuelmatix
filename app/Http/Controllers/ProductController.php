@@ -674,7 +674,9 @@ class ProductController extends Controller
 
         // Prepare the final result array
         $result = [
-            'date' => Carbon::parse($date, SessionUser::TIMEZONE)->format('Y-m-d H:i:s'),
+            'date' => Carbon::parse($date, SessionUser::TIMEZONE)
+                ->setTimeFromTimeString(Carbon::now(SessionUser::TIMEZONE)->format('H:i:s'))
+                ->format('Y-m-d H:i:s'),
             'product_id' => $inputData['product_id'],
             'tanks' => $tanks,
             'amount' => $amount,
