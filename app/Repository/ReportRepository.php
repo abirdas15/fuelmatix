@@ -667,7 +667,9 @@ class ReportRepository
             $product['gain_loss'] = $gainLoss;
             $product['gain_loss_format'] = $gainLoss > 0 ? number_format(abs($gainLoss), $sessionUser['quantity_precision']) .'%' : '-';
         }
-        $accountReceivable = Category::where('client_company_id', $sessionUser['client_company_id'])->where('slug', strtolower( AccountCategory::ACCOUNT_RECEIVABLE))->first();
+        $accountReceivable = Category::where('client_company_id', $sessionUser['client_company_id'])
+            ->where('slug', strtolower( AccountCategory::ACCOUNT_RECEIVABLE))
+            ->first();
         $transaction = Transaction::select('transactions.account_id as id',  DB::raw("SUM(transactions.debit_amount) as amount"), 'categories.name', DB::raw('SUM(transactions.quantity) as quantity'), 'c1.name as product_name')
             ->leftJoin('transactions as t1', 't1.id', '=', 'transactions.linked_id')
             ->leftJoin('categories', 'categories.id', '=', 'transactions.account_id')
@@ -676,7 +678,7 @@ class ReportRepository
             ->whereJsonContains('categories.category_ids', $accountReceivable->id)
             ->where('transactions.client_company_id', $sessionUser['client_company_id'])
             ->having('amount', '>', 0)
-            ->groupBy('transactions.account_id')
+            ->groupBy('transactions.id')
             ->get()
             ->toArray();
         $totalQuantity = 0;
