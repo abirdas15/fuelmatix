@@ -520,7 +520,7 @@ class ReportRepository
         $products = Product::select('products.id', 'products.name as product_name', 'product_types.tank', 'products.selling_price')
             ->leftJoin('product_types', 'product_types.id', '=', 'products.type_id')
             ->where('products.client_company_id', $sessionUser['client_company_id'])
-            ->where('product_types.tank', '1')
+            ->where('product_types.type', 'fuel')
             ->with(['tanks' => function($q) {
                 $q->select('id', 'product_id', 'tank_name', 'opening_stock');
             },'tanks.dispensers' => function($q) {
