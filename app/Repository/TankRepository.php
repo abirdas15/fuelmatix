@@ -8,6 +8,7 @@ use App\Helpers\SessionUser;
 use App\Http\Controllers\TransactionController;
 use App\Models\BstiChart;
 use App\Models\Category;
+use App\Models\PayOrderData;
 use App\Models\Product;
 use App\Models\Tank;
 use App\Models\TankLog;
@@ -83,9 +84,9 @@ class TankRepository
      *
      * @param array $initialData Initial data for tank refill.
      * @param Product $product The product associated with the tank refill.
-     * @return TankRefillTotal|array The saved tank refill total or an error response.
+     * @return TankRefillTotal The saved tank refill total or an error response.
      */
-    public static function saveTankRefill(array $initialData, Product $product)
+    public static function saveTankRefill(array $initialData, Product $product, PayOrderData $payOrder): TankRefillTotal
     {
         // Retrieve the current session user.
         $sessionUser = SessionUser::getUser();
@@ -106,7 +107,7 @@ class TankRepository
         // Create a new TankRefillTotal instance and populate its fields.
         $date = $initialData['date'];
         $tankRefillTotal = new TankRefillTotal();
-        DB::transaction(function() use ($date, $initialData, $sessionUser, $product, $lossCategory, $incomeCategory, $tankRefillTotal) {
+        DB::transaction(function() use ($date, $initialData, $sessionUser, $product, $lossCategory, $incomeCategory, $tankRefillTotal, $payOrder) {
            $tankRefillTotal->date = $date;
            $tankRefillTotal->time = date('H:i:s');
            $tankRefillTotal->product_id = $initialData['product_id'];
@@ -205,6 +206,12 @@ class TankRepository
 
                $stockAmount = $dipSale * $product['buying_price'];
                if ($stockCategory instanceof Category && !empty($stockAmount)) {
+
+                   $assetAccountId = $initialData['vendor_id'];
+                   if (!empty($payOrder['bank_id'])) {
+                       $assetAccountId = $payOrder['bank_id'];
+                   }
+
                    $transactionData = [
                        ['date' => $date, 'account_id' => $stockCategory['id'], 'debit_amount' => $stockAmount,  'credit_amount' => 0, 'module' => Module::TANK_REFILL, 'module_id' => $tankRefill['id']]
                    ];
@@ -218,7 +225,7 @@ class TankRepository
                        $transactionData[] = ['date' => $date, 'account_id' => $incomeCategory['id'], 'debit_amount' => 0, 'credit_amount' => abs($netProfitAmount), 'module' => Module::TANK_REFILL, 'module_id' => $tankRefill['id']];
                    }
 
-                   $transactionData[] = ['date' => $date, 'account_id' => $initialData['vendor_id'], 'debit_amount' => 0, 'credit_amount' => $creditAmount, 'module' => Module::TANK_REFILL, 'module_id' => $tankRefill['id']];
+                   $transactionData[] = ['date' => $date, 'account_id' => $assetAccountId, 'debit_amount' => 0, 'credit_amount' => $creditAmount, 'module' => Module::TANK_REFILL, 'module_id' => $tankRefill['id']];
                    // Save the transaction data
                    TransactionRepository::saveTransaction($transactionData);
                }

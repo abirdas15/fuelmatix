@@ -32,7 +32,7 @@ class PayOrderController extends Controller
 
         // Validate the request data
         $validator = Validator::make($inputData, [
-            'bank_id' => 'required|integer',
+            'bank_id' => 'nullable|integer',
             'vendor_id' => 'required|integer',
             'number' => 'required|string',
             'remarks' => 'nullable|string',
@@ -114,13 +114,13 @@ class PayOrderController extends Controller
                 ];
 
                 // Prepare transaction data
-                $transactionData = [
-                    ['date' => date('Y-m-d'), 'account_id' => $inputData['bank_id'], 'debit_amount' => 0, 'credit_amount' => $product['total'], 'module' => Module::PAY_ORDER, 'module_id' => $payOrder->id],
-                    ['date' => date('Y-m-d'), 'account_id' => $inputData['vendor_id'], 'debit_amount' => $product['total'], 'credit_amount' => 0, 'module' => Module::PAY_ORDER, 'module_id' => $payOrder->id],
-                ];
+//                $transactionData = [
+//                    ['date' => date('Y-m-d'), 'account_id' => $inputData['bank_id'], 'debit_amount' => 0, 'credit_amount' => $product['total'], 'module' => Module::PAY_ORDER, 'module_id' => $payOrder->id],
+//                    ['date' => date('Y-m-d'), 'account_id' => $inputData['vendor_id'], 'debit_amount' => $product['total'], 'credit_amount' => 0, 'module' => Module::PAY_ORDER, 'module_id' => $payOrder->id],
+//                ];
 
                 // Save transaction data
-                TransactionRepository::saveTransaction($transactionData);
+                //TransactionRepository::saveTransaction($transactionData);
             }
 
             // Insert pay order data into PayOrderData table
