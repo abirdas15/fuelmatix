@@ -958,7 +958,7 @@ export default {
             });
         },
         getCarList: function () {
-            ApiService.POST(ApiRoutes.CarList, {company_id: this.company_id}, res => {
+            ApiService.POST(ApiRoutes.CarList, {company_id: this.company_id, limit: 200}, res => {
                 if (parseInt(res.status) === 200) {
                     this.carList = res.data.data
                 } else {
