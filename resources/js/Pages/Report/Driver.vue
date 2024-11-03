@@ -142,7 +142,7 @@ export default {
     },
     methods: {
         fetchCar() {
-            ApiService.POST(ApiRoutes.CarList, {company_id: this.param.company_id}, (res) => {
+            ApiService.POST(ApiRoutes.CarList, {company_id: this.param.company_id, limit: 500}, (res) => {
                 if (parseFloat(res.status) === 200) {
                     this.cars = res.data.data;
                 }
