@@ -22,12 +22,12 @@
     <div class="print-body">
         <table class="print-details">
             <tr>
-                <th>Date</th>
-                <th>Company Name</th>
-                <th>Car Number</th>
-                <th>Voucher No</th>
-                <th>Quantity</th>
-                <th>Bill</th>
+                <th style="width: 15%">Date</th>
+                <th style="width: 30%">Company Name</th>
+                <th style="width: 15%">Car Number</th>
+                <th style="width: 13%">Voucher No</th>
+                <th style="width: 12%">Quantity</th>
+                <th style="width: 15%">Bill</th>
             </tr>
             @foreach($data['data'] as $each)
                 <tr>
