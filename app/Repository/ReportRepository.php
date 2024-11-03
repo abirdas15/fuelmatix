@@ -8,6 +8,7 @@ use App\Common\FuelMatixStatus;
 use App\Helpers\Helpers;
 use App\Helpers\SessionUser;
 use App\Models\BalanceTransfer;
+use App\Models\Car;
 use App\Models\Category;
 use App\Models\Expense;
 use App\Models\FuelAdjustment;
@@ -984,9 +985,8 @@ class ReportRepository
             });
         }
         if (!empty($filter['car_number'])) {
-            $result->where(function($q) use ($filter) {
-                $q->where('car.id', $filter['car_number']);
-            });
+            $car = Car::where('id', $filter['car_number'])->first();
+            $result->where('car.car_number', $car['car_number']);
         }
         $result = $result->groupBy('transactions.date')
             ->groupBy('transactions.car_id')
