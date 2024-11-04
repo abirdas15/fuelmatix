@@ -580,8 +580,12 @@ class ProductController extends Controller
                         $subQuery->select('shift_summary.id', 'shift_summary.nozzle_id', 'shift_summary.start_reading', 'shift_summary.end_reading')
                             ->join('shift_sale', 'shift_summary.shift_sale_id', '=', 'shift_sale.id')
                             ->join('shift_total', 'shift_sale.shift_id', '=', 'shift_total.id')
-                            ->where('shift_total.start_date', '<=', $date) // Filter by date here
-                            ->orderBy('shift_total.start_date', 'desc');
+                            ->where('shift_total.start_date', '<=', $date)
+                            ->whereIn('shift_summary.id', function ($query) {
+                                $query->select(DB::raw('MAX(shift_summary.id)'))
+                                    ->from('shift_summary')
+                                    ->groupBy('nozzle_id');
+                            });
                     }]);
             }])
             ->get()
