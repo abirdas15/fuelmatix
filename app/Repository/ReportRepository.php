@@ -977,7 +977,8 @@ class ReportRepository
             ->leftJoin('categories', 'categories.id', '=', 't1.account_id')
             ->whereBetween('transactions.date', [$filter['start_date'], $filter['end_date']])
             ->where('transactions.client_company_id', $sessionUser['client_company_id'])
-            ->whereNotNull('transactions.car_id');
+            ->whereNotNull('transactions.car_id')
+            ->where('transactions.debit_amount', '>', 0);
 
         if (!empty($companyId)) {
             $result->where(function($q) use ($companyId){
