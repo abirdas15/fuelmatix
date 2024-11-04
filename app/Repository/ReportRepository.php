@@ -971,14 +971,13 @@ class ReportRepository
     public static function driverReport(array $filter): array
     {
         $sessionUser = SessionUser::getUser();
-        $result = Transaction::select('transactions.id', 'categories.name as company_name', 'transactions.date', 'car.car_number', 'transactions.voucher_no', DB::raw('SUM(transactions.debit_amount) as bill'), DB::raw('SUM(transactions.quantity) as quantity'))
+        $result = Transaction::select('transactions.id', 'categories.name as company_name', 'transactions.date', 'car.car_number', 'transactions.voucher_no', 'transactions.credit_amount as bill', DB::raw('transactions.quantity'))
             ->leftJoin('car', 'car.id', '=', 'transactions.car_id')
             ->leftJoin('transactions as t1', 't1.linked_id', '=', 'transactions.id')
             ->leftJoin('categories', 'categories.id', '=', 't1.account_id')
             ->whereBetween('transactions.date', [$filter['start_date'], $filter['end_date']])
             ->where('transactions.client_company_id', $sessionUser['client_company_id'])
-            ->whereNotNull('transactions.car_id')
-            ->where('transactions.debit_amount', '>', 0);
+            ->whereNotNull('transactions.car_id');
 
         if (!empty($companyId)) {
             $result->where(function($q) use ($companyId){
