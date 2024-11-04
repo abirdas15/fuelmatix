@@ -9,6 +9,7 @@ use App\Helpers\SessionUser;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductType;
+use App\Models\ShiftName;
 use App\Models\ShiftSale;
 use App\Models\ShiftSummary;
 use App\Models\ShiftTotal;
@@ -152,6 +153,7 @@ class ShiftSaleController extends Controller
             'products.name as product_name',  // Get product name
             'users.name as user_name',  // Get user name
             'product_types.tank',  // Get tank information from product_types
+            'shift_names.name as shift_name',
             DB::raw('SUM(shift_sale.consumption) as total_consumption'),  // Aggregate total consumption
             DB::raw('SUM(shift_sale.amount) as total_amount')  // Aggregate total amount
         )
@@ -159,6 +161,7 @@ class ShiftSaleController extends Controller
             ->leftJoin('products', 'products.id', '=', 'shift_total.product_id')  // Join with products table
             ->leftJoin('product_types', 'product_types.id', '=', 'products.type_id')  // Join with product_types table
             ->leftJoin('users', 'users.id', '=', 'shift_total.user_id')  // Join with users table
+            ->leftJoin('shift_names', 'shift_names.id', '=', 'shift_total.shift_name_id')
             ->where('shift_total.client_company_id', $session['client_company_id']);  // Filter by client company ID
 
         // Apply keyword search if provided
@@ -472,6 +475,17 @@ class ShiftSaleController extends Controller
         return response()->json([
             'status' => 200,
             'data' => $jsonDecode
+        ]);
+    }
+    public function shiftNameList(Request $request): JsonResponse
+    {
+        $sessionUser = SessionUser::getUser();
+        $result = ShiftName::where('client_company_id', $sessionUser['client_company_id'])
+            ->get()
+            ->toArray();
+        return response()->json([
+            'status' => 200,
+            'data' => $result
         ]);
     }
 

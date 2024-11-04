@@ -532,9 +532,11 @@ class ProductController extends Controller
             ->where('status', 'start')
             ->first();
 
+        $shiftNameId = $request->input('shift_name_id');
         if ($shiftSale instanceof ShiftTotal) {
             $shiftSaleId = $shiftSale->id;
             $date = Carbon::parse($shiftSale->start_date, SessionUser::TIMEZONE);
+            $shiftNameId = $shiftSale->shift_name_id;
         }
         // Query tanks with the most recent shift sale details
         $tanks = Tank::select(
@@ -687,7 +689,8 @@ class ProductController extends Controller
             'selling_price' => $product->selling_price,
             'unit' => $productType['unit'],
             'tank' => $productType['tank'],
-            'net_profit' => 0
+            'net_profit' => 0,
+            'shift_name_id' => $shiftNameId
         ];
         $result['status'] = 'start';
         $result['pos_sale'] = [];

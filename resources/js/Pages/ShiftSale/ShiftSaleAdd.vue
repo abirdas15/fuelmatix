@@ -31,6 +31,13 @@
                                             </select>
                                             <div class="invalid-feedback"></div>
                                         </div>
+                                        <div class="col-md-3 form-group">
+                                            <label>Select Shift Name</label>
+                                            <select class="form-control" v-model="shift_name_id" name="shift_name_id">
+                                                <option :value="p.id" v-for="(p, pIndex) in shiftNames">{{ p.name }}</option>
+                                            </select>
+                                            <div class="invalid-feedback"></div>
+                                        </div>
                                         <div class="col-2">
                                             <button class="btn btn-primary mt-4" type="button" @click="searchDispenser()">Search</button>
                                         </div>
@@ -411,6 +418,8 @@ export default {
             bstiChart: [],
             date: moment().format('YYYY-MM-DD'),
             apiLoading: false,
+            shiftNames: [],
+            shift_name_id: ''
         }
     },
     computed: {
@@ -438,6 +447,13 @@ export default {
         }
     },
     methods: {
+        fetchShiftName() {
+            ApiService.POST(ApiRoutes.ShiftName, {},(res) => {
+                if (parseInt(res.status) === 200) {
+                    this.shiftNames = res.data;
+                }
+            });
+        },
         getNozzleLatestReading(tankIndex, dispenserIndex, nozzleIndex, nozzleId) {
             $('.nozzle'+ nozzleId).toggle();
             ApiService.POST(ApiRoutes.ShiftSale + '/getNozzleLatestReading', {nozzle_id: nozzleId}, (res) => {
@@ -606,12 +622,13 @@ export default {
             this.totalAmount = 0
             ApiService.ClearErrorHandler();
             this.apiLoading = true;
-            ApiService.POST(ApiRoutes.ProductDispenser, {product_id: this.product_id, date: this.date}, res => {
+            ApiService.POST(ApiRoutes.ProductDispenser, {product_id: this.product_id, date: this.date, shift_name_id: this.shift_name_id}, res => {
                 this.apiLoading = false;
                 if (parseInt(res.status) === 200) {
                     this.listDispenser = res.data;
                     this.getCategory()
                     this.updateOilStock();
+                    this.shift_name_id = res.data.shift_name_id;
                 } else {
                     ApiService.ErrorHandler(res.errors);
                 }
@@ -725,8 +742,9 @@ export default {
         },
     },
     created() {
-        this.getProduct()
-        this.getSingleMitchMatch()
+        this.getProduct();
+        this.getSingleMitchMatch();
+        this.fetchShiftName();
     },
     mounted() {
         if (this.$route.query.product_id !== undefined && this.$route.query.date !== undefined) {

@@ -7,6 +7,7 @@ use App\Common\Module;
 use App\Helpers\SessionUser;
 use App\Models\Category;
 use App\Models\CompanyProductPrice;
+use App\Models\Transaction;
 use App\Repository\CategoryRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -292,6 +293,30 @@ class CreditCompanyController extends Controller
         return response()->json([
             'status' => 200,
             'data' => $result
+        ]);
+    }
+    public function delete(Request $request): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'id' => 'required'
+        ]);
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 500,
+                'errors' => $validator->errors()
+            ]);
+        }
+        $transaction = Transaction::where('account_id', $request->input('id'))->first();
+        if ($transaction instanceof Transaction) {
+            return response()->json([
+                'status' => 300,
+                'message' => 'This company already have many transaction. Please delete transaction first.'
+            ]);
+        }
+        Category::where('id', $request->input('id'))->delete();
+        return response()->json([
+            'status' => 200,
+            'message' => 'Successfully deleted credit company.'
         ]);
     }
     /**

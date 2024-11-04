@@ -37,6 +37,7 @@
                                             <thead>
                                             <tr class="text-white" style="background-color: #4886EE;color:#ffffff">
                                                 <th class="text-white" @click="sortData('name')" :class="sortClass('name')">Date</th>
+                                                <th class="text-white" @click="sortData('shift_name')" :class="sortClass('shift_name')">Shift Name</th>
                                                 <th class="text-white" @click="sortData('product_name')" :class="sortClass('product_name')">Product Name</th>
                                                 <th class="text-white" @click="sortData('start_reading')" :class="sortClass('start_reading')">Start Reading</th>
                                                 <th class="text-white" @click="sortData('end_reading')" :class="sortClass('end_reading')">End Reading</th>
@@ -48,6 +49,7 @@
                                             <tbody v-if="listData.length > 0 && TableLoading == false">
                                             <tr v-for="f in listData">
                                                 <td >{{f.date}}</td>
+                                                <td >{{f.shift_name}}</td>
                                                 <td >{{f.product_name}}</td>
                                                 <td >{{f.start_reading}}</td>
                                                 <td >{{f.end_reading}}</td>

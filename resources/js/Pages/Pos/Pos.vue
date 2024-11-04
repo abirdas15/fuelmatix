@@ -819,9 +819,9 @@ export default {
             this.sale.splice(i, 1)
         },
         cartProduct: function (p) {
-            let quantity =  1;
+            let quantity =  '';
             let selling_price = p.selling_price;
-            let subtotal = p.selling_price;
+            let subtotal = 0;
             if (this.advance_sale) {
                 subtotal = this.driver_amount;
                 quantity = subtotal / selling_price;

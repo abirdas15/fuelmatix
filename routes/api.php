@@ -141,6 +141,7 @@ Route::group(['middleware' => 'AuthReqCheck'], function() {
         Route::post('getShiftByDate', [ShiftSaleController::class, 'getShiftByDate']);
         Route::post('tankReading', [ShiftSaleController::class, 'tankReading']);
         Route::post('getNozzleLatestReading', [ShiftSaleController::class, 'getNozzleLatestReading']);
+        Route::post('shiftName/list', [ShiftSaleController::class, 'shiftNameList']);
     });
     Route::group(['prefix' => 'expense'], function() {
         Route::post('save', [ExpenseController::class, 'save']);

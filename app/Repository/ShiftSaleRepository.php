@@ -44,6 +44,7 @@ class ShiftSaleRepository
         $shiftTotal->consumption = 0;
         $shiftTotal->client_company_id = $sessionUser['client_company_id'];
         $shiftTotal->user_id = $sessionUser['id'];
+        $shiftTotal->shift_name_id = $initialData['shift_name_id'];
 
         // Save the ShiftTotal object to the database
         if (!$shiftTotal->save()) {

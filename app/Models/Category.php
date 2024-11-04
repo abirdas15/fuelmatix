@@ -8,13 +8,13 @@ use App\Helpers\SessionUser;
 use App\Repository\TransactionRepository;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
 
 class Category extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
     protected $table = 'categories';
-    public $timestamps = false;
     protected $guarded = ['id'];
 
     /**
