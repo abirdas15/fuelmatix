@@ -112,6 +112,7 @@ import BulkSaleAdd from "../Pages/BulkSale/Add.vue";
 import BulkSale from "../Pages/BulkSale/List.vue";
 import CompanySummary from "../Pages/Report/CompanySummary.vue";
 import CompanyBillDetails from "../Pages/Report/CompanyBillDetails.vue";
+import DummySaleCreate from "../Pages/DummySale/Create.vue";
 
 const ROOT_URL = "";
 const router = new VueRouter({
@@ -609,7 +610,10 @@ const router = new VueRouter({
                 },
                 {
                     path: ROOT_URL + "/company/bill/:id/:start_date/:end_date", name: "CompanyBillDetails", component: CompanyBillDetails
-                }
+                },
+                {
+                    path: ROOT_URL + "/dummySale/create", name: "DummySaleCreate", component: DummySaleCreate
+                },
             ],
         },
     ],

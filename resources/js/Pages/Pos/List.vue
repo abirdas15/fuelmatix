@@ -64,7 +64,7 @@
                                                 <th class="text-white text-end" >Action</th>
                                             </tr>
                                             </thead>
-                                            <tbody v-if="listData.length > 0 && TableLoading == false">
+                                            <tbody v-if="listData.length > 0 && TableLoading === false">
                                             <tr v-for="f in listData">
                                                 <td >{{f.date}}</td>
                                                 <td><a href="javascript:void(0);">{{f.invoice_number}}</a></td>
@@ -76,6 +76,12 @@
                                                 <td><a href="javascript:void(0);">{{f?.user_name}}</a></td>
                                                 <td>
                                                     <div class="d-flex justify-content-end">
+                                                        <a  href="javascript:void(0)" :class="'invoice' + f.id" @click="printInvoice(f.id)" class="btn btn-success shadow btn-xs sharp  me-1">
+                                                            <i class="fa fa-print"></i>
+                                                        </a>
+                                                        <a style="display: none" :class="'invoice' + f.id" class="btn btn-primary shadow btn-xs sharp  me-1">
+                                                            <i class="fa fa-spinner fa-spin"></i>
+                                                        </a>
                                                         <router-link  :to="{name: 'PosView', params: { id: f.id }}" class=" btn btn-primary shadow btn-xs sharp me-1">
                                                             <i class="fas fa-eye"></i>
                                                         </router-link>
@@ -112,6 +118,70 @@
                 </div>
             </div>
         </div>
+        <div id="print" v-if="singleSaleData">
+            <header class="text-center">
+                <strong>{{ singleSaleData.company?.name }}</strong>
+                <br>
+                <small>
+                    {{ singleSaleData.company?.address }}
+                </small>
+                <br>
+                <small>
+                    Phone: {{ singleSaleData.company?.phone_number }}
+                </small>
+            </header>
+            <p>Invoice Number : {{ singleSaleData.invoice_number }}</p>
+            <table class="bill-details">
+                <tbody>
+                <tr>
+                    <td>Date : <span>{{ singleSaleData.date }}</span></td>
+                </tr>
+                <tr>
+                    <td><strong>Vehicle No: {{ singleSaleData.customer_name }}</strong></td>
+                </tr>
+                </tbody>
+            </table>
+
+            <table class="items">
+                <thead>
+                <tr>
+                    <th class="heading name">Item</th>
+                    <th class="heading qty">Qty</th>
+                    <th class="heading rate">Price</th>
+                    <th class="heading amount">Subtotal</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr v-for="p in singleSaleData.products">
+                    <td>{{ p?.product_name }}</td>
+                    <td>{{ p.quantity }}</td>
+                    <td class="price">{{ p.price }}</td>
+                    <td class="price">{{ p.subtotal }}</td>
+                </tr>
+                <tr>
+                    <th colspan="3" class="total text">Total</th>
+                    <th class="total price">{{singleSaleData.total_amount}}</th>
+                </tr>
+                </tbody>
+            </table>
+            <section>
+                <p>
+                    Paid by : <span>{{ singleSaleData.payment_method }}</span>
+                </p>
+                <p style="text-align:center">
+                    Thank you for your visit!
+                </p>
+            </section>
+            <section style="margin-top: 10px; text-align: center">
+                <qrcode-vue :value="value" :size="100" level="H" render-as="svg"></qrcode-vue>
+            </section>
+            <section style="text-align: center">
+                <sub>
+                    Powered By : <span>Fuel Matix</span>
+                </sub>
+            </section>
+        </div>
     </div>
 </template>
 
@@ -122,9 +192,12 @@ import ApiRoutes from "../../Services/ApiRoutes";
 import Pagination from "../../Helpers/Pagination";
 import Section from "../../Helpers/Section";
 import Action from "../../Helpers/Action";
+import {Printd} from "printd";
+import QrcodeVue from "qrcode.vue";
 export default {
     name: "Agent",
     components: {
+        QrcodeVue,
         Pagination,
     },
     data() {
@@ -141,6 +214,129 @@ export default {
             Loading: false,
             TableLoading: false,
             listData: [],
+            printD: null,
+            singleSaleData: null,
+            cssText: `
+                 @page {
+                    size: 2.8in 11in;
+                    margin-top: 0cm;
+                    margin-left: 0cm;
+                    margin-right: 0cm;
+                }
+
+                table {
+                    width: 100%;
+                }
+
+                tr {
+                    width: 100%;
+
+                }
+
+                h1 {
+                    text-align: center;
+                    vertical-align: middle;
+                }
+
+                #logo {
+                    width: 60%;
+                    text-align: center;
+                    -webkit-align-content: center;
+                    align-content: center;
+                    padding: 5px;
+                    margin: 2px;
+                    display: block;
+                    margin: 0 auto;
+                }
+
+                header {
+                    width: 100%;
+                    text-align: center;
+                    -webkit-align-content: center;
+                    align-content: center;
+                    vertical-align: middle;
+                }
+
+                .items thead {
+                    text-align: center;
+                }
+
+                .center-align {
+                    text-align: center;
+                }
+
+                .bill-details td {
+                    font-size: 12px;
+                }
+
+                .receipt {
+                    font-size: medium;
+                }
+
+                .items .heading {
+                    font-size: 12.5px;
+                    text-transform: uppercase;
+                    border-top:1px solid black;
+                    margin-bottom: 4px;
+                    border-bottom: 1px solid black;
+                    vertical-align: middle;
+                }
+
+                .items thead tr th:first-child,
+                .items tbody tr td:first-child {
+                    width: 47%;
+                    min-width: 47%;
+                    max-width: 47%;
+                    word-break: break-all;
+                    text-align: left;
+                }
+
+                .items td {
+                    font-size: 12px;
+                    text-align: right;
+                    vertical-align: bottom;
+                }
+
+                .price::before {
+                    content: "৳";
+                    font-family: Arial;
+                    text-align: right;
+                }
+
+                .sum-up {
+                    text-align: right !important;
+                }
+                .total {
+                    font-size: 13px;
+                    border-top:1px dashed black !important;
+                    border-bottom:1px dashed black !important;
+                }
+                .total.text, .total.price {
+                    text-align: right;
+                }
+                .total.price::before {
+                    content: "৳";
+                }
+                .line {
+                    border-top:1px solid black !important;
+                }
+                .heading.rate {
+                    width: 20%;
+                }
+                .heading.amount {
+                    width: 25%;
+                }
+                .heading.qty {
+                    width: 5%
+                }
+                p {
+                    padding: 1px;
+                    margin: 0;
+                }
+                section, footer {
+                    font-size: 12px;
+                }
+            `,
         };
     },
     watch: {
@@ -163,6 +359,23 @@ export default {
         },
     },
     methods: {
+        printInvoice: function (id) {
+            $('.invoice'+ id).toggle();
+            ApiService.POST(ApiRoutes.SaleSingle, {id: id}, res => {
+                $('.invoice'+ id).toggle();
+                if (parseInt(res.status) === 200) {
+                    this.singleSaleData = res.data;
+                    this.printD = new Printd();
+                    setTimeout(() => {
+                        this.loading = false
+                        this.print()
+                    }, 1000)
+                }
+            });
+        },
+        print () {
+            this.printD.print(document.getElementById('print'), [this.cssText])
+        },
         openModalDelete(data) {
             Swal.fire({
                 title: 'Are you sure you want to delete?',

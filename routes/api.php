@@ -42,6 +42,7 @@ use App\Http\Controllers\CompanyBillController;
 use App\Http\Controllers\CarController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\BulkSaleController;
+use App\Http\Controllers\DummySaleController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -215,6 +216,10 @@ Route::group(['middleware' => 'AuthReqCheck'], function() {
         Route::post('delete', [SaleController::class, 'delete']);
         Route::post('unauthorizedBill', [SaleController::class, 'unauthorizedBill']);
         Route::post('unauthorizedBill/transfer', [SaleController::class, 'unauthorizedBillTransfer']);
+    });
+    Route::group(['prefix' => 'dummySale'], function() {
+        Route::post('save', [DummySaleController::class, 'save']);
+        Route::post('single', [DummySaleController::class, 'single']);
     });
     Route::group(['prefix' => 'creditCompany'], function() {
         Route::post('save', [CreditCompanyController::class, 'save']);

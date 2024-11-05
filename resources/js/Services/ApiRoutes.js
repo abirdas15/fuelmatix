@@ -129,6 +129,8 @@ const ApiRoutes = {
     PayOrderLatest: ApiVersion + '/pay/order/latest',
     PayOrderQuantity: ApiVersion + '/pay/order/quantity',
     //sale
+    DummySaleAdd: ApiVersion + '/dummySale/save',
+    DummySaleSingle: ApiVersion + '/dummySale/single',
     SaleAdd: ApiVersion + '/sale/save',
     SaleEdit: ApiVersion + '/sale/update',
     SaleSingle: ApiVersion + '/sale/single',
