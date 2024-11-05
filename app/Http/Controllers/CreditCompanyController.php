@@ -7,6 +7,7 @@ use App\Common\Module;
 use App\Helpers\SessionUser;
 use App\Models\Category;
 use App\Models\CompanyProductPrice;
+use App\Models\Sale;
 use App\Models\Transaction;
 use App\Repository\CategoryRepository;
 use Illuminate\Http\JsonResponse;
@@ -311,6 +312,13 @@ class CreditCompanyController extends Controller
             return response()->json([
                 'status' => 300,
                 'message' => 'This company already have many transaction. Please delete transaction first.'
+            ]);
+        }
+        $sale = Sale::where('payment_category_id', $request->input('id'))->first();
+        if ($sale instanceof Sale) {
+            return response()->json([
+                'status' => 300,
+                'message' => 'This company already have many sale. Please delete sale first.'
             ]);
         }
         Category::where('id', $request->input('id'))->delete();
