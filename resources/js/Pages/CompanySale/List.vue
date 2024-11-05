@@ -121,7 +121,7 @@
         </div>
         <div class="popup-wrapper-modal createExpand d-none">
             <div style="height: 500px; overflow: auto">
-                <form @submit.prevent="expand" class="popup-box" style="max-width: 800px">
+                <form @submit.prevent="expand" class="popup-box" style="max-width: 900px">
                     <button type="button" class=" btn  closeBtn"><i class="fas fa-times"></i></button>
                     <div class="row align-items-center">
                         <div class="col-sm-3">
@@ -129,7 +129,7 @@
                                 <label for="description"><strong>Car Number</strong></label>
                             </div>
                         </div>
-                        <div class="col-sm-3">
+                        <div class="col-sm-2">
                             <div class="input-wrapper form-group">
                                 <label for="description"><strong>Voucher Number</strong></label>
                             </div>
@@ -139,7 +139,12 @@
                                 <label for="description"><strong>Amount</strong></label>
                             </div>
                         </div>
-                        <div class="col-sm-2">
+                        <div class="col-sm-3">
+                            <div class="input-wrapper form-group">
+                                <label for="description"><strong>Invoice Date</strong></label>
+                            </div>
+                        </div>
+                        <div class="col-sm-1">
                             <div class="input-wrapper form-group">
                                 <label for="description"><strong>Action</strong></label>
                             </div>
@@ -155,7 +160,7 @@
                                 <small class="invalid-feedback"></small>
                             </div>
                         </div>
-                        <div class="col-sm-3">
+                        <div class="col-sm-2">
                             <div class="input-wrapper form-group mb-3">
                                 <input type="text" class="w-100 form-control" :name="'data.' + i + '.voucher_number'" id="description"
                                        v-model="e.voucher_number" placeholder="Voucher Number">
@@ -169,7 +174,13 @@
                                 <small class="invalid-feedback"></small>
                             </div>
                         </div>
-                        <div class="col-sm-2">
+                        <div class="col-sm-3">
+                            <div class="input-wrapper form-group mb-3">
+                                <input class="form-control invoice_date" name="start_date" type="text">
+                                <small class="invalid-feedback"></small>
+                            </div>
+                        </div>
+                        <div class="col-sm-1">
                             <button type="button" v-if="i == 0" class="btn btn-primary" @click="addMore">+</button>
                             <button v-else class="btn btn-danger"  style="height: 54px" type="button" @click="spliceData(i)">
                                 <i class="fa-solid fa-xmark"></i>
@@ -227,7 +238,8 @@ export default {
                     {
                         description: '',
                         voucher_number: '',
-                        amount: ''
+                        amount: '',
+                        invoice_date: ''
                     }
                 ]
             },
@@ -365,6 +377,7 @@ export default {
         },
         addMore: function () {
             this.expandParam.data.push({amount: '', description: '', voucher_number: ''})
+            this.initInvoiceDate();
         },
         spliceData: function (i) {
             this.expandParam.data.splice(i, 1)
@@ -414,10 +427,25 @@ export default {
             this.Param.order_mode = this.Param.order_mode == 'DESC' ? 'ASC' : 'DESC'
             this.list();
         },
+        initInvoiceDate() {
+            setTimeout(() => {
+                $('.invoice_date').each((index, element) => {
+                    $(element).flatpickr({
+                        altInput: true,
+                        altFormat: "d/m/Y",
+                        dateFormat: "Y-m-d",
+                        onChange: (date, dateStr) => {
+                            this.expandParam.data[index].invoice_date = dateStr;
+                        }
+                    });
+                });
+            }, 500);
+        }
 
     },
     mounted() {
         $('#dashboard_bar').text('Company Sale')
+        this.initInvoiceDate();
         setTimeout(() => {
             $('.date').flatpickr({
                 altInput: true,

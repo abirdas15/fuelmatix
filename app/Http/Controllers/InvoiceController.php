@@ -270,7 +270,7 @@ class InvoiceController extends Controller
         $category['address'] = $others->address ?? '';
         $invoice['customer_company'] = $category;
         $invoice['company'] = $company;
-        $invoiceItem = InvoiceItem::select('invoice_item.id', 'invoice_item.transaction_id', 'invoice_item.date', 'car.car_number', 'transactions.voucher_no', 'invoice_item.quantity', 'invoice_item.price', 'invoice_item.subtotal', 'products.name as product_name')
+        $invoiceItem = InvoiceItem::select('invoice_item.id', 'invoice_item.transaction_id', 'invoice_item.date', 'car.car_number', 'transactions.voucher_no', 'invoice_item.quantity', 'invoice_item.price', 'invoice_item.subtotal', 'products.name as product_name', 'transactions.invoice_date')
             ->leftJoin('transactions', 'transactions.id', 'invoice_item.transaction_id')
             ->leftJoin('car', 'car.id', 'transactions.car_id')
             ->leftJoin('products', 'products.id', 'invoice_item.product_id')
@@ -283,7 +283,11 @@ class InvoiceController extends Controller
             $item['price'] = number_format($item['price'], $sessionUser['currency_precision']);
             $item['subtotal'] = number_format($item['subtotal'], $sessionUser['currency_precision']);
             $item['quantity'] = number_format($item['quantity'], $sessionUser['currency_precision']);
-            $item['date'] = !empty($item['date']) ? Helpers::formatDate($item['date'], FuelMatixDateTimeFormat::STANDARD_DATE) : '';
+            if (!empty($item['invoice_date'])) {
+                $item['date'] = Helpers::formatDate($item['invoice_date'], FuelMatixDateTimeFormat::STANDARD_DATE);
+            } else {
+                $item['date'] = !empty($item['date']) ? Helpers::formatDate($item['date'], FuelMatixDateTimeFormat::STANDARD_DATE) : '';
+            }
         }
         $invoice['amount'] = number_format($totalAmount, $sessionUser['currency_precision']);
         $invoice['invoice_item'] = $invoiceItem;

@@ -324,40 +324,43 @@ class TransactionController extends Controller
                 return response()->json(['status' => 500, 'errors' => $voucherError]);
             }
         }
-        $transactionData = [];
-        foreach ($requestData['data'] as $data) {
-            $carId = null;
-            $car = Car::where('car_number', $data['description'])->first();
-            if ($car instanceof Car) {
-                $carId = $car->id;
+        DB::transaction(function() use ($requestData, $company, $transaction) {
+            $transactionData = [];
+            foreach ($requestData['data'] as $data) {
+                $carId = null;
+                $car = Car::where('car_number', $data['description'])->first();
+                if ($car instanceof Car) {
+                    $carId = $car->id;
+                }
+                $transactionData[] = [
+                    'date' => $transaction['date'],
+                    'account_id' => $transaction['account_id'],
+                    'invoice_date' => $data['invoice_date'] ?? null,
+                    'description' => $data['description'] ?? '',
+                    'debit_amount' => $transaction['credit_amount'] == 0 ? $data['amount'] : 0,
+                    'credit_amount' => $transaction['debit_amount'] == 0 ? $data['amount'] : 0,
+                    'file' => $transaction['file'] ?? null,
+                    'linked_id' => $transaction['linked_id'],
+                    'user_id' => $transaction['user_id'],
+                    'module' => $transaction['module'],
+                    'module_id' => $transaction['module_id'],
+                    'client_company_id' => $transaction['client_company_id'],
+                    'parent_id' => $transaction['parent_id'],
+                    'car_id' => $carId,
+                    'voucher_no' => $data['voucher_number'],
+                    'created_at' => Carbon::parse($transaction['date']. date(' H:i:s'), SessionUser::TIMEZONE),
+                ];
             }
-            $transactionData[] = [
-                'date' => $transaction['date'],
-                'account_id' => $transaction['account_id'],
-                'description' => $data['description'] ?? '',
-                'debit_amount' => $transaction['credit_amount'] == 0 ? $data['amount'] : 0,
-                'credit_amount' => $transaction['debit_amount'] == 0 ? $data['amount'] : 0,
-                'file' => $transaction['file'] ?? null,
-                'linked_id' => $transaction['linked_id'],
-                'user_id' => $transaction['user_id'],
-                'module' => $transaction['module'],
-                'module_id' => $transaction['module_id'],
-                'client_company_id' => $transaction['client_company_id'],
-                'parent_id' => $transaction['parent_id'],
-                'car_id' => $carId,
-                'voucher_no' => $data['voucher_number'],
-                'created_at' => Carbon::parse($transaction['date']. date(' H:i:s'), SessionUser::TIMEZONE),
-            ];
-        }
-        Transaction::insert($transactionData);
-        Transaction::where('id', $requestData['id'])->delete();
-        if ($company['voucher_check'] == 1) {
-            foreach ($requestData['data'] as  $data) {
-                $voucher = Voucher::where('voucher_number', $data['voucher_number'])->where('company_id', $transaction['account_id'])->where('status', 'pending')->first();
-                $voucher->status = 'done';
-                $voucher->save();
+            Transaction::insert($transactionData);
+            Transaction::where('id', $requestData['id'])->delete();
+            if ($company['voucher_check'] == 1) {
+                foreach ($requestData['data'] as  $data) {
+                    $voucher = Voucher::where('voucher_number', $data['voucher_number'])->where('company_id', $transaction['account_id'])->where('status', 'pending')->first();
+                    $voucher->status = 'done';
+                    $voucher->save();
+                }
             }
-        }
+        });
         return response()->json(['status' => 200, 'message' => 'Successfully split transaction.']);
     }
 }
