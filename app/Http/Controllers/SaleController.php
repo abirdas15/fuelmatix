@@ -449,12 +449,14 @@ class SaleController extends Controller
         if ($sale->save()) {
             SaleData::where('sale_id', $inputData['id'])->delete();
             foreach ($inputData['products'] as $product) {
+                $shiftTotal = ShiftTotal::where('product_id', $product['product_id'])->where('status', FuelMatixStatus::START)->first();
                 $saleData = new SaleData();
                 $saleData->sale_id = $sale->id;
                 $saleData->product_id = $product['product_id'];
                 $saleData->quantity = $product['quantity'];
                 $saleData->price = $product['price'];
                 $saleData->subtotal = $product['subtotal'];
+                $saleData->shift_sale_id = $shiftTotal->id;
                 $saleData->save();
             }
             return response()->json(['status' => 200, 'message' => 'Successfully updated sale.']);
