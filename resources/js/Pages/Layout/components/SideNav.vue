@@ -25,6 +25,7 @@
                         <li v-if="CheckPermission(Section.POS + '-' + Action.VIEW)"><router-link :to="{name: 'Pos'}" >POS</router-link></li>
                         <li v-if="CheckPermission(Section.POS_HISTORY + '-' + Action.VIEW)"><router-link :to="{name: 'PosList'}" >POS History</router-link></li>
                         <li><router-link :to="{name: 'DummySaleCreate'}" >Dummy Sale</router-link></li>
+                        <li><router-link :to="{name: 'DummySaleList'}" >Dummy Sale History</router-link></li>
                         <li><router-link :to="{name: 'BulkSale'}">Bulk Sale</router-link></li>
                         <li v-if="CheckPermission(Section.COMPANY_SALE + '-' + Action.VIEW)"><router-link :to="{name: 'CompanySale'}">Company Sale </router-link></li>
                         <li v-if="CheckPermission(Section.COMPANY_SALE + '-' + Action.VIEW)"><router-link :to="{name: 'unauthorizedBill'}">Unauthorized Bill </router-link></li>

@@ -367,11 +367,11 @@ class SaleController extends Controller
             ->toArray();
         foreach ($products as &$product) {
             $product['price'] = number_format($product['price'], $sessionUser['currency_precision']);
-            $product['quantity'] = number_format($product['quantity'], $sessionUser['quantity_precision']);
-            $product['subtotal'] = number_format($product['subtotal'], $sessionUser['currency_precision']);
+            $product['quantity_format'] = number_format($product['quantity'], $sessionUser['quantity_precision']);
+            $product['subtotal_format'] = number_format($product['subtotal'], $sessionUser['currency_precision']);
         }
         $result['products'] = $products;
-        $result['total_amount'] = number_format($result['total_amount'], $sessionUser['currency_precision']);
+        $result['total_amount_format'] = number_format($result['total_amount'], $sessionUser['currency_precision']);
         $result['company'] = ClientCompany::select('id', 'name', 'address', 'email', 'phone_number')->find($sessionUser['client_company_id']);
         if ($result['payment_method'] == PaymentMethod::CASH ||  $result['payment_method'] == PaymentMethod::CARD) {
             $result['company_name'] = null;
@@ -396,14 +396,56 @@ class SaleController extends Controller
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
+        $errorsMessage = [];
+        foreach ($inputData['products'] as $product) {
+            $saleData = SaleData::where('product_id', $product['product_id'])->where('sale_id', $inputData['id'])->first();
+            if (!$saleData instanceof SaleData) {
+                $errorsMessage[$product['name']][] = $product.' Sale is not found';
+            }
+            $shiftTotal =ShiftTotal::where('id', $saleData->shift_sale_id)->where('status', FuelMatixStatus::END)->first();
+            if ($shiftTotal instanceof ShiftTotal) {
+                $errorsMessage[$product['name']][] = 'Cannot edit this '.$product['name']. ' sale.This shift is close.';
+            }
+        }
+        if (count($errorsMessage) > 0) {
+            return response()->json(['status' => 600, 'errors' => $errorsMessage]);
+        }
         $sale = Sale::find($inputData['id']);
         if (!$sale instanceof Sale) {
             return response()->json(['status' => 500, 'error' => 'Cannot find sale.']);
         }
+        $sessionUser = SessionUser::getUser();
+        if (!empty($request['car_number'])) {
+            $car = Car::where('car_number', $request['car_number'])
+                ->where('client_company_id', $sessionUser['client_company_id'])
+                ->first();
+            if ($car instanceof Car) {
+                $carId = $car->id;
+            }
+        }
+        $payment_category_id = $request['company_id'] ?? '';
+        if ($request['payment_method'] == PaymentMethod::CASH) {
+            $category = Category::where('id', $sessionUser['category_id'])->first();
+            if (!$category instanceof Category) {
+                return response()->json(['status' => 500, 'message' => 'You are not a cashier user.']);
+            }
+            $payment_category_id = $category['id'];
+        }
+        if ($request['payment_method'] == PaymentMethod::CARD) {
+            $category = Category::where('id', $request['pos_machine_id'])->first();
+            if (!$category instanceof Category) {
+                return response()->json(['status' => 500, 'message' => 'Pos machine cannot be found.']);
+            }
+            $payment_category_id = $category['id'];
+        }
+        $driverId = $request['driver_sale']['driver_id'] ?? null;
         $total_amount = array_sum(array_column($inputData['products'], 'subtotal'));
         $sale->total_amount = $total_amount;
         $sale->customer_id = $inputData['customer_id'] ?? null;
         $sale->payment_method = $inputData['payment_method'] ?? null;
+        $sale->car_id = $carId ?? null;
+        $sale->driver_id = $driverId ?? null;
+        $sale->payment_category_id = $payment_category_id;
         if ($sale->save()) {
             SaleData::where('sale_id', $inputData['id'])->delete();
             foreach ($inputData['products'] as $product) {

@@ -220,6 +220,7 @@ Route::group(['middleware' => 'AuthReqCheck'], function() {
     Route::group(['prefix' => 'dummySale'], function() {
         Route::post('save', [DummySaleController::class, 'save']);
         Route::post('single', [DummySaleController::class, 'single']);
+        Route::post('list', [DummySaleController::class, 'list']);
     });
     Route::group(['prefix' => 'creditCompany'], function() {
         Route::post('save', [CreditCompanyController::class, 'save']);

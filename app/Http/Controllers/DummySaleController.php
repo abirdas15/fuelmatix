@@ -25,6 +25,7 @@ use App\Repository\DriverRepository;
 use App\Repository\SaleRepository;
 use App\Repository\TransactionRepository;
 use Carbon\Carbon;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -187,6 +188,37 @@ class DummySaleController extends Controller
         $result['company'] = ClientCompany::select('id', 'name', 'address', 'email', 'phone_number')->find($sessionUser['client_company_id']);
         if ($result['payment_method'] == PaymentMethod::CASH ||  $result['payment_method'] == PaymentMethod::CARD) {
             $result['company_name'] = null;
+        }
+        return response()->json(['status' => 200, 'data' => $result]);
+    }
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function list(Request $request): JsonResponse
+    {
+        $inputData = $request->all();
+        $limit = $inputData['limit'] ?? 10;
+        $keyword = $inputData['keyword'] ?? '';
+        $order_by = $inputData['order_by'] ?? 'sale.id';
+        $order_mode = $inputData['order_mode'] ?? 'DESC';
+        $result = DummySale::select('dummy_sale.id', 'dummy_sale.invoice_number', 'dummy_sale.date', 'dummy_sale.total_amount', 'dummy_sale.payment_method', 'users.name as user_name', 'dummy_sale.voucher_number', 'car.car_number', 'categories.name as company_name')
+            ->leftJoin('car', 'car.id', '=', 'dummy_sale.car_id')
+            ->leftJoin('categories', 'categories.id', '=', 'dummy_sale.payment_category_id')
+            ->leftJoin('users', 'users.id', '=', 'dummy_sale.user_id')
+            ->where('dummy_sale.client_company_id', $inputData['session_user']['client_company_id']);
+        if (!empty($keyword)) {
+            $result->where(function ($q) use ($keyword) {
+                $q->where('invoice_number', 'LIKE', '%'.$keyword.'%');
+            });
+        }
+        $result = $result->orderBy($order_by, $order_mode)
+            ->paginate($limit);
+        foreach ($result as &$data) {
+            $data['date'] = date(FuelMatixDateTimeFormat::STANDARD_DATE_TIME, strtotime($data['date']));
+            if ($data['payment_method'] == PaymentMethod::CASH || $data['payment_method'] == PaymentMethod::CARD) {
+                $data['company_name'] = null;
+            }
         }
         return response()->json(['status' => 200, 'data' => $result]);
     }

@@ -113,6 +113,8 @@ import BulkSale from "../Pages/BulkSale/List.vue";
 import CompanySummary from "../Pages/Report/CompanySummary.vue";
 import CompanyBillDetails from "../Pages/Report/CompanyBillDetails.vue";
 import DummySaleCreate from "../Pages/DummySale/Create.vue";
+import DummySaleList from "../Pages/DummySale/List.vue";
+import DummySaleView from "../Pages/DummySale/View.vue";
 
 const ROOT_URL = "";
 const router = new VueRouter({
@@ -613,6 +615,12 @@ const router = new VueRouter({
                 },
                 {
                     path: ROOT_URL + "/dummySale/create", name: "DummySaleCreate", component: DummySaleCreate
+                },
+                {
+                    path: ROOT_URL + "/dummySale/list", name: "DummySaleList", component: DummySaleList
+                },
+                {
+                    path: ROOT_URL + "/dummySale/:id", name: "DummySaleView", component: DummySaleView
                 },
             ],
         },

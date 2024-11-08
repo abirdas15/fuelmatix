@@ -426,7 +426,7 @@ export default {
             singleSaleData: null,
             billed_to: '',
             printD: null,
-            value: null,
+            value: '',
             errorText: '',
             voucher_number: '',
             cssText: `
@@ -821,7 +821,7 @@ export default {
         cartProduct: function (p) {
             let quantity =  '';
             let selling_price = p.selling_price;
-            let subtotal = 0;
+            let subtotal = '';
             if (this.advance_sale) {
                 subtotal = this.driver_amount;
                 quantity = subtotal / selling_price;

@@ -131,6 +131,7 @@ const ApiRoutes = {
     //sale
     DummySaleAdd: ApiVersion + '/dummySale/save',
     DummySaleSingle: ApiVersion + '/dummySale/single',
+    DummySaleList: ApiVersion + '/dummySale/list',
     SaleAdd: ApiVersion + '/sale/save',
     SaleEdit: ApiVersion + '/sale/update',
     SaleSingle: ApiVersion + '/sale/single',

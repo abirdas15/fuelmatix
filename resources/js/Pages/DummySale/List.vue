@@ -4,14 +4,14 @@
             <div class="row page-titles">
                 <ol class="breadcrumb align-items-center ">
                     <li class="breadcrumb-item active"><router-link :to="{name: 'Dashboard'}">Home</router-link></li>
-                    <li class="breadcrumb-item"><a href="javascript:void(0)">Sale History List</a></li>
+                    <li class="breadcrumb-item"><a href="javascript:void(0)">Dummy Sale</a></li>
                 </ol>
             </div>
             <div class="row">
                 <div class="col-12">
                     <div class="card">
                         <div class="card-header bg-secondary">
-                            <h4 class="card-title">Sale History List</h4>
+                            <h4 class="card-title">Dummy Sale</h4>
                         </div>
                         <div class="card-body">
                             <div class="row align-items-end">
@@ -82,15 +82,9 @@
                                                         <a style="display: none" :class="'invoice' + f.id" class="btn btn-primary shadow btn-xs sharp  me-1">
                                                             <i class="fa fa-spinner fa-spin"></i>
                                                         </a>
-                                                        <router-link  :to="{name: 'PosEdit', params: { id: f.id }}" class=" btn btn-primary shadow btn-xs sharp me-1">
-                                                            <i class="fas fa-pencil"></i>
-                                                        </router-link>
-                                                        <router-link  :to="{name: 'PosView', params: { id: f.id }}" class=" btn btn-primary shadow btn-xs sharp me-1">
+                                                        <router-link  :to="{name: 'DummySaleView', params: { id: f.id }}" class=" btn btn-primary shadow btn-xs sharp me-1">
                                                             <i class="fas fa-eye"></i>
                                                         </router-link>
-                                                        <a  v-if="CheckPermission(Section.POS + '-' + Action.DELETE)" href="javascript:void(0)"  @click="openModalDelete(f)" class="btn btn-danger shadow btn-xs sharp">
-                                                            <i class="fa fa-trash"></i>
-                                                        </a>
                                                     </div>
                                                 </td>
                                             </tr>
@@ -364,7 +358,7 @@ export default {
     methods: {
         printInvoice: function (id) {
             $('.invoice'+ id).toggle();
-            ApiService.POST(ApiRoutes.SaleSingle, {id: id}, res => {
+            ApiService.POST(ApiRoutes.DummySaleSingle, {id: id}, res => {
                 $('.invoice'+ id).toggle();
                 if (parseInt(res.status) === 200) {
                     this.singleSaleData = res.data;
@@ -395,14 +389,14 @@ export default {
             })
         },
         list: function (page) {
-            if (page == undefined) {
+            if (page === undefined) {
                 page = {
                     page: 1
                 };
             }
             this.Param.page = page.page;
             this.TableLoading = true
-            ApiService.POST(ApiRoutes.SaleList, this.Param,res => {
+            ApiService.POST(ApiRoutes.DummySaleList, this.Param,res => {
                 this.TableLoading = false
                 if (parseInt(res.status) === 200) {
                     this.paginateData = res.data;
@@ -442,7 +436,7 @@ export default {
 
     },
     mounted() {
-        $('#dashboard_bar').text('Product List')
+        $('#dashboard_bar').text('Dummy Sale')
     }
 }
 </script>
