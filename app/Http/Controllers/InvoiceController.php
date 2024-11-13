@@ -286,7 +286,7 @@ class InvoiceController extends Controller
             if (!empty($item['invoice_date'])) {
                 $item['date'] = Helpers::formatDate($item['invoice_date'], FuelMatixDateTimeFormat::STANDARD_DATE);
             } else {
-                $item['date'] = !empty($item['date']) ? Helpers::formatDate($item['date'], FuelMatixDateTimeFormat::STANDARD_DATE) : '';
+               // $item['date'] = !empty($item['date']) ? Helpers::formatDate($item['date'], FuelMatixDateTimeFormat::STANDARD_DATE) : '';
             }
         }
         $invoice['amount'] = number_format($totalAmount, $sessionUser['currency_precision']);

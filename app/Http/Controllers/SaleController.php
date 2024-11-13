@@ -127,9 +127,9 @@ class SaleController extends Controller
                     $carId = $car->id;
                 }
             }
-            if (empty($requestData['voucher_number'])) {
-                $payment_category_id = $driver['un_authorized_bill_id'];
-            }
+//            if (empty($requestData['voucher_number'])) {
+//                $payment_category_id = $driver['un_authorized_bill_id'];
+//            }
             if (!empty($requestData['advance_pay']) || !empty($requestData['advance_sale'])) {
                 $driverLiability = Category::find($driver['driver_liability_id']);
                 if (!$driverLiability instanceof Category) {
@@ -195,6 +195,7 @@ class SaleController extends Controller
         $sale = new Sale();
         DB::transaction(function() use ($requestData, $total_amount, $payment_category_id, $carId, $voucherNo, $voucher, $sale, $driverId) {
             $sale->date = Carbon::parse($requestData['date']. date('H:i:s'))->format('Y-m-d H:i:s');
+            $sale->invoice_date = Carbon::parse($requestData['invoice_date']. date('H:i:s'))->format('Y-m-d H:i:s');
             $sale->invoice_number = Sale::getInvoiceNumber();
             $sale->total_amount = $total_amount;
             $sale->driver_tip = $requestData['driver_tip'] ?? 0;

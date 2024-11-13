@@ -173,6 +173,34 @@
                     </table>
                 </div>
             </div>
+            <div class="card" v-if="productSales.length > 0">
+                <div class="text-center mt-2"><h2>Product Sale</h2></div>
+                <div class="card-body mt-0">
+                    <table class="table table-bordered">
+                        <tbody>
+                        <tr>
+                            <th>Product Name</th>
+                            <th class="text-center">Quantity</th>
+                            <th class="text-end">Amount</th>
+                        </tr>
+                        </tbody>
+                        <tbody>
+                        <tr v-for="each in productSales">
+                            <td class="" v-text="each.product_name"></td>
+                            <td class="text-center" v-text="each.quantity"></td>
+                            <td class="text-end" v-text="each.amount_format"></td>
+                        </tr>
+                        </tbody>
+                        <tbody>
+                        <tr>
+                            <th colspan="1" class="text-end">Total:</th>
+                            <th class="text-center" v-text="total.quantity"></th>
+                            <th class="text-end" v-text="total.amount"></th>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
             <div class="card" v-if="expenses.length > 0">
                 <div class="text-center mt-2"><h2>Expense</h2></div>
                 <div class="card-body mt-0">
@@ -279,6 +307,7 @@ export default {
             posSales: [],
             expenses: [],
             assetTransfer: [],
+            productSales: [],
             total: {},
             loadingFile: false,
             loading: false,
@@ -311,6 +340,7 @@ export default {
                     this.posSales = res.posSales;
                     this.expenses = res.expenses;
                     this.assetTransfer = res.assetTransfer;
+                    this.productSales = res.productSales;
                     this.total = res.total;
                 }
             });

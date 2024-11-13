@@ -29,6 +29,7 @@ class TransactionRepository
 
             // Set the transaction date.
             $transaction->date = $data['date'];
+            $transaction->invoice_date = !empty($data['invoice_date']) ? $data['invoice_date'] : null;
 
             // Set the transaction description, if provided.
             $transaction->description = $data['description'] ?? null;

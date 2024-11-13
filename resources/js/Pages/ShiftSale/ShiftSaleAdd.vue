@@ -351,7 +351,7 @@
                                                         <div class="invalid-feedback"></div>
                                                     </div>
                                                     <div class="col-sm-1 mb-3">
-                                                        <button class="btn btn-primary"  style="height: 54px" v-if="index == 0" type="button" @click="addCategory">+</button>
+                                                        <button class="btn btn-primary" style="height: 54px" v-if="index === categories.length - 1" type="button" @click="addCategory">+</button>
                                                         <button class="btn btn-danger"  style="height: 54px"   v-else  type="button" @click="removeCategory(index)">
                                                             <i class="fa-solid fa-xmark"></i>
                                                         </button>

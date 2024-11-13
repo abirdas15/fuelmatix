@@ -71,12 +71,12 @@
                                                 </td>
                                             </tr>
                                             </tbody>
-                                            <tbody v-if="listData.length == 0 && TableLoading == false">
+                                            <tbody v-if="listData.length === 0 && TableLoading === false">
                                             <tr>
                                                 <td colspan="10" class="text-center">No data found</td>
                                             </tr>
                                             </tbody>
-                                            <tbody v-if="TableLoading == true">
+                                            <tbody v-if="TableLoading === true">
                                             <tr>
                                                 <td colspan="10" class="text-center">Loading....</td>
                                             </tr>

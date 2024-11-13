@@ -181,7 +181,7 @@
                             </div>
                         </div>
                         <div class="col-sm-1">
-                            <button type="button" v-if="i == 0" class="btn btn-primary" @click="addMore">+</button>
+                            <button type="button" v-if="i === expandParam.data.length - 1" class="btn btn-primary" @click="addMore">+</button>
                             <button v-else class="btn btn-danger"  style="height: 54px" type="button" @click="spliceData(i)">
                                 <i class="fa-solid fa-xmark"></i>
                             </button>

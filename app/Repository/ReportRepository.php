@@ -684,11 +684,23 @@ class ReportRepository
             ->toArray();
         $totalQuantity = 0;
         $totalAmount = 0;
+        $productWiseSale = [];
         foreach ($transaction as &$data) {
+            $productWiseSale[$data['product_name']][] = $data;
             $data['amount_format'] = number_format($data['amount'], $sessionUser['currency_precision']);
             $totalQuantity += $data['quantity'];
             $data['quantity'] = number_format($data['quantity'], $sessionUser['quantity_precision']);
             $totalAmount += $data['amount'];
+        }
+        $productWiseSaleArray = [];
+        foreach ($productWiseSale as $key => $row) {
+            $quantity = array_sum(array_column($row, 'quantity'));
+            $amount = array_sum(array_column($row, 'amount'));
+            $productWiseSaleArray[] = [
+                'product_name' => $key,
+                'quantity' => number_format($quantity, $sessionUser['quantity_precision']),
+                'amount_format' => number_format($amount, $sessionUser['currency_precision']),
+            ];
         }
         $expenses = Expense::select('expense.id', 'expense.date', 'c1.name as expense_type', 'c2.name as payment_method', 'expense.amount', 'expense.remarks', 'expense.approve_date', 'u1.name as approve_by', 'u2.name as request_by')
             ->leftJoin('categories as c1', 'c1.id', '=', 'expense.category_id')
@@ -757,6 +769,7 @@ class ReportRepository
             'expenses' => $expenses,
             'posSales' => $posSales,
             'assetTransfer' => $assetTransfer,
+            'productSales' => $productWiseSaleArray,
             'total' => [
                 'quantity' => number_format($totalQuantity, $sessionUser['quantity_precision']),
                 'amount' => number_format($totalAmount, $sessionUser['currency_precision']),

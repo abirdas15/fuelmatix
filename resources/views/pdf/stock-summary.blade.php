@@ -132,6 +132,26 @@
                 <td style="text-align: right">{{ $data['total']['amount'] }}</td>
             </tr>
         </table>
+        <div class="text-center"><h2>Product Sale</h2></div>
+        <table class="print-details">
+            <tr>
+                <th>Product Name</th>
+                <th style="text-align: center">Quantity</th>
+                <th style="text-align: end">Amount</th>
+            </tr>
+            @foreach($data['productSales'] as $productSale)
+                <tr>
+                    <td class="">{{ $productSale['product_name'] }}</td>
+                    <td style="text-align: center">{{ $productSale['quantity'] }}</td>
+                    <td style="text-align: right">{{ $productSale['amount_format'] }}</td>
+                </tr>
+            @endforeach
+            <tr>
+                <th colspan="1" style="text-align: right">Total:</th>
+                <td style="text-align: center">{{ $data['total']['quantity'] }}</td>
+                <td style="text-align: right">{{ $data['total']['amount'] }}</td>
+            </tr>
+        </table>
         <div class="text-center"><h2>Expense</h2></div>
         <table class="print-details">
             <tr>

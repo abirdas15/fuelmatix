@@ -1,14 +1,6 @@
 <template>
     <div class="content-body">
-        <div class="container-fluid">
-            <div class="row page-titles">
-                <ol class="breadcrumb align-items-center ">
-                    <li class="breadcrumb-item active">
-                        <router-link :to="{name: 'Dashboard'}">Home</router-link>
-                    </li>
-                    <li class="breadcrumb-item"><a href="javascript:void(0)">Pos</a></li>
-                </ol>
-            </div>
+        <div class="container-fluid" style="padding-top: 10px !important">
             <div class="row">
                 <div class="col-xl-12 col-lg-12">
                     <div class="row">
@@ -16,6 +8,9 @@
                             <div class="row">
                                 <div class="col-6 mb-3">
                                     <input type="text" class="form-control date bg-white" name="date" v-model="date">
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <input type="text" class="form-control invoice_date bg-white" placeholder="Invoice Date" name="invoice_date" v-model="invoice_date">
                                 </div>
                                 <div class="col-sm-6">
                                     <div class="user-search">
@@ -73,7 +68,7 @@
                                 </div>
                             </div>
                             <div class="default-cart">
-                                <div class="t-section">
+                                <div class="">
                                     <table class="table">
                                         <thead>
                                         <tr>
@@ -252,8 +247,7 @@
                                         </div>
                                         <div class="detail">
                                             <div class="name">{{ p.name }}</div>
-                                            <div class="d-flex align-items-center justify-content-between">
-                                                <div class="desc">{{ p.product_type }}</div>
+                                            <div class="align-items-center justify-content-between">
                                                 <div>৳ {{ p.selling_price }}</div>
                                             </div>
                                             <p class="mt-1 mb-0" v-if="i < 9">
@@ -572,7 +566,8 @@ export default {
             car_number: '',
             date: '',
             carList: [],
-            errorsMessage: []
+            errorsMessage: [],
+            invoice_date: ''
         }
     },
     computed: {
@@ -679,7 +674,8 @@ export default {
                 products: this.sale,
                 car_number: this.car_number,
                 date: this.date != '' ? this.date : moment().format('YYYY-MM-DD'),
-                billed_to: this.billed_to
+                billed_to: this.billed_to,
+                invoice_date: this.invoice_date
             }
             if (type == 'company') {
                 param.driver_tip = this.driver_tip
@@ -986,6 +982,14 @@ export default {
                     this.date = dateStr
                 }
             })
+            $('.invoice_date').flatpickr({
+                altInput: true,
+                altFormat: "d/m/Y",
+                dateFormat: "Y-m-d",
+                onChange: (date, dateStr) => {
+                    this.invoice_date = dateStr
+                }
+            })
             document.addEventListener('DOMContentLoaded', function() {
                 // Trigger the click event on the submit button
                 document.getElementById('submitButton').click();
@@ -1016,7 +1020,7 @@ export default {
         margin-right: 15px;
         border-radius: 10px;
         box-shadow: 0rem 0.3125rem 0.3125rem 0rem rgba(82, 63, 105, 0.05);
-        width: 180px;
+        width: 100px;
         transition: 500ms;
         margin-bottom: 15px;
 
@@ -1027,7 +1031,7 @@ export default {
 
         .img {
             width: 100%;
-            height: 170px;
+            height: 50px;
 
             img {
                 border-top-left-radius: 10px;
