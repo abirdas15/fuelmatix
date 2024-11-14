@@ -98,8 +98,7 @@
                                                         <div class="btn-cart-plus cursor-pointer"
                                                              @click="updateProduct('minus', i)">-
                                                         </div>
-                                                        <input class="form-control control-sm" step='0.01' type="number"
-                                                               v-model="s.quantity" @input="updateSubtotal(i)">
+                                                        <input class="form-control control-sm"  type="text" v-model="s.quantity" @input="updateSubtotal(i)">
                                                         <div class="btn-cart-plus cursor-pointer"
                                                              @click="updateProduct('plus', i)">+
                                                         </div>
@@ -109,8 +108,7 @@
                                                     ৳ {{ s.price }}
                                                 </td>
                                                 <td class="text-end">
-                                                    <input class="form-control w-100 control-sm text-end" step="any"
-                                                           type="number" v-model="s.subtotal" @input="updateQuantity(i)">
+                                                    <input class="form-control w-100 control-sm text-end" type="text" v-model="s.subtotal" @input="updateQuantity(i)">
                                                 </td>
                                                 <td class="text-end">
                                                     <i class="fa-regular text-danger fa-trash-can cursor-pointer"
@@ -835,11 +833,11 @@ export default {
                 expense_category_id: p.expense_category_id,
                 shift_sale: p.shift_sale,
                 product_id: p.id,
-                quantity: parseFloat(quantity).toFixed(2),
+                quantity: quantity !== '' ? parseFloat(quantity).toFixed(2) : '',
                 price: parseFloat(selling_price).toFixed(2),
                 buying_price: parseFloat(p.buying_price).toFixed(2),
                 driver_selling_price: parseFloat(p.driver_selling_price).toFixed(2),
-                subtotal: parseFloat(subtotal).toFixed(2),
+                subtotal: subtotal !== '' ? parseFloat(subtotal).toFixed(2) : '',
             }
             let isExist = this.sale.map(v => v.product_id).indexOf(product.product_id);
             if (isExist > -1) {

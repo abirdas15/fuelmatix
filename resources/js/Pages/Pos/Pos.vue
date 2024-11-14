@@ -93,7 +93,7 @@
                                                             <div class="btn-cart-plus cursor-pointer"
                                                                  @click="updateProduct('minus', i)">-
                                                             </div>
-                                                            <input class="form-control control-sm" step='0.01' type="number"
+                                                            <input class="form-control control-sm"  type="text"
                                                                    v-model="s.quantity" @input="updateSubtotal(i)">
                                                             <div class="btn-cart-plus cursor-pointer"
                                                                  @click="updateProduct('plus', i)">+
@@ -104,8 +104,8 @@
                                                         ৳ {{ s.price }}
                                                     </td>
                                                     <td class="text-end">
-                                                        <input class="form-control w-100 control-sm text-end" step="any"
-                                                               type="number" v-model="s.subtotal" @input="updateQuantity(i)">
+                                                        <input class="form-control w-100 control-sm text-end"
+                                                               type="text" v-model="s.subtotal" @input="updateQuantity(i)">
                                                     </td>
                                                     <td class="text-end">
                                                         <i class="fa-regular text-danger fa-trash-can cursor-pointer"
@@ -325,6 +325,10 @@
                         </select>
                         <div class="invalid-feedback"></div>
                     </div>
+                    <div class="form-group col-sm-12 mt-2">
+                        <label>Card Number/Transaction ID</label>
+                        <input type="text" class="sm-control form-control" v-model="card_number" placeholder="Card Number/Transaction ID">
+                    </div>
                 </div>
                 <button type="submit" class="btn btn-primary " v-if="!cardLoading">Submit</button>
                 <button type="button" class="btn btn-primary " disabled v-if="cardLoading">SubmitTing...</button>
@@ -385,9 +389,9 @@
                     Thank you for your visit!
                 </p>
             </section>
-            <section style="margin-top: 10px; text-align: center">
-                <qrcode-vue :value="value" :size="100" level="H" render-as="svg"></qrcode-vue>
-            </section>
+<!--            <section style="margin-top: 10px; text-align: center">-->
+<!--                <qrcode-vue :value="value" :size="100" level="H" render-as="svg"></qrcode-vue>-->
+<!--            </section>-->
             <section style="text-align: center">
                 <sub>
                     Powered By : <span>Fuel Matix</span>
@@ -424,126 +428,172 @@ export default {
             errorText: '',
             voucher_number: '',
             cssText: `
-                 @page {
-                    size: 2.8in 11in;
-                    margin-top: 0cm;
-                    margin-left: 0cm;
-                    margin-right: 0cm;
-                }
+    @page {
+        size: 2.8in 11in;
+        margin: 0 !important; /* Ensure no margin on the page */
+    }
 
-                table {
-                    width: 100%;
-                }
+    html, body {
+        margin: 0; /* Reset margin for html and body */
+        padding: 0; /* Reset padding for html and body */
+        height: 100%; /* Ensure full height for body */
+    }
 
-                tr {
-                    width: 100%;
+    * {
+        margin: 0; /* Reset margin for all elements */
+        padding: 0; /* Reset padding for all elements */
+        box-sizing: border-box; /* Include padding and border in total size */
+    }
 
-                }
+    /* Specific styles for print layout */
+    @media print {
+        #print {
+            margin: 0 !important; /* Force no margin on the print container */
+            padding: 0 !important; /* Force no padding on the print container */
+        }
 
-                h1 {
-                    text-align: center;
-                    vertical-align: middle;
-                }
+        header,
+        section {
+            margin: 0; /* Reset margins for header and sections */
+            padding: 0; /* Reset padding */
+        }
 
-                #logo {
-                    width: 60%;
-                    text-align: center;
-                    -webkit-align-content: center;
-                    align-content: center;
-                    padding: 5px;
-                    margin: 2px;
-                    display: block;
-                    margin: 0 auto;
-                }
+        /* Remove potential browser-specific margin */
+        body {
+            margin: 0 !important;
+            padding: 0 !important;
+        }
 
-                header {
-                    width: 100%;
-                    text-align: center;
-                    -webkit-align-content: center;
-                    align-content: center;
-                    vertical-align: middle;
-                }
+        /* Ensure tables take full width without gaps */
+        table {
+            width: 100%;
+            border-collapse: collapse; /* Remove space between table cells */
+            margin: 0; /* Ensure no margin around tables */
+        }
 
-                .items thead {
-                    text-align: center;
-                }
+        p {
+            margin: 0; /* Ensure no margin on paragraphs */
+        }
 
-                .center-align {
-                    text-align: center;
-                }
+        /* Additional reset for all elements in print */
+        h1, h2, h3, h4, h5, h6 {
+            margin: 0; /* Reset margins for all headings */
+        }
 
-                .bill-details td {
-                    font-size: 12px;
-                }
+        /* Optional: remove any unwanted top space */
+        .center-align {
+            margin-top: 0; /* Reset any top margin */
+        }
+    }
 
-                .receipt {
-                    font-size: medium;
-                }
+    table {
+        width: 100%;
+    }
 
-                .items .heading {
-                    font-size: 12.5px;
-                    text-transform: uppercase;
-                    border-top:1px solid black;
-                    margin-bottom: 4px;
-                    border-bottom: 1px solid black;
-                    vertical-align: middle;
-                }
+    tr {
+        width: 100%;
+    }
 
-                .items thead tr th:first-child,
-                .items tbody tr td:first-child {
-                    width: 47%;
-                    min-width: 47%;
-                    max-width: 47%;
-                    word-break: break-all;
-                    text-align: left;
-                }
+    h1 {
+        text-align: center;
+        vertical-align: middle;
+    }
 
-                .items td {
-                    font-size: 12px;
-                    text-align: right;
-                    vertical-align: bottom;
-                }
+    #logo {
+        width: 60%;
+        text-align: center;
+        display: block;
+        margin: 0 auto;
+    }
 
-                .price::before {
-                    content: "৳";
-                    font-family: Arial;
-                    text-align: right;
-                }
+    header {
+        width: 100%;
+        text-align: center;
+    }
 
-                .sum-up {
-                    text-align: right !important;
-                }
-                .total {
-                    font-size: 13px;
-                    border-top:1px dashed black !important;
-                    border-bottom:1px dashed black !important;
-                }
-                .total.text, .total.price {
-                    text-align: right;
-                }
-                .total.price::before {
-                    content: "৳";
-                }
-                .line {
-                    border-top:1px solid black !important;
-                }
-                .heading.rate {
-                    width: 20%;
-                }
-                .heading.amount {
-                    width: 25%;
-                }
-                .heading.qty {
-                    width: 5%
-                }
-                p {
-                    padding: 1px;
-                    margin: 0;
-                }
-                section, footer {
-                    font-size: 12px;
-                }
-            `,
+    .items thead {
+        text-align: center;
+    }
+
+    .center-align {
+        text-align: center;
+    }
+
+    .bill-details td {
+        font-size: 12px;
+    }
+
+    .receipt {
+        font-size: medium;
+    }
+
+    .items .heading {
+        font-size: 12.5px;
+        text-transform: uppercase;
+        border-top: 1px solid black;
+        border-bottom: 1px solid black;
+    }
+
+    .items thead tr th:first-child,
+    .items tbody tr td:first-child {
+        width: 47%;
+        word-break: break-all;
+        text-align: left;
+    }
+
+    .items td {
+        font-size: 12px;
+        text-align: right;
+    }
+
+    .price::before {
+        content: "৳";
+        font-family: Arial;
+    }
+
+    .sum-up {
+        text-align: right !important;
+    }
+
+    .total {
+        font-size: 13px;
+        border-top: 1px dashed black !important;
+        border-bottom: 1px dashed black !important;
+    }
+
+    .total.text, .total.price {
+        text-align: right;
+    }
+
+    .total.price::before {
+        content: "৳";
+    }
+
+    .line {
+        border-top: 1px solid black !important;
+    }
+
+    .heading.rate {
+        width: 20%;
+    }
+
+    .heading.amount {
+        width: 25%;
+    }
+
+    .heading.qty {
+        width: 5%;
+    }
+
+    p {
+        padding: 1px;
+        margin: 0;
+    }
+
+    section, footer {
+        font-size: 12px;
+    }
+`,
             creditCompany: [],
             posMachine: [],
             payment_method: '',
@@ -567,7 +617,8 @@ export default {
             date: '',
             carList: [],
             errorsMessage: [],
-            invoice_date: ''
+            invoice_date: '',
+            card_number: '',
         }
     },
     computed: {
@@ -688,7 +739,8 @@ export default {
                 param.advance_sale = this.advance_sale;
             }
             if (type == 'card') {
-                param.pos_machine_id = this.pos_machine_id
+                param.pos_machine_id = this.pos_machine_id;
+                param.card_number = this.card_number
             }
 
             ApiService.POST(ApiRoutes.SaleAdd, param, res => {
@@ -831,11 +883,11 @@ export default {
                 expense_category_id: p.expense_category_id,
                 shift_sale: p.shift_sale,
                 product_id: p.id,
-                quantity: parseFloat(quantity).toFixed(2),
+                quantity: quantity !== '' ? parseFloat(quantity).toFixed(2) : '',
                 price: parseFloat(selling_price).toFixed(2),
                 buying_price: parseFloat(p.buying_price).toFixed(2),
                 driver_selling_price: parseFloat(p.driver_selling_price).toFixed(2),
-                subtotal: parseFloat(subtotal).toFixed(2),
+                subtotal: subtotal !== '' ? parseFloat(subtotal).toFixed(2) : '',
             }
             let isExist = this.sale.map(v => v.product_id).indexOf(product.product_id);
             if (isExist > -1) {
@@ -1094,6 +1146,12 @@ export default {
     width: 150px;
     @media only screen and (max-width: 1366px) {
         width: 117px;
+    }
+}
+@media print {
+    #print {
+        margin-top: 0 !important; /* Force no top margin */
+        padding-top: 0 !important; /* Force no top padding */
     }
 }
 

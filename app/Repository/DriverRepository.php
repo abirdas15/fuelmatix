@@ -40,7 +40,7 @@ class DriverRepository
     {
         $sessionUser = SessionUser::getUser();
         $result =  Transaction::select(DB::raw('SUM(debit_amount) as debit_amount'), DB::raw('SUM(credit_amount) as credit_amount'))
-            ->where('linked_id', $id)
+            ->where('account_id', $id)
             ->where('client_company_id', $sessionUser['client_company_id'])
             ->first();
         if (!empty($result)) {

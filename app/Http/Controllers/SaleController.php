@@ -202,6 +202,7 @@ class SaleController extends Controller
             $sale->user_id = $requestData['session_user']['id'];
             $sale->customer_id = $requestData['payment_method'] == PaymentMethod::COMPANY ? $payment_category_id : null;
             $sale->payment_method = $requestData['payment_method'] ?? null;
+            $sale->card_number = $requestData['card_number'] ?? null;
             $sale->billed_to = $requestData['billed_to'] ?? null;
             $sale->voucher_number = $requestData['voucher_number'] ?? null;
             $sale->car_id = $carId;

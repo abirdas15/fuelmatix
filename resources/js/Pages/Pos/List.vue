@@ -121,7 +121,7 @@
                 </div>
             </div>
         </div>
-        <div id="print" v-if="singleSaleData">
+        <div id="print" v-if="singleSaleData" style="margin: 0; padding: 0;">
             <header class="text-center">
                 <strong>{{ singleSaleData.company?.name }}</strong>
                 <br>
@@ -176,9 +176,9 @@
                     Thank you for your visit!
                 </p>
             </section>
-            <section style="margin-top: 10px; text-align: center">
-                <qrcode-vue :value="value" :size="100" level="H" render-as="svg"></qrcode-vue>
-            </section>
+<!--            <section style="margin-top: 10px; text-align: center">-->
+<!--                <qrcode-vue :value="value" :size="100" level="H" render-as="svg"></qrcode-vue>-->
+<!--            </section>-->
             <section style="text-align: center">
                 <sub>
                     Powered By : <span>Fuel Matix</span>
@@ -220,126 +220,131 @@ export default {
             printD: null,
             singleSaleData: null,
             cssText: `
-                 @page {
-                    size: 2.8in 11in;
-                    margin-top: 0cm;
-                    margin-left: 0cm;
-                    margin-right: 0cm;
-                }
+    @page {
+        size: 2.8in 11in;
+        margin: 0 !important; /* Set all margins to zero */
+    }
 
-                table {
-                    width: 100%;
-                }
+    body {
+        margin: 0; /* Reset body margin */
+        padding: 0; /* Reset body padding */
+    }
 
-                tr {
-                    width: 100%;
+    * {
+        margin: 0; /* Reset margin for all elements */
+        padding: 0; /* Reset padding for all elements */
+        box-sizing: border-box; /* Include padding and border in element's total width and height */
+    }
 
-                }
+    table {
+        width: 100%;
+    }
 
-                h1 {
-                    text-align: center;
-                    vertical-align: middle;
-                }
+    tr {
+        width: 100%;
+    }
 
-                #logo {
-                    width: 60%;
-                    text-align: center;
-                    -webkit-align-content: center;
-                    align-content: center;
-                    padding: 5px;
-                    margin: 2px;
-                    display: block;
-                    margin: 0 auto;
-                }
+    h1 {
+        text-align: center;
+        vertical-align: middle;
+    }
 
-                header {
-                    width: 100%;
-                    text-align: center;
-                    -webkit-align-content: center;
-                    align-content: center;
-                    vertical-align: middle;
-                }
+    #logo {
+        width: 60%;
+        text-align: center;
+        display: block;
+        margin: 0 auto;
+    }
 
-                .items thead {
-                    text-align: center;
-                }
+    header {
+        width: 100%;
+        text-align: center;
+    }
 
-                .center-align {
-                    text-align: center;
-                }
+    .items thead {
+        text-align: center;
+    }
 
-                .bill-details td {
-                    font-size: 12px;
-                }
+    .center-align {
+        text-align: center;
+    }
 
-                .receipt {
-                    font-size: medium;
-                }
+    .bill-details td {
+        font-size: 12px;
+    }
 
-                .items .heading {
-                    font-size: 12.5px;
-                    text-transform: uppercase;
-                    border-top:1px solid black;
-                    margin-bottom: 4px;
-                    border-bottom: 1px solid black;
-                    vertical-align: middle;
-                }
+    .receipt {
+        font-size: medium;
+    }
 
-                .items thead tr th:first-child,
-                .items tbody tr td:first-child {
-                    width: 47%;
-                    min-width: 47%;
-                    max-width: 47%;
-                    word-break: break-all;
-                    text-align: left;
-                }
+    .items .heading {
+        font-size: 12.5px;
+        text-transform: uppercase;
+        border-top: 1px solid black;
+        border-bottom: 1px solid black;
+    }
 
-                .items td {
-                    font-size: 12px;
-                    text-align: right;
-                    vertical-align: bottom;
-                }
+    .items thead tr th:first-child,
+    .items tbody tr td:first-child {
+        width: 47%;
+        word-break: break-all;
+        text-align: left;
+    }
 
-                .price::before {
-                    content: "৳";
-                    font-family: Arial;
-                    text-align: right;
-                }
+    .items td {
+        font-size: 12px;
+        text-align: right;
+    }
 
-                .sum-up {
-                    text-align: right !important;
-                }
-                .total {
-                    font-size: 13px;
-                    border-top:1px dashed black !important;
-                    border-bottom:1px dashed black !important;
-                }
-                .total.text, .total.price {
-                    text-align: right;
-                }
-                .total.price::before {
-                    content: "৳";
-                }
-                .line {
-                    border-top:1px solid black !important;
-                }
-                .heading.rate {
-                    width: 20%;
-                }
-                .heading.amount {
-                    width: 25%;
-                }
-                .heading.qty {
-                    width: 5%
-                }
-                p {
-                    padding: 1px;
-                    margin: 0;
-                }
-                section, footer {
-                    font-size: 12px;
-                }
-            `,
+    .price::before {
+        content: "৳";
+        font-family: Arial;
+    }
+
+    .sum-up {
+        text-align: right !important;
+    }
+
+    .total {
+        font-size: 13px;
+        border-top: 1px dashed black !important;
+        border-bottom: 1px dashed black !important;
+    }
+
+    .total.text, .total.price {
+        text-align: right;
+    }
+
+    .total.price::before {
+        content: "৳";
+    }
+
+    .line {
+        border-top: 1px solid black !important;
+    }
+
+    .heading.rate {
+        width: 20%;
+    }
+
+    .heading.amount {
+        width: 25%;
+    }
+
+    .heading.qty {
+        width: 5%;
+    }
+
+    p {
+        padding: 1px;
+        margin: 0;
+    }
+
+    section, footer {
+        font-size: 12px;
+    }
+`,
+            value: ''
         };
     },
     watch: {
@@ -377,7 +382,17 @@ export default {
             });
         },
         print () {
-            this.printD.print(document.getElementById('print'), [this.cssText])
+            const printElement = document.getElementById('print');
+
+            // Add inline styles directly for print
+            printElement.style.margin = '0';
+            printElement.style.padding = '0';
+
+            document.body.style.margin = '0';
+            document.body.style.padding = '0';
+
+            // Adjust the print logic to ensure styles are applied
+            this.printD.print(printElement, [this.cssText]);
         },
         openModalDelete(data) {
             Swal.fire({
