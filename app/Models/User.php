@@ -55,7 +55,9 @@ class User extends Authenticatable
             'client_company_id' => $userInfo->client_company_id,
             'voucher_check' => $clientCompany['voucher_check'] ?? 0,
             'company_name' => $clientCompany->name ?? '',
-            'permission' => $permission
+            'permission' => $permission,
+            'currency_precision' => $clientCompany->currency_precision,
+            'quantity_precision' => $clientCompany->quantity_precision
         ];
     }
 }

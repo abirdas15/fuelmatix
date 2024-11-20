@@ -119,7 +119,7 @@
                                     <div class="row">
                                         <div class="col-sm-7"></div>
                                         <div class="col-sm-5 text-end mb-2">
-                                            <table class="table">
+                                            <table class="table table-bordered">
                                                 <tr>
                                                     <td style="font-size: 18px;padding: 0;" class="">Total sale:</td>
                                                     <td style="font-size: 18px;padding: 0;" class="text-end ">{{shiftSale.consumption}} {{ shiftSale.unit }}</td>
@@ -128,13 +128,6 @@
                                                     <td style="font-size: 18px;padding: 0;" class="">Total amount:</td>
                                                     <td style="font-size: 18px;padding: 0;" class="text-end ">{{shiftSale.amount}} Tk</td>
                                                 </tr>
-                                            </table>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-sm-7"></div>
-                                        <div class="col-sm-5 text-end mb-2">
-                                            <table class="table">
                                                 <tr v-for="(category,index) in shiftSale.categories">
                                                     <td style="font-size: 18px;padding: 0;" class="">{{category.name}}:</td>
                                                     <td style="font-size: 18px;padding: 0;" class="text-end ">{{category.amount}} Tk</td>

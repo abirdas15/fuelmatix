@@ -93,19 +93,29 @@
                                                             <div class="btn-cart-plus cursor-pointer"
                                                                  @click="updateProduct('minus', i)">-
                                                             </div>
-                                                            <input class="form-control control-sm"  type="text"
-                                                                   v-model="s.quantity" @input="updateSubtotal(i)">
+                                                            <InputNumber
+                                                                v-model="s.quantity"
+                                                                @input="updateSubtotal(i)"
+                                                                :minFractionDigits="numberFractionDigit"
+                                                                :maxFractionDigits="numberFractionDigit"
+                                                                class="border-right"
+                                                            />
                                                             <div class="btn-cart-plus cursor-pointer"
                                                                  @click="updateProduct('plus', i)">+
                                                             </div>
                                                         </div>
                                                     </td>
                                                     <td class="text-end" style="width: 130px;">
-                                                        ৳ {{ s.price }}
+                                                        ৳ {{ format_number(s.price) }}
                                                     </td>
                                                     <td class="text-end">
-                                                        <input class="form-control w-100 control-sm text-end"
-                                                               type="text" v-model="s.subtotal" @input="updateQuantity(i)">
+                                                        <InputNumber
+                                                            v-model="s.subtotal"
+                                                            @input="updateQuantity(i)"
+                                                            :minFractionDigits="numberFractionDigit"
+                                                            :maxFractionDigits="numberFractionDigit"
+                                                            class="border-right"
+                                                        />
                                                     </td>
                                                     <td class="text-end">
                                                         <i class="fa-regular text-danger fa-trash-can cursor-pointer"
@@ -168,7 +178,7 @@
                                                 <td></td>
                                                 <td></td>
                                                 <td></td>
-                                                <td class="text-end">Total: ৳ <strong>{{ getProductTotalPrice() }}</strong>
+                                                <td class="text-end">Total: ৳ <strong>{{ format_number(getProductTotalPrice()) }}</strong>
                                                 </td>
                                             </tr>
                                         </tbody>

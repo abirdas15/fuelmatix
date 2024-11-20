@@ -298,6 +298,9 @@ Route::group(['middleware' => 'AuthReqCheck'], function() {
         Route::group(['prefix' => 'vendor'], function() {
             Route::post('export/pdf', [ReportController::class, 'vendorReportExportPDF']);
         });
+        Route::group(['prefix' => 'pos-machine'], function() {
+            Route::post('', [ReportController::class, 'posMachine']);
+        });
         Route::group(['prefix' => 'company/summary'], function() {
             Route::post('/', [ReportController::class, 'companySummary']);
             Route::post('export/pdf', [ReportController::class, 'companySummaryExportPDF']);

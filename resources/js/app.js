@@ -13,10 +13,13 @@ import VueToast from "vue-toast-notification";
 import "vue-toast-notification/dist/theme-default.css";
 import "vue-select/dist/vue-select.css";
 import vSelect from "vue-select";
+import PrimeVue from 'primevue/config';
 
+import 'primevue/resources/themes/bootstrap4-light-blue/theme.css';
 import App from "./App.vue";
 import router from "./Router/router";
 import store from "./Store/store";
+import InputNumber from 'primevue/inputnumber';
 
 // import VueMqtt from 'vue-mqtt';
 // Vue.use(VueMqtt, 'mqtt://magic.infrmtx.com:1883', {
@@ -30,8 +33,20 @@ Vue.use(VueRouter, axios, Vuex);
 Vue.use(VuePageTransition);
 Vue.component("v-select", vSelect);
 Vue.use(VueToast, { position: "top-right" });
+Vue.component("InputNumber", InputNumber)
+Vue.use(PrimeVue);
 Vue.mixin({
         computed: {
+            numberFractionDigit() {
+                let auth = store.getters.GetAuth ?? [];
+                let value = auth['currency_precision'] ?? 2;
+                return parseInt(value);
+            },
+            quantityFractionDigit() {
+                let auth = store.getters.GetAuth ?? [];
+                let value = auth['quantity_precision'] ?? 2;
+                return parseInt(value);
+            },
             Auth: function () {
                 return this.$store.getters.GetAuth;
             },
@@ -40,6 +55,17 @@ Vue.mixin({
             },
         },
         methods: {
+            format_number(amount) {
+                if (amount === '' || amount === 0) {
+                    return 0.00;
+                }
+                let auth = store.getters.GetAuth ?? [];
+                return `${parseFloat(amount).toFixed(parseInt(auth.currency_precision)).replace(/\d(?=(\d{3})+\.)/g, '$&,')}`;
+            },
+            format_quantity(quantity) {
+                let auth = store.getters.GetAuth ?? [];
+                return `${parseFloat(quantity).toFixed(parseInt(auth.quantity_precision)).replace(/\d(?=(\d{3})+\.)/g, '$&,')}`;
+            },
             CheckPermission:function(sectionName) {
                 let permission = this.Auth.permission ?? [];
                 return permission.includes(sectionName);

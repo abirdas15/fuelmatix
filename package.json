@@ -26,6 +26,7 @@
         "vue-template-compiler": "^2.6.12"
     },
     "dependencies": {
+        "@primevue/themes": "^4.2.2",
         "bootstrap-colorpicker": "^3.4.0",
         "cssnano": "^5.0.17",
         "datatables.net": "^1.12.1",
@@ -36,6 +37,7 @@
         "moment": "^2.29.4",
         "mqtt": "^4.0.1",
         "postcss": "^8.1.0",
+        "primevue": "^2.10.4",
         "printd": "^1.6.0",
         "qrcode.vue": "^1.7.0",
         "skeleton-loader-vue": "^1.0.10",

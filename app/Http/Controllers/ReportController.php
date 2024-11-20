@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Common\AccountCategory;
 use App\Common\FuelMatixDateTimeFormat;
 use App\Common\FuelMatixStatus;
 use App\Helpers\Helpers;
@@ -9,6 +10,7 @@ use App\Helpers\SessionUser;
 use App\Models\Category;
 use App\Models\ClientCompany;
 use App\Models\Product;
+use App\Models\Sale;
 use App\Models\ShiftSale;
 use App\Models\ShiftTotal;
 use App\Models\TankRefill;
@@ -561,6 +563,49 @@ class ReportController extends Controller
             'name' => $creditCompany->name
         ]);
         return $pdf->output();
+    }
+    public function posMachine(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'start_date' => 'required',
+            'end_date' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 500,
+                'errors' => $validator->errors()
+            ]);
+        }
+        $startDate = Carbon::parse($request->input('start_date'))->startOfDay();
+        $endDate = Carbon::parse($request->input('end_date'))->endOfDay();
+        $sessionUser = SessionUser::getUser();
+        $posMachineId = Category::where('slug', strtolower(AccountCategory::POS_MACHINE))
+            ->where('client_company_id', $sessionUser['client_company_id'])
+            ->first()->id;
+        $posMachineIds = Category::where('parent_category', $posMachineId)
+            ->pluck('id')
+            ->toArray();
+        $result = Sale::select(
+            'sale.id',
+            'categories.name as category_name',
+            DB::raw('SUM(total_amount) as amount')
+        )
+            ->leftJoin('categories', 'categories.id', '=', 'sale.payment_category_id')
+            ->whereBetween('sale.date', [$startDate, $endDate])
+            ->whereIn('payment_category_id', $posMachineIds)
+            ->groupBy('sale.payment_category_id')
+            ->get()
+            ->toArray();
+        $total = 0;
+        foreach ($result as &$item) {
+            $total += $item['amount'];
+            $item['amount'] = number_format($item['amount'], $sessionUser['currency_precision']);
+        }
+        return response()->json([
+            'status' => 200,
+            'data' => $result,
+            'total' => number_format($total, 2),
+        ]);
     }
 
 }

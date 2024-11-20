@@ -105,9 +105,10 @@
                                                                     </div>
                                                                     <div class="col-md-2 offset-2 mb-3">
                                                                         <div class="input-group">
-                                                                            <input disabled id="prReading"
-                                                                                   type="text" class="form-control"
-                                                                                   v-model="tank.start_reading_mm">
+<!--                                                                            <input disabled id="prReading"-->
+<!--                                                                                   type="text" class="form-control"-->
+<!--                                                                                   v-model="tank.start_reading_mm">-->
+                                                                            <InputNumber disabled="disabled" v-model="tank.start_reading_mm" inputId="locale-user" :minFractionDigits="quantityFractionDigit" :maxFractionDigits="quantityFractionDigit"/>
                                                                             <div class="input-group-append">
                                                                                 <span class="input-group-text" >mm</span>
                                                                             </div>
@@ -116,9 +117,12 @@
                                                                     <div class="mb-3 col-md-2"></div>
                                                                     <div class="mb-3 col-md-2" v-if="listDispenser.status === 'end'">
                                                                         <div class="input-group">
-                                                                            <input id="prReading"
-                                                                                   type="text" class="form-control text-end"
-                                                                                   v-model="tank.end_reading_mm" @input="getReading($event, 'end_reading', tankIndex, tank.id)">
+<!--                                                                            <input id="prReading"-->
+<!--                                                                                   type="text" class="form-control text-end"-->
+<!--                                                                                   v-model="tank.end_reading_mm" @input="getReading($event, 'end_reading', tankIndex, tank.id)">-->
+
+                                                                            <InputNumber v-model="tank.end_reading_mm" @input="getReading($event, 'end_reading', tankIndex, tank.id)" inputId="locale-user" :minFractionDigits="quantityFractionDigit" :maxFractionDigits="quantityFractionDigit"/>
+
                                                                             <div class="input-group-append">
                                                                                 <span class="input-group-text" >mm</span>
                                                                             </div>
@@ -129,9 +133,10 @@
                                                                     <div class="mb-3 col-md-2"></div>
                                                                     <div class="mb-3 col-md-2 offset-2">
                                                                         <div class="input-group">
-                                                                            <input disabled id="prReading"
-                                                                                   type="text" class="form-control"
-                                                                                   v-model="tank.start_reading">
+                                                                            <InputNumber disabled id="prReading"  v-model="tank.start_reading" inputId="locale-user" :minFractionDigits="quantityFractionDigit" :maxFractionDigits="quantityFractionDigit"/>
+<!--                                                                            <input disabled id="prReading"-->
+<!--                                                                                   type="text" class="form-control"-->
+<!--                                                                                   v-model="tank.start_reading">-->
                                                                             <div class="input-group-append">
                                                                                 <span class="input-group-text" >{{ listDispenser.unit }}</span>
                                                                             </div>
@@ -139,8 +144,9 @@
                                                                     </div>
                                                                     <div class="mb-3 col-md-2" v-if="listDispenser.status === 'end'">
                                                                         <div class="input-group">
-                                                                            <input type="text" class="form-control"  disabled
-                                                                                   v-model="tank.tank_refill">
+                                                                            <InputNumber disabled v-model="tank.tank_refill" inputId="locale-user" :minFractionDigits="quantityFractionDigit" :maxFractionDigits="quantityFractionDigit"/>
+<!--                                                                            <input type="text" class="form-control"  disabled-->
+<!--                                                                                   v-model="tank.tank_refill">-->
                                                                             <div class="input-group-append">
                                                                                 <span class="input-group-text" >{{ listDispenser.unit }}</span>
                                                                             </div>
@@ -149,9 +155,10 @@
                                                                     </div>
                                                                     <div class="mb-3 col-md-2" v-if="listDispenser.status === 'end'">
                                                                         <div class="input-group">
-                                                                            <input id="frReading" disabled
-                                                                                   type="text" class="form-control"
-                                                                                   v-model="tank.end_reading">
+                                                                            <InputNumber id="frReading" disabled v-model="tank.end_reading" inputId="locale-user" :minFractionDigits="quantityFractionDigit" :maxFractionDigits="quantityFractionDigit"/>
+<!--                                                                            <input id="frReading" disabled-->
+<!--                                                                                   type="text" class="form-control"-->
+<!--                                                                                   v-model="tank.end_reading">-->
                                                                             <div class="input-group-append">
                                                                                 <span class="input-group-text" >Liter</span>
                                                                             </div>
@@ -161,10 +168,11 @@
                                                                     </div>
                                                                     <div class="mb-3 col-md-2" v-if="listDispenser.status === 'end'">
                                                                         <div class="input-group">
-                                                                            <input id="frReading" @blur="disableInput('frReading')" v-if="listDispenser.status === 'end'"
-                                                                                   type="text" class="form-control" disabled
-                                                                                   v-model="tank.adjustment"
-                                                                                   @input="calculateAmount(tankIndex)">
+                                                                            <InputNumber v-if="listDispenser.status === 'end'" id="frReading" @blur="disableInput('frReading')" @input="calculateAmount(tankIndex)"  v-model="tank.adjustment" inputId="locale-user" :minFractionDigits="quantityFractionDigit" :maxFractionDigits="quantityFractionDigit"/>
+<!--                                                                            <input id="frReading" @blur="disableInput('frReading')" v-if="listDispenser.status === 'end'"-->
+<!--                                                                                   type="text" class="form-control" disabled-->
+<!--                                                                                   v-model="tank.adjustment"-->
+<!--                                                                                   @input="calculateAmount(tankIndex)">-->
                                                                             <div class="input-group-append">
                                                                                 <span class="input-group-text" >{{ listDispenser.unit }}</span>
                                                                             </div>
@@ -175,8 +183,14 @@
 
                                                                     <div class="mb-3 col-md-2" v-if="listDispenser.status === 'end'">
                                                                         <div class="input-group">
-                                                                            <input type="text" class="form-control" id="consumption" disabled  v-if="listDispenser.status === 'end'"
-                                                                                   v-model="tank.consumption">
+                                                                            <InputNumber v-if="listDispenser.status === 'end'"
+                                                                                         disabled="disabled"
+                                                                                         v-model="tank.consumption"
+                                                                                         inputId="locale-user"
+                                                                                         :minFractionDigits="quantityFractionDigit"
+                                                                                         :maxFractionDigits="quantityFractionDigit"/>
+<!--                                                                            <input type="text" class="form-control" id="consumption" disabled  v-if="listDispenser.status === 'end'"-->
+<!--                                                                                   v-model="tank.consumption">-->
                                                                             <div class="input-group-append">
                                                                                 <span class="input-group-text" >Liter</span>
                                                                             </div>
@@ -201,8 +215,14 @@
                                                                 <div class="mb-3 col-md-2">
                                                                     <label>Start Reading </label>
                                                                     <div class="input-group">
-                                                                        <input type="text" class="form-control" disabled
-                                                                               v-model="n.start_reading">
+                                                                        <InputNumber
+                                                                                     disabled="disabled"
+                                                                                     v-model="n.start_reading"
+                                                                                     inputId="locale-user"
+                                                                                     :minFractionDigits="quantityFractionDigit"
+                                                                                     :maxFractionDigits="quantityFractionDigit"/>
+<!--                                                                        <input type="text" class="form-control" disabled-->
+<!--                                                                               v-model="n.start_reading">-->
                                                                         <div class="input-group-append">
                                                                             <span class="input-group-text" >{{ listDispenser.unit }}</span>
                                                                         </div>
@@ -212,14 +232,23 @@
                                                                 <div class="mb-3 col-md-3"  v-if="listDispenser.status === 'end'">
                                                                     <label>End Reading </label>
                                                                     <div class="input-group">
-                                                                        <input
-                                                                            type="text"
-                                                                            class="form-control text-end"
+                                                                        <InputNumber
                                                                             @blur="disableInput('frReading'+nIndex+dIndex)"
                                                                             v-if="listDispenser.status === 'end'"
                                                                             v-model="n.end_reading"
                                                                             @click="enableInput('frReading'+nIndex+dIndex)"
-                                                                            @input="calculateAmountNozzle(dIndex, nIndex, tankIndex)">
+                                                                            @input="calculateAmountNozzle(dIndex, nIndex, tankIndex)"
+                                                                            :minFractionDigits="quantityFractionDigit"
+                                                                            :maxFractionDigits="quantityFractionDigit"
+                                                                        />
+<!--                                                                        <input-->
+<!--                                                                            type="text"-->
+<!--                                                                            class="form-control text-end"-->
+<!--                                                                            @blur="disableInput('frReading'+nIndex+dIndex)"-->
+<!--                                                                            v-if="listDispenser.status === 'end'"-->
+<!--                                                                            v-model="n.end_reading"-->
+<!--                                                                            @click="enableInput('frReading'+nIndex+dIndex)"-->
+<!--                                                                            @input="calculateAmountNozzle(dIndex, nIndex, tankIndex)">-->
 
                                                                         <template v-if="n.mac !== null">
                                                                             <button
@@ -243,10 +272,19 @@
                                                                 <div class="mb-3 col-md-2" v-if="listDispenser.status === 'end'">
                                                                     <label>Adjustment </label>
                                                                     <div class="input-group">
-                                                                        <input type="text" class="form-control text-end" @blur="disableInput('frReading'+nIndex+dIndex)"
-                                                                               v-if="listDispenser.status === 'end'"
-                                                                               v-model="n.adjustment"
-                                                                               @input="calculateAmountNozzle(dIndex, nIndex, tankIndex) " disabled>
+                                                                        <InputNumber
+                                                                            @input="calculateAmountNozzle(dIndex, nIndex, tankIndex) "
+                                                                            v-if="listDispenser.status === 'end'"
+                                                                            v-model="n.adjustment"
+                                                                            disabled="disabled"
+                                                                            @click="enableInput('frReading'+nIndex+dIndex)"
+                                                                            :minFractionDigits="quantityFractionDigit"
+                                                                            :maxFractionDigits="quantityFractionDigit"
+                                                                        />
+<!--                                                                        <input type="text" class="form-control text-end" @blur="disableInput('frReading'+nIndex+dIndex)"-->
+<!--                                                                               v-if="listDispenser.status === 'end'"-->
+<!--                                                                               v-model="n.adjustment"-->
+<!--                                                                               @input="calculateAmountNozzle(dIndex, nIndex, tankIndex) " disabled>-->
                                                                         <div class="input-group-append">
                                                                             <span class="input-group-text" >{{ listDispenser.unit }}</span>
                                                                         </div>
@@ -261,8 +299,14 @@
                                                                 <div class="mb-3 col-md-2"  v-if="listDispenser.status === 'end'">
                                                                     <label>Consumption </label>
                                                                     <div class="input-group">
-                                                                        <input type="text" disabled class="form-control"
-                                                                               v-model="n.consumption">
+                                                                        <InputNumber
+                                                                            v-model="n.consumption"
+                                                                            disabled="disabled"
+                                                                            :minFractionDigits="quantityFractionDigit"
+                                                                            :maxFractionDigits="quantityFractionDigit"
+                                                                        />
+<!--                                                                        <input type="text" disabled class="form-control"-->
+<!--                                                                               v-model="n.consumption">-->
                                                                         <div class="input-group-append">
                                                                             <span class="input-group-text" >{{ listDispenser.unit }}</span>
                                                                         </div>
@@ -286,7 +330,7 @@
                                                 <table class="table">
                                                     <tr>
                                                         <td style="font-size: 18px;padding: 0px;" class="">Total sale:</td>
-                                                        <td style="font-size: 18px;padding: 0px;" class="text-end ">{{totalSale.toFixed(2)}} {{ listDispenser.unit }}</td>
+                                                        <td style="font-size: 18px;padding: 0px;" class="text-end ">{{ format_number(totalSale) }} {{ listDispenser.unit }}</td>
                                                     </tr>
                                                     <!--                                                            <tr>-->
                                                     <!--                                                                <td style="font-size: 18px;padding: 0px;" class="">Total amount:</td>-->
@@ -305,8 +349,13 @@
                                                         <option v-for="c in allAmountCategory" :value="c.id">{{c.name}}</option>
                                                     </select>
                                                     <div class="form-group">
-                                                        <input class="form-control me-3 text-end"  style="max-width: 210px" type="number" v-model="pos.amount"
-                                                               disabled>
+                                                        <InputNumber
+                                                            v-model="pos.amount"
+                                                            disabled="disabled"
+                                                            :minFractionDigits="numberFractionDigit"
+                                                            :maxFractionDigits="numberFractionDigit"
+                                                            class="border-right"
+                                                        />
                                                         <div class="invalid-feedback"></div>
                                                     </div>
                                                 </div>
@@ -316,11 +365,11 @@
                                                 <table class="table">
                                                     <tr>
                                                         <td style="font-size: 18px;padding: 0px;" class="">Total POS sale:</td>
-                                                        <td style="font-size: 18px;padding: 0px;" class="text-end ">{{totalPosSale()}} Tk</td>
+                                                        <td style="font-size: 18px;padding: 0px;" class="text-end ">{{ format_number(totalPosSale()) }} Tk</td>
                                                     </tr>
                                                     <tr v-if="totalAmount > 0">
                                                         <td style="font-size: 18px;padding: 0px;" class="">Remaining Balance: </td>
-                                                        <td style="font-size: 18px;padding: 0px;" class="text-end ">{{totalAmount - totalPosSale()}} Tk</td>
+                                                        <td style="font-size: 18px;padding: 0px;" class="text-end ">{{ format_number(totalAmount - totalPosSale()) }} Tk</td>
                                                     </tr>
                                                 </table>
                                             </div>
@@ -331,23 +380,36 @@
                                             <div class="col-sm-8 text-end">
                                                 <div class="row"  v-for="(category,index) in categories">
                                                     <div class="col-sm-4 mb-3">
-                                                        <select class="form-control me-3" style="max-width: 210px" v-model="category.category_id"
+                                                        <select class="form-control me-3" v-model="category.category_id"
                                                                 @change="isDataExist(category.category_id, 'category_id', index, categories); filterProductPrice(index)" >
                                                             <option v-for="c in allAmountCategory" :value="c.id">{{c.name}}</option>
                                                         </select>
                                                     </div>
                                                     <div class="form-group col-sm-3 mb-3">
-                                                        <div class="input-group" style="width: 95%">
-                                                            <input type="text" class="form-control text-end" v-model="category.liter" disabled>
+                                                        <div class="input-group">
+                                                            <InputNumber
+                                                                v-model="category.liter"
+                                                                disabled="disabled"
+                                                                :minFractionDigits="quantityFractionDigit"
+                                                                :maxFractionDigits="quantityFractionDigit"
+                                                                class="w-100"
+                                                            />
                                                             <div class="input-group-append">
                                                                 <span class="input-group-text" >{{ listDispenser.unit }}</span>
                                                             </div>
                                                         </div>
                                                     </div>
                                                     <div class="form-group col-sm-4 mb-3">
-                                                        <input class="form-control me-3 text-end"  style="width: 95%" type="number" step="any" v-model="category.amount" :id="'categories.'+index+'.amount'"
-                                                               @input="calculateValue(category.amount, index); filterProductPrice(index)"
-                                                               :name="'categories.'+index+'.amount'" placeholder="Amount here">
+                                                        <InputNumber
+                                                            v-model="category.amount"
+                                                            :id="'categories.'+index+'.amount'"
+                                                            @input="calculateValue(category.amount, index); filterProductPrice(index)"
+                                                            :minFractionDigits="numberFractionDigit"
+                                                            :maxFractionDigits="numberFractionDigit"
+                                                            :name="'categories.'+index+'.amount'"
+                                                            placeholder="Amount here"
+                                                            class="border-right w-100"
+                                                        />
                                                         <div class="invalid-feedback"></div>
                                                     </div>
                                                     <div class="col-sm-1 mb-3">
@@ -360,10 +422,10 @@
                                                 <div class="row">
                                                     <div class="col-sm-4"></div>
                                                     <div class="col-sm-3 text-center">
-                                                        <span><strong>Total: {{ totalLiter }} {{ listDispenser.unit }}</strong></span>
+                                                        <span><strong>Total: {{ format_quantity(totalLiter) }} {{ listDispenser.unit }}</strong></span>
                                                     </div>
                                                     <div class="col-sm-4 text-center">
-                                                        <span><strong>Amount: {{isNaN(totalPaid) ? 0 : totalPaid}} Tk</strong></span>
+                                                        <span><strong>Amount: {{ format_number(totalPaid) }} Tk</strong></span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -410,7 +472,13 @@ export default {
             totalSale: 0,
             totalAmount: 0,
             allAmountCategory: null,
-            categories: [],
+            categories: [
+                {
+                    category_id: '',
+                    liter: 0,
+                    amount: 0,
+                },
+            ],
             totalPaid: 0,
             oilStock: false,
             noDIPShow: true,
@@ -460,11 +528,14 @@ export default {
                 $('.nozzle'+ nozzleId).toggle();
                 if (parseInt(res.status) === 200) {
                     this.listDispenser.tanks[tankIndex]['dispensers'][dispenserIndex]['nozzle'][nozzleIndex]['end_reading'] =  res.data.liters;
+                    setTimeout(() => {
+                        this.calculateAmountNozzle(dispenserIndex, nozzleIndex, tankIndex);
+                    }, 200);
                 }
             });
         },
         getReading: function(event, field, index, tank_id) {
-            this.getBstiChart(event.target.value, field, index, tank_id);
+            this.getBstiChart(event, field, index, tank_id);
         },
         getBstiChart: function(height, field, index, tank_id) {
             ApiService.POST(ApiRoutes.TankGetVolume, {tank_id: tank_id, height: height}, res => {
@@ -522,9 +593,9 @@ export default {
         },
         addCategory: function() {
             this.categories.push({
-                amount: '',
+                amount: 0,
                 category_id: '',
-                liter: ''
+                liter: 0
             });
         },
         getTotalSale: function () {
@@ -559,21 +630,16 @@ export default {
             this.listDispenser.amount = parseFloat(this.listDispenser.tanks[tankIndex].consumption ) * parseFloat(this.listDispenser.selling_price)
         },
         calculateAmountNozzle: function (dIndex, nIndex, tankIndex) {
-            if (this.isNumeric(this.listDispenser.tanks[tankIndex].dispensers[dIndex].nozzle[nIndex].end_reading)) {
-                let pf = 1;
-                if (this.listDispenser.tanks[tankIndex].dispensers[dIndex].nozzle[nIndex].pf != null && this.listDispenser.tanks[tankIndex].dispensers[dIndex].nozzle[nIndex].pf !== '') {
-                    pf = this.listDispenser.tanks[tankIndex].dispensers[dIndex].nozzle[nIndex].pf;
-                }
-                if (parseFloat(this.listDispenser.tanks[tankIndex].dispensers[dIndex].nozzle[nIndex].end_reading) < parseFloat(this.listDispenser.tanks[tankIndex].dispensers[dIndex].nozzle[nIndex].start_reading)) {
-                    this.listDispenser.tanks[tankIndex].dispensers[dIndex].nozzle[nIndex].consumption = (parseFloat(this.listDispenser.tanks[tankIndex].dispensers[dIndex].nozzle[nIndex].max_value) - parseFloat(this.listDispenser.tanks[tankIndex].dispensers[dIndex].nozzle[nIndex].start_reading) + parseFloat(this.listDispenser.tanks[tankIndex].dispensers[dIndex].nozzle[nIndex].end_reading) - parseFloat(this.listDispenser.tanks[tankIndex].dispensers[dIndex].nozzle[nIndex].adjustment)) * pf;
-                } else {
-                    this.listDispenser.tanks[tankIndex].dispensers[dIndex].nozzle[nIndex].consumption = (parseFloat(this.listDispenser.tanks[tankIndex].dispensers[dIndex].nozzle[nIndex].end_reading) - parseFloat(this.listDispenser.tanks[tankIndex].dispensers[dIndex].nozzle[nIndex].start_reading)  - parseFloat(this.listDispenser.tanks[tankIndex].dispensers[dIndex].nozzle[nIndex].adjustment)) * parseFloat(pf)
-                }
-                this.listDispenser.tanks[tankIndex].dispensers[dIndex].nozzle[nIndex].amount = parseFloat(this.listDispenser.tanks[tankIndex].dispensers[dIndex].nozzle[nIndex].consumption) * parseFloat(this.listDispenser.selling_price)
-            } else {
-                this.listDispenser.tanks[tankIndex].dispensers[dIndex].nozzle[nIndex].consumption = 0
-                this.listDispenser.tanks[tankIndex].dispensers[dIndex].nozzle[nIndex].amount = 0
+            let pf = 1;
+            if (this.listDispenser.tanks[tankIndex].dispensers[dIndex].nozzle[nIndex].pf != null && this.listDispenser.tanks[tankIndex].dispensers[dIndex].nozzle[nIndex].pf !== '') {
+                pf = this.listDispenser.tanks[tankIndex].dispensers[dIndex].nozzle[nIndex].pf;
             }
+            if (parseFloat(this.listDispenser.tanks[tankIndex].dispensers[dIndex].nozzle[nIndex].end_reading) < parseFloat(this.listDispenser.tanks[tankIndex].dispensers[dIndex].nozzle[nIndex].start_reading)) {
+                this.listDispenser.tanks[tankIndex].dispensers[dIndex].nozzle[nIndex].consumption = (parseFloat(this.listDispenser.tanks[tankIndex].dispensers[dIndex].nozzle[nIndex].max_value) - parseFloat(this.listDispenser.tanks[tankIndex].dispensers[dIndex].nozzle[nIndex].start_reading) + parseFloat(this.listDispenser.tanks[tankIndex].dispensers[dIndex].nozzle[nIndex].end_reading) - parseFloat(this.listDispenser.tanks[tankIndex].dispensers[dIndex].nozzle[nIndex].adjustment)) * pf;
+            } else {
+                this.listDispenser.tanks[tankIndex].dispensers[dIndex].nozzle[nIndex].consumption = (parseFloat(this.listDispenser.tanks[tankIndex].dispensers[dIndex].nozzle[nIndex].end_reading) - parseFloat(this.listDispenser.tanks[tankIndex].dispensers[dIndex].nozzle[nIndex].start_reading)  - parseFloat(this.listDispenser.tanks[tankIndex].dispensers[dIndex].nozzle[nIndex].adjustment)) * parseFloat(pf)
+            }
+            this.listDispenser.tanks[tankIndex].dispensers[dIndex].nozzle[nIndex].amount = parseFloat(this.listDispenser.tanks[tankIndex].dispensers[dIndex].nozzle[nIndex].consumption) * parseFloat(this.listDispenser.selling_price)
             this.getTotalSale()
         },
         getProduct: function () {
@@ -596,9 +662,9 @@ export default {
                         }
                     });
                     this.categories.push({
-                        amount: '',
+                        amount: 0,
                         category_id: category_id,
-                        liter: ''
+                        liter: 0
                     });
                 }
             });
