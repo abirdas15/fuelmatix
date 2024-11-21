@@ -13,7 +13,6 @@ use App\Models\Category;
 use App\Models\Expense;
 use App\Models\FuelAdjustment;
 use App\Models\Invoice;
-use App\Models\Nozzle;
 use App\Models\PayOrderData;
 use App\Models\Product;
 use App\Models\Sale;
@@ -621,6 +620,7 @@ class ReportRepository
             ->get()
             ->keyBy('product_id')
             ->toArray();
+        $grandTotal = 0;
         foreach ($products as &$product) {
             $totalSale = 0;
             $totalEndReading = 0;
@@ -648,6 +648,7 @@ class ReportRepository
                 $totalEndReading += $tank['end_reading'];
                 $totalRefill += $tank['refill'];
             }
+            $grandTotal += $totalAmount;
             $product['total'] = $totalSale > 0 ? number_format($totalSale, $sessionUser['quantity_precision']) : '-';
             $product['subtotal_amount'] = $totalAmount > 0 ? number_format($totalAmount, $sessionUser['currency_precision']) : '-';
             $adjustment = $fuelAdjustment[$product['id']]['total_quantity'] ?? 0;
@@ -671,26 +672,37 @@ class ReportRepository
         $accountReceivable = Category::where('client_company_id', $sessionUser['client_company_id'])
             ->where('slug', strtolower( AccountCategory::ACCOUNT_RECEIVABLE))
             ->first();
-        $transaction = Transaction::select('transactions.account_id as id',  DB::raw("SUM(transactions.debit_amount) as amount"), 'categories.name', DB::raw('SUM(transactions.quantity) as quantity'), 'c1.name as product_name')
+        $transaction = Transaction::select('transactions.account_id as id',  DB::raw("SUM(transactions.debit_amount) as amount"),  DB::raw("SUM(transactions.credit_amount) as paid_amount"), 'categories.name', DB::raw('SUM(transactions.quantity) as quantity'), 'c1.name as product_name')
             ->leftJoin('transactions as t1', 't1.id', '=', 'transactions.linked_id')
             ->leftJoin('categories', 'categories.id', '=', 'transactions.account_id')
             ->leftJoin('categories as c1', 'c1.id', '=', 't1.account_id')
             ->where('transactions.date', $date)
             ->whereJsonContains('categories.category_ids', $accountReceivable->id)
             ->where('transactions.client_company_id', $sessionUser['client_company_id'])
-            ->having('amount', '>', 0)
             ->groupBy('transactions.id')
             ->get()
             ->toArray();
         $totalQuantity = 0;
         $totalAmount = 0;
         $productWiseSale = [];
+        $totalPaidAmount = 0;
+        $debitAmountArray = [];
+        $creditAmountArray = [];
         foreach ($transaction as &$data) {
-            $productWiseSale[$data['product_name']][] = $data;
             $data['amount_format'] = number_format($data['amount'], $sessionUser['currency_precision']);
             $totalQuantity += $data['quantity'];
             $data['quantity'] = number_format($data['quantity'], $sessionUser['quantity_precision']);
             $totalAmount += $data['amount'];
+            $totalPaidAmount += $data['paid_amount'];
+            $data['paid_amount_format'] = number_format($data['paid_amount'], $sessionUser['currency_precision']);
+
+            if (!empty($data['amount'])) {
+                $productWiseSale[$data['product_name']][] = $data;
+                $debitAmountArray[] = $data;
+            }
+            if (!empty($data['paid_amount'])) {
+                $creditAmountArray[] = $data;
+            }
         }
         $productWiseSaleArray = [];
         foreach ($productWiseSale as $key => $row) {
@@ -765,7 +777,8 @@ class ReportRepository
         return [
             'status' => 200,
             'data' => $products,
-            'companySales' => $transaction,
+            'companySales' => $debitAmountArray,
+            'companyPaid' => $creditAmountArray,
             'expenses' => $expenses,
             'posSales' => $posSales,
             'assetTransfer' => $assetTransfer,
@@ -776,6 +789,8 @@ class ReportRepository
                 'expense' => number_format($totalExpense, $sessionUser['currency_precision']),
                 'posSaleTotalAmount' => number_format($posSaleTotalAmount, $sessionUser['currency_precision']),
                 'totalTransferAmount' => number_format($totalTransferAmount, $sessionUser['currency_precision']),
+                'paid_amount' => number_format($totalPaidAmount, $sessionUser['currency_precision']),
+                'grandTotal' => number_format($grandTotal, $sessionUser['currency_precision'])
             ]
         ];
     }

@@ -72,11 +72,11 @@
                                     <table class="table">
                                         <thead>
                                         <tr>
-                                            <th>Product</th>
-                                            <th>Qty</th>
-                                            <th class="text-end">Price</th>
-                                            <th class="text-end">Subtotal</th>
-                                            <th class="text-end"></th>
+                                            <th width="20%">Product</th>
+                                            <th width="25%">Qty</th>
+                                            <th width="20%" class="text-end">Price</th>
+                                            <th width="30%" class="text-end">Subtotal</th>
+                                            <th width="5%" class="text-end"></th>
                                         </tr>
                                         </thead>
                                         <tbody v-if="sale.length > 0">
@@ -90,9 +90,9 @@
                                                     </td>
                                                     <td>
                                                         <div class="d-flex align-items-center justify-content-between">
-                                                            <div class="btn-cart-plus cursor-pointer"
-                                                                 @click="updateProduct('minus', i)">-
-                                                            </div>
+<!--                                                            <div class="btn-cart-plus cursor-pointer"-->
+<!--                                                                 @click="updateProduct('minus', i)">- -->
+<!--                                                            </div>-->
                                                             <InputNumber
                                                                 v-model="s.quantity"
                                                                 @input="updateSubtotal(i)"
@@ -100,9 +100,9 @@
                                                                 :maxFractionDigits="numberFractionDigit"
                                                                 class="border-right"
                                                             />
-                                                            <div class="btn-cart-plus cursor-pointer"
-                                                                 @click="updateProduct('plus', i)">+
-                                                            </div>
+<!--                                                            <div class="btn-cart-plus cursor-pointer"-->
+<!--                                                                 @click="updateProduct('plus', i)">+-->
+<!--                                                            </div>-->
                                                         </div>
                                                     </td>
                                                     <td class="text-end" style="width: 130px;">
@@ -877,9 +877,9 @@ export default {
             this.sale.splice(i, 1)
         },
         cartProduct: function (p) {
-            let quantity =  '';
+            let quantity =  0;
             let selling_price = p.selling_price;
-            let subtotal = '';
+            let subtotal = 0;
             if (this.advance_sale) {
                 subtotal = this.driver_amount;
                 quantity = subtotal / selling_price;
@@ -893,11 +893,11 @@ export default {
                 expense_category_id: p.expense_category_id,
                 shift_sale: p.shift_sale,
                 product_id: p.id,
-                quantity: quantity !== '' ? parseFloat(quantity).toFixed(2) : '',
-                price: parseFloat(selling_price).toFixed(2),
-                buying_price: parseFloat(p.buying_price).toFixed(2),
-                driver_selling_price: parseFloat(p.driver_selling_price).toFixed(2),
-                subtotal: subtotal !== '' ? parseFloat(subtotal).toFixed(2) : '',
+                quantity: quantity,
+                price: selling_price,
+                buying_price: p.buying_price,
+                driver_selling_price: p.driver_selling_price,
+                subtotal: subtotal,
             }
             let isExist = this.sale.map(v => v.product_id).indexOf(product.product_id);
             if (isExist > -1) {

@@ -104,14 +104,9 @@
                                                                         <label>Consumption </label>
                                                                     </div>
                                                                     <div class="col-md-2 offset-2 mb-3">
-                                                                        <div class="input-group">
-<!--                                                                            <input disabled id="prReading"-->
-<!--                                                                                   type="text" class="form-control"-->
-<!--                                                                                   v-model="tank.start_reading_mm">-->
+                                                                        <div class="p-inputgroup">
                                                                             <InputNumber disabled="disabled" v-model="tank.start_reading_mm" inputId="locale-user" :minFractionDigits="quantityFractionDigit" :maxFractionDigits="quantityFractionDigit"/>
-                                                                            <div class="input-group-append">
-                                                                                <span class="input-group-text" >mm</span>
-                                                                            </div>
+                                                                            <span class="p-inputgroup-addon">mm</span>
                                                                         </div>
                                                                     </div>
                                                                     <div class="mb-3 col-md-2"></div>
@@ -214,17 +209,19 @@
                                                                 </div>
                                                                 <div class="mb-3 col-md-2">
                                                                     <label>Start Reading </label>
-                                                                    <div class="input-group">
-                                                                        <InputNumber
-                                                                                     disabled="disabled"
-                                                                                     v-model="n.start_reading"
-                                                                                     inputId="locale-user"
-                                                                                     :minFractionDigits="quantityFractionDigit"
-                                                                                     :maxFractionDigits="quantityFractionDigit"/>
-<!--                                                                        <input type="text" class="form-control" disabled-->
-<!--                                                                               v-model="n.start_reading">-->
-                                                                        <div class="input-group-append">
-                                                                            <span class="input-group-text" >{{ listDispenser.unit }}</span>
+                                                                    <div class="form-group">
+                                                                        <div class="input-group">
+                                                                            <InputNumber
+                                                                                disabled="disabled"
+                                                                                v-model="n.start_reading"
+                                                                                inputId="locale-user"
+                                                                                :minFractionDigits="quantityFractionDigit"
+                                                                                :maxFractionDigits="quantityFractionDigit"/>
+                                                                            <!--                                                                        <input type="text" class="form-control" disabled-->
+                                                                            <!--                                                                               v-model="n.start_reading">-->
+                                                                            <div class="input-group-append">
+                                                                                <span class="input-group-text" >{{ listDispenser.unit }}</span>
+                                                                            </div>
                                                                         </div>
                                                                     </div>
 
@@ -249,23 +246,21 @@
 <!--                                                                            v-model="n.end_reading"-->
 <!--                                                                            @click="enableInput('frReading'+nIndex+dIndex)"-->
 <!--                                                                            @input="calculateAmountNozzle(dIndex, nIndex, tankIndex)">-->
-
-                                                                        <template v-if="n.mac !== null">
-                                                                            <button
-                                                                                type="button"
-                                                                                class="btn btn-primary btn-sm"
-                                                                                :class="'nozzle' + n.id"
-                                                                                @click="getNozzleLatestReading(tankIndex, dIndex, nIndex, n.id)">
-                                                                                Get
-                                                                            </button>
-                                                                            <button style="display: none" :class="'nozzle' + n.id"  class="btn btn-primary btn-sm">
-                                                                                <i class="fa fa-spinner fa-spin"></i>
-                                                                            </button>
-                                                                        </template>
-
-                                                                        <span class="input-group-text">
-                                                                            {{ listDispenser.unit }}
-                                                                        </span>
+                                                                        <div class="input-group-append">
+                                                                            <span class="input-group-text">
+                                                                                <template v-if="n.mac !== null">
+                                                                                    <span class="cursor-pointer" :class="'nozzle' + n.id" @click="getNozzleLatestReading(tankIndex, dIndex, nIndex, n.id)">
+                                                                                        Get
+                                                                                    </span>
+                                                                                    <span style="display: none" :class="'nozzle' + n.id">
+                                                                                        <i class="fa fa-spinner fa-spin"></i>
+                                                                                    </span>
+                                                                                </template>
+                                                                                <template v-else>
+                                                                                    {{ listDispenser.unit }}
+                                                                                </template>
+                                                                            </span>
+                                                                        </div>
                                                                     </div>
                                                                     <!--                                                            <input class="form-control" value="0" v-if="listDispenser.status == 'start'" disabled>-->
                                                                 </div>
@@ -343,35 +338,41 @@
                                             <div class="col-sm-6">
                                             </div>
                                             <div class="col-sm-6 text-end">
-                                                <h4 style="text-align: left;margin-left: 5rem;">POS Sale</h4>
                                                 <div class="d-flex mb-3 justify-content-end"  v-for="pos in listDispenser.pos_sale">
-                                                    <select class="form-control me-3" style="max-width: 210px" v-model="pos.category_id" disabled>
-                                                        <option v-for="c in allAmountCategory" :value="c.id">{{c.name}}</option>
-                                                    </select>
-                                                    <div class="form-group">
-                                                        <InputNumber
-                                                            v-model="pos.amount"
-                                                            disabled="disabled"
-                                                            :minFractionDigits="numberFractionDigit"
-                                                            :maxFractionDigits="numberFractionDigit"
-                                                            class="border-right"
-                                                        />
-                                                        <div class="invalid-feedback"></div>
-                                                    </div>
+                                                    <table class="table table-bordered">
+                                                        <thead>
+                                                            <tr class="bg-custom">
+                                                                <th colspan="3" class="text-center">POS Sale</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr>
+                                                                <th class="text-center">Payment Method</th>
+                                                                <th class="text-center">Quantity</th>
+                                                                <th class="text-end">Amount</th>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>
+                                                                    {{pos.category_name}}
+                                                                </td>
+                                                                <td class="text-end">
+                                                                    {{ pos.quantity_format }}
+                                                                </td>
+                                                                <td class="text-end">
+                                                                    {{ pos.amount_format }}
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <th colspan="2">Total POS Sale:</th>
+                                                                <th>{{ format_number(totalPosSale()) }} Tk</th>
+                                                            </tr>
+                                                            <tr v-if="totalAmount > 0">
+                                                                <th colspan="2" class="">Remaining Balance: </th>
+                                                                <th class="text-end ">{{ format_number(totalAmount - totalPosSale()) }} Tk</th>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
                                                 </div>
-                                            </div>
-                                            <div class="col-sm-8"></div>
-                                            <div class="col-sm-4">
-                                                <table class="table">
-                                                    <tr>
-                                                        <td style="font-size: 18px;padding: 0px;" class="">Total POS sale:</td>
-                                                        <td style="font-size: 18px;padding: 0px;" class="text-end ">{{ format_number(totalPosSale()) }} Tk</td>
-                                                    </tr>
-                                                    <tr v-if="totalAmount > 0">
-                                                        <td style="font-size: 18px;padding: 0px;" class="">Remaining Balance: </td>
-                                                        <td style="font-size: 18px;padding: 0px;" class="text-end ">{{ format_number(totalAmount - totalPosSale()) }} Tk</td>
-                                                    </tr>
-                                                </table>
                                             </div>
                                         </div>
 
@@ -459,9 +460,10 @@ import ApiRoutes from "../../Services/ApiRoutes";
 import Swal from 'sweetalert2/dist/sweetalert2.js'
 import moment from "moment";
 import SkeletonLoaderVue  from 'skeleton-loader-vue';
+import Table from "../../admin/Pages/Common/Table.vue";
 
 export default {
-    components: { SkeletonLoaderVue  },
+    components: {Table, SkeletonLoaderVue  },
     data() {
         return {
             loading: false,
@@ -857,5 +859,18 @@ export default {
 }
 .animation--fade {
     width: 100% !important;
+}
+.bg-custom {
+    background-color: #d7d2d2;
+}
+table{
+    tbody{
+        tr{
+            border-color: #000000 !important;
+            th, td {
+                border-color: #000000 !important;
+            }
+        }
+    }
 }
 </style>

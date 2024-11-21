@@ -703,14 +703,19 @@ class ProductController extends Controller
                 $result['date'] = Carbon::parse($shiftSale['date'], SessionUser::TIMEZONE)->format('Y-m-d H:i:s');
                 $result['status'] = 'end';
             }
-            $posSale = SaleData::select('sale_data.sale_id', 'sale_data.id', DB::raw('SUM(sale_data.quantity) as quantity'), DB::raw('SUM(sale_data.subtotal) as amount'), 'sale.payment_category_id as category_id')
+            $posSale = SaleData::select('sale_data.sale_id', 'sale_data.id', 'categories.name as category_name', DB::raw('SUM(sale_data.quantity) as quantity'), DB::raw('SUM(sale_data.subtotal) as amount'), 'sale.payment_category_id as category_id')
                 ->leftJoin('sale', 'sale.id', '=', 'sale_data.sale_id')
+                ->leftJoin('categories', 'categories.id', '=', 'sale.payment_category_id')
                 ->where('shift_sale_id', $shiftSale->id)
                 ->where('sale.client_company_id', $sessionUser['client_company_id'])
                 ->whereNotNull('sale.id')
                 ->groupBy('sale.payment_category_id')
                 ->get()
                 ->toArray();
+            foreach ($posSale as &$posItem) {
+                $posItem['quantity_format'] = number_format($posItem['quantity'], $sessionUser['quantity_precision']);
+                $posItem['amount_format'] = number_format($posItem['amount'], $sessionUser['currency_precision']);
+            }
             $result['pos_sale'] = $posSale;
             $result['total_pos_sale_liter'] = array_sum(array_column($posSale, 'quantity'));
         }

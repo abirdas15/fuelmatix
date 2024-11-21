@@ -88,6 +88,14 @@
                             </tbody>
                         </table>
                     </template>
+                    <table class="table table-bordered">
+                        <tbody>
+                            <tr>
+                                <th colspan="5" class="text-end">Grand Total</th>
+                                <th class="text-end" v-text="total.grandTotal"></th>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
 
@@ -169,6 +177,33 @@
                                 <th class="text-center" v-text="total.quantity"></th>
                                 <th class="text-end" v-text="total.amount"></th>
                             </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card" v-if="companyPaid.length > 0">
+                <div class="text-center mt-2"><h2>Company Paid</h2></div>
+                <div class="card-body mt-0">
+                    <table class="table table-bordered">
+                        <tbody>
+                        <tr>
+                            <th>Company Name</th>
+                            <th>Payment Method</th>
+                            <th class="text-end">Amount</th>
+                        </tr>
+                        </tbody>
+                        <tbody>
+                        <tr v-for="each in companyPaid">
+                            <td v-text="each.name"></td>
+                            <td class="" v-text="each.product_name"></td>
+                            <td class="text-end" v-text="each.paid_amount_format"></td>
+                        </tr>
+                        </tbody>
+                        <tbody>
+                        <tr>
+                            <th colspan="2" class="text-end">Total:</th>
+                            <th class="text-end" v-text="total.paid_amount"></th>
+                        </tr>
                         </tbody>
                     </table>
                 </div>
@@ -304,6 +339,7 @@ export default {
             },
             data: null,
             companySales: [],
+            companyPaid: [],
             posSales: [],
             expenses: [],
             assetTransfer: [],
@@ -337,6 +373,7 @@ export default {
                 if (parseInt(res.status) === 200) {
                     this.data = res.data;
                     this.companySales = res.companySales;
+                    this.companyPaid = res.companyPaid;
                     this.posSales = res.posSales;
                     this.expenses = res.expenses;
                     this.assetTransfer = res.assetTransfer;

@@ -1,6 +1,6 @@
 <template>
     <div class="content-body">
-        <div class="container-fluid" style="background-color: #e9e4e4">
+        <div class="container-fluid" style="background-color: #6666ff">
             <div class="row page-titles">
                 <ol class="breadcrumb align-items-center ">
                     <li class="breadcrumb-item active">

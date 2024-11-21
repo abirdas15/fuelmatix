@@ -65,6 +65,14 @@
                 </tr>
             </table>
         @endforeach
+            <table class="print-details">
+                <tbody>
+                    <tr class="bg-custom">
+                        <th colspan="5" class="text-end">Grand Total</th>
+                        <th class="text-end">{{ $data['total']['grandTotal'] }}</th>
+                    </tr>
+                </tbody>
+            </table>
 
         <div class="text-center"><h2>Received and Under Tank Summary</h2></div>
         @foreach($data['data'] as $product)
@@ -130,6 +138,25 @@
                 <th colspan="2" style="text-align: right">Total:</th>
                 <td style="text-align: center">{{ $data['total']['quantity'] }}</td>
                 <td style="text-align: right">{{ $data['total']['amount'] }}</td>
+            </tr>
+        </table>
+        <div class="text-center"><h2>Company Paid</h2></div>
+        <table class="print-details">
+            <tr>
+                <th>Company Name</th>
+                <th>Payment Method</th>
+                <th style="text-align: end">Amount</th>
+            </tr>
+            @foreach($data['companyPaid'] as $each)
+                <tr>
+                    <td>{{ $each['name'] }}</td>
+                    <td class="">{{ $each['product_name'] }}</td>
+                    <td style="text-align: right">{{ $each['paid_amount_format'] }}</td>
+                </tr>
+            @endforeach
+            <tr>
+                <th colspan="2" style="text-align: right">Total:</th>
+                <td style="text-align: right">{{ $data['total']['paid_amount'] }}</td>
             </tr>
         </table>
         <div class="text-center"><h2>Product Sale</h2></div>

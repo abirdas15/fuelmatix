@@ -49,6 +49,15 @@ class Section
     const INVOICE_PAYMENT = 'Invoice-Payment';
     const PURCHASE = 'Purchase';
     const CAR = 'Car';
+    const DUMMY_SALE = 'Dummy-Sale';
+    const DUMMY_SALE_HISTORY = 'Dummy-Sale-History';
+    const BULK_SALE = 'Bulk-Sale';
+    const SALES_STOCK = 'Sales-Stock';
+    const VENDOR_REPORT = 'Vendor-Report';
+    const EXPENSE_REPORT = 'Expense-Report';
+    const WINDFALL_REPORT = 'Windfall-Report';
+    const CREDIT_COMPANY_REPORT = 'Credit-Company-Report';
+    const DRIVER_RE = 'User-Report';
 
     /**
      * @return array
@@ -101,6 +110,7 @@ class Section
             'INVOICE_PAYMENT' => self::INVOICE_PAYMENT,
             'PURCHASE' => self::PURCHASE,
             'CAR' => self::CAR,
+            'DUMMY_SALE' => self::DUMMY_SALE,
         ];
     }
 }
