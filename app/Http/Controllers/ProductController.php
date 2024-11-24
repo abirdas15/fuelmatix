@@ -626,7 +626,7 @@ class ProductController extends Controller
                 if (!empty($nozzle['latest_shift_summary'])) {
                     $nozzle['start_reading'] = !empty($nozzle['latest_shift_summary'][0]['end_reading']) ? $nozzle['latest_shift_summary'][0]['end_reading'] : $nozzle['latest_shift_summary'][0]['start_reading'];
                 }
-                $nozzle['end_reading'] = 0;
+                $nozzle['end_reading'] = null;
                 $nozzle['adjustment'] = $adjustment;
                 $nozzle['consumption'] =  $nozzle['end_reading']  - $nozzle['start_reading'] -  $adjustment;
                 $nozzle['amount'] = 0;

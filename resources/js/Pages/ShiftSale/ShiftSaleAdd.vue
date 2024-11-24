@@ -116,7 +116,12 @@
 <!--                                                                                   type="text" class="form-control text-end"-->
 <!--                                                                                   v-model="tank.end_reading_mm" @input="getReading($event, 'end_reading', tankIndex, tank.id)">-->
 
-                                                                            <InputNumber v-model="tank.end_reading_mm" @input="getReading($event, 'end_reading', tankIndex, tank.id)" inputId="locale-user" :minFractionDigits="quantityFractionDigit" :maxFractionDigits="quantityFractionDigit"/>
+                                                                            <InputNumber
+                                                                                v-model="tank.end_reading_mm"
+                                                                                @input="onTankInput($event, 'end_reading', tankIndex, tank.id)"
+                                                                                inputId="locale-user"
+                                                                                :minFractionDigits="quantityFractionDigit"
+                                                                                :maxFractionDigits="quantityFractionDigit"/>
 
                                                                             <div class="input-group-append">
                                                                                 <span class="input-group-text" >mm</span>
@@ -212,6 +217,7 @@
                                                                     <div class="form-group">
                                                                         <div class="input-group">
                                                                             <InputNumber
+                                                                                @input="(value) => n.start_reading = Number(value)"
                                                                                 disabled="disabled"
                                                                                 v-model="n.start_reading"
                                                                                 inputId="locale-user"
@@ -234,7 +240,7 @@
                                                                             v-if="listDispenser.status === 'end'"
                                                                             v-model="n.end_reading"
                                                                             @click="enableInput('frReading'+nIndex+dIndex)"
-                                                                            @input="calculateAmountNozzle(dIndex, nIndex, tankIndex)"
+                                                                            @input="onNozzleInput($event, tankIndex, dIndex, nIndex)"
                                                                             :minFractionDigits="quantityFractionDigit"
                                                                             :maxFractionDigits="quantityFractionDigit"
                                                                         />
@@ -405,7 +411,7 @@
                                                         <InputNumber
                                                             v-model="category.amount"
                                                             :id="'categories.'+index+'.amount'"
-                                                            @input="calculateValue(category.amount, index); filterProductPrice(index)"
+                                                            @input="categoryInput($event, index)"
                                                             :minFractionDigits="numberFractionDigit"
                                                             :maxFractionDigits="numberFractionDigit"
                                                             :name="'categories.'+index+'.amount'"
@@ -479,7 +485,7 @@ export default {
                 {
                     category_id: '',
                     liter: 0,
-                    amount: 0,
+                    amount: null,
                 },
             ],
             totalPaid: 0,
@@ -518,6 +524,21 @@ export default {
         }
     },
     methods: {
+        categoryInput(value, index) {
+            this.categories[index]['amount'] = Number(value);
+            setTimeout(() => {
+                this.calculateValue(value);
+                this.filterProductPrice(index);
+            }, 200);
+        },
+        onTankInput(value, end_reading, tankIndex, id) {
+            this.listDispenser.tanks[tankIndex]['end_reading_mm'] = Number(value);
+            this.getReading(value, end_reading, tankIndex, id)
+        },
+        onNozzleInput(value, tankIndex, dIndex, nIndex, ) {
+            this.listDispenser.tanks[tankIndex]['dispensers'][dIndex]['nozzle'][nIndex]['end_reading'] = Number(value);
+            this.calculateAmountNozzle(dIndex, nIndex, tankIndex); // Call your calculation logic
+        },
         fetchShiftName() {
             ApiService.POST(ApiRoutes.ShiftName, {},(res) => {
                 if (parseInt(res.status) === 200) {
@@ -565,25 +586,24 @@ export default {
             return total
         },
         filterProductPrice: function(index) {
-            this.categories[index]['liter'] = '';
+            this.categories[index]['liter'] = 0;
             let category_id = this.categories[index]['category_id'];
             let product_price = [];
             this.allAmountCategory.map((v) => {
-                if (v.id == category_id) {
+                if (v.id === category_id) {
                     product_price = v.product_price;
                 }
             });
             let selling_price = this.listDispenser.selling_price;
             if (product_price.length > 0) {
                 product_price.map((v) => {
-                    if (v.product_id == this.product_id) {
+                    if (v.product_id === this.product_id) {
                         selling_price = v.price;
                     }
                 });
             }
-            console.log(this.totalSale / selling_price);
-            console.log(this.totalSale / selling_price);
-            this.categories[index]['liter'] = parseFloat(this.categories[index]['amount'] / selling_price).toFixed(2);
+            let liter = parseFloat(this.categories[index]['amount'])/ parseFloat(selling_price);
+            this.categories[index]['liter'] = Number(liter);
         },
         calculateValue: function (amount) {
             this.totalPaid = 0
@@ -596,7 +616,7 @@ export default {
         },
         addCategory: function() {
             this.categories.push({
-                amount: 0,
+                amount: null,
                 category_id: '',
                 liter: 0
             });
@@ -660,12 +680,12 @@ export default {
                     this.allAmountCategory = res.data;
                     let category_id = '';
                     res.data.map((v) => {
-                        if (v.selected == true) {
+                        if (v.selected === true) {
                             category_id = v.id;
                         }
                     });
                     this.categories.push({
-                        amount: 0,
+                        amount: null,
                         category_id: category_id,
                         liter: 0
                     });
