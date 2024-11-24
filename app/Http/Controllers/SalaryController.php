@@ -15,7 +15,6 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use Rmunate\Utilities\SpellNumber;
 
 class SalaryController extends Controller
 {
@@ -54,10 +53,15 @@ class SalaryController extends Controller
         $employeeIds = $employees->pluck('id')->toArray();
 
         // Retrieve transactions for the given month and year
-        $transactions = Transaction::select('linked_id as employee_id', 'debit_amount as amount', 'account_id as category_id')
-            ->whereIn('linked_id', $employeeIds)
-            ->whereMonth('date', $request->input('month'))
-            ->whereYear('date', $request->input('year'))
+        $transactions = Transaction::select(
+            'transactions.account_id as employee_id',
+            'transactions.debit_amount as amount',
+            't1.account_id as category_id'
+        )
+            ->leftJoin('transactions as t1', 't1.linked_id', '=', 'transactions.id')
+            ->whereIn('transactions.account_id', $employeeIds)
+            ->whereMonth('transactions.date', $request->input('month'))
+            ->whereYear('transactions.date', $request->input('year'))
             ->get()
             ->keyBy('employee_id')
             ->toArray();
@@ -111,15 +115,25 @@ class SalaryController extends Controller
         $employeeIds = array_column($request->input('employees'), 'id');
 
         // Delete existing salary transactions for the provided month and year
-        $transactionIds = Transaction::where('client_company_id', $sessionUser['client_company_id'])
-            ->where('date', $date)
-            ->where('module', Module::SALARY)
-            ->where('account_id', $employeeIds)
-            ->pluck('id')
+        $transactions = Transaction::select('transactions.*', 't1.*') // Select desired columns
+            ->leftJoin('transactions as t1', function ($join) {
+                $join->on('t1.linked_id', '=', 'transactions.id');
+            })
+            ->where('transactions.client_company_id', $sessionUser['client_company_id'])
+            ->whereMonth('transactions.date', $request->input('month'))
+            ->whereYear('transactions.date', $request->input('year'))
+            ->where('transactions.module', Module::SALARY)
+            ->whereIn('transactions.account_id', $employeeIds)
+            ->get()
             ->toArray();
-        Transaction::whereIn('account_id', $employeeIds)
-            ->orWhereIn('linked_id', $transactionIds)
-            ->delete();
+        $transactionIds = [];
+        foreach ($transactions as $transaction) {
+            $transactionIds[] = $transaction['id'];
+            $transactionIds[] = $transaction['linked_id'];
+        }
+        if (count($transactionIds) > 0) {
+            Transaction::whereIn('id', $transactionIds)->delete();
+        }
 
         // Loop through each employee and save the transactions
         foreach ($request->input('employees') as $employee) {
@@ -217,8 +231,7 @@ class SalaryController extends Controller
         }
 
         // Group, order, and paginate the results
-        $transactions = $query->groupBy('transactions.id')
-            ->orderBy($orderBy, $orderMode)
+        $transactions = $query->orderBy($orderBy, $orderMode)
             ->paginate($limit);
 
         // Format the date in the response

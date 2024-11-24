@@ -202,8 +202,23 @@ class DummySaleController extends Controller
         $keyword = $inputData['keyword'] ?? '';
         $order_by = $inputData['order_by'] ?? 'sale.id';
         $order_mode = $inputData['order_mode'] ?? 'DESC';
-        $result = DummySale::select('dummy_sale.id', 'dummy_sale.invoice_number', 'dummy_sale.date', 'dummy_sale.total_amount', 'dummy_sale.payment_method', 'users.name as user_name', 'dummy_sale.voucher_number', 'car.car_number', 'categories.name as company_name')
+        $sessionUser = SessionUser::getUser();
+        $result = DummySale::select(
+            'dummy_sale.id',
+            'dummy_sale.invoice_number',
+            'dummy_sale.date',
+            'dummy_sale.total_amount',
+            'dummy_sale.payment_method',
+            'users.name as user_name',
+            'dummy_sale.voucher_number',
+            'car.car_number',
+            'categories.name as company_name',
+            DB::raw('SUM(quantity) as quantity'),
+            DB::raw("GROUP_CONCAT(products.name SEPARATOR ', ') as product_name")
+        )
+            ->leftJoin('dummy_sale_data', 'dummy_sale_data.sale_id', '=', 'dummy_sale.id')
             ->leftJoin('car', 'car.id', '=', 'dummy_sale.car_id')
+            ->leftJoin('products', 'products.id', '=', 'dummy_sale_data.product_id')
             ->leftJoin('categories', 'categories.id', '=', 'dummy_sale.payment_category_id')
             ->leftJoin('users', 'users.id', '=', 'dummy_sale.user_id')
             ->where('dummy_sale.client_company_id', $inputData['session_user']['client_company_id']);
@@ -219,6 +234,8 @@ class DummySaleController extends Controller
             if ($data['payment_method'] == PaymentMethod::CASH || $data['payment_method'] == PaymentMethod::CARD) {
                 $data['company_name'] = null;
             }
+            $data['quantity'] = number_format($data['quantity'], $sessionUser['quantity_precision']);
+            $data['total_amount'] = number_format($data['total_amount'], $sessionUser['currency_precision']);
         }
         return response()->json(['status' => 200, 'data' => $result]);
     }

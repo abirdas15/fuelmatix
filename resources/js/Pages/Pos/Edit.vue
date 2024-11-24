@@ -1,14 +1,6 @@
 <template>
     <div class="content-body">
         <div class="container-fluid">
-            <div class="row page-titles">
-                <ol class="breadcrumb align-items-center ">
-                    <li class="breadcrumb-item active">
-                        <router-link :to="{name: 'Dashboard'}">Home</router-link>
-                    </li>
-                    <li class="breadcrumb-item"><a href="javascript:void(0)">Pos</a></li>
-                </ol>
-            </div>
             <div class="row">
                 <div class="col-xl-12 col-lg-12">
                     <div class="row">
@@ -359,7 +351,7 @@
             <table class="bill-details">
                 <tbody>
                 <tr>
-                    <td>Date : <span>{{ singleSaleData?.date }}</span></td>
+                    <td>Date : <span>{{ singleSaleData?.date_format }}</span></td>
                 </tr>
                 <tr>
                     <td><strong>Vehicle No: {{ singleSaleData?.customer_name }}</strong></td>
@@ -1014,56 +1006,6 @@ export default {
 #print{
     display: none;
 }
-.product-list {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-
-    .each-product {
-        cursor: pointer;
-        border: 1px solid #f2f2f2;
-        background-color: #ffffff;
-        margin-right: 15px;
-        border-radius: 10px;
-        box-shadow: 0rem 0.3125rem 0.3125rem 0rem rgba(82, 63, 105, 0.05);
-        width: 180px;
-        transition: 500ms;
-        margin-bottom: 15px;
-
-        &:hover {
-            border: 1px solid #6572FF;
-            transition: 500ms;
-        }
-
-        .img {
-            width: 100%;
-            height: 170px;
-
-            img {
-                border-top-left-radius: 10px;
-                border-top-right-radius: 10px;
-                width: 100%;
-                height: 100%;
-                object-fit: cover;
-                object-position: center;
-            }
-        }
-
-        .detail {
-            padding: 10px;
-
-            .name {
-                font-weight: bold;
-            }
-
-            .desc {
-                font-size: 13px;
-                color: #808080;
-            }
-        }
-    }
-}
-
 .blank-white {
     width: 100%;
     border-radius: 15px;
@@ -1073,7 +1015,6 @@ export default {
 }
 
 .t-section {
-    height: 530px;
     overflow: auto;
 }
 

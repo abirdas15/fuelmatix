@@ -87,8 +87,8 @@
                                                     </div>
                                                 </td>
                                                 <td>
-                                                    <button @click="addProduct" v-if="index == 0" type="button" class="btn btn-info">+</button>
-                                                    <button @click="removeProduct(index)" v-if="index != 0" type="button" class="btn btn-danger">x</button>
+                                                    <button @click="addProduct" v-if="index === param.products.length - 1" type="button" class="btn btn-info">+</button>
+                                                    <button @click="removeProduct(index)" v-else type="button" class="btn btn-danger">x</button>
                                                 </td>
                                             </tr>
                                         </tbody>

@@ -68,7 +68,7 @@
                                 </div>
                             </div>
                             <div class="default-cart">
-                                <div class="">
+                                <div class="t-section">
                                     <table class="table">
                                         <thead>
                                         <tr>
@@ -356,14 +356,14 @@
                     Phone: {{ singleSaleData.company?.phone_number }}
                 </small>
             </header>
-            <p>Invoice Number : {{ singleSaleData.invoice_number }}</p>
+            <p>Invoice Number : {{ singleSaleData?.invoice_number }}</p>
             <table class="bill-details">
                 <tbody>
                 <tr>
-                    <td>Date : <span>{{ singleSaleData.date }}</span></td>
+                    <td>Date : <span>{{ singleSaleData?.date_format }}</span></td>
                 </tr>
                 <tr>
-                    <td><strong>Vehicle No: {{ singleSaleData.customer_name }}</strong></td>
+                    <td><strong>Vehicle No: {{ singleSaleData?.customer_name }}</strong></td>
                 </tr>
                 </tbody>
             </table>
@@ -850,25 +850,25 @@ export default {
             return total
         },
         updateDriveSaleProduct: function (type) {
-            if (type == 'minus') {
+            if (type === 'minus') {
                 if (this.driver_sale.quantity > 1) {
                     this.driver_sale.quantity--;
                 }
             }
-            if (type == 'plus') {
+            if (type === 'plus') {
                 this.driver_sale.quantity++;
             }
         },
         updateProduct: function (type, i) {
-            if (type == 'minus') {
-                if (this.sale[i].quantity == 1) {
+            if (type === 'minus') {
+                if (this.sale[i].quantity === 1) {
                     this.sale.splice(i, 1)
                 } else {
                     this.sale[i].quantity--
                     this.sale[i].subtotal = this.sale[i].quantity * this.sale[i].price
                 }
             }
-            if (type == 'plus') {
+            if (type === 'plus') {
                 this.sale[i].quantity++
                 this.sale[i].subtotal = this.sale[i].quantity * this.sale[i].price
             }
@@ -1070,55 +1070,6 @@ export default {
 #print{
     display: none;
 }
-.product-list {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-
-    .each-product {
-        cursor: pointer;
-        border: 1px solid #f2f2f2;
-        background-color: #ffffff;
-        margin-right: 15px;
-        border-radius: 10px;
-        box-shadow: 0rem 0.3125rem 0.3125rem 0rem rgba(82, 63, 105, 0.05);
-        width: 100px;
-        transition: 500ms;
-        margin-bottom: 15px;
-
-        &:hover {
-            border: 1px solid #6572FF;
-            transition: 500ms;
-        }
-
-        .img {
-            width: 100%;
-            height: 50px;
-
-            img {
-                border-top-left-radius: 10px;
-                border-top-right-radius: 10px;
-                width: 100%;
-                height: 100%;
-                object-fit: cover;
-                object-position: center;
-            }
-        }
-
-        .detail {
-            padding: 10px;
-
-            .name {
-                font-weight: bold;
-            }
-
-            .desc {
-                font-size: 13px;
-                color: #808080;
-            }
-        }
-    }
-}
 
 .blank-white {
     width: 100%;
@@ -1129,7 +1080,7 @@ export default {
 }
 
 .t-section {
-    height: 530px;
+    max-height: 530px;
     overflow: auto;
 }
 

@@ -603,7 +603,7 @@ const router = new VueRouter({
                     path: ROOT_URL + "/report/driver", meta: { title: 'Driver Report - FuelMatix' }, name: "DriverReport", component: DriverReport
                 },
                 {
-                    path: ROOT_URL + "/report/pos", meta: { title: 'POS Report - FuelMatix' }, name: "Pos Report", component: PosReport
+                    path: ROOT_URL + "/report/pos", meta: { title: 'POS Report - FuelMatix' }, name: "PosReport", component: PosReport
                 },
                 {
                     path: ROOT_URL + "/bulkSale/add", meta: { title: 'Bulk Sale Add - FuelMatix' }, name: "BulkSaleAdd", component: BulkSaleAdd

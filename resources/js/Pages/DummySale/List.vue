@@ -59,6 +59,8 @@
                                                 <th class="text-white" @click="sortData('payment_method')" :class="sortClass('payment_method')">Payment Method</th>
                                                 <th class="text-white" @click="sortData('voucher_number')" :class="sortClass('voucher_number')">Voucher Number</th>
                                                 <th class="text-white" @click="sortData('Car Number')" :class="sortClass('voucher_number')">Car Number</th>
+                                                <th class="text-white">Product Name</th>
+                                                <th class="text-white">Quantity</th>
                                                 <th class="text-white" @click="sortData('total_amount')" :class="sortClass('total_amount')">Total </th>
                                                 <th class="text-white" @click="sortData('user_name')" :class="sortClass('user_name')" >User</th>
                                                 <th class="text-white text-end" >Action</th>
@@ -72,6 +74,8 @@
                                                 <td><a href="javascript:void(0);">{{f?.payment_method}}</a></td>
                                                 <td><a href="javascript:void(0);">{{f?.voucher_number}}</a></td>
                                                 <td><a href="javascript:void(0);">{{f.car_number}}</a></td>
+                                                <td><a href="javascript:void(0);">{{f.product_name}}</a></td>
+                                                <td><a href="javascript:void(0);">{{f.quantity}}</a></td>
                                                 <td><a href="javascript:void(0);">{{f.total_amount}}</a></td>
                                                 <td><a href="javascript:void(0);">{{f?.user_name}}</a></td>
                                                 <td>
@@ -170,9 +174,9 @@
                     Thank you for your visit!
                 </p>
             </section>
-            <section style="margin-top: 10px; text-align: center">
-                <qrcode-vue :value="value" :size="100" level="H" render-as="svg"></qrcode-vue>
-            </section>
+<!--            <section style="margin-top: 10px; text-align: center">-->
+<!--                <qrcode-vue :value="value" :size="100" level="H" render-as="svg"></qrcode-vue>-->
+<!--            </section>-->
             <section style="text-align: center">
                 <sub>
                     Powered By : <span>Fuel Matix</span>

@@ -338,8 +338,8 @@
                                             <div class="col-sm-6">
                                             </div>
                                             <div class="col-sm-6 text-end">
-                                                <div class="d-flex mb-3 justify-content-end"  v-for="pos in listDispenser.pos_sale">
-                                                    <table class="table table-bordered">
+                                                <div class="d-flex mb-3 justify-content-end">
+                                                    <table class="table table-bordered" v-if="listDispenser.pos_sale.length > 0">
                                                         <thead>
                                                             <tr class="bg-custom">
                                                                 <th colspan="3" class="text-center">POS Sale</th>
@@ -351,19 +351,20 @@
                                                                 <th class="text-center">Quantity</th>
                                                                 <th class="text-end">Amount</th>
                                                             </tr>
+                                                                <tr  v-for="pos in listDispenser.pos_sale">
+                                                                    <td>
+                                                                        {{pos.category_name}}
+                                                                    </td>
+                                                                    <td class="text-end">
+                                                                        {{ pos.quantity_format }}
+                                                                    </td>
+                                                                    <td class="text-end">
+                                                                        {{ pos.amount_format }}
+                                                                    </td>
+                                                                </tr>
                                                             <tr>
-                                                                <td>
-                                                                    {{pos.category_name}}
-                                                                </td>
-                                                                <td class="text-end">
-                                                                    {{ pos.quantity_format }}
-                                                                </td>
-                                                                <td class="text-end">
-                                                                    {{ pos.amount_format }}
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <th colspan="2">Total POS Sale:</th>
+                                                                <th colspan="1">Total POS Sale:</th>
+                                                                <th>{{ listDispenser.total_pos_sale_liter }}</th>
                                                                 <th>{{ format_number(totalPosSale()) }} Tk</th>
                                                             </tr>
                                                             <tr v-if="totalAmount > 0">

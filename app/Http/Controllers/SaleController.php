@@ -311,23 +311,41 @@ class SaleController extends Controller
         $keyword = $inputData['keyword'] ?? '';
         $order_by = $inputData['order_by'] ?? 'sale.id';
         $order_mode = $inputData['order_mode'] ?? 'DESC';
-        $result = Sale::select('sale.id', 'sale.invoice_number', 'sale.date', 'sale.total_amount', 'sale.payment_method', 'users.name as user_name', 'sale.voucher_number', 'car.car_number', 'categories.name as company_name')
+        $sessionUser = SessionUser::getUser();
+        $result = Sale::select(
+            'sale.id',
+            'sale.invoice_number',
+            'sale.date',
+            'sale.total_amount',
+            'sale.payment_method',
+            'users.name as user_name',
+            'sale.voucher_number',
+            'car.car_number',
+            'categories.name as company_name',
+            DB::raw('SUM(quantity) as quantity'),
+            DB::raw("GROUP_CONCAT(products.name SEPARATOR ', ') as product_name")
+        )
+            ->leftJoin('sale_data', 'sale_data.sale_id', '=', 'sale.id')
             ->leftJoin('car', 'car.id', '=', 'sale.car_id')
+            ->leftJoin('products', 'products.id', '=', 'sale_data.product_id')
             ->leftJoin('categories', 'categories.id', '=', 'sale.payment_category_id')
             ->leftJoin('users', 'users.id', '=', 'sale.user_id')
-            ->where('sale.client_company_id', $inputData['session_user']['client_company_id']);
+            ->where('sale.client_company_id', $sessionUser['client_company_id']);
         if (!empty($keyword)) {
             $result->where(function ($q) use ($keyword) {
                 $q->where('invoice_number', 'LIKE', '%'.$keyword.'%');
             });
         }
-        $result = $result->orderBy($order_by, $order_mode)
+        $result = $result->groupBy('sale.id')
+            ->orderBy($order_by, $order_mode)
             ->paginate($limit);
         foreach ($result as &$data) {
             $data['date'] = date(FuelMatixDateTimeFormat::STANDARD_DATE_TIME, strtotime($data['date']));
             if ($data['payment_method'] == PaymentMethod::CASH || $data['payment_method'] == PaymentMethod::CARD) {
                 $data['company_name'] = null;
             }
+            $data['quantity'] = number_format($data['quantity'], $sessionUser['quantity_precision']);
+            $data['total_amount'] = number_format($data['total_amount'], $sessionUser['currency_precision']);
         }
         return response()->json(['status' => 200, 'data' => $result]);
     }
@@ -352,7 +370,7 @@ class SaleController extends Controller
             ->leftJoin('car', 'car.id', '=', 'sale.car_id')
             ->leftJoin('categories', 'categories.id', '=', 'sale.payment_category_id')
             ->find($inputData['id']);
-        $result['date'] = date(FuelMatixDateTimeFormat::STANDARD_DATE_TIME, strtotime($result['date']));
+        $result['date_format'] = date(FuelMatixDateTimeFormat::STANDARD_DATE_TIME, strtotime($result['date']));
         $result['customer_name'] = $result['billed_to'] ?? 'Walk in Customer';
         $result['payment_method'] = ucfirst($result['payment_method']);
         if (!empty($result['customer_id'])) {

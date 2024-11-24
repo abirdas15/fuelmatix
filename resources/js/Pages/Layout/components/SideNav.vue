@@ -175,6 +175,10 @@
                             <router-link :to="{name: 'CompanySummary'}" >Bill Summary
                             </router-link>
                         </li>
+                        <li>
+                            <router-link :to="{name: 'PosReport'}" >POS Report
+                            </router-link>
+                        </li>
                     </ul>
                 </li>
                 <li v-if="CheckPermission(Section.ROLE + '-' + Action.VIEW)">

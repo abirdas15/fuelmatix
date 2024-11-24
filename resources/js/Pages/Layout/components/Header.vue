@@ -26,8 +26,8 @@
                       </div>
                       <ul class="navbar-nav header-right">
                           <li class="nav-item dropdown header-profile">
-                              <a class="nav-link" href="javascript:void(0);" role="button" data-bs-toggle="dropdown">
-                                  <img src="images/user.jpg" width="56" alt="" />
+                              <a class="nav-link profile-name" href="javascript:void(0);" role="button" data-bs-toggle="dropdown">
+                                  <img :src="'https://via.placeholder.com/200x150?text=' + Auth.name" alt="">
                               </a>
                               <div class="dropdown-menu dropdown-menu-end">
                                   <a href="javascript:void(0)" @click="Logout" class="dropdown-item ai-icon">
@@ -68,7 +68,6 @@ export default {
         },
     },
     mounted() {
-
     },
     computed: {
         Auth: function () {
@@ -80,3 +79,10 @@ export default {
     },
 };
 </script>
+<style lang="scss">
+.profile-link{
+    height: 3.75rem;
+    width: 3.75rem;
+    border-radius: 4.25rem;
+}
+</style>

@@ -59,6 +59,8 @@
                                                 <th class="text-white" @click="sortData('payment_method')" :class="sortClass('payment_method')">Payment Method</th>
                                                 <th class="text-white" @click="sortData('voucher_number')" :class="sortClass('voucher_number')">Voucher Number</th>
                                                 <th class="text-white" @click="sortData('Car Number')" :class="sortClass('voucher_number')">Car Number</th>
+                                                <th class="text-white">Product Name</th>
+                                                <th class="text-white">Quantity</th>
                                                 <th class="text-white" @click="sortData('total_amount')" :class="sortClass('total_amount')">Total </th>
                                                 <th class="text-white" @click="sortData('user_name')" :class="sortClass('user_name')" >User</th>
                                                 <th class="text-white text-end" >Action</th>
@@ -72,6 +74,8 @@
                                                 <td><a href="javascript:void(0);">{{f?.payment_method}}</a></td>
                                                 <td><a href="javascript:void(0);">{{f?.voucher_number}}</a></td>
                                                 <td><a href="javascript:void(0);">{{f.car_number}}</a></td>
+                                                <td><a href="javascript:void(0);">{{f.product_name}}</a></td>
+                                                <td><a href="javascript:void(0);">{{f.quantity}}</a></td>
                                                 <td><a href="javascript:void(0);">{{f.total_amount}}</a></td>
                                                 <td><a href="javascript:void(0);">{{f?.user_name}}</a></td>
                                                 <td>
@@ -130,17 +134,17 @@
                 </small>
                 <br>
                 <small>
-                    Phone: {{ singleSaleData.company?.phone_number }}
+                    Phone: {{ singleSaleData?.company?.phone_number }}
                 </small>
             </header>
-            <p>Invoice Number : {{ singleSaleData.invoice_number }}</p>
+            <p>Invoice Number : {{ singleSaleData?.invoice_number }}</p>
             <table class="bill-details">
                 <tbody>
                 <tr>
-                    <td>Date : <span>{{ singleSaleData.date }}</span></td>
+                    <td>Date : <span>{{ singleSaleData?.date_format }}</span></td>
                 </tr>
                 <tr>
-                    <td><strong>Vehicle No: {{ singleSaleData.customer_name }}</strong></td>
+                    <td><strong>Vehicle No: {{ singleSaleData?.customer_name }}</strong></td>
                 </tr>
                 </tbody>
             </table>
