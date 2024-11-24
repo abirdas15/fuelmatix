@@ -717,7 +717,7 @@ class ProductController extends Controller
                 $posItem['amount_format'] = number_format($posItem['amount'], $sessionUser['currency_precision']);
             }
             $result['pos_sale'] = $posSale;
-            $result['total_pos_sale_liter'] = number_format(array_sum(array_column($posSale, 'quantity')), $sessionUser['currency_precision']);
+            $result['total_pos_sale_liter'] = array_sum(array_column($posSale, 'quantity'));
         }
 
         $result['shift_id'] = $shiftSaleId;
