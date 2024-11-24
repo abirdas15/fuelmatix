@@ -370,7 +370,7 @@
                                                                 </tr>
                                                             <tr>
                                                                 <th colspan="1">Total POS Sale:</th>
-                                                                <th>{{ listDispenser.total_pos_sale_liter }}</th>
+                                                                <th>{{ listDispenser.total_pos_sale_liter_format }}</th>
                                                                 <th>{{ format_number(totalPosSale()) }} Tk</th>
                                                             </tr>
                                                             <tr v-if="totalAmount > 0">

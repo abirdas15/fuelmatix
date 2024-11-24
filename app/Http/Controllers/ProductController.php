@@ -718,6 +718,7 @@ class ProductController extends Controller
             }
             $result['pos_sale'] = $posSale;
             $result['total_pos_sale_liter'] = array_sum(array_column($posSale, 'quantity'));
+            $result['total_pos_sale_liter_format'] = number_format(array_sum(array_column($posSale, 'quantity')), $sessionUser['currency_precision']);
         }
 
         $result['shift_id'] = $shiftSaleId;
