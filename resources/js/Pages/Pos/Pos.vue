@@ -718,7 +718,7 @@ export default {
             this.enableDriverTip = false
         },
         updateSubtotal: function (i) {
-            let subtotal = parseFloat(this.sale[i].price) / parseFloat(this.sale[i].quantity);
+            let subtotal = parseFloat(this.sale[i].price) * parseFloat(this.sale[i].quantity);
             this.sale[i].subtotal = Number(subtotal);
         },
         updateQuantity: function (i) {
