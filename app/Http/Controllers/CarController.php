@@ -48,7 +48,9 @@ class CarController extends Controller
         }
         $sessionUser = SessionUser::getUser();
 
-        $car = Car::where('car_number', $requestData['car_number'])->where('client_company_id', $sessionUser['client_company_id'])->first();
+        $car = Car::where('car_number', $requestData['car_number'])
+            ->where('company_id', $requestData['company_id'])
+            ->where('client_company_id', $sessionUser['client_company_id'])->first();
         if ($car instanceof Car) {
             return response()->json([
                 'status' => 500,
