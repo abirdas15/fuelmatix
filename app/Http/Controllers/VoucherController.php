@@ -6,6 +6,7 @@ use App\Helpers\SessionUser;
 use App\Models\Voucher;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class VoucherController extends Controller
@@ -43,6 +44,8 @@ class VoucherController extends Controller
                 'voucher_number' => $i,
                 'validity' => $requestData['validity'],
                 'client_company_id' => $sessionUser['client_company_id'],
+                'prefix' => $requestData['prefix'] ?? '',
+                'suffix' => $requestData['suffix'] ?? '',
             ];
         }
         Voucher::insert($arrayVoucher);
@@ -58,7 +61,18 @@ class VoucherController extends Controller
         $limit = $requestData['limit'] ?? 10;
         $keyword = $request->input('keyword', '');
         $sessionUser = SessionUser::getUser();
-        $result = Voucher::select('voucher.id', 'voucher.voucher_number', 'voucher.validity', 'voucher.status', 'categories.name as company_name')
+        $result = Voucher::select(
+            'voucher.id',
+            DB::raw('CONCAT(
+                        COALESCE(voucher.prefix, ""),
+                        IF(voucher.prefix IS NOT NULL AND voucher.suffix IS NOT NULL, "-", ""),
+                        voucher.voucher_number,
+                        IF(voucher.suffix IS NOT NULL, CONCAT("-", voucher.suffix), "")
+                    ) as voucher_number'),
+            'voucher.validity',
+            'voucher.status',
+            'categories.name as company_name'
+        )
             ->leftJoin('categories', 'categories.id', '=', 'voucher.company_id')
             ->where('voucher.client_company_id', $sessionUser['client_company_id']);
         if (!empty($keyword)) {

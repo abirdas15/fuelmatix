@@ -61,17 +61,17 @@
                                                 <td><a href="javascript:void(0);">{{f?.format_paid_amount}}</a></td>
                                                 <td>
                                                     <a href="javascript:void(0);">
-                                                        <span class="badge bg-warning text-bg-warning text-capitalize" v-if="f.status == 'due'">{{f?.status}}</span>
-                                                        <span class="badge bg-danger text-bg-danger text-capitalize" v-if="f.status == 'over due'">{{f?.status}}</span>
-                                                        <span class="badge bg-primary text-bg-primary text-capitalize" v-if="f.status == 'partial paid'">{{f?.status}}</span>
-                                                        <span class="badge bg-success text-bg-success text-capitalize" v-if="f.status == 'paid'">{{f?.status}}</span>
+                                                        <span class="badge bg-warning text-bg-warning text-capitalize" v-if="f.status === 'due'">{{f?.status}}</span>
+                                                        <span class="badge bg-danger text-bg-danger text-capitalize" v-if="f.status === 'over due'">{{f?.status}}</span>
+                                                        <span class="badge bg-primary text-bg-primary text-capitalize" v-if="f.status === 'partial paid'">{{f?.status}}</span>
+                                                        <span class="badge bg-success text-bg-success text-capitalize" v-if="f.status === 'paid'">{{f?.status}}</span>
                                                     </a>
                                                 </td>
                                                 <td>
                                                     <div class="d-flex justify-content-end align-items-center">
-                                                        <button v-if="CheckPermission(Section.INVOICE + '-' + Action.CREATE) && f.status != 'paid'"  class="btn btn-sm btn-primary me-2" @click="paymentModal(f)">Payment</button>
+                                                        <button v-if="CheckPermission(Section.INVOICE + '-' + Action.CREATE) && f.status !== 'paid'" class="btn btn-sm btn-primary me-2" @click="paymentModal(f)">Payment</button>
                                                         <router-link  :to="{name: 'InvoicesView', params: { id: f.id }}" class="btn btn-sm btn-info me-2">View</router-link>
-                                                        <button v-if="CheckPermission(Section.INVOICE + '-' + Action.DELETE) && f.status != 'paid'"  class="btn btn-sm btn-danger me-2" @click="openModalDelete(f)">Delete</button>
+                                                        <button v-if="CheckPermission(Section.INVOICE + '-' + Action.DELETE) && (f.status !== 'partial paid' && f.status !== 'paid')" class="btn btn-sm btn-danger me-2" @click="openModalDelete(f)">Delete</button>
                                                     </div>
                                                 </td>
                                             </tr>

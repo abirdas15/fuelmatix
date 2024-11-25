@@ -114,10 +114,19 @@ class SaleController extends Controller
                 if (!$voucher instanceof Voucher) {
                     return response()->json(['status' => 500, 'errors' => ['voucher_number' => ['The voucher number is not valid.']]]);
                 }
-                if ($voucher->status == FuelMatixStatus::DONE) {
-                    return response()->json(['status' => 500, 'errors' => ['voucher_number' => ['The voucher number is already used.']]]);
+                if ($voucher->status == FuelMatixStatus::DONE && !$requestData['voucher_check']) {
+                    return response()->json(['status' => 402, 'message' => 'The voucher number is already used.']);
                 }
                 $voucherNo = $voucher->voucher_number;
+
+                // Check if prefix exists and concatenate it with the voucher number
+                if (!empty($voucher->prefix) && !empty($voucher->suffix)) {
+                    $voucherNo = $voucher->prefix . '-' . $voucherNo . '-' . $voucher->suffix;
+                } elseif (!empty($voucher->prefix)) {
+                    $voucherNo = $voucher->prefix . '-' . $voucherNo;
+                } elseif (!empty($voucher->suffix)) {
+                    $voucherNo = $voucherNo . '-' . $voucher->suffix;
+                }
             }
             if (!empty($request['car_number'])) {
                 $car = Car::where('car_number', $request['car_number'])
@@ -204,7 +213,7 @@ class SaleController extends Controller
             $sale->payment_method = $requestData['payment_method'] ?? null;
             $sale->card_number = $requestData['card_number'] ?? null;
             $sale->billed_to = $requestData['billed_to'] ?? null;
-            $sale->voucher_number = $requestData['voucher_number'] ?? null;
+            $sale->voucher_number = $voucherNo;
             $sale->car_id = $carId;
             $sale->driver_id = $driverId;
             $sale->payment_category_id = $payment_category_id;

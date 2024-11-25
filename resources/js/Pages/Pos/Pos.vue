@@ -416,6 +416,7 @@ import ApiService from "../../Services/ApiService";
 import ApiRoutes from "../../Services/ApiRoutes";
 import {Printd} from "printd"
 import QrcodeVue from 'qrcode.vue'
+import Swal from 'sweetalert2/dist/sweetalert2.js'
 
 export default {
     components: {
@@ -629,6 +630,7 @@ export default {
             errorsMessage: [],
             invoice_date: '',
             card_number: '',
+            voucher_check: false,
         }
     },
     computed: {
@@ -725,12 +727,12 @@ export default {
         },
         order: function (type) {
             ApiService.ClearErrorHandler();
-            if (this.sale.length == 0 && !this.advance_pay) {
+            if (this.sale.length === 0 && !this.advance_pay) {
                 return;
             }
             if (type === 'cash') {
                 this.loading = true
-            } else if (type == 'company') {
+            } else if (type === 'company') {
                 this.companyLoading = true
             } else {
                 this.cardLoading = true
@@ -740,11 +742,11 @@ export default {
                 payment_method: this.payment_method,
                 products: this.sale,
                 car_number: this.car_number,
-                date: this.date != '' ? this.date : moment().format('YYYY-MM-DD'),
+                date: this.date !== '' ? this.date : moment().format('YYYY-MM-DD'),
                 billed_to: this.billed_to,
                 invoice_date: this.invoice_date
             }
-            if (type == 'company') {
+            if (type === 'company') {
                 param.driver_tip = this.driver_tip
                 param.company_id = this.company_id
                 param.voucher_number = this.voucher_number;
@@ -753,21 +755,23 @@ export default {
                 param.advance_pay = this.advance_pay;
                 param.is_driver_sale = this.enableDriverSale;
                 param.advance_sale = this.advance_sale;
+                param.voucher_check = this.voucher_check;
             }
-            if (type == 'card') {
+            if (type === 'card') {
                 param.pos_machine_id = this.pos_machine_id;
                 param.card_number = this.card_number
             }
 
             ApiService.POST(ApiRoutes.SaleAdd, param, res => {
-                if (type == 'cash') {
+                if (type === 'cash') {
                     this.loading = false
-                } else if (type == 'company') {
+                } else if (type === 'company') {
                     this.companyLoading = false
                 } else {
                     this.cardLoading = false
                 }
                 if (parseInt(res.status) === 200) {
+                    this.voucher_check = false;
                     this.saleId = res.data
                     this.sale = [];
                     this.enableDriverTip = false
@@ -788,12 +792,27 @@ export default {
                     }
                     this.errorsMessage = [];
                     this.closeModal()
-                } else if (parseInt(res.status) == 400) {
+                } else if (parseInt(res.status) === 400) {
                     this.$toast.warning(res.message);
-                } else if (parseInt(res.status) == 600) {
+                } else if (parseInt(res.status) === 600) {
                     this.errorsMessage = res.errors;
+                } else if (parseInt(res.status) === 402) {
+                    Swal.fire({
+                        title: res.message,
+                        text: "Do you want to use this voucher again?",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Yes!'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            this.voucher_check = true;
+                            this.order(type);
+                        }
+                    });
                 } else {
-                    if (res.message != undefined) {
+                    if (res.message !== undefined) {
                         this.errorText = res.message
                     } else {
                         ApiService.ErrorHandler(res.errors);

@@ -122,6 +122,22 @@
                     </div>
                     <div class="col-sm-12">
                         <div class="input-wrapper form-group mb-3">
+                            <label for="prefix">Prefix </label>
+                            <input type="text" class="w-100 form-control bg-white" name="prefix" id="prefix"
+                                   v-model="voucherParam.prefix" placeholder="Prefix">
+                            <small class="invalid-feedback"></small>
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <div class="input-wrapper form-group mb-3">
+                            <label for="suffix">Suffix </label>
+                            <input type="text" class="w-100 form-control bg-white" name="suffix" id="suffix"
+                                   v-model="voucherParam.suffix" placeholder="Suffix">
+                            <small class="invalid-feedback"></small>
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <div class="input-wrapper form-group mb-3">
                             <label for="validity">Validity</label>
                             <input type="text" class="form-control date bg-white" name="date" v-model="voucherParam.validity">
                             <small class="invalid-feedback"></small>
@@ -164,7 +180,9 @@ export default {
                 company_id: '',
                 from_number: '',
                 to_number: '',
-                validity: ''
+                validity: '',
+                prefix: '',
+                suffix: ''
             }
         };
     },
