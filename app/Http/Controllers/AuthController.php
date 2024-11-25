@@ -6,6 +6,7 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
@@ -18,21 +19,33 @@ class AuthController extends Controller
             'password' => 'required'
         ]);
         if ($validator->fails()) {
-            return response()->json(['status' => 500, 'error' => $validator->errors()]);
+            return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
-        $remember = isset($input['remember']) && $input['remember'] == 1;
         $field = 'phone';
         if(filter_var($inputData['email'], FILTER_VALIDATE_EMAIL)) {
             $field = 'email';
         }
-        $credential[$field] = $inputData['email'];
-        $credential['password'] = $inputData['password'];
-        if (Auth::attempt($credential, $remember)) {
-            $userInfo = User::where($field, $inputData['email'])->first();
-            $userInfo->save();
-            return response()->json(['status' => 200, 'msg' => 'Successfully login.', 'data' => User::ParseData($userInfo)]);
+
+        $user = User::where($field, $inputData['email'])->first();
+        if ($user == null) {
+            return response()->json([
+                'status' => 500,
+                'errors' => ['email' => ['Invalid credentials! Please try again.']]
+            ]);
         }
-        return response()->json(['status' => 500, 'error' => ['email' => 'Invalid credentials! Please try again.']]);
+        if (!Hash::check($inputData['password'], $user->password)) {
+            return response()->json([
+                'status' => 500,
+                'errors' => ['password' => ['Password is not correct! Please try again.']]
+            ]);
+        }
+        $access_token = $user->createToken('authToken')->accessToken;
+        return response()->json([
+            'status' => 200,
+            'message' => 'Successfully login.',
+            'data' => User::ParseData($user),
+            'access_token' => $access_token
+        ]);
     }
     public function logout(Request $request)
     {

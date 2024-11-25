@@ -2,14 +2,15 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Passport\HasApiTokens;
+use Laravel\Passport\TokenRepository;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, HasApiTokens;
 
     public $timestamps = false;
 
@@ -59,5 +60,40 @@ class User extends Authenticatable
             'currency_precision' => $clientCompany->currency_precision,
             'quantity_precision' => $clientCompany->quantity_precision
         ];
+    }
+    public static function findUserByToken()
+    {
+        $bearerToken = request()->bearerToken();
+        // If no bearer token is provided, return null
+        if ($bearerToken == null) {
+            return null;
+        }
+
+        // Decode the token. The token is assumed to be a JWT, which is base64url encoded and
+        // consists of three parts separated by dots (header, payload, signature).
+        // Extract and decode the payload (second part of the JWT).
+        try {
+            $tokens = json_decode(array_map(
+                function ($v) {
+                    return base64_decode($v);
+                }, // Decode each part from base64
+                explode('.', $bearerToken) // Split the token into parts
+            )[1], true, 512, JSON_THROW_ON_ERROR); // Decode JSON payload
+
+            // Instantiate the TokenRepository to find the token in the database
+            $tokenRepository = new TokenRepository();
+
+            // Find the token using the 'jti' (JWT ID) claim from the payload
+            $passportToken = $tokenRepository->find($tokens['jti']);
+
+            // If the token is not found in the repository, return null
+            if (!$passportToken) {
+                return null;
+            }
+
+            return User::where('id', $passportToken->user_id)->first();
+        } catch (\Exception $exception) {
+            return null;
+        }
     }
 }

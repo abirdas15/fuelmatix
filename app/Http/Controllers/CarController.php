@@ -47,6 +47,14 @@ class CarController extends Controller
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
         $sessionUser = SessionUser::getUser();
+
+        $car = Car::where('car_number', $requestData['car_number'])->where('client_company_id', $sessionUser['client_company_id'])->first();
+        if ($car instanceof Car) {
+            return response()->json([
+                'status' => 500,
+                'errors' => ['car_number' => ['The car number has already been taken.']]
+            ]);
+        }
         $car = new Car();
         $car->company_id = $requestData['company_id'];
         $car->car_number = $requestData['car_number'];

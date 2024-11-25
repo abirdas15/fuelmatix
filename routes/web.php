@@ -25,10 +25,8 @@ Route::get('/admin/{any}', [\App\Http\Controllers\Admin\SpaController::class, 'i
 
 Route::get('/auth/{any}', [SpaController::class, 'index'])
     ->where('any', '.*')
-    ->name('spa.auth')
-    ->middleware('login.check');
+    ->name('spa.auth');
 
 Route::get('/{any}', [SpaController::class, 'index'])
     ->where('any', '.*')
-    ->name('spa.dashboard')
-    ->middleware('login.check');
+    ->name('spa.dashboard');

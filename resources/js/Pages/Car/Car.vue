@@ -104,7 +104,7 @@
                     <div class="col-sm-12">
                         <div class="input-wrapper form-group mb-3">
                             <label for="name">Name</label>
-                            <input type="text" class="w-100 form-control bg-white" name="name" id="name"
+                            <input type="text" class="w-100 form-control bg-white" name="car_number" id="name"
                                    v-model="carParam.car_number" placeholder="Name">
                             <small class="invalid-feedback"></small>
                         </div>
@@ -171,6 +171,7 @@ export default {
     },
     methods: {
         openCarEditModal: function(id) {
+            ApiService.ClearErrorHandler();
             $('.driverModal').removeClass('d-none');
             ApiService.POST(ApiRoutes.CarSingle, {id: id}, (res) => {
                 this.Loading = false;
@@ -196,6 +197,7 @@ export default {
             });
         },
         openCarModal: function (f) {
+            ApiService.ClearErrorHandler();
             this.carParam = {
                 id: '',
                 company_id: '',

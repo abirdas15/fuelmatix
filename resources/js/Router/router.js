@@ -124,11 +124,12 @@ const router = new VueRouter({
     },
     mode: "history",
     routes: [
-        { path: ROOT_URL + "/auth/login", meta: { title: 'Login - FuelMatix' }, name: "Login", component: Login},
+        { path: ROOT_URL + "/auth/login", meta: { title: 'Login - FuelMatix' }, name: "Login", component: Login, beforeEnter: authCheck},
         {
             path: ROOT_URL + "/",
             name: "Layout",
             component: Layout,
+            beforeEnter: authRequestCheck,
             children: [
                 { path: ROOT_URL + "/dashboard", meta: { title: 'Dashboard - FuelMatix' }, name: "Dashboard", component: Dashboard},
                 { path: ROOT_URL + "/nozzle/status", meta: { title: 'Nozzle Status - FuelMatix' }, name: "NozzleStatus", component: NozzleStatus},
@@ -630,6 +631,39 @@ const router = new VueRouter({
         },
     ],
 });
+function authCheck(to, from, next) {
+    let token = localStorage.getItem('FuelMatixAccessToken');
+
+    if (token !== undefined && token != null) {
+        // If the user has a token and is navigating to the login page, redirect to dashboard
+        if (to.path === '/auth/login') {
+            next('/dashboard');
+        } else {
+            next();
+        }
+    } else {
+        next();
+    }
+}
+
+// Authentication request check function for protected routes
+function authRequestCheck(to, from, next) {
+    const token = localStorage.getItem('FuelMatixAccessToken'); // Fetch token from localStorage
+
+    if (!token) {
+        return next('/auth/login');
+    }
+
+    // Token exists
+    if (to.path === '/' || to.path === '/auth/login') {
+        // Redirect to dashboard if trying to access root or login page
+        return next('/dashboard');
+    }
+
+    // Allow navigation to other paths
+    next();
+}
+
 function CheckPermission(to, from, next, sectionName) {
     let auth = JSON.parse(localStorage.getItem('userInfo'));
     let permission = auth.permission ?? [];

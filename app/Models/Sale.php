@@ -32,4 +32,8 @@ class Sale extends Model
         $date = Carbon::now();
         return Helpers::formatDate($date, 'Ymdhi').'-'.$number;
     }
+    public function sale_data()
+    {
+        return $this->hasMany(SaleData::class, 'sale_id', 'id');
+    }
 }

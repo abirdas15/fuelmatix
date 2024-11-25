@@ -18,12 +18,12 @@
                                         <div class="mb-3 form-group">
                                             <label class="mb-1"><strong>Email or Phone</strong></label>
                                             <input type="text" placeholder="hello@example.com" name="email" class="form-control" v-model="param.email" autocomplete="new-email">
-                                            <small class="error-report text-danger"></small>
+                                            <div class="invalid-feedback"></div>
                                         </div>
                                         <div class="mb-3 form-group">
                                             <label class="mb-1"><strong>Password</strong></label>
                                             <input type="password" class="form-control" name="password" v-model="param.password" autocomplete="password">
-                                            <small class="error-report text-danger"></small>
+                                            <small class="invalid-feedback"></small>
                                         </div>
                                         <div class="row d-flex justify-content-between mt-4 mb-2">
                                             <div class="mb-3">
@@ -77,11 +77,13 @@ export default {
             ApiService.POST(ApiRoutes.Login, this.param, res => {
                 if (parseInt(res.status) === 200) {
                     this.$store.commit('PutAuth', res.data);
-                    this.$toast.success(res.msg);
+                    this.$store.commit('PutAccessToken', res.access_token);
+                    localStorage.setItem('FuelMatixAccessToken', res.access_token);
+                    this.$toast.success(res.message);
                     window.location.reload();
                 } else {
                     this.Loading = false;
-                    ApiService.ErrorHandler(res.error);
+                    ApiService.ErrorHandler(res.errors);
                 }
             });
         }

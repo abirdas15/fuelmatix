@@ -94,8 +94,8 @@
 <!--                                                                 @click="updateProduct('minus', i)">- -->
 <!--                                                            </div>-->
                                                             <InputNumber
-                                                                v-model="s.quantity"
-                                                                @input="updateSubtotal(i)"
+                                                                :value="s.quantity"
+                                                                @input="(value) => { s.quantity = Number(value); updateSubtotal(i); }"
                                                                 :minFractionDigits="numberFractionDigit"
                                                                 :maxFractionDigits="numberFractionDigit"
                                                                 class="border-right"
@@ -110,8 +110,8 @@
                                                     </td>
                                                     <td class="text-end">
                                                         <InputNumber
-                                                            v-model="s.subtotal"
-                                                            @input="updateQuantity(i)"
+                                                            :value="s.subtotal"
+                                                            @input="(value) => { s.subtotal = Number(value); updateQuantity(i); }"
                                                             :minFractionDigits="numberFractionDigit"
                                                             :maxFractionDigits="numberFractionDigit"
                                                             class="border-right"
@@ -664,13 +664,17 @@ export default {
         },
     },
     methods: {
+        onInput(value, index, field) {
+            this.sale[index][field] = Number(value);
+            this.updateQuantity(index);
+        },
         selectCar: function (car) {
             this.car_number = car.car_number
             this.carList = []
         },
         fetchDriverAmount: function() {
             ApiService.POST(ApiRoutes.DriverAmount, {driver_id: this.driver_sale.driver_id}, (res) => {
-                if (parseInt(res.status) == 200) {
+                if (parseInt(res.status) === 200) {
                     this.driver_amount = res.data;
                 }
             });
@@ -712,17 +716,19 @@ export default {
             this.enableDriverTip = false
         },
         updateSubtotal: function (i) {
-            this.sale[i].subtotal = parseFloat(this.sale[i].price * this.sale[i].quantity).toFixed(2)
+            let subtotal = parseFloat(this.sale[i].price) / parseFloat(this.sale[i].quantity);
+            this.sale[i].subtotal = Number(subtotal);
         },
         updateQuantity: function (i) {
-            this.sale[i].quantity = parseFloat(this.sale[i].subtotal / this.sale[i].price).toFixed(2)
+            let quantity = parseFloat(this.sale[i].subtotal) / parseFloat(this.sale[i].price);
+            this.sale[i].quantity = Number(quantity);
         },
         order: function (type) {
             ApiService.ClearErrorHandler();
             if (this.sale.length == 0 && !this.advance_pay) {
                 return;
             }
-            if (type == 'cash') {
+            if (type === 'cash') {
                 this.loading = true
             } else if (type == 'company') {
                 this.companyLoading = true
@@ -877,9 +883,9 @@ export default {
             this.sale.splice(i, 1)
         },
         cartProduct: function (p) {
-            let quantity =  0;
+            let quantity =  null;
             let selling_price = p.selling_price;
-            let subtotal = 0;
+            let subtotal = null;
             if (this.advance_sale) {
                 subtotal = this.driver_amount;
                 quantity = subtotal / selling_price;

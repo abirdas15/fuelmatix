@@ -41,6 +41,18 @@ class Category extends Model
                 $retainEarning = Category::where('client_company_id', $sessionUser['client_company_id'])
                     ->where('slug', strtolower(AccountCategory::RETAIN_EARNING))
                     ->first();
+                if (!$retainEarning instanceof Category) {
+                    $equityCategory = Category::where('slug', strtolower(AccountCategory::EQUITY))->first();
+                    if ($equityCategory instanceof Category) {
+                        $retainEarning = new Category([
+                            'name' => AccountCategory::RETAIN_EARNING,
+                            'parent_category' => $equityCategory['id'],
+                            'type' => FuelMatixCategoryType::EQUITY,
+                            'client_company_id' => $sessionUser['client_company_id'],
+                        ]);
+                        $retainEarning->save();
+                    }
+                }
 
                 // If the 'retain earning' category exists
                 if ($retainEarning instanceof Category) {

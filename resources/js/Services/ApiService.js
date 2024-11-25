@@ -2,13 +2,15 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
-import store from "../Store/store";
+import store from '../Store/store';
 
 Vue.use(Vuex);
 Vue.use(VueAxios, axios);
+const access_token = store?.getters?.GetAccessToken;
 let headers = {
     'Content-Type': 'application/json; charset=utf-8',
-    'x-api-key': '_@@jbbrd2023fuelmatix@@_'
+    'x-api-key': '_@@jbbrd2023fuelmatix@@_',
+    'Authorization':  'Bearer '+ access_token
 };
 const ApiService = {
     POST: (url, param, callback, auth = false) => {
@@ -39,7 +41,8 @@ const ApiService = {
         axios.post(url, param, {
             headers: {
                 'Content-Type': 'application/json; charset=utf-8',
-                'x-api-key': '_@@jbbrd2023fuelmatix@@_'
+                'x-api-key': '_@@jbbrd2023fuelmatix@@_',
+                'Authorization':  'Bearer '+ access_token
             },
             responseType: 'blob' }).then((response) => {
             if (response.status === 200) {
@@ -53,9 +56,9 @@ const ApiService = {
         })
     },
     UPLOAD: (url, media, callback, auth = false) => {
-        const access_token = store.getters.GetAccessToken;
         const MediaHeaders = {
             "Content-Type": "multipart/form-data",
+            'Authorization':  'Bearer '+ access_token
         };
         axios.post(url, media, {headers: MediaHeaders}).then((response) => {
             if (response.status === 200) {

@@ -546,7 +546,7 @@ button:disabled{
     color: #ffffff !important;
 }
 .p-inputtext {
-    width: 100%;
+    width: 100% !important;
     border-top-left-radius: 15px !important;
     border-bottom-left-radius: 15px !important;
 }

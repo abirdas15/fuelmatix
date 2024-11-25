@@ -27,7 +27,7 @@
 
     <link href="{{ asset('css/style.css') }}" rel="stylesheet" />
     <link href="{{ asset('css/popup.css') }}" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('css/custom.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/custom.css?version=1.1') }}">
     <link href="{{ asset('vendor/jquery-nice-select/css/nice-select.css') }}" rel="stylesheet">
 
     <script src="https://kit.fontawesome.com/f1e7026320.js" crossorigin="anonymous"></script>
@@ -43,7 +43,7 @@
     <app></app>
 </div>
 
-<script src="{{asset('js/app.js?version=1.0.2')}}"></script>
+<script src="{{asset('js/app.js?version=2.1')}}"></script>
 
 <script src="{{ asset('vendor/global/global.min.js') }}"></script>
 <script src="{{ asset('vendor/chart.js/Chart.bundle.min.js') }}"></script>
