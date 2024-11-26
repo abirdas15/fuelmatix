@@ -2,13 +2,70 @@
 
 namespace App\Repository;
 
+use App\Common\FuelMatixDateTimeFormat;
 use App\Common\Module;
 use App\Common\PaymentMethod;
+use App\Helpers\SessionUser;
 use App\Http\Controllers\TransactionController;
+use App\Models\Sale;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Validator;
 
 class SaleRepository
 {
+    /**
+     * @param array $filter
+     * @param array $paginateData
+     * @return mixed
+     */
+    public static function saleList(array $filter, array $paginateData)
+    {
+        $sessionUser = SessionUser::getUser();
+        $result = Sale::select('sale.id', 'sale.invoice_number', 'sale.date', 'sale.total_amount', 'sale.payment_method', 'users.name as user_name', 'sale.voucher_number', 'car.car_number', 'categories.name as company_name')
+            ->with(['sale_data' => function($q) {
+                $q->select('sale_data.id', 'sale_data.sale_id', 'sale_data.product_id', 'sale_data.quantity', 'products.name as product_name')
+                    ->join('products', 'products.id', '=', 'sale_data.product_id');
+            }])
+            ->leftJoin('car', 'car.id', '=', 'sale.car_id')
+            ->leftJoin('categories', 'categories.id', '=', 'sale.payment_category_id')
+            ->leftJoin('users', 'users.id', '=', 'sale.user_id')
+            ->where('sale.client_company_id', $sessionUser['client_company_id']);
+        if (!empty($filter['keyword'])) {
+            $result->where(function ($q) use ($filter) {
+                $q->where('invoice_number', 'LIKE', '%'.$filter['keyword'].'%');
+            });
+        }
+        if (!empty($filter['start_date']) && !empty($filter['end_date'])) {
+            $startDate = Carbon::parse($filter['start_date'])->startOfDay();
+            $endDate = Carbon::parse($filter['end_date'])->endOfDay();
+            $result->where(function($q) use ($startDate, $endDate) {
+                $q->whereBetween('sale.date', [$startDate, $endDate]);
+            });
+        }
+        if (!empty($filter['ids'])) {
+            $result->where(function($q) use ($filter) {
+                $q->whereIn('sale.id', $filter['ids']);
+            });
+        }
+        $result = $result->orderBy($paginateData['order_by'], $paginateData['order_mode'])
+            ->paginate($paginateData['limit']);
+        foreach ($result as &$data) {
+            $data['date'] = date(FuelMatixDateTimeFormat::STANDARD_DATE_TIME, strtotime($data['date']));
+            if ($data['payment_method'] == PaymentMethod::CASH || $data['payment_method'] == PaymentMethod::CARD) {
+                $data['company_name'] = null;
+            }
+            $totalQuantity = 0;
+            $productArray = [];
+            foreach ($data['sale_data'] as $sale_data) {
+                $productArray[] = $sale_data['product_name'];
+                $totalQuantity += $sale_data['quantity'];
+            }
+            $data['quantity'] = number_format($totalQuantity, $sessionUser['quantity_precision']);
+            $data['product_name'] = implode(', ', $productArray);
+            $data['total_amount'] = number_format($data['total_amount'], $sessionUser['currency_precision']);
+        }
+        return $result;
+    }
     /**
      * @param array $data
      * @return true

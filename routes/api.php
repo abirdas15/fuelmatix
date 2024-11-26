@@ -211,6 +211,7 @@ Route::group(['middleware' => 'auth:api'], function() {
     Route::group(['prefix' => 'sale'], function() {
         Route::post('save', [SaleController::class, 'save']);
         Route::post('list', [SaleController::class, 'list']);
+        Route::post('list/export/pdf', [SaleController::class, 'exportPdf']);
         Route::post('single', [SaleController::class, 'single']);
         Route::post('update', [SaleController::class, 'update']);
         Route::post('delete', [SaleController::class, 'delete']);

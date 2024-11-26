@@ -225,9 +225,11 @@ class InvoiceController extends Controller
         if (!$invoice instanceof Invoice) {
             return response()->json(['status' => 500, 'error' => 'Cannot find invoice.']);
         }
-        Invoice::where('id', $requestData['id'])->delete();
-        Invoice::where('invoice_id', $requestData['id'])->delete();
-        Transaction::where('module', Module::INVOICE)->where('module_id', $requestData['id'])->delete();
+        DB::transaction(function() use ($requestData) {
+            Invoice::where('id', $requestData['id'])->delete();
+            InvoiceItem::where('invoice_id', $requestData['id'])->delete();
+            Transaction::where('module', Module::INVOICE)->where('module_id', $requestData['id'])->delete();
+        });
         return response()->json(['status' => 200, 'message' => 'Successfully deleted invoice.']);
     }
 

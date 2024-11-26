@@ -25,6 +25,7 @@ use App\Repository\DriverRepository;
 use App\Repository\ProductPriceRepository;
 use App\Repository\SaleRepository;
 use App\Repository\TransactionRepository;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -315,44 +316,45 @@ class SaleController extends Controller
      */
     public function list(Request $request): JsonResponse
     {
-        $inputData = $request->all();
-        $limit = $inputData['limit'] ?? 10;
-        $keyword = $inputData['keyword'] ?? '';
-        $order_by = $inputData['order_by'] ?? 'sale.id';
-        $order_mode = $inputData['order_mode'] ?? 'DESC';
-        $sessionUser = SessionUser::getUser();
-        $result = Sale::select('sale.id', 'sale.invoice_number', 'sale.date', 'sale.total_amount', 'sale.payment_method', 'users.name as user_name', 'sale.voucher_number', 'car.car_number', 'categories.name as company_name')
-            ->with(['sale_data' => function($q) {
-                $q->select('sale_data.id', 'sale_data.sale_id', 'sale_data.product_id', 'sale_data.quantity', 'products.name as product_name')
-                    ->join('products', 'products.id', '=', 'sale_data.product_id');
-            }])
-            ->leftJoin('car', 'car.id', '=', 'sale.car_id')
-            ->leftJoin('categories', 'categories.id', '=', 'sale.payment_category_id')
-            ->leftJoin('users', 'users.id', '=', 'sale.user_id')
-            ->where('sale.client_company_id', $inputData['session_user']['client_company_id']);
-        if (!empty($keyword)) {
-            $result->where(function ($q) use ($keyword) {
-                $q->where('invoice_number', 'LIKE', '%'.$keyword.'%');
-            });
-        }
-        $result = $result->orderBy($order_by, $order_mode)
-            ->paginate($limit);
-        foreach ($result as &$data) {
-            $data['date'] = date(FuelMatixDateTimeFormat::STANDARD_DATE_TIME, strtotime($data['date']));
-            if ($data['payment_method'] == PaymentMethod::CASH || $data['payment_method'] == PaymentMethod::CARD) {
-                $data['company_name'] = null;
-            }
-            $totalQuantity = 0;
-            $productArray = [];
-            foreach ($data['sale_data'] as $sale_data) {
-                $productArray[] = $sale_data['product_name'];
-                $totalQuantity += $sale_data['quantity'];
-            }
-            $data['quantity'] = number_format($totalQuantity, $sessionUser['quantity_precision']);
-            $data['product_name'] = implode(', ', $productArray);
-            $data['total_amount'] = number_format($data['total_amount'], $sessionUser['currency_precision']);
-        }
+        $filter = [
+            'keyword' => $request->input('keyword', ''),
+            'start_date' => $request->input('start_date', ''),
+            'end_date' => $request->input('end_date', '')
+        ];
+        $paginateData = [
+            'order_by' => $request->input('order_by', 'sale.id'),
+            'order_mode' => $request->input('order_mode', 'DESC'),
+            'limit' => $request->input('limit', 10)
+        ];
+        $result = SaleRepository::saleList($filter, $paginateData);
         return response()->json(['status' => 200, 'data' => $result]);
+    }
+    public function exportPdf(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'ids' => 'required|array',
+            'ids.*' => 'integer|exists:sale,id'
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['status' => 500, 'message' => $validator->errors()]);
+        }
+        $sessionUser = SessionUser::getUser();
+        $filter = [
+            'keyword' => $request->input('keyword', ''),
+            'start_date' => $request->input('start_date', ''),
+            'end_date' => $request->input('end_date', ''),
+            'ids' => $request->input('ids')
+        ];
+        $paginateData = [
+            'order_by' => $request->input('order_by', 'sale.id'),
+            'order_mode' => $request->input('order_mode', 'DESC'),
+            'limit' => $request->input('limit', 10)
+        ];
+        $result = SaleRepository::saleList($filter, $paginateData);
+        $company = ClientCompany::where('id', $sessionUser['client_company_id'])->first();
+        $pdf = Pdf::loadView('pdf.sale-list', ['data' => $result, 'company' => $company]);
+        $pdf->setPaper('a4', 'landscape');
+        return $pdf->output();
     }
     /**
      * @param Request $request

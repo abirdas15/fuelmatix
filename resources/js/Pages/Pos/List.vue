@@ -14,22 +14,21 @@
                             <h4 class="card-title">Sale History List</h4>
                         </div>
                         <div class="card-body">
-                            <div class="row align-items-end">
-<!--                                <div class="col-xl-3 mb-3">
+                            <div class="row">
+                                <div class="col-xl-3 mb-3">
                                     <div class="example">
-                                        <p class="mb-1">Product type </p>
-                                        <select class="me-sm-2 form-control wide" id="inlineFormCustomSelect" v-model="Param.type_id">
-                                            <option value="">Select Type</option>
-                                            <option v-for="t of productType" :value="t.id">{{t.name}}</option>
-                                        </select>
+                                        <input class="form-control input-daterange-datepicker date" type="text" placeholder="Select Date">
                                     </div>
                                 </div>
                                 <div class="col-xl-3 mb-3">
-                                    <button type="button" class="btn btn-rounded btn-white border" @click="list"><span
-                                        class="btn-icon-start text-info"><i class="fa fa-filter color-white"></i>
-											</span>Filter</button>
-
-                                </div>-->
+                                    <button type="button" class="btn btn-rounded btn-white border" @click="list">
+                                        <span class="btn-icon-start text-info"><i class="fa fa-filter color-white"></i></span>Filter
+                                    </button>
+                                </div>
+                                <div class="col-xl-3 mb-3" v-if="Param.ids.length > 0">
+                                    <button class="btn btn-primary" v-if="!loadingFile" @click="downloadPdf"><i class="fa fa-print" aria-hidden="true"></i>&nbsp;Print</button>
+                                    <button class="btn btn-primary" v-if="loadingFile"><i class="fa fa-print" aria-hidden="true"></i>&nbsp;Print...</button>
+                                </div>
                             </div>
                             <div class="row mt-4">
                                 <div class="table-responsive">
@@ -53,6 +52,9 @@
                                         <table class="display  dataTable no-footer" style="min-width: 845px">
                                             <thead>
                                             <tr class="text-white" style="background-color: #4886EE;color:#ffffff">
+                                                <th>
+                                                    <input type="checkbox" class="form-check-input" @change="selectAll($event)">
+                                                </th>
                                                 <th class="text-white" @click="sortData('date')" :class="sortClass('date')">Date</th>
                                                 <th class="text-white" @click="sortData('invoice_number')" :class="sortClass('invoice_number')">Invoice Number</th>
                                                 <th class="text-white" @click="sortData('company_name')" :class="sortClass('company_name')">Company Name</th>
@@ -68,6 +70,9 @@
                                             </thead>
                                             <tbody v-if="listData.length > 0 && TableLoading === false">
                                             <tr v-for="f in listData">
+                                                <td>
+                                                    <input type="checkbox" :checked="isExist(f.id)" class="form-check-input" @change="selectIds($event, f.id)">
+                                                </td>
                                                 <td >{{f.date}}</td>
                                                 <td><a href="javascript:void(0);">{{f.invoice_number}}</a></td>
                                                 <td><a href="javascript:void(0);">{{f.company_name}}</a></td>
@@ -209,6 +214,7 @@ export default {
     },
     data() {
         return {
+            loadingFile: false,
             paginateData: {},
             Param: {
                 keyword: '',
@@ -217,6 +223,9 @@ export default {
                 order_mode: 'DESC',
                 page: 1,
                 type_id: '',
+                ids: [],
+                start_date: '',
+                end_date: ''
             },
             Loading: false,
             TableLoading: false,
@@ -357,6 +366,21 @@ export default {
         },
     },
     created() {
+        setTimeout(() => {
+            $('.date').flatpickr({
+                altInput: true,
+                altFormat: "d/m/Y",
+                dateFormat: "Y-m-d",
+                mode: 'range',
+                onChange: (date, dateStr) => {
+                    let dateArr = dateStr.split('to')
+                    if (dateArr.length === 2) {
+                        this.Param.start_date = dateArr[0]
+                        this.Param.end_date = dateArr[1]
+                    }
+                }
+            })
+        }, 1000);
         this.list();
     },
     computed: {
@@ -371,6 +395,39 @@ export default {
         },
     },
     methods: {
+        downloadPdf: function() {
+            this.loadingFile = true
+            ApiService.ClearErrorHandler();
+            ApiService.DOWNLOAD(ApiRoutes.SaleList + '/export/pdf', this.Param,'',(res) => {
+                this.Param.ids = [];
+                this.loadingFile = false
+                let blob = new Blob([res], {type: 'pdf'});
+                const link = document.createElement('a');
+                link.href = window.URL.createObjectURL(blob);
+                link.download = 'Sale List.pdf';
+                link.click();
+            });
+        },
+        isExist: function (id) {
+            let index = this.Param.ids.indexOf(id)
+            return index > -1;
+        },
+        selectAll: function (e) {
+            if (e.target.checked) {
+                this.listData.map(v => {
+                    this.Param.ids.push(v.id);
+                });
+            } else {
+                this.Param.ids = []
+            }
+        },
+        selectIds: function (e, id) {
+            if (e.target.checked) {
+                this.Param.ids.push(id)
+            } else {
+                this.Param.ids.splice(this.Param.ids.indexOf(id), 1)
+            }
+        },
         printInvoice: function (id) {
             $('.invoice'+ id).toggle();
             ApiService.POST(ApiRoutes.SaleSingle, {id: id}, res => {
@@ -461,7 +518,7 @@ export default {
 
     },
     mounted() {
-        $('#dashboard_bar').text('Product List')
+        $('#dashboard_bar').text('Sales List')
     }
 }
 </script>
