@@ -24,9 +24,9 @@
                         <li v-if="CheckPermission(Section.SHIFT_SALE + '-' + Action.VIEW)"><router-link :to="{name: 'ShiftSalePrevious'}">Previous Shift Sale</router-link></li>
                         <li v-if="CheckPermission(Section.POS + '-' + Action.VIEW)"><router-link :to="{name: 'Pos'}" >POS</router-link></li>
                         <li v-if="CheckPermission(Section.POS_HISTORY + '-' + Action.VIEW)"><router-link :to="{name: 'PosList'}" >POS History</router-link></li>
-                        <li><router-link :to="{name: 'DummySaleCreate'}" >Dummy Sale</router-link></li>
-                        <li><router-link :to="{name: 'DummySaleList'}" >Dummy Sale History</router-link></li>
-                        <li><router-link :to="{name: 'BulkSale'}">Bulk Sale</router-link></li>
+                        <li v-if="CheckPermission(Section.DUMMY_SALE + '-' + Action.CREATE)"><router-link :to="{name: 'DummySaleCreate'}" >Dummy Sale</router-link></li>
+                        <li v-if="CheckPermission(Section.DUMMY_SALE + '-' + Action.VIEW)"><router-link :to="{name: 'DummySaleList'}" >Dummy Sale History</router-link></li>
+                        <li v-if="CheckPermission(Section.BULK_SALE + '-' + Action.VIEW)"><router-link :to="{name: 'BulkSale'}">Bulk Sale</router-link></li>
                         <li v-if="CheckPermission(Section.COMPANY_SALE + '-' + Action.VIEW)"><router-link :to="{name: 'CompanySale'}">Company Sale </router-link></li>
                         <li v-if="CheckPermission(Section.COMPANY_SALE + '-' + Action.VIEW)"><router-link :to="{name: 'unauthorizedBill'}">Unauthorized Bill </router-link></li>
                     </ul>
@@ -60,7 +60,7 @@
                         <li v-if="CheckPermission(Section.BILL + '-' + Action.VIEW)"><router-link :to="{name: 'Invoices'}">Invoices </router-link></li>
                         <li v-if="CheckPermission(Section.INVOICE_PAYMENT + '-' + Action.VIEW)"><router-link :to="{name: 'InvoicePayment'}">Invoice Payment </router-link></li>
                         <li v-if="CheckPermission(Section.COMPANY_BILL + '-' + Action.VIEW)"><router-link :to="{name: 'CompanyBills'}">Company Bills </router-link></li>
-                        <li><router-link :to="{name: 'purchase'}">Purchase</router-link></li>
+                        <li v-if="CheckPermission(Section.PURCHASE + '-' + Action.VIEW)"><router-link :to="{name: 'purchase'}">Purchase</router-link></li>
                     </ul>
 
                 </li>
@@ -93,7 +93,7 @@
                         <li v-if="CheckPermission(Section.VOUCHER + '-' + Action.VIEW)"><router-link :to="{name: 'voucher'}">Voucher</router-link></li>
                         <li v-if="CheckPermission(Section.DRIVER + '-' + Action.VIEW)"><router-link :to="{name: 'driver'}">Driver</router-link></li>
                         <li v-if="CheckPermission(Section.FUEL_ADJUSTMENT + '-' + Action.VIEW)"><router-link :to="{name: 'adjustment'}">Fuel Adjustment</router-link></li>
-                        <li><router-link :to="{name: 'car'}">Car</router-link></li>
+                        <li v-if="CheckPermission(Section.CAR + '-' + Action.VIEW)"><router-link :to="{name: 'car'}">Car</router-link></li>
                     </ul>
                 </li>
                 <li>
@@ -147,35 +147,35 @@
                             <router-link :to="{name: 'salesReport'}" >Sales Report
                             </router-link>
                         </li>
-                        <li>
+                        <li v-if="CheckPermission(Section.SALES_STOCK + '-' + Action.VIEW)">
                             <router-link :to="{name: 'StockSummary'}" >Sale Stock & Sale Summary
                             </router-link>
                         </li>
-                        <li>
+                        <li v-if="CheckPermission(Section.VENDOR_REPORT + '-' + Action.VIEW)">
                             <router-link :to="{name: 'VendorReport'}" >Vendor Report
                             </router-link>
                         </li>
-                        <li>
+                        <li v-if="CheckPermission(Section.EXPENSE_REPORT + '-' + Action.VIEW)">
                             <router-link :to="{name: 'ExpenseReport'}" >Expense Report
                             </router-link>
                         </li>
-                        <li>
+                        <li v-if="CheckPermission(Section.WINDFALL_REPORT + '-' + Action.VIEW)">
                             <router-link :to="{name: 'WindfallReport'}" >WindFall Report
                             </router-link>
                         </li>
-                        <li>
+                        <li v-if="CheckPermission(Section.CREDIT_COMPANY_REPORT + '-' + Action.VIEW)">
                             <router-link :to="{name: 'CreditCompanyReport'}" >Credit Company Report
                             </router-link>
                         </li>
-                        <li>
+                        <li v-if="CheckPermission(Section.DRIVER_REPORT + '-' + Action.VIEW)">
                             <router-link :to="{name: 'DriverReport'}" >Driver Report
                             </router-link>
                         </li>
-                        <li>
+                        <li v-if="CheckPermission(Section.BILL_SUMMARY + '-' + Action.VIEW)">
                             <router-link :to="{name: 'CompanySummary'}" >Bill Summary
                             </router-link>
                         </li>
-                        <li>
+                        <li v-if="CheckPermission(Section.POS_REPORT + '-' + Action.VIEW)">
                             <router-link :to="{name: 'PosReport'}" >POS Report
                             </router-link>
                         </li>

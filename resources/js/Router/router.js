@@ -132,6 +132,7 @@ const router = new VueRouter({
             beforeEnter: authRequestCheck,
             children: [
                 { path: ROOT_URL + "/dashboard", meta: { title: 'Dashboard - FuelMatix' }, name: "Dashboard", component: Dashboard},
+
                 { path: ROOT_URL + "/nozzle/status", meta: { title: 'Nozzle Status - FuelMatix' }, name: "NozzleStatus", component: NozzleStatus},
                 {
                     path: ROOT_URL + "/accounts", name: "Accounts", component: Category, meta: { title: 'Accounts - FuelMatix' },  beforeEnter: (to, from, next) => {
@@ -264,7 +265,9 @@ const router = new VueRouter({
                     },
                 },
                 {
-                    path: ROOT_URL + "/shift/sale/view/:id", meta: { title: 'Shift Sale View - FuelMatix' }, name: "ShiftSaleView", component: ShiftSaleView,
+                    path: ROOT_URL + "/shift/sale/view/:id", meta: { title: 'Shift Sale View - FuelMatix' }, name: "ShiftSaleView", component: ShiftSaleView, beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.SHIFT_SALE + '-' + Action.VIEW)
+                    },
                 },
                 {
                     path: ROOT_URL + "/pos", meta: { title: 'POS - FuelMatix' }, name: "Pos", component: Pos, beforeEnter: (to, from, next) => {
@@ -545,7 +548,9 @@ const router = new VueRouter({
                     },
                 },
                 {
-                    path: ROOT_URL + "/fuel/adjustment/view/:id", meta: { title: 'Fuel Adjustment View - FuelMatix' }, name: "adjustmentView", component: fuelAdjustmentView
+                    path: ROOT_URL + "/fuel/adjustment/view/:id", meta: { title: 'Fuel Adjustment View - FuelMatix' }, name: "adjustmentView", component: fuelAdjustmentView, beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.FUEL_ADJUSTMENT + '-' + Action.VIEW)
+                    },
                 },
                 {
                     path: ROOT_URL + "/unauthorizedBill", meta: { title: 'Unauthorized Bill - FuelMatix' }, name: "unauthorizedBill", component: UnauthorizedBill,  beforeEnter: (to, from, next) => {
@@ -568,7 +573,9 @@ const router = new VueRouter({
                     },
                 },
                 {
-                    path: ROOT_URL + "/cars", meta: { title: 'Car - FuelMatix' }, name: "car", component: car
+                    path: ROOT_URL + "/cars", meta: { title: 'Car - FuelMatix' }, name: "car", component: car, beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.CAR + '-' + Action.VIEW)
+                    },
                 },
                 {
                     path: ROOT_URL + "/purchase", meta: { title: 'Purchase - FuelMatix' }, name: "purchase", component: purchase,  beforeEnter: (to, from, next) => {
@@ -586,46 +593,72 @@ const router = new VueRouter({
                     }
                 },
                 {
-                    path: ROOT_URL + "/report/stockSummary", meta: { title: 'Stock Summary - FuelMatix' }, name: "StockSummary", component: StockSummary
+                    path: ROOT_URL + "/report/stockSummary", meta: { title: 'Stock Summary - FuelMatix' }, name: "StockSummary", component: StockSummary, beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.SALES_STOCK + '-' + Action.VIEW)
+                    },
                 },
                 {
-                    path: ROOT_URL + "/report/vendor", meta: { title: 'Vendor Report - FuelMatix' }, name: "VendorReport", component: VendorReport
+                    path: ROOT_URL + "/report/vendor", meta: { title: 'Vendor Report - FuelMatix' }, name: "VendorReport", component: VendorReport, beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.VENDOR_REPORT + '-' + Action.VIEW)
+                    },
                 },
                 {
-                    path: ROOT_URL + "/report/expense", meta: { title: 'Expense Report - FuelMatix' }, name: "ExpenseReport", component: ExpenseReport
+                    path: ROOT_URL + "/report/expense", meta: { title: 'Expense Report - FuelMatix' }, name: "ExpenseReport", component: ExpenseReport,  beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.EXPENSE_REPORT + '-' + Action.VIEW)
+                    },
                 },
                 {
-                    path: ROOT_URL + "/report/windfall", meta: { title: 'Windfall Report - FuelMatix' }, name: "WindfallReport", component: WindfallReport
+                    path: ROOT_URL + "/report/windfall", meta: { title: 'Windfall Report - FuelMatix' }, name: "WindfallReport", component: WindfallReport,  beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.WINDFALL_REPORT + '-' + Action.VIEW)
+                    },
                 },
                 {
-                    path: ROOT_URL + "/report/creditCompany", meta: { title: 'Credit Company Report - FuelMatix' }, name: "CreditCompanyReport", component: CreditCompanyReport
+                    path: ROOT_URL + "/report/creditCompany", meta: { title: 'Credit Company Report - FuelMatix' }, name: "CreditCompanyReport", component: CreditCompanyReport,  beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.CREDIT_COMPANY_REPORT + '-' + Action.VIEW)
+                    },
                 },
                 {
-                    path: ROOT_URL + "/report/driver", meta: { title: 'Driver Report - FuelMatix' }, name: "DriverReport", component: DriverReport
+                    path: ROOT_URL + "/report/driver", meta: { title: 'Driver Report - FuelMatix' }, name: "DriverReport", component: DriverReport,  beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.DRIVER_REPORT + '-' + Action.VIEW)
+                    },
                 },
                 {
-                    path: ROOT_URL + "/report/pos", meta: { title: 'POS Report - FuelMatix' }, name: "PosReport", component: PosReport
+                    path: ROOT_URL + "/report/pos", meta: { title: 'POS Report - FuelMatix' }, name: "PosReport", component: PosReport,  beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.POS_REPORT + '-' + Action.VIEW)
+                    },
                 },
                 {
-                    path: ROOT_URL + "/bulkSale/add", meta: { title: 'Bulk Sale Add - FuelMatix' }, name: "BulkSaleAdd", component: BulkSaleAdd
+                    path: ROOT_URL + "/bulkSale/add", meta: { title: 'Bulk Sale Add - FuelMatix' }, name: "BulkSaleAdd", component: BulkSaleAdd,  beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.BULK_SALE + '-' + Action.CREATE)
+                    },
                 },
                 {
-                    path: ROOT_URL + "/bulkSale", meta: { title: 'Bulk Sale - FuelMatix' }, name: "BulkSale", component: BulkSale
+                    path: ROOT_URL + "/bulkSale", meta: { title: 'Bulk Sale - FuelMatix' }, name: "BulkSale", component: BulkSale,  beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.BULK_SALE + '-' + Action.VIEW)
+                    },
                 },
                 {
-                    path: ROOT_URL + "/company/bill", meta: { title: 'Company Bill - FuelMatix' }, name: "CompanySummary", component: CompanySummary
+                    path: ROOT_URL + "/company/bill", meta: { title: 'Company Bill - FuelMatix' }, name: "CompanySummary", component: CompanySummary,  beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.BILL_SUMMARY + '-' + Action.VIEW)
+                    },
                 },
                 {
                     path: ROOT_URL + "/company/bill/:id/:start_date/:end_date", meta: { title: 'Company Bill - FuelMatix' }, name: "CompanyBillDetails", component: CompanyBillDetails
                 },
                 {
-                    path: ROOT_URL + "/dummySale/create", meta: { title: 'Dummy Sale Add - FuelMatix' }, name: "DummySaleCreate", component: DummySaleCreate
+                    path: ROOT_URL + "/dummySale/create", meta: { title: 'Dummy Sale Add - FuelMatix' }, name: "DummySaleCreate", component: DummySaleCreate,  beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.DUMMY_SALE + '-' + Action.CREATE)
+                    },
                 },
                 {
-                    path: ROOT_URL + "/dummySale/list", meta: { title: 'Dummy Sale - FuelMatix' }, name: "DummySaleList", component: DummySaleList
+                    path: ROOT_URL + "/dummySale/list", meta: { title: 'Dummy Sale - FuelMatix' }, name: "DummySaleList", component: DummySaleList,  beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.DUMMY_SALE + '-' + Action.VIEW)
+                    },
                 },
                 {
-                    path: ROOT_URL + "/dummySale/:id", meta: { title: 'Dummy Sale View - FuelMatix' }, name: "DummySaleView", component: DummySaleView
+                    path: ROOT_URL + "/dummySale/:id", meta: { title: 'Dummy Sale View - FuelMatix' }, name: "DummySaleView", component: DummySaleView,  beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.DUMMY_SALE + '-' + Action.VIEW)
+                    },
                 },
             ],
         },

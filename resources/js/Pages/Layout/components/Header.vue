@@ -61,13 +61,22 @@ export default {
         };
     },
     created() {
+        this.fetchProfile();
     },
     methods: {
         Logout: function () {
            store.dispatch('Logout')
         },
+        fetchProfile() {
+            ApiService.POST(ApiRoutes.Profile, {}, (res) => {
+                if (parseInt(res.status) === 200) {
+                    this.$store.commit('PutAuth', res.data);
+                }
+            });
+        }
     },
     mounted() {
+
     },
     computed: {
         Auth: function () {

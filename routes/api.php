@@ -43,6 +43,7 @@ use App\Http\Controllers\CarController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\BulkSaleController;
 use App\Http\Controllers\DummySaleController;
+use App\Http\Controllers\ProfileController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -379,6 +380,9 @@ Route::group(['middleware' => 'auth:api'], function() {
     Route::group(['prefix' => 'bulkSale'], function() {
         Route::post('save', [BulkSaleController::class, 'save']);
         Route::post('list', [BulkSaleController::class, 'list']);
+    });
+    Route::group(['prefix' => 'profile'], function() {
+        Route::post('me', [ProfileController::class, 'getProfile']);
     });
 });
 

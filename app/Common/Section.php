@@ -57,7 +57,9 @@ class Section
     const EXPENSE_REPORT = 'Expense-Report';
     const WINDFALL_REPORT = 'Windfall-Report';
     const CREDIT_COMPANY_REPORT = 'Credit-Company-Report';
-    const DRIVER_RE = 'User-Report';
+    const DRIVER_REPORT = 'Driver-Report';
+    const BILL_SUMMARY = 'Bill-Summary';
+    const POS_REPORT = 'Pos-Report';
 
     /**
      * @return array
@@ -111,6 +113,16 @@ class Section
             'PURCHASE' => self::PURCHASE,
             'CAR' => self::CAR,
             'DUMMY_SALE' => self::DUMMY_SALE,
+            'DUMMY_SALE_HISTORY' => self::DUMMY_SALE_HISTORY,
+            'BULK_SALE' => self::BULK_SALE,
+            'SALES_STOCK' => self::SALES_STOCK,
+            'VENDOR_REPORT' => self::VENDOR_REPORT,
+            'EXPENSE_REPORT' => self::EXPENSE_REPORT,
+            'WINDFALL_REPORT' => self::WINDFALL_REPORT,
+            'CREDIT_COMPANY_REPORT' => self::CREDIT_COMPANY_REPORT,
+            'DRIVER_REPORT' => self::DRIVER_REPORT,
+            'BILL_SUMMARY' => self::BILL_SUMMARY,
+            'POS_REPORT' => self::POS_REPORT,
         ];
     }
 }

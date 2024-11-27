@@ -261,7 +261,8 @@ const ApiRoutes = {
     InvoicePayment: ApiVersion + '/invoice/payment/list',
     Report: ApiVersion + '/report',
     BulkSale: ApiVersion + '/bulkSale',
-    ShiftName: ApiVersion + '/shift/sale/shiftName/list'
+    ShiftName: ApiVersion + '/shift/sale/shiftName/list',
+    Profile: ApiVersion + '/profile/me'
 };
 
 export default ApiRoutes;

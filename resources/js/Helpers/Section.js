@@ -44,6 +44,18 @@ const Section= {
     INVOICE_PAYMENT: 'Invoice-Payment',
     PURCHASE: 'Purchase',
     CAR: 'Car',
+    DUMMY_SALE: 'Dummy-Sale',
+    DUMMY_SALE_HISTORY: 'Dummy-Sale-History',
+    BULK_SALE: 'Bulk-Sale',
+    SALES_STOCK: 'Sales-Stock',
+    VENDOR_REPORT: 'Vendor-Report',
+    EXPENSE_REPORT: 'Expense-Report',
+    WINDFALL_REPORT: 'Windfall-Report',
+    CREDIT_COMPANY_REPORT: 'Credit-Company-Report',
+    DRIVER_REPORT: 'Driver-Report',
+    BILL_SUMMARY: 'Bill-Summary',
+    POS_REPORT: 'Pos-Report',
+
 }
 export default Section;
 

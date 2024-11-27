@@ -14,7 +14,7 @@ class AdminPermission extends Command
      *
      * @var string
      */
-    protected $signature = 'admin:permission';
+    protected $signature = 'user:permission';
 
     /**
      * The console command description.
@@ -40,27 +40,17 @@ class AdminPermission extends Command
      */
     public function handle()
     {
-        $this->info('Enter Company ID');
-        $companyId = $this->ask('Company Id:');
-        if (empty($companyId)) {
-            $this->warn('Company cannot be blank.');
-            return;
-        }
-        $company = ClientCompany::where('id', $companyId)->first();
-        if (!$company instanceof ClientCompany) {
-            $this->warn('Cannot found company.');
-            return;
-        }
         $roles = Role::get()->toArray();
         $permission = Permission::getAllPermission();
         $permissionData = [];
         foreach ($roles as $role) {
+            $this->info('Permission For: ' . $role['name']);
             Permission::where('role_id', $role['id'])->delete();
             foreach ($permission as $permissionName) {
                 $permissionData[] = [
                     'name' => $permissionName,
                     'role_id' => $role['id'],
-                    'client_company_id' => $companyId
+                    'client_company_id' => $role['client_company_id']
                 ];
             }
         }
