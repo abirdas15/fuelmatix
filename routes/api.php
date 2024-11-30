@@ -44,6 +44,7 @@ use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\BulkSaleController;
 use App\Http\Controllers\DummySaleController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\StaffLoanController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -302,6 +303,7 @@ Route::group(['middleware' => 'auth:api'], function() {
         });
         Route::group(['prefix' => 'pos-machine'], function() {
             Route::post('', [ReportController::class, 'posMachine']);
+            Route::post('export/pdf', [ReportController::class, 'posMachineExportPdf']);
         });
         Route::group(['prefix' => 'company/summary'], function() {
             Route::post('/', [ReportController::class, 'companySummary']);
@@ -383,6 +385,14 @@ Route::group(['middleware' => 'auth:api'], function() {
     });
     Route::group(['prefix' => 'profile'], function() {
         Route::post('me', [ProfileController::class, 'getProfile']);
+    });
+    Route::group(['prefix' => 'loan'], function() {
+        Route::post('staff/list', [StaffLoanController::class, 'staffList']);
+    });
+    Route::group(['prefix' => 'staff/loan'], function() {
+        Route::post('save', [StaffLoanController::class, 'loanSave']);
+        Route::post('list', [StaffLoanController::class, 'loanList']);
+        Route::post('payment', [StaffLoanController::class, 'loanPayment']);
     });
 });
 

@@ -116,6 +116,8 @@ import DummySaleCreate from "../Pages/DummySale/Create.vue";
 import DummySaleList from "../Pages/DummySale/List.vue";
 import DummySaleView from "../Pages/DummySale/View.vue";
 import PosReport from "../Pages/Report/PosReport.vue";
+import StaffLoanList from "../Pages/StaffLoan/List.vue";
+import StaffLoanAdd from "../Pages/StaffLoan/Add.vue";
 
 const ROOT_URL = "";
 const router = new VueRouter({
@@ -660,41 +662,41 @@ const router = new VueRouter({
                         CheckPermission(to, from, next, Section.DUMMY_SALE + '-' + Action.VIEW)
                     },
                 },
+                {
+                    path: ROOT_URL + "/staff-loan/list", meta: { title: 'Staff Loan View - FuelMatix' }, name: "StaffLoanList", component: StaffLoanList
+                },
+                {
+                    path: ROOT_URL + "/staff-loan/add", meta: { title: 'Staff Loan Add - FuelMatix' }, name: "StaffLoanAdd", component: StaffLoanAdd
+                },
             ],
         },
     ],
 });
 function authCheck(to, from, next) {
-    let token = localStorage.getItem('FuelMatixAccessToken');
+    // Fetch token from Vuex or localStorage
+    const token = store?.getters?.GetAccessToken || localStorage.getItem('FuelMatixAccessToken');
 
-    if (token !== undefined && token != null) {
-        // If the user has a token and is navigating to the login page, redirect to dashboard
+    if (token) {
         if (to.path === '/auth/login') {
-            next('/dashboard');
-        } else {
-            next();
+            return next('/dashboard'); // Redirect logged-in user to dashboard
         }
-    } else {
-        next();
     }
+    next(); // Proceed to intended route
 }
 
-// Authentication request check function for protected routes
 function authRequestCheck(to, from, next) {
-    const token = localStorage.getItem('FuelMatixAccessToken'); // Fetch token from localStorage
+    // Fetch token from Vuex or localStorage
+    const token = store?.getters?.GetAccessToken || localStorage.getItem('FuelMatixAccessToken');
 
     if (!token) {
-        return next('/auth/login');
+        return next('/auth/login'); // Redirect to login if no token
     }
 
-    // Token exists
     if (to.path === '/' || to.path === '/auth/login') {
-        // Redirect to dashboard if trying to access root or login page
-        return next('/dashboard');
+        return next('/dashboard'); // Redirect logged-in user to dashboard
     }
 
-    // Allow navigation to other paths
-    next();
+    next(); // Allow navigation to other paths
 }
 
 function CheckPermission(to, from, next, sectionName) {

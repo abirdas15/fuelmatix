@@ -213,12 +213,12 @@ class DummySaleController extends Controller
             'dummy_sale.voucher_number',
             'car.car_number',
             'categories.name as company_name',
-            DB::raw('SUM(quantity) as quantity'),
-            DB::raw("GROUP_CONCAT(products.name SEPARATOR ', ') as product_name")
         )
-            ->leftJoin('dummy_sale_data', 'dummy_sale_data.sale_id', '=', 'dummy_sale.id')
+            ->with(['dummy_sale_data' => function($q) {
+                $q->select('dummy_sale_data.id', 'dummy_sale_data.sale_id', 'dummy_sale_data.product_id', 'dummy_sale_data.quantity', 'products.name as product_name')
+                    ->join('products', 'products.id', '=', 'dummy_sale_data.product_id');
+            }])
             ->leftJoin('car', 'car.id', '=', 'dummy_sale.car_id')
-            ->leftJoin('products', 'products.id', '=', 'dummy_sale_data.product_id')
             ->leftJoin('categories', 'categories.id', '=', 'dummy_sale.payment_category_id')
             ->leftJoin('users', 'users.id', '=', 'dummy_sale.user_id')
             ->where('dummy_sale.client_company_id', $inputData['session_user']['client_company_id']);
@@ -234,8 +234,15 @@ class DummySaleController extends Controller
             if ($data['payment_method'] == PaymentMethod::CASH || $data['payment_method'] == PaymentMethod::CARD) {
                 $data['company_name'] = null;
             }
-            $data['quantity'] = number_format($data['quantity'], $sessionUser['quantity_precision']);
+            $totalQuantity = 0;
+            $productArray = [];
+            foreach ($data['dummy_sale_data'] as $sale_data) {
+                $productArray[] = $sale_data['product_name'];
+                $totalQuantity += $sale_data['quantity'];
+            }
+            $data['quantity'] = number_format($totalQuantity, $sessionUser['quantity_precision']);
             $data['total_amount'] = number_format($data['total_amount'], $sessionUser['currency_precision']);
+            $data['product_name'] = implode(', ', $productArray);
         }
         return response()->json(['status' => 200, 'data' => $result]);
     }

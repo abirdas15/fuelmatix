@@ -378,6 +378,10 @@ export default {
                         this.Param.start_date = dateArr[0]
                         this.Param.end_date = dateArr[1]
                     }
+                    if (dateArr.length === 1) {
+                        this.Param.start_date = dateArr[0];
+                        this.Param.end_date = dateArr[0];
+                    }
                 }
             })
         }, 1000);

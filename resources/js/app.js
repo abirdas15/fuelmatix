@@ -55,6 +55,13 @@ Vue.mixin({
             },
         },
         methods: {
+            preventArrowKeyIncrement(event) {
+                const keysToPrevent = ['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown'];
+                if (keysToPrevent.includes(event.key)) {
+                    event.preventDefault(); // Prevent the default behavior
+                    event.stopPropagation(); // Stop the event from bubbling up
+                }
+            },
             format_number(amount) {
                 if (amount === '' || amount === 0) {
                     return 0.00;
@@ -133,6 +140,12 @@ Vue.mixin({
             }
         },
         mounted() {
+            this.$nextTick(() => {
+                const inputs = document.querySelectorAll('input[type="number"]'); // Target all number inputs
+                inputs.forEach(input => {
+                    input.addEventListener('keydown', this.preventArrowKeyIncrement);
+                });
+            });
             $('.closeBtn').click(() => {
                 $('.popup-wrapper-modal').addClass('d-none')
             })

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Common\AccountCategory;
+use App\Common\Module;
 use App\Helpers\SessionUser;
 use App\Models\Category;
 use App\Models\Transaction;
@@ -10,6 +11,7 @@ use App\Models\User;
 use App\Repository\CategoryRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
@@ -42,52 +44,57 @@ class UserController extends Controller
 
         // Get the currently logged-in user
         $sessionUser = SessionUser::getUser();
+        DB::transaction(function () use ($request, $sessionUser) {
+            // Create a new User instance
+            $user = new User();
+            $user->name = $request->input('name');
+            $user->email = $request->input('email');
+            $user->role_id = $request->input('role_id');
+            $user->password = bcrypt($request->input('password')); // Hash the password
+            $user->phone = $request->input('phone') ?? null; // Set phone if provided, else null
+            $user->address = $request->input('address') ?? null; // Set address if provided, else null
+            $user->client_company_id = $sessionUser['client_company_id'];
+            $user->cashier_balance = !empty($request->input('cashier_balance')) ? 1 : 0; // Set cashier balance flag
+            $user->loan_status = !empty($request->input('loan_status')) ? 1 : 0; // Set cashier balance flag
 
-        // Create a new User instance
-        $user = new User();
-        $user->name = $request->input('name');
-        $user->email = $request->input('email');
-        $user->role_id = $request->input('role_id');
-        $user->password = bcrypt($request->input('password')); // Hash the password
-        $user->phone = $request->input('phone') ?? null; // Set phone if provided, else null
-        $user->address = $request->input('address') ?? null; // Set address if provided, else null
-        $user->client_company_id = $sessionUser['client_company_id'];
-        $user->cashier_balance = !empty($request->input('cashier_balance')) ? 1 : 0; // Set cashier balance flag
-
-        // Save the user and check if it was successful
-        if (!$user->save()) {
-            return response()->json(['status' => 500, 'message' => 'Cannot save user.']);
-        }
-
-        // If cashier_balance is set, handle cash in hand category
-        if (!empty($request->input('cashier_balance'))) {
-            // Find the "cash in hand" category for the user's company
-            $cashInHandCategory = Category::where('client_company_id', $sessionUser['client_company_id'])
-                ->where('slug', strtolower(AccountCategory::CASH_IN_HAND))
-                ->first();
-
-            if (!$cashInHandCategory instanceof Category) {
-                return response()->json(['status' => 400, 'message' => 'Cannot find cash in hand category.']);
+            // Save the user and check if it was successful
+            if (!$user->save()) {
+                return response()->json(['status' => 500, 'message' => 'Cannot save user.']);
             }
 
-            // Prepare data for the new category
-            $categoryData = [
-                'name' => $request->input('name'),
-                'opening_balance' => $request->input('opening_balance', 0) // Default to 0 if not provided
-            ];
+            // If cashier_balance is set, handle cash in hand category
+            if (!empty($request->input('cashier_balance'))) {
+                // Find the "cash in hand" category for the user's company
+                $cashInHandCategory = Category::where('client_company_id', $sessionUser['client_company_id'])
+                    ->where('slug', strtolower(AccountCategory::CASH_IN_HAND))
+                    ->first();
 
-            // Save or update the cash in hand category
-            $cashInHandCategory = CategoryRepository::saveCategory($categoryData, $cashInHandCategory->id, null);
+                if (!$cashInHandCategory instanceof Category) {
+                    return response()->json(['status' => 400, 'message' => 'Cannot find cash in hand category.']);
+                }
 
-            // Update user's category_id with the new category ID
-            if ($cashInHandCategory instanceof Category) {
-                $user->category_id = $cashInHandCategory->id;
-                $user->save();
+                // Prepare data for the new category
+                $categoryData = [
+                    'name' => $request->input('name'),
+                    'opening_balance' => $request->input('opening_balance', 0) // Default to 0 if not provided
+                ];
+
+                // Save or update the cash in hand category
+                $cashInHandCategory = CategoryRepository::saveCategory($categoryData, $cashInHandCategory->id, null);
+
+                // Update user's category_id with the new category ID
+                if ($cashInHandCategory instanceof Category) {
+                    $user->category_id = $cashInHandCategory->id;
+                    $user->save();
+                }
+
+                // Add the opening balance to the category
+                $cashInHandCategory->addOpeningBalance();
             }
-
-            // Add the opening balance to the category
-            $cashInHandCategory->addOpeningBalance();
-        }
+            if (!empty($request->input('loan_status'))) {
+                $user->saveStaffLoanCategory();
+            }
+        });
 
         // Return success response
         return response()->json([
@@ -166,7 +173,17 @@ class UserController extends Controller
         }
 
         // Retrieve the user details based on the provided ID
-        $result = User::select('id', 'name', 'email', 'phone', 'address', 'cashier_balance', 'role_id', 'category_id')
+        $result = User::select(
+            'id',
+            'name',
+            'email',
+            'phone',
+            'address',
+            'cashier_balance',
+            'role_id',
+            'category_id',
+            'loan_status'
+        )
             ->where('id', $request->input('id'))
             ->first();
 
@@ -223,6 +240,24 @@ class UserController extends Controller
             ->where('email', $request->input('email'))
             ->where('id', '!=', $request->input('id'))
             ->first();
+        $staffLoanCategory = Category::where('module', Module::STAFF_LOAN_RECEIVABLE)
+            ->where('module_id', $request->input('id'))
+            ->where('client_company_id', $sessionUser['client_company_id'])
+            ->first();
+        if (empty($request->input('loan_status'))) {
+            if ($staffLoanCategory instanceof Category) {
+                $transaction = Transaction::where('account_id', $staffLoanCategory->id)->first();
+                if ($transaction instanceof Transaction) {
+                    return response()->json([
+                        'status' => 500,
+                        'errors' => [
+                            'loan_status' => ['You cannot remove this user from loan status.']
+                        ]
+                    ]);
+                }
+            }
+        }
+
 
         // If another user with the same email exists, return an error response
         if ($user instanceof User) {
@@ -242,72 +277,80 @@ class UserController extends Controller
                 'message' => 'Cannot find user'
             ]);
         }
+        DB::transaction(function() use ($user, $staffLoanCategory, $sessionUser, $request) {
+            // Update the user details with the provided data
+            $user->name = $request->input('name');
+            $user->role_id = $request->input('role_id');
+            $user->email = $request->input('email');
 
-        // Update the user details with the provided data
-        $user->name = $request->input('name');
-        $user->role_id = $request->input('role_id');
-        $user->email = $request->input('email');
-
-        // Update the password if provided
-        if (!empty($request->input('password'))) {
-            $user->password = bcrypt($request->input('password'));
-        }
-
-        // Update optional fields
-        $user->phone = $request->input('phone') ?? null;
-        $user->address = $request->input('address') ?? null;
-        $user->client_company_id = $sessionUser['client_company_id'];
-        $user->cashier_balance = !empty($request->input('cashier_balance')) ? 1 : 0;
-
-        // Save the user and return an error response if saving fails
-        if (!$user->save()) {
-            return response()->json([
-                'status' => 400,
-                'message' => 'Cannot update user.'
-            ]);
-        }
-
-        // Prepare category data for cash-in-hand category
-        $categoryData = [
-            'name' => $request->input('name'),
-            'opening_balance' => $request->input('opening_balance'),
-        ];
-
-        // Find or create the cash-in-hand category
-        $cashInHandCategory = Category::where('client_company_id', $sessionUser['client_company_id'])
-            ->where('slug', strtolower(AccountCategory::CASH_IN_HAND))
-            ->first();
-
-        // If the cash-in-hand category is not found, return an error response
-        if (!$cashInHandCategory instanceof Category) {
-            return response()->json([
-                'status' => 400,
-                'message' => 'Cannot find [cash in hand] category'
-            ]);
-        }
-
-        // Handle cash-in-hand category creation or update based on the user's cashier balance
-        if (!empty($request->input('cashier_balance')) && empty($user->category_id)) {
-            $cashInHandCategory = CategoryRepository::saveCategory($categoryData, $cashInHandCategory->id, null);
-            if ($cashInHandCategory instanceof Category) {
-                $user->category_id = $cashInHandCategory->id;
-                $user->save();
+            // Update the password if provided
+            if (!empty($request->input('password'))) {
+                $user->password = bcrypt($request->input('password'));
             }
-        } else if (!empty($request->input('cashier_balance')) && !empty($user->category_id)) {
-            $category = Category::find($user->category_id);
-            if (!$category instanceof Category) {
+
+            // Update optional fields
+            $user->phone = $request->input('phone') ?? null;
+            $user->address = $request->input('address') ?? null;
+            $user->client_company_id = $sessionUser['client_company_id'];
+            $user->cashier_balance = !empty($request->input('cashier_balance')) ? 1 : 0;
+            $user->loan_status = !empty($request->input('loan_status')) ? 1 : 0;
+
+            // Save the user and return an error response if saving fails
+            if (!$user->save()) {
+                return response()->json([
+                    'status' => 400,
+                    'message' => 'Cannot update user.'
+                ]);
+            }
+
+            // Prepare category data for cash-in-hand category
+            $categoryData = [
+                'name' => $request->input('name'),
+                'opening_balance' => $request->input('opening_balance'),
+            ];
+
+            // Find or create the cash-in-hand category
+            $cashInHandCategory = Category::where('client_company_id', $sessionUser['client_company_id'])
+                ->where('slug', strtolower(AccountCategory::CASH_IN_HAND))
+                ->first();
+
+            // If the cash-in-hand category is not found, return an error response
+            if (!$cashInHandCategory instanceof Category) {
+                return response()->json([
+                    'status' => 400,
+                    'message' => 'Cannot find [cash in hand] category'
+                ]);
+            }
+
+            // Handle cash-in-hand category creation or update based on the user's cashier balance
+            if (!empty($request->input('cashier_balance')) && empty($user->category_id)) {
                 $cashInHandCategory = CategoryRepository::saveCategory($categoryData, $cashInHandCategory->id, null);
-                $user->category_id = $cashInHandCategory->id;
-                $user->save();
-            } else {
-                $cashInHandCategory = CategoryRepository::updateCategory($category, $categoryData);
+                if ($cashInHandCategory instanceof Category) {
+                    $user->category_id = $cashInHandCategory->id;
+                    $user->save();
+                }
+            } else if (!empty($request->input('cashier_balance')) && !empty($user->category_id)) {
+                $category = Category::find($user->category_id);
+                if (!$category instanceof Category) {
+                    $cashInHandCategory = CategoryRepository::saveCategory($categoryData, $cashInHandCategory->id, null);
+                    $user->category_id = $cashInHandCategory->id;
+                    $user->save();
+                } else {
+                    $cashInHandCategory = CategoryRepository::updateCategory($category, $categoryData);
+                }
             }
-        }
 
-        // Add opening balance if applicable
-        if ($cashInHandCategory instanceof Category && !empty($request->input('opening_balance'))) {
-            $cashInHandCategory->addOpeningBalance();
-        }
+            // Add opening balance if applicable
+            if ($cashInHandCategory instanceof Category && !empty($request->input('opening_balance'))) {
+                $cashInHandCategory->addOpeningBalance();
+            }
+            if (!empty($request->input('loan_status'))) {
+                $user->saveStaffLoanCategory();
+            }
+            if (empty($request->input('loan_status')) && $staffLoanCategory instanceof Category) {
+                $staffLoanCategory->delete();
+            }
+        });
 
         // Return a success response
         return response()->json([

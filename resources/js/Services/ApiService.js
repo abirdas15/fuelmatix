@@ -14,7 +14,14 @@ let headers = {
 };
 const ApiService = {
     POST: (url, param, callback, auth = false) => {
-        axios.post(url, param, {headers: headers}).then((response) => {
+        const access_token = store?.getters?.GetAccessToken || localStorage.getItem('FuelMatixAccessToken');
+        const headers = {
+            'Content-Type': 'application/json; charset=utf-8',
+            'x-api-key': '_@@jbbrd2023fuelmatix@@_',
+            'Authorization': `Bearer ${access_token}`
+        };
+
+        axios.post(url, param, { headers }).then(response => {
             if (response.status === 200) {
                 callback(response.data);
             }
@@ -23,10 +30,17 @@ const ApiService = {
             if (error_code === 422) {
                 store.dispatch('Logout');
             }
-        })
+        });
     },
     GET: (url, callback, auth = false) => {
-        axios.get(url, {headers: headers}).then((response) => {
+        const access_token = store?.getters?.GetAccessToken || localStorage.getItem('FuelMatixAccessToken');
+        const headers = {
+            'Content-Type': 'application/json; charset=utf-8',
+            'x-api-key': '_@@jbbrd2023fuelmatix@@_',
+            'Authorization': `Bearer ${access_token}`
+        };
+
+        axios.get(url, { headers }).then(response => {
             if (response.status === 200) {
                 callback(response.data);
             }
@@ -35,16 +49,20 @@ const ApiService = {
             if (error_code === 422) {
                 store.dispatch('Logout');
             }
-        })
+        });
     },
     DOWNLOAD: (url, param, headersAxios, callback, auth = false) => {
+        const access_token = store?.getters?.GetAccessToken || localStorage.getItem('FuelMatixAccessToken');
+        const headers = {
+            'Content-Type': 'application/json; charset=utf-8',
+            'x-api-key': '_@@jbbrd2023fuelmatix@@_',
+            'Authorization': `Bearer ${access_token}`
+        };
+
         axios.post(url, param, {
-            headers: {
-                'Content-Type': 'application/json; charset=utf-8',
-                'x-api-key': '_@@jbbrd2023fuelmatix@@_',
-                'Authorization':  'Bearer '+ access_token
-            },
-            responseType: 'blob' }).then((response) => {
+            headers,
+            responseType: 'blob'
+        }).then(response => {
             if (response.status === 200) {
                 callback(response.data);
             }
@@ -53,14 +71,16 @@ const ApiService = {
             if (error_code === 422) {
                 store.dispatch('Logout');
             }
-        })
+        });
     },
     UPLOAD: (url, media, callback, auth = false) => {
-        const MediaHeaders = {
+        const access_token = store?.getters?.GetAccessToken || localStorage.getItem('FuelMatixAccessToken');
+        const headers = {
             "Content-Type": "multipart/form-data",
-            'Authorization':  'Bearer '+ access_token
+            'Authorization': `Bearer ${access_token}`
         };
-        axios.post(url, media, {headers: MediaHeaders}).then((response) => {
+
+        axios.post(url, media, { headers }).then(response => {
             if (response.status === 200) {
                 callback(response.data);
             }
@@ -69,7 +89,7 @@ const ApiService = {
             if (error_code === 422) {
                 store.dispatch('Logout');
             }
-        })
+        });
     },
     ErrorHandler(errors) {
         $('.is-invalid').removeClass('is-invalid');
@@ -77,7 +97,7 @@ const ApiService = {
         $('.error-report-g').html('');
         $.each(errors, (i, v) => {
             if (i === 'error') {
-                $('.error-report-g').html('<p class="alert alert-danger">' + v + '</p>')
+                $('.error-report-g').html('<p class="alert alert-danger">' + v + '</p>');
             } else {
                 $('[name="' + i + '"]').addClass('is-invalid');
                 $('[name="' + i + '"]').closest('.form-group').find('.invalid-feedback').html(v);
@@ -88,5 +108,5 @@ const ApiService = {
         $('.is-invalid').removeClass('is-invalid');
         $('.invalid-feedback').html('');
     }
-}
+};
 export default ApiService;

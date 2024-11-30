@@ -31,10 +31,10 @@
                                         <span class="btn-icon-start text-info"><i class="fa fa-filter color-white"></i></span>Filter...
                                     </button>
                                 </div>
-<!--                                <div class="col-xl-3 mb-3">-->
-<!--                                    <button class="btn btn-primary" v-if="!loadingFile" @click="downloadPdf"><i class="fa fa-print" aria-hidden="true"></i>&nbsp;Print</button>-->
-<!--                                    <button class="btn btn-primary" v-if="loadingFile"><i class="fa fa-print" aria-hidden="true"></i>&nbsp;Print...</button>-->
-<!--                                </div>-->
+                                <div class="col-xl-3 mb-3">
+                                    <button class="btn btn-primary" v-if="!loadingFile" @click="downloadPdf"><i class="fa fa-print" aria-hidden="true"></i>&nbsp;Print</button>
+                                    <button class="btn btn-primary" v-if="loadingFile"><i class="fa fa-print" aria-hidden="true"></i>&nbsp;Print...</button>
+                                </div>
                             </div>
 
                             <div class=" mt-4" v-if="summary.length > 0">
@@ -42,20 +42,34 @@
                                     <table class="table table-bordered table-responsive-sm">
                                         <thead>
                                             <tr>
-                                                <th>Name</th>
+                                                <th>Date</th>
+                                                <th>Card Name</th>
+                                                <th>Voucher Number</th>
+                                                <th>Card Number/Transaction ID</th>
+                                                <th>Product Name</th>
+                                                <th>Quantity</th>
+                                                <th>Price</th>
                                                 <th>Amount</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             <tr v-for="each in summary">
+                                                <td v-text="each.date"></td>
                                                 <td v-text="each.category_name"></td>
-                                                <td v-text="each.amount"></td>
+                                                <td v-text="each.voucher_number"></td>
+                                                <td v-text="each.card_number"></td>
+                                                <td v-text="each.product_name"></td>
+                                                <td v-text="each.quantity"></td>
+                                                <td v-text="each.price"></td>
+                                                <td v-text="each.subtotal"></td>
                                             </tr>
                                         </tbody>
                                         <tfoot v-if="summary.length > 0">
                                             <tr>
-                                                <th>Total</th>
-                                                <th>{{ format_number(total) }}</th>
+                                                <th colspan="5">Total</th>
+                                                <th>{{ total.quantity }}</th>
+                                                <th></th>
+                                                <th>{{ total.amount }}</th>
                                             </tr>
                                         </tfoot>
                                         <tbody v-if="summary.length === 0">
@@ -89,20 +103,23 @@ export default {
             loading: false,
             summary: [],
             products: [],
-            total: [],
+            total: {
+
+            },
             loadingFile: false,
         }
     },
     methods: {
+
         downloadPdf: function () {
             this.loadingFile = true
             ApiService.ClearErrorHandler();
-            ApiService.DOWNLOAD(ApiRoutes.Report + '/company/summary/export/pdf', this.param, '', (res) => {
+            ApiService.DOWNLOAD(ApiRoutes.Report + '/pos-machine/export/pdf', this.param, '', (res) => {
                 this.loadingFile = false
                 let blob = new Blob([res], {type: 'pdf'});
                 const link = document.createElement('a');
                 link.href = window.URL.createObjectURL(blob);
-                link.download = 'CompanySummary.pdf';
+                link.download = 'Pos Report.pdf';
                 link.click();
             });
         },

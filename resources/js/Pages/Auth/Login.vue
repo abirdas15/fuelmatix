@@ -35,7 +35,7 @@
                                                 </div>
                                             </div>
                                             <div class="mb-3">
-                                                <router-link :to="{name: 'Forgot'}">Forgot Password?</router-link>
+                                                <a>Forgot Password?</a>
                                             </div>
                                         </div>
                                         <div class="text-center">

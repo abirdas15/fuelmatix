@@ -576,36 +576,38 @@ class ReportController extends Controller
                 'errors' => $validator->errors()
             ]);
         }
-        $startDate = Carbon::parse($request->input('start_date'))->startOfDay();
-        $endDate = Carbon::parse($request->input('end_date'))->endOfDay();
-        $sessionUser = SessionUser::getUser();
-        $posMachineId = Category::where('slug', strtolower(AccountCategory::POS_MACHINE))
-            ->where('client_company_id', $sessionUser['client_company_id'])
-            ->first()->id;
-        $posMachineIds = Category::where('parent_category', $posMachineId)
-            ->pluck('id')
-            ->toArray();
-        $result = Sale::select(
-            'sale.id',
-            'categories.name as category_name',
-            DB::raw('SUM(total_amount) as amount')
-        )
-            ->leftJoin('categories', 'categories.id', '=', 'sale.payment_category_id')
-            ->whereBetween('sale.date', [$startDate, $endDate])
-            ->whereIn('payment_category_id', $posMachineIds)
-            ->groupBy('sale.payment_category_id')
-            ->get()
-            ->toArray();
-        $total = 0;
-        foreach ($result as &$item) {
-            $total += $item['amount'];
-            $item['amount'] = number_format($item['amount'], $sessionUser['currency_precision']);
-        }
-        return response()->json([
-            'status' => 200,
-            'data' => $result,
-            'total' => number_format($total, 2),
+        $filter = [
+            'start_date' => $request->input('start_date'),
+            'end_date' => $request->input('end_date'),
+        ];
+        $result = ReportRepository::posMachineReport($filter);
+        return response()->json($result);
+    }
+    public function posMachineExportPdf(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'start_date' => 'required',
+            'end_date' => 'required',
         ]);
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 500,
+                'errors' => $validator->errors()
+            ]);
+        }
+        $sessionUser = SessionUser::getUser();
+        $company = ClientCompany::where('id', $sessionUser['client_company_id'])->first();
+        $filter = [
+            'start_date' => $request->input('start_date'),
+            'end_date' => $request->input('end_date'),
+        ];
+        $result = ReportRepository::posMachineReport($filter);
+        $pdf = Pdf::loadView('pdf.pos-machine-report', [
+            'data' => $result,
+            'company' => $company,
+        ]);
+        $pdf->setPaper('a4', 'landscape');
+        return $pdf->output();
     }
 
 }

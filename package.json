@@ -26,6 +26,7 @@
         "vue-template-compiler": "^2.6.12"
     },
     "dependencies": {
+        "@coders-tm/vue-number-format": "^3.34.1",
         "@primevue/themes": "^4.2.2",
         "bootstrap-colorpicker": "^3.4.0",
         "cssnano": "^5.0.17",

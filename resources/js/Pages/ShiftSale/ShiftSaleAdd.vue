@@ -235,12 +235,14 @@
                                                                 <div class="mb-3 col-md-3"  v-if="listDispenser.status === 'end'">
                                                                     <label>End Reading </label>
                                                                     <div class="input-group">
+
                                                                         <InputNumber
                                                                             @blur="disableInput('frReading'+nIndex+dIndex)"
                                                                             v-if="listDispenser.status === 'end'"
-                                                                            v-model="n.end_reading"
+                                                                            :value="n.end_reading === 0 ? '' : n.end_reading"
                                                                             @click="enableInput('frReading'+nIndex+dIndex)"
-                                                                            @input="onNozzleInput($event, tankIndex, dIndex, nIndex)"
+                                                                            @input="updateEndReading($event, tankIndex, dIndex, nIndex)"
+                                                                            @keydown="onKeyDown($event, nIndex, dIndex)"
                                                                             :minFractionDigits="quantityFractionDigit"
                                                                             :maxFractionDigits="quantityFractionDigit"
                                                                         />
@@ -274,7 +276,7 @@
                                                                     <label>Adjustment </label>
                                                                     <div class="input-group">
                                                                         <InputNumber
-                                                                            @input="calculateAmountNozzle(dIndex, nIndex, tankIndex) "
+                                                                            @input="calculateAmountNozzle(dIndex, nIndex, tankIndex);"
                                                                             v-if="listDispenser.status === 'end'"
                                                                             v-model="n.adjustment"
                                                                             disabled="disabled"
@@ -411,7 +413,7 @@
                                                         <InputNumber
                                                             v-model="category.amount"
                                                             :id="'categories.'+index+'.amount'"
-                                                            @input="categoryInput($event, index)"
+                                                            @input="categoryInput($event, index); preventArrowKeyIncrement"
                                                             :minFractionDigits="numberFractionDigit"
                                                             :maxFractionDigits="numberFractionDigit"
                                                             :name="'categories.'+index+'.amount'"
@@ -500,6 +502,14 @@ export default {
         }
     },
     computed: {
+        formattedEndReading: {
+            get() {
+                return this.n.end_reading === 0 ? '' : this.n.end_reading;
+            },
+            set(value) {
+                this.n.end_reading = value === '' ? 0 : value;
+            },
+        },
         totalLiter: function() {
             let total = 0;
             this.categories.map((v) => {
@@ -524,6 +534,9 @@ export default {
         }
     },
     methods: {
+        updateEndReading(value, tankIndex, dIndex, nIndex) {
+            this.onNozzleInput(value, tankIndex, dIndex, nIndex);
+        },
         categoryInput(value, index) {
             this.categories[index]['amount'] = Number(value);
             setTimeout(() => {
@@ -536,8 +549,8 @@ export default {
             this.getReading(value, end_reading, tankIndex, id)
         },
         onNozzleInput(value, tankIndex, dIndex, nIndex, ) {
-            this.listDispenser.tanks[tankIndex]['dispensers'][dIndex]['nozzle'][nIndex]['end_reading'] = Number(value);
-            this.calculateAmountNozzle(dIndex, nIndex, tankIndex); // Call your calculation logic
+            this.listDispenser.tanks[tankIndex]['dispensers'][dIndex]['nozzle'][nIndex]['end_reading'] = value === null ? null : Number(value);
+            this.calculateAmountNozzle(dIndex, nIndex, tankIndex);
         },
         fetchShiftName() {
             ApiService.POST(ApiRoutes.ShiftName, {},(res) => {

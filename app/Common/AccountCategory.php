@@ -38,4 +38,5 @@ class AccountCategory
     const IN_DIRECT_EXPENSE = 'Indirect Expense';
     const ADVANCE_PAYABLE = 'Advance Payable';
     const RETAIN_EARNING = 'Retained earnings';
+    const STAFF_LOAN_RECEIVABLES = 'Staff Loan Receivables';
 }

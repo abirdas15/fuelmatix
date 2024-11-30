@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Common\Module;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -19,5 +20,11 @@ class Transaction extends Model
             return asset('uploads/'.$this->file);
         }
         return null;
+    }
+    public function staff_loan_payment()
+    {
+        return $this->hasMany(Transaction::class, 'module_id', 'id')
+            ->where('module', Module::STAFF_LOAN_PAYMENT)
+            ->havingRaw('credit_amount > 0');
     }
 }

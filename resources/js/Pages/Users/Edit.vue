@@ -64,6 +64,14 @@
                                         <input type="text" class="form-control" name="address" v-model="param.opening_balance">
                                         <div class="invalid-feedback"></div>
                                     </div>
+                                    <div class="form-group col-md-12">
+                                        <div class="form-check custom-checkbox ms-1">
+                                            <input type="checkbox" class="form-check-input" name="loan_statusloan_statusloan_status"
+                                                   id="loan_status" v-model="param.loan_status">
+                                            <label class="form-check-label" for="loan_status">Loan Status:</label>
+                                        </div>
+                                        <div class="invalid-feedback"></div>
+                                    </div>
                                 </div>
                                 <div class="row" style="text-align: right;">
                                     <div class="mb-3 col-md-6">

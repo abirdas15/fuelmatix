@@ -609,3 +609,8 @@ button:disabled{
         }
     }
 }
+.white-bg {
+    input {
+        color: #ffffff !important;
+    }
+}

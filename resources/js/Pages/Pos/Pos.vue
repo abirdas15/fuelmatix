@@ -12,7 +12,7 @@
                                 <div class="col-6 mb-3">
                                     <input type="text" class="form-control invoice_date bg-white" placeholder="Invoice Date" name="invoice_date" v-model="invoice_date">
                                 </div>
-                                <div class="col-sm-6">
+                                <div class="col-sm-12">
                                     <div class="user-search">
                                         <div class="input-group mb-3">
                                                 <span class="input-group-text">

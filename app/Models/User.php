@@ -2,6 +2,9 @@
 
 namespace App\Models;
 
+use App\Common\AccountCategory;
+use App\Common\Module;
+use App\Helpers\SessionUser;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -95,5 +98,46 @@ class User extends Authenticatable
         } catch (\Exception $exception) {
             return null;
         }
+    }
+    /**
+     * @return Category
+     */
+    public function saveStaffLoanCategory(): Category
+    {
+        $sessionUser = SessionUser::getUser();
+        $staffLoanReceivableCategory = Category::where('slug', strtolower(AccountCategory::STAFF_LOAN_RECEIVABLES))
+            ->where('client_company_id', $sessionUser->client_company_id)
+            ->first();
+        if (!$staffLoanReceivableCategory instanceof Category) {
+            $assetCategory = Category::where('slug', strtolower(AccountCategory::ASSETS))
+                ->where('client_company_id', $sessionUser->client_company_id)
+                ->first();
+            $staffLoanReceivableCategory = new Category();
+            $staffLoanReceivableCategory->name = AccountCategory::STAFF_LOAN_RECEIVABLES;
+            $staffLoanReceivableCategory->slug = strtolower(AccountCategory::STAFF_LOAN_RECEIVABLES);
+            $staffLoanReceivableCategory->parent_category = $assetCategory->id;
+            $staffLoanReceivableCategory->type = $assetCategory->type;
+            $staffLoanReceivableCategory->default = 1;
+            $staffLoanReceivableCategory->client_company_id = $sessionUser['client_company_id'];
+            $staffLoanReceivableCategory->save();
+            $staffLoanReceivableCategory->updateCategory();
+        }
+        $staffLoanCategory = Category::where('module', Module::STAFF_LOAN_RECEIVABLE)
+            ->where('module_id', $this['id'])
+            ->where('client_company_id', $sessionUser['client_company_id'])
+            ->first();
+        if (!$staffLoanCategory instanceof Category) {
+            $staffLoanCategory = new Category();
+        }
+        $staffLoanCategory->name = $this['name'];
+        $staffLoanCategory->slug = strtolower($this['name']);
+        $staffLoanCategory->parent_category = $staffLoanReceivableCategory->id;
+        $staffLoanCategory->type = $staffLoanReceivableCategory->type;
+        $staffLoanCategory->client_company_id = $sessionUser['client_company_id'];
+        $staffLoanCategory->module = Module::STAFF_LOAN_RECEIVABLE;
+        $staffLoanCategory->module_id = $this['id'];
+        $staffLoanCategory->save();
+        $staffLoanCategory->updateCategory();
+        return $staffLoanCategory;
     }
 }

@@ -1360,4 +1360,58 @@ class ReportRepository
 
     }
 
+    /**
+     * @param array $filter
+     * @return array
+     */
+    public static function posMachineReport(array $filter): array
+    {
+        $startDate = Carbon::parse($filter['start_date'])->startOfDay();
+        $endDate = Carbon::parse($filter['end_date'])->endOfDay();
+        $sessionUser = SessionUser::getUser();
+        $posMachineId = Category::where('slug', strtolower(AccountCategory::POS_MACHINE))
+            ->where('client_company_id', $sessionUser['client_company_id'])
+            ->first()->id;
+        $posMachineIds = Category::where('parent_category', $posMachineId)
+            ->pluck('id')
+            ->toArray();
+        $result = Sale::select(
+            'sale.id',
+            'categories.name as category_name',
+            'sale.date',
+            'sale.card_number',
+            'sale.voucher_number',
+            'sale_data.quantity',
+            'sale_data.price',
+            'sale_data.subtotal',
+            'products.name as product_name'
+        )
+            ->join('sale_data', 'sale_data.sale_id', '=', 'sale.id')
+            ->join('categories', 'categories.id', '=', 'sale.payment_category_id')
+            ->join('products', 'products.id', '=', 'sale_data.product_id')
+            ->whereBetween('sale.date', [$startDate, $endDate])
+            ->whereIn('payment_category_id', $posMachineIds)
+            ->groupBy('sale_data.id')
+            ->get()
+            ->toArray();
+        $total = 0;
+        $totalQuantity = 0;
+        foreach ($result as &$item) {
+            $total += $item['subtotal'];
+            $totalQuantity += $item['quantity'];
+            $item['date'] =  Helpers::formatDate($item['date'], FuelMatixDateTimeFormat::STANDARD_DATE_TIME);
+            $item['quantity'] = number_format($item['quantity'], $sessionUser['quantity_precision']);
+            $item['price'] = number_format($item['price'], $sessionUser['currency_precision']);
+            $item['subtotal'] = number_format($item['subtotal'], $sessionUser['currency_precision']);
+        }
+        return [
+            'status' => 200,
+            'data' => $result,
+            'total' => [
+                'amount' => number_format($total, $sessionUser['currency_precision']),
+                'quantity' => number_format($totalQuantity, $sessionUser['quantity_precision']),
+            ],
+        ];
+    }
+
 }

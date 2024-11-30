@@ -262,7 +262,9 @@ const ApiRoutes = {
     Report: ApiVersion + '/report',
     BulkSale: ApiVersion + '/bulkSale',
     ShiftName: ApiVersion + '/shift/sale/shiftName/list',
-    Profile: ApiVersion + '/profile/me'
-};
+    Profile: ApiVersion + '/profile/me',
+    LoanStaffList: ApiVersion + '/loan/staff/list',
+    StaffLoan: ApiVersion + '/staff/loan'
+}
 
 export default ApiRoutes;
