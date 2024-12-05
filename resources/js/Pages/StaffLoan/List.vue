@@ -37,9 +37,7 @@
                                         <table class="display  dataTable no-footer" style="min-width: 845px">
                                             <thead>
                                             <tr class="text-white" style="background-color: #4886EE;color:#ffffff">
-                                                <th class="text-white" @click="sortData('date')" :class="sortClass('date')">Date</th>
                                                 <th class="text-white" @click="sortData('staff_name')" :class="sortClass('staff_name')">Staff Name</th>
-                                                <th class="text-white" @click="sortData('payment_method')" :class="sortClass('payment_method')">Payment Method</th>
                                                 <th class="text-white" @click="sortData('loan_amount')" :class="sortClass('loan_amount')">Loan Amount</th>
                                                 <th class="text-white" @click="sortData('payment_amount')" :class="sortClass('payment_amount')">Payment Amount</th>
                                                 <th class="text-white" @click="sortData('due')" :class="sortClass('due')">Due</th>
@@ -48,18 +46,18 @@
                                             </thead>
                                             <tbody v-if="listData.length > 0 && TableLoading === false">
                                             <tr v-for="f in listData">
-                                                <td >{{f.date}}</td>
                                                 <td >{{f.staff_name}}</td>
-                                                <td >{{f.payment_method}}</td>
                                                 <td >{{f.loan_amount_format}}</td>
                                                 <td >{{f.payment_amount_format}}</td>
                                                 <td >{{f.due_amount_format}}</td>
                                                 <td>
-                                                    <div class="d-flex justify-content-end">
-                                                        <button v-if="f.due_amount > 0" class="btn btn-sm btn-primary me-2" @click="paymentModal(f)">Payment</button>
-<!--                                                        <a  href="javascript:void(0)"  @click="openModalDelete(f)" class="btn btn-danger shadow btn-xs sharp">-->
-<!--                                                            <i class="fa fa-trash"></i>-->
-<!--                                                        </a>-->
+                                                    <div class="d-flex">
+                                                        <a v-if="f.due_amount > 0" class="btn btn-sm btn-primary me-2" @click="paymentModal(f)">
+                                                            <i class="fa fa-money"></i>
+                                                        </a>
+                                                        <router-link :to="{name: 'StaffLoanView', params: {id: f.id}}"  class="btn btn-info shadow btn-sm sharp">
+                                                            <i class="fa fa-eye"></i>
+                                                        </router-link>
                                                     </div>
                                                 </td>
                                             </tr>
@@ -149,7 +147,7 @@ export default {
                 id: '',
                 amount: '',
                 payment_id: ''
-            }
+            },
         };
     },
     watch: {
@@ -192,7 +190,6 @@ export default {
             this.paymentInfo = f
             this.paymentParam.id = f.id
             this.paymentParam.amount = f.due_amount;
-            console.log(this.paymentParam);
             $('.invoiceModal').removeClass('d-none');
 
         },

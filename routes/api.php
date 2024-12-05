@@ -393,6 +393,7 @@ Route::group(['middleware' => 'auth:api'], function() {
         Route::post('save', [StaffLoanController::class, 'loanSave']);
         Route::post('list', [StaffLoanController::class, 'loanList']);
         Route::post('payment', [StaffLoanController::class, 'loanPayment']);
+        Route::post('single', [StaffLoanController::class, 'single']);
     });
 });
 

@@ -61,7 +61,6 @@
                         <li v-if="CheckPermission(Section.INVOICE_PAYMENT + '-' + Action.VIEW)"><router-link :to="{name: 'InvoicePayment'}">Invoice Payment </router-link></li>
                         <li v-if="CheckPermission(Section.COMPANY_BILL + '-' + Action.VIEW)"><router-link :to="{name: 'CompanyBills'}">Company Bills </router-link></li>
                         <li v-if="CheckPermission(Section.PURCHASE + '-' + Action.VIEW)"><router-link :to="{name: 'purchase'}">Purchase</router-link></li>
-                        <li><router-link :to="{name: 'StaffLoanList'}">Staff Loan</router-link></li>
                     </ul>
 
                 </li>
@@ -73,8 +72,8 @@
                         <li v-if="CheckPermission(Section.EMPLOYEE + '-' + Action.VIEW)"><router-link :to="{name: 'employee'}">Employees </router-link></li>
                         <li v-if="CheckPermission(Section.SALARY + '-' + Action.VIEW)"><router-link :to="{name: 'salary'}">Salary </router-link></li>
                         <li v-if="CheckPermission(Section.ATTENDANCE + '-' + Action.VIEW)"><a href="javascript:void(0)">Attendance</a></li>
+                        <li><router-link :to="{name: 'StaffLoanList'}">Loan</router-link></li>
                     </ul>
-
                 </li>
                 <li><a class="has-arrow " href="javascript:void(0)" aria-expanded="false">
                     <i class="fa-solid fa-gear"></i>

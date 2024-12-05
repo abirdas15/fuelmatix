@@ -118,6 +118,7 @@ import DummySaleView from "../Pages/DummySale/View.vue";
 import PosReport from "../Pages/Report/PosReport.vue";
 import StaffLoanList from "../Pages/StaffLoan/List.vue";
 import StaffLoanAdd from "../Pages/StaffLoan/Add.vue";
+import StaffLoanView from "../Pages/StaffLoan/View.vue";
 
 const ROOT_URL = "";
 const router = new VueRouter({
@@ -667,6 +668,9 @@ const router = new VueRouter({
                 },
                 {
                     path: ROOT_URL + "/staff-loan/add", meta: { title: 'Staff Loan Add - FuelMatix' }, name: "StaffLoanAdd", component: StaffLoanAdd
+                },
+                {
+                    path: ROOT_URL + "/staff-loan/view/:id", meta: { title: 'Staff Loan View - FuelMatix' }, name: "StaffLoanView", component: StaffLoanView
                 },
             ],
         },

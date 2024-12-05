@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Common\AccountCategory;
 use App\Common\FuelMatixDateTimeFormat;
 use App\Common\Module;
 use App\Helpers\Helpers;
@@ -24,17 +25,15 @@ class StaffLoanController extends Controller
     public function staffList(Request $request): JsonResponse
     {
         $sessionUser = SessionUser::getUser();
-        $userIds = User::select('id')
-            ->where('client_company_id', $sessionUser->client_company_id)
-            ->where('loan_status', 1)
-            ->pluck('id')
-            ->toArray();
+        $staffLoanReceivable = Category::select('id')
+            ->where('client_company_id', $sessionUser['client_company_id'])
+            ->where('slug', strtolower(AccountCategory::STAFF_LOAN_RECEIVABLES))
+            ->first();
         $result = Category::select(
             'id',
             'name'
         )
-            ->where('module', Module::STAFF_LOAN_RECEIVABLE)
-            ->whereIn('module_id', $userIds)
+            ->where('parent_category', $staffLoanReceivable->id)
             ->get()
             ->toArray();
         return response()->json([
@@ -94,11 +93,11 @@ class StaffLoanController extends Controller
         $limit = $request->input('limit', 10);
         $sessionUser = SessionUser::getUser();
         $result = Transaction::select(
-            'transactions.id',
+            'transactions.account_id as id',
             'transactions.date as date',
-            'transactions.debit_amount as loan_amount',
+            DB::raw('SUM(transactions.debit_amount) as loan_amount'),
             'c1.name as staff_name',
-            'c2.name as payment_method',
+            'c2.name as payment_method'
         )
             ->join('categories as c1', 'c1.id', '=', 'transactions.account_id')
             ->join('transactions as t1', 't1.linked_id', '=', 'transactions.id')
@@ -106,10 +105,11 @@ class StaffLoanController extends Controller
             ->with('staff_loan_payment')
             ->where('transactions.module', Module::STAFF_LOAN_RECEIVABLE)
             ->where('transactions.client_company_id', $sessionUser->client_company_id)
-            ->havingRaw('transactions.debit_amount > 0')
+            ->groupBy('transactions.account_id')
+            ->havingRaw('SUM(transactions.debit_amount) > 0')
             ->orderBy('transactions.id', 'DESC')
-            ->groupBy('transactions.id')
             ->paginate($limit);
+
         foreach ($result as &$data) {
             $totalPayment = 0;
             foreach ($data['staff_loan_payment'] as $paymentData) {
@@ -146,7 +146,6 @@ class StaffLoanController extends Controller
         }
         $transaction = Transaction::where('id', $request->input('id'))->first();
         DB::transaction((function () use ($request, $transaction) {
-            $sessionUser = SessionUser::getUser();
             $transactionData = [
                 ['date' => date('Y-m-d'), 'account_id' => $transaction->account_id, 'debit_amount' => 0, 'credit_amount' => $request->input('amount'), 'module' => Module::STAFF_LOAN_PAYMENT, 'module_id' => $transaction->id],
                 ['date' => date('Y-m-d'), 'account_id' => $request->input(['payment_id']), 'debit_amount' => $request->input('amount'), 'credit_amount' => 0, 'module' => Module::STAFF_LOAN_PAYMENT, 'module_id' => $transaction->id],
@@ -156,6 +155,50 @@ class StaffLoanController extends Controller
         return response()->json([
             'status' => 200,
             'message' => 'Payment has been saved successfully.'
+        ]);
+    }
+    public function single(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'id' => 'required'
+        ]);
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 500,
+                'errors'=> $validator->errors()
+            ]);
+        }
+        $sessionUser = SessionUser::getUser();
+        $result = Transaction::select(
+            'transactions.id',
+            'transactions.date as date',
+            'transactions.account_id',
+            'transactions.debit_amount',
+            'transactions.credit_amount',
+            'c1.name as payment_method'
+        )
+            ->join('transactions as t1', 't1.linked_id', '=', 'transactions.id')
+            ->join('categories as c1', 'c1.id', '=', 't1.account_id')
+            ->where('transactions.account_id', $request->input('id'))
+            ->get()
+            ->toArray();
+        $totalDebit = 0;
+        $totalCredit = 0;
+        foreach ($result as &$data) {
+            $totalDebit += $data['debit_amount'];
+            $totalCredit += $data['credit_amount'];
+            $data['debit_amount'] = !empty($data['debit_amount']) ? number_format($data['debit_amount'], $sessionUser['currency_precision']) : '';
+            $data['credit_amount'] = !empty($data['credit_amount']) ? number_format($data['credit_amount'], $sessionUser['currency_precision']) : '';
+            $data['date'] = Helpers::formatDate($data['date'], FuelMatixDateTimeFormat::STANDARD_DATE);
+        }
+        return response()->json([
+            'status' => 200,
+            'data' => $result,
+            'total' => [
+                'debit_amount' => number_format($totalDebit, $sessionUser['currency_precision']),
+                'credit_amount' => number_format($totalCredit, $sessionUser['currency_precision']),
+                'due_amount' => number_format($totalDebit - $totalCredit, $sessionUser['currency_precision'])
+            ]
         ]);
     }
 }

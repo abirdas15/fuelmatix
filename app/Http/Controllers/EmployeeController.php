@@ -8,6 +8,7 @@ use App\Repository\CategoryRepository;
 use App\Repository\EmployeeRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class EmployeeController extends Controller
@@ -32,19 +33,22 @@ class EmployeeController extends Controller
         if (!$salaryExpense instanceof Category) {
             return response()->json(['status' => 400, 'message' => 'Cannot find [salary expense] category.']);
         }
-        $others = [
-            'position' => $requestData['position'] ?? null,
-            'salary' => $requestData['salary'] ?? null,
-        ];
-        $categoryData = [
-            'name' => $requestData['name'],
-            'rfid' => $requestData['rfid'] ?? null,
-            'others' => json_encode($others)
-        ];
-        $newCategory = CategoryRepository::saveCategory($categoryData, $salaryExpense['id']);
-        if (!$newCategory instanceof Category) {
-            return response()->json(['status' => 400, 'message' => 'Cannot saved employee.']);
-        }
+        DB::transaction(function() use ($requestData, $salaryExpense) {
+            $others = [
+                'position' => $requestData['position'] ?? null,
+                'salary' => $requestData['salary'] ?? null,
+            ];
+            $categoryData = [
+                'name' => $requestData['name'],
+                'rfid' => $requestData['rfid'] ?? null,
+                'others' => json_encode($others)
+            ];
+            $newCategory = CategoryRepository::saveCategory($categoryData, $salaryExpense['id']);
+            if (!$newCategory instanceof Category) {
+                return response()->json(['status' => 400, 'message' => 'Cannot saved employee.']);
+            }
+            $newCategory->saveStaffLoanCategory();
+        });
         return response()->json(['status' => 200, 'message' => 'Successfully saved employee.']);
     }
     /**
@@ -116,6 +120,7 @@ class EmployeeController extends Controller
             return response()->json(['status' => 400, 'message' => 'Cannot updated [employee].']);
         }
         $category->updateCategory();
+        $category->saveStaffLoanCategory();
         return response()->json(['status' => 200, 'message' => 'Successfully updated employee.']);
     }
 }

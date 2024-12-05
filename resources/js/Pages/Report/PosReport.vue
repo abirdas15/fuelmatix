@@ -137,7 +137,7 @@ export default {
         },
     },
     created() {
-        $('#dashboard_bar').text('Company Bill')
+        $('#dashboard_bar').text('Pos Report')
         setTimeout(() => {
             $('.date').flatpickr({
                 altInput: true,
@@ -146,9 +146,12 @@ export default {
                 mode: 'range',
                 onChange: (date, dateStr) => {
                     let dateArr = dateStr.split('to')
-                    if (dateArr.length == 2) {
+                    if (dateArr.length === 2) {
                         this.param.start_date = dateArr[0]
                         this.param.end_date = dateArr[1]
+                    } else {
+                        this.param.start_date = dateStr;
+                        this.param.end_date = dateStr;
                     }
                 }
             })
