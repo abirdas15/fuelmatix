@@ -115,6 +115,7 @@ class CompanyController extends Controller
         $clientCompany->header_text = $request->input('company.header_text');
         $clientCompany->footer_text = $request->input('company.footer_text');
         $clientCompany->voucher_check = $request->input('company.voucher_check');
+        $clientCompany->invoice_qr_code = $request->input('company.invoice_qr_code');
         if (!$clientCompany->save()) {
             return response()->json([
                 'message' => 'Company cannot be saved!',
@@ -217,6 +218,7 @@ class CompanyController extends Controller
         $company->voucher_check = $request->input('voucher_check');
         $company->header_text = $request->input('header_text');
         $company->footer_text = $request->input('footer_text');
+        $company->invoice_qr_code = $request->input('invoice_qr_code');
         if (!$company->save()) {
             return response()->json([
                 'status' => 300,

@@ -345,7 +345,7 @@ class ReportController extends Controller
     public function stockSummary(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
-            'date' => 'required|date',
+            'date' => 'required',
         ]);
         if ($validator->fails()) {
             return response()->json([
@@ -363,7 +363,7 @@ class ReportController extends Controller
     public function stockSummaryExportPDF(Request $request): string
     {
         $validator = Validator::make($request->all(), [
-            'date' => 'required|date',
+            'date' => 'required',
         ]);
         if ($validator->fails()) {
             return response()->json([
@@ -376,7 +376,7 @@ class ReportController extends Controller
         $summary = ReportRepository::stockSummary($request->input('date'));
         $pdf = Pdf::loadView('pdf.stock-summary', [
             'data' => $summary,
-            'date' => Carbon::parse($request->input('date'))->format('F j, Y'),
+            'date' => $request->input('date'),
             'company' => $company,
             'print_at' => Carbon::now()->format('F j, Y h:i A')
         ]);

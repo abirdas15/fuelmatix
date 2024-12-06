@@ -209,7 +209,7 @@
                 </div>
             </div>
             <div class="card" v-if="productSales.length > 0">
-                <div class="text-center mt-2"><h2>Product Sale</h2></div>
+                <div class="text-center mt-2"><h2>Credit Company Product Sale</h2></div>
                 <div class="card-body mt-0">
                     <table class="table table-bordered">
                         <tbody>
@@ -401,6 +401,7 @@ export default {
                 altFormat: "d/m/Y",
                 dateFormat: "Y-m-d",
                 defaultDate: 'today',
+                mode: 'range',
                 onChange: (dateStr, date) => {
                     this.param.date = date
                 }

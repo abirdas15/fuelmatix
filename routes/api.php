@@ -214,6 +214,7 @@ Route::group(['middleware' => 'auth:api'], function() {
         Route::post('save', [SaleController::class, 'save']);
         Route::post('list', [SaleController::class, 'list']);
         Route::post('list/export/pdf', [SaleController::class, 'exportPdf']);
+        Route::post('list/export/excel', [SaleController::class, 'exportExcel']);
         Route::post('single', [SaleController::class, 'single']);
         Route::post('update', [SaleController::class, 'update']);
         Route::post('delete', [SaleController::class, 'delete']);
@@ -267,6 +268,7 @@ Route::group(['middleware' => 'auth:api'], function() {
         Route::post('delete', [InvoiceController::class, 'delete']);
         Route::post('single', [InvoiceController::class, 'single']);
         Route::post('download/pdf', [InvoiceController::class, 'downloadPdf']);
+        Route::post('download/excel', [InvoiceController::class, 'downloadExcel']);
         Route::post('payment/list', [InvoiceController::class, 'invoicePayment']);
         Route::post('change-number', [InvoiceController::class, 'changeInvoiceNumber']);
     });

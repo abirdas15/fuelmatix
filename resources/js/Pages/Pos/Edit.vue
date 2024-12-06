@@ -390,8 +390,8 @@
                     Thank you for your visit!
                 </p>
             </section>
-            <section style="margin-top: 10px; text-align: center">
-                <qrcode-vue :value="value" :size="100" level="H" render-as="svg"></qrcode-vue>
+            <section style="margin-top: 10px; text-align: center" v-if="Auth.invoice_qr_code === 1">
+                <qrcode-vue :value="value" :size="50" level="H" render-as="svg"></qrcode-vue>
             </section>
             <section style="text-align: center">
                 <sub>

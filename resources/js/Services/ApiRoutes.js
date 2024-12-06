@@ -184,6 +184,7 @@ const ApiRoutes = {
     invoiceDelete: ApiVersion + '/invoice/delete',
     invoiceList: ApiVersion + '/invoice/list',
     invoiceDownloadPdf: ApiVersion + '/invoice/download/pdf',
+    invoiceDownloadExcel: ApiVersion + '/invoice/download/excel',
     //Dashboard
     getDashboard: ApiVersion + '/dashboard/get',
     //Report daily log

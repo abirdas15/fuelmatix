@@ -25,33 +25,38 @@
                                         <div class="invalid-feedback"></div>
                                     </div>
                                     <div class="col-md-8"></div>
-                                    <div class="table-responsive">
-                                        <table class="customTable">
+                                    <div class="table-responsive table-container">
+                                        <table class="table">
                                             <thead>
                                             <tr>
-                                                <th style="width: 20%;">Permission</th>
-                                                <template v-for="action in permissions.actions">
-                                                    <th style="width: 10%;">{{ action.name }}</th>
+                                                <th class="w-20">Permission</th>
+                                                <!-- Loop through actions -->
+                                                <template v-for="action in actions">
+                                                    <th class="w-10">{{ action.name }}</th>
                                                 </template>
                                             </tr>
                                             </thead>
                                             <tbody>
-                                            <tr style="background-color: grey">
-                                                <th>All</th>
-                                                <template v-for="(action,index) in permissions.actions">
-                                                    <td>
+                                            <!-- Row for 'All' permissions -->
+                                            <tr>
+                                                <th style="background-color: #dddddd">All</th>
+                                                <!-- Loop through actions for 'All' checkboxes -->
+                                                <template v-for="(action,index) in actions">
+                                                    <td style="background-color: #dddddd">
                                                         <div class="form-check form-switch">
-                                                            <input type="checkbox" @click="switchAllToggle($event, action.value)" class="form-check-input">
+                                                            <input type="checkbox" v-model="action.checked" @click="switchAllToggle(index)" class="form-check-input">
                                                         </div>
                                                     </td>
                                                 </template>
                                             </tr>
-                                            <tr v-for="section in permissions.sections">
-                                                <th>{{ section.name }}</th>
-                                                <template v-for="(action,index) in permissions.actions">
-                                                    <td>
+                                            <!-- Rows for each section -->
+                                            <tr v-for="section in sections">
+                                                <td>{{ section.name }}</td>
+                                                <!-- Loop through actions for each section -->
+                                                <template v-for="(action,index) in section.actions">
+                                                    <td class="text-center">
                                                         <div class="form-check form-switch">
-                                                            <input type="checkbox" @click="switchToggle($event, section.value, action.value)" class="form-check-input" :id="section.value + '-' + action.value">
+                                                            <input type="checkbox" @click="switchToggle()" class="form-check-input" v-model="action.checked">
                                                         </div>
                                                     </td>
                                                 </template>
@@ -87,8 +92,14 @@ export default {
     data() {
         return {
             permissions: [],
-            roleParam: {},
-            loading:false
+            roleParam: {
+                id: '',
+                name: '',
+                permission: []
+            },
+            loading:false,
+            sections: [],
+            actions: []
         }
     },
     methods: {
@@ -96,12 +107,12 @@ export default {
             ApiService.POST(ApiRoutes.RoleSingle, {id: this.$route.params.id}, (res) => {
                 this.loading = false;
                 if (parseInt(res.status) === 200) {
-                    this.roleParam = res.data;
-                    if (res.data.permission.length > 0) {
-                        res.data.permission.map((name) => {
-                            $("#" + name).attr('checked', 'checked');
-                        });
-                    }
+                    this.roleParam.id = res.data.id;
+                    this.roleParam.name = res.data.name;
+                    this.sections = res.data.sections;
+                    setTimeout(() => {
+                        this.toggleAllCheckUncheck();
+                    }, 200)
                 } else if (parseInt(res.status) === 500) {
                     ApiService.ErrorHandler(res.errors);
                 } else {
@@ -109,8 +120,35 @@ export default {
                 }
             });
         },
+        switchToggle: function() {
+            setTimeout(() => {
+                this.toggleAllCheckUncheck();
+            }, 200)
+        },
+        toggleAllCheckUncheck() {
+            let actionArray = [];
+            this.actions.map((action, index) => {
+                actionArray[index] = 0;
+            })
+            let totalSection = this.sections.length ?? 0;
+            this.actions.map((action, index) => {
+                this.sections.map((section) => {
+                    if (section['actions'][index]['checked'] === true) {
+                        actionArray[index]++;
+                    }
+                });
+                this.actions[index]['checked'] = actionArray[index] === totalSection;
+            });
+        },
         updateRole: function() {
             this.loading = true;
+            this.sections.map((section) => {
+                section.actions.map((action, index) => {
+                    if (action['checked'] === true) {
+                        this.roleParam.permission.push(section['value'] + '-' + action['value']);
+                    }
+                })
+            });
             ApiService.POST(ApiRoutes.RoleUpdate, this.roleParam, (res) => {
                 this.loading = false;
                 if (parseInt(res.status) === 200) {
@@ -125,33 +163,21 @@ export default {
                 }
             });
         },
-        switchAllToggle: function(event, actionValue) {
-            this.permissions.sections.map((v) => {
-                let name = v.value + '-' + actionValue;
-                if (event.target.checked) {
-                    $("#" + name).attr('checked', 'checked');
-                    this.roleParam.permission.push(name);
-                } else {
-                    $("#" + name).removeAttr('checked');
-                    this.roleParam.permission.splice(this.roleParam.permission.indexOf(name), 1);
-                }
-            });
-        },
-        switchToggle: function(event, sectionName, actionName) {
-            let name = sectionName + '-' + actionName;
-            if (event.target.checked) {
-                $("#" + name).attr('checked', 'checked');
-                this.roleParam.permission.push(name)
-            } else {
-                $("#" + name).removeAttr('checked');
-                this.roleParam.permission.splice(this.roleParam.permission.indexOf(name), 1);
-            }
+        switchAllToggle: function(index) {
+            setTimeout(() => {
+                this.sections.map((v) => {
+                    v.actions[index].checked = this.actions[index]['checked'];
+                });
+            }, 100)
+
         },
         fetchPermission: function() {
             ApiService.POST(ApiRoutes.PermissionList, this.param, (res) => {
                 this.skeleton = false;
                 if (parseInt(res.status) === 200) {
                     this.permissions = res.data;
+                    this.actions = res.data.actions;
+                    this.sections = res.data.sections;
                 }
             });
         }
@@ -173,5 +199,17 @@ export default {
 .table-responsive {
     max-height: 60vh;
     width: 50%;
+}
+.table-container {
+    max-height: 400px; /* Set your desired table height */
+    overflow-y: auto; /* Enable vertical scrolling */
+    border: 1px solid #ccc; /* Optional: Add a border around the table */
+}
+
+.table thead th {
+    position: sticky;
+    top: 0; /* Fix to the top of the container */
+    z-index: 2; /* Ensure it stays above table body content */
+    background-color: #f8f9fa; /* Optional: Add background color to match the table style */
 }
 </style>

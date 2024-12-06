@@ -31,6 +31,9 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class SaleController extends Controller
 {
@@ -109,11 +112,13 @@ class SaleController extends Controller
                     ->pluck('id')
                     ->toArray();
                 $voucher = Voucher::whereIn('company_id', $companyIds)
-                    ->where('validity', '>=', date('Y-m-d'))
                     ->where('voucher_number', $requestData['voucher_number'])
                     ->first();
                 if (!$voucher instanceof Voucher) {
                     return response()->json(['status' => 500, 'errors' => ['voucher_number' => ['The voucher number is not valid.']]]);
+                }
+                if (Carbon::parse($voucher['validity'])->lessThan(Carbon::now())) {
+                    return response()->json(['status' => 500, 'errors' => ['voucher_number' => ['The voucher number date is expired.']]]);
                 }
                 if ($voucher->status == FuelMatixStatus::DONE && !$requestData['voucher_check']) {
                     return response()->json(['status' => 402, 'message' => 'The voucher number is already used.']);
@@ -356,6 +361,59 @@ class SaleController extends Controller
         $pdf->setPaper('a4', 'landscape');
         return $pdf->output();
     }
+    public function exportExcel(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'ids' => 'required|array',
+            'ids.*' => 'integer|exists:sale,id'
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['status' => 500, 'message' => $validator->errors()]);
+        }
+        $filter = [
+            'keyword' => $request->input('keyword', ''),
+            'start_date' => $request->input('start_date', ''),
+            'end_date' => $request->input('end_date', ''),
+            'ids' => $request->input('ids')
+        ];
+        $paginateData = [
+            'order_by' => $request->input('order_by', 'sale.id'),
+            'order_mode' => $request->input('order_mode', 'DESC'),
+            'limit' => $request->input('limit', 10)
+        ];
+        $result = SaleRepository::saleList($filter, $paginateData);
+        $spreadsheet = new Spreadsheet();
+        $activeWorksheet = $spreadsheet->getActiveSheet();
+        $headers = ['Date', 'Invoice Number', 'Company Name', 'Payment Method', 'Voucher Number', 'Car Number', 'Product Name', 'Quantity', 'Total', 'User'];
+        foreach ($headers as $colIndex => $header) {
+            $column = chr(65 + $colIndex);
+            $activeWorksheet->setCellValue($column . '1', $header);
+            $activeWorksheet->getStyle($column . '1',)->getFont()->setBold(true);
+            $activeWorksheet->getColumnDimension($column)->setWidth(20);
+        }
+        $activeWorksheet->getStyle('A1:J1')
+            ->getFill()
+            ->setFillType(Fill::FILL_SOLID)
+            ->getStartColor()
+            ->setARGB('9BCF41');
+        $rowIndex = 2;
+        foreach ($result as $item) {
+            $activeWorksheet->setCellValue('A' . $rowIndex, $item['date']);
+            $activeWorksheet->setCellValue('B' . $rowIndex, $item['invoice_number']);
+            $activeWorksheet->setCellValue('C' . $rowIndex, $item['company_name']);
+            $activeWorksheet->setCellValue('D' . $rowIndex, $item['payment_method']);
+            $activeWorksheet->setCellValue('E' . $rowIndex, $item['voucher_number']);
+            $activeWorksheet->setCellValue('F' . $rowIndex, $item['car_number']);
+            $activeWorksheet->setCellValue('G' . $rowIndex, $item['product_name']);
+            $activeWorksheet->setCellValue('H' . $rowIndex, $item['quantity']);
+            $activeWorksheet->setCellValue('I' . $rowIndex, $item['total_amount']);
+            $activeWorksheet->setCellValue('J' . $rowIndex, $item['user_name']);
+            $rowIndex++;
+        }
+        // Save and output the file
+        $writer = new Xlsx($spreadsheet);
+        $writer->save('php://output');
+    }
     /**
      * @param Request $request
      * @return JsonResponse
@@ -465,6 +523,25 @@ class SaleController extends Controller
             }
             $payment_category_id = $category['id'];
         }
+        $voucherNo = null;
+        if ($request['payment_method'] == PaymentMethod::COMPANY) {
+            $voucher = Voucher::where('company_id', $request['company_id'])
+                ->where('voucher_number', $request['voucher_number'])
+                ->first();
+            if (!$voucher instanceof Voucher) {
+                return response()->json(['status' => 500, 'errors' => ['voucher_number' => ['The voucher number is not valid.']]]);
+            }
+            $voucherNo = $voucher->voucher_number;
+
+            // Check if prefix exists and concatenate it with the voucher number
+            if (!empty($voucher->prefix) && !empty($voucher->suffix)) {
+                $voucherNo = $voucher->prefix . '-' . $voucherNo . '-' . $voucher->suffix;
+            } elseif (!empty($voucher->prefix)) {
+                $voucherNo = $voucher->prefix . '-' . $voucherNo;
+            } elseif (!empty($voucher->suffix)) {
+                $voucherNo = $voucherNo . '-' . $voucher->suffix;
+            }
+        }
         $driverId = $request['driver_sale']['driver_id'] ?? null;
         $total_amount = array_sum(array_column($inputData['products'], 'subtotal'));
         $sale->total_amount = $total_amount;
@@ -473,6 +550,7 @@ class SaleController extends Controller
         $sale->car_id = $carId ?? null;
         $sale->driver_id = $driverId ?? null;
         $sale->payment_category_id = $payment_category_id;
+        $sale->voucher_number = $voucherNo;
         if ($sale->save()) {
             SaleData::where('sale_id', $inputData['id'])->delete();
             foreach ($inputData['products'] as $product) {
@@ -577,11 +655,19 @@ class SaleController extends Controller
             ->get()
             ->pluck('un_authorized_bill_id')
             ->toArray();
-        $result = Transaction::select('transactions.id','transactions.created_at', 'transactions.linked_id as driver_id', 'transactions.debit_amount as amount', 'c1.name as driver_name', 'c2.name as company_name', 'users.name as user_name')
+        $result = Transaction::select(
+            'transactions.id',
+            'transactions.created_at',
+            'transactions.linked_id as driver_id',
+            'transactions.debit_amount as amount',
+            'c1.name as driver_name',
+            'c2.name as company_name',
+            'users.name as user_name'
+        )
             ->leftJoin('categories as c1', 'c1.id', '=', 'transactions.linked_id')
             ->leftJoin('categories as c2', 'c2.id', '=', 'c1.parent_category')
             ->leftJoin('users', 'users.id', '=', 'transactions.user_id')
-            ->whereIn('transactions.linked_id', $driverId)
+            ->whereIn('transactions.account_id', $driverId)
             ->where('transactions.client_company_id', $sessionUser['client_company_id']);
         if (!empty($keyword)) {
             $result->where(function($q) use ($keyword) {

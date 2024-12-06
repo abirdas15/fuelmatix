@@ -1,7 +1,7 @@
 .header-right {
     height: 100%;
-	
-	
+
+
     .nav-item {
         height: 100%;
         display: flex;
@@ -47,13 +47,13 @@
 			 @include respond('laptop') {
 				padding:0.625rem;
 			 }
-			
+
             i {
                 font-size: 1.5rem;
 				@include respond('laptop') {
 					font-size: 1.125rem;
 				}
-				
+
             }
 			svg{
 				@include respond('laptop') {
@@ -61,7 +61,7 @@
 					height:1.5rem;
 				}
 				@include respond('phone') {
-					width:1.25rem;	
+					width:1.25rem;
 					height:1.25rem;
 				}
 			}
@@ -78,7 +78,7 @@
                 text-align: center;
                 padding: 0.3125rem;
 				font-size: 0.875rem;
-					
+
 				@include respond('laptop') {
 					height: 1.25rem;
 					width: 1.25rem;
@@ -130,9 +130,9 @@
 			border-bottom-left-radius: 3.125rem;
 			&:hover,
 			&:focus{
-				border-color:#EEEEEE;	
+				border-color:#EEEEEE;
 			}
-		}	
+		}
 		.input-group-text{
 			height        : 3.75rem;
 			border-radius : 3.125rem;
@@ -152,8 +152,8 @@
 	}
 	.invoices-btn{
 		@include respond ('phone'){
-			display:none;	
-		}	
+			display:none;
+		}
 	}
 }
 .dlab-fullscreen{
@@ -174,7 +174,7 @@
         min-width: 19.375rem;
         padding: 0rem 0 1rem;
         top: 100%;
-		
+
         .notification_title {
             background: var(--primary);
             color: $white;
@@ -188,7 +188,7 @@
 			width: 2.8125rem ;
 			height: 2.8125rem ;
 			font-size: 1.125rem ;
-			
+
             // &:last-child{
             //     border-bottom: 0rem;
             // }
@@ -242,25 +242,25 @@
             // color: $dark;
             text-align: center;
 			border-top: 0.0625rem solid $light;
-				
+
             i {
                 margin-left: 0.625rem;
             }
         }
     }
-	
+
 }
 	.header-profile {
         &>a.nav-link {
 			padding:0;
 			display: flex;
 			align-items: center;
-			margin-left: 0.9375rem;	
+			margin-left: 0.9375rem;
             i {
                 font-weight: 700;
             }
 			.header-info{
-				padding-left: 0rem;
+				padding-left: 0;
 				text-align: left;
 				@include respond('laptop') {
 					padding-left: 0.625rem;
@@ -312,8 +312,8 @@
             }
         }
         img {
-            width: 3.5rem;
-            height: 3.5rem;
+            width: 2.5rem !important;
+            height: 2.5rem !important;
             border-radius: $radius;
 			@include respond('laptop') {
 				 width: 2.4375rem;

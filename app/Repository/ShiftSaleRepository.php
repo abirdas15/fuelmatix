@@ -492,16 +492,30 @@ class ShiftSaleRepository
         $result['tanks'] = $formattedShiftSale;
 
         // Fetch category details associated with the shift sale
-        $categories = ShiftSaleTransaction::select('shift_sale_transaction.category_id', DB::raw('SUM(shift_sale_transaction.amount) as amount'), 'categories.name')
-            ->leftJoin('categories', 'categories.id', '=', 'shift_sale_transaction.category_id')
+        $categories = ShiftSaleTransaction::select(
+            'shift_sale_transaction.category_id',
+            DB::raw('SUM(shift_sale_transaction.amount) as amount'), 'categories.name',
+            'categories.category_ids'
+        )
+            ->join('categories', 'categories.id', '=', 'shift_sale_transaction.category_id')
             ->where('shift_id', $id)
             ->where('client_company_id', $sessionUser['client_company_id'])
             ->groupBy('shift_sale_transaction.category_id')
             ->get()
             ->toArray();
 
+        $accountReceivable = Category::select('id')
+            ->where('slug', strtolower(AccountCategory::ACCOUNT_RECEIVABLE))
+            ->where('client_company_id', $sessionUser['client_company_id'])
+            ->first();
+
+        $totalCompanySale = 0;
         // Format the category amounts
         foreach ($categories as &$category) {
+            $categoryIds = json_decode($category['category_ids'], true);
+            if (in_array($accountReceivable['id'], $categoryIds)) {
+                $totalCompanySale += $category['amount'];
+            }
             $category['amount'] = number_format($category['amount'], $sessionUser['currency_precision']);
         }
 
@@ -515,6 +529,7 @@ class ShiftSaleRepository
         // Format the consumption and amount fields
         $result['consumption'] = !empty($result['consumption']) ? number_format($result['consumption'], $sessionUser['currency_precision']) : '';
         $result['amount'] = !empty($result['amount']) ? number_format($result['amount'], $sessionUser['currency_precision']) : '';
+        $result['company_sale'] = !empty($totalCompanySale) ? number_format($totalCompanySale, $sessionUser['currency_precision']) : '';
 
         // Return the result with all formatted data
         return $result;

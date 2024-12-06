@@ -516,6 +516,10 @@ class ReportRepository
      */
     public static function stockSummary(string $date): array
     {
+
+        $date = explode('to ', $date);
+        $startDate = Carbon::parse($date[0], SessionUser::TIMEZONE)->startOfDay();
+        $endDate = isset($date[1]) ? Carbon::parse($date[1], SessionUser::TIMEZONE)->endOfDay() : Carbon::parse($date[0], SessionUser::TIMEZONE)->endOfDay();
         $sessionUser = SessionUser::getUser();
         $products = Product::select('products.id', 'products.name as product_name', 'product_types.tank', 'products.selling_price')
             ->leftJoin('product_types', 'product_types.id', '=', 'products.type_id')
@@ -531,8 +535,6 @@ class ReportRepository
             ->get()
             ->toArray();
         $productIds = array_column($products, 'id');
-        $startDate = Carbon::parse($date, SessionUser::TIMEZONE)->startOfDay();
-        $endDate = Carbon::parse($date, SessionUser::TIMEZONE)->endOfDay();
 
         $shiftId = ShiftTotal::select('id')
             ->where('client_company_id', $sessionUser['client_company_id'])
@@ -606,7 +608,7 @@ class ReportRepository
         $tankRefill = TankRefillTotal::select(DB::raw('SUM(tank_refill.dip_sale) as volume'), 'tank_refill.tank_id')
             ->leftJoin('tank_refill', 'tank_refill.refill_id', '=', 'tank_refill_total.id')
             ->where('tank_refill_total.client_company_id', $sessionUser['client_company_id'])
-            ->where('tank_refill_total.date', $date)
+            ->whereBetween('tank_refill_total.date', [$startDate, $endDate])
             ->get()
             ->keyBy('tank_id')
             ->toArray();
@@ -676,10 +678,11 @@ class ReportRepository
             ->leftJoin('transactions as t1', 't1.id', '=', 'transactions.linked_id')
             ->leftJoin('categories', 'categories.id', '=', 'transactions.account_id')
             ->leftJoin('categories as c1', 'c1.id', '=', 't1.account_id')
-            ->where('transactions.date', $date)
+            ->whereBetween('transactions.date', [$startDate, $endDate])
             ->whereJsonContains('categories.category_ids', $accountReceivable->id)
             ->where('transactions.client_company_id', $sessionUser['client_company_id'])
-            ->groupBy('transactions.id')
+            ->groupBy('transactions.account_id')
+            ->groupBy('c1.id')
             ->get()
             ->toArray();
         $totalQuantity = 0;
@@ -999,17 +1002,26 @@ class ReportRepository
     public static function driverReport(array $filter): array
     {
         $sessionUser = SessionUser::getUser();
-        $result = Transaction::select('transactions.id', 'categories.name as company_name', 'transactions.date', 'car.car_number', 'transactions.voucher_no', 'transactions.credit_amount as bill', DB::raw('transactions.quantity'))
-            ->leftJoin('car', 'car.id', '=', 'transactions.car_id')
+        $result = Transaction::select(
+            'transactions.id',
+            'categories.name as company_name',
+            'transactions.date',
+            'car.car_number',
+            'transactions.voucher_no',
+            'transactions.credit_amount as bill',
+            DB::raw('transactions.quantity')
+        )
+            ->join('car', 'car.id', '=', 'transactions.car_id')
             ->leftJoin('transactions as t1', 't1.linked_id', '=', 'transactions.id')
             ->leftJoin('categories', 'categories.id', '=', 't1.account_id')
             ->whereBetween('transactions.date', [$filter['start_date'], $filter['end_date']])
             ->where('transactions.client_company_id', $sessionUser['client_company_id'])
+            ->having('credit_amount', '>', 0)
             ->whereNotNull('transactions.car_id');
 
-        if (!empty($companyId)) {
-            $result->where(function($q) use ($companyId){
-                $q->where('transactions.account_id', $companyId);
+        if (!empty($filter['company_id'])) {
+            $result->where(function($q) use ($filter){
+                $q->where('t1.account_id', $filter['company_id']);
             });
         }
         if (!empty($filter['car_number'])) {

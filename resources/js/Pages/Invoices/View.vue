@@ -17,9 +17,19 @@
                     </div>
                     <div class="card-body">
                         <div class="row">
-                            <div class="col-sm-12 text-end">
-                                <button class="btn btn-primary" @click="downloadInvoice" v-if="!download">Download Invoice</button>
-                                <button class="btn btn-primary" v-if="download">Downloading....</button>
+                            <div class="col-sm-6 text-end d-flex">
+                               <div class="me-2">
+                                   <button class="btn btn-primary" @click="downloadInvoice" v-if="!download">
+                                       <i class="fa fa-file-pdf-o" aria-hidden="true"></i>
+                                   </button>
+                                   <button class="btn btn-primary" v-if="download"><i class="fa fa-file-pdf-o" aria-hidden="true"></i>....</button>
+                               </div>
+                                <div class="me-2">
+                                    <button class="btn btn-primary" @click="downloadInvoiceExcel" v-if="!excelLoading">
+                                        <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                                    </button>
+                                    <button class="btn btn-primary" v-if="excelLoading"><i class="fa fa-file-excel-o" aria-hidden="true"></i>....</button>
+                                </div>
                             </div>
                         </div>
                         <div class="basic-form">
@@ -143,7 +153,8 @@ export default {
             company_id: '',
             Loading: false,
             selectedItemId: '',
-            invoice_number: ''
+            invoice_number: '',
+            excelLoading: false,
         }
     },
     watch: {
@@ -177,6 +188,17 @@ export default {
                 if (parseInt(res.status) === 200) {
                     this.param = res.data
                 }
+            });
+        },
+        downloadInvoiceExcel() {
+            this.excelLoading = true
+            ApiService.DOWNLOAD(ApiRoutes.invoiceDownloadExcel, {id: this.id},'',res => {
+                this.excelLoading = false
+                let blob = new Blob([res], {type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+                const link = document.createElement('a');
+                link.href = window.URL.createObjectURL(blob);
+                link.download = 'invoice.xlsx';
+                link.click();
             });
         },
         downloadInvoice: function () {

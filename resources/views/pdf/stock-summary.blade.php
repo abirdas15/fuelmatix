@@ -27,9 +27,9 @@
                     <th>Nozzle</th>
                     <th>Current Meter</th>
                     <th>Previous Meter</th>
-                    <th>Sale</th>
+                    <th style="width: 20%">Sale</th>
                     <th>Unit Price</th>
-                    <th>Amount</th>
+                    <th style="width: 20%">Amount</th>
                 </tr>
                 @foreach($product['tanks'] as $tank)
                     @foreach($tank['dispensers'] as $dispenser)
@@ -69,7 +69,7 @@
                 <tbody>
                     <tr class="bg-custom">
                         <th colspan="5" class="text-end">Grand Total</th>
-                        <th class="text-end">{{ $data['total']['grandTotal'] }}</th>
+                        <th style="width: 20%" class="text-end">{{ $data['total']['grandTotal'] }}</th>
                     </tr>
                 </tbody>
             </table>
@@ -159,7 +159,7 @@
                 <td style="text-align: right">{{ $data['total']['paid_amount'] }}</td>
             </tr>
         </table>
-        <div class="text-center"><h2>Product Sale</h2></div>
+        <div class="text-center"><h2>Credit Company Product Sale</h2></div>
         <table class="print-details">
             <tr>
                 <th>Product Name</th>

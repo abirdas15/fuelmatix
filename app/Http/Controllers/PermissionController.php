@@ -15,20 +15,35 @@ class PermissionController extends Controller
      */
     public function getAllPermission(Request $request): JsonResponse
     {
-        $action = Action::getArray();
+        // Get default actions from AccountBookAction
+        $actions = Action::getArray();
         $actionArray = [];
-        foreach ($action as $name) {
+        $actionChecked = [];
+
+        // Generate action arrays with initial checked state
+        foreach ($actions as $name) {
             $actionArray[] = [
                 'name' => ucfirst($name),
-                'value' => $name
+                'value' => $name,
+                'checked' => false
+            ];
+            $actionChecked[] = [
+                'name' => ucfirst($name),
+                'value' => $name,
+                'checked' => false,
             ];
         }
-        $section = Section::getArray();
+
+        // Get default sections from AccountBookSection
+        $sections = Section::getArray();
         $sectionArray = [];
-        foreach ($section as $name) {
+
+        // Generate section arrays with associated actions
+        foreach ($sections as $name) {
             $sectionArray[] = [
                 'name' => str_replace('-', ' ', ucfirst($name)),
-                'value' => $name
+                'value' => $name,
+                'actions' => $actionChecked
             ];
         }
         return response()->json([

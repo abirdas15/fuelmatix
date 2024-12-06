@@ -105,6 +105,15 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="form-group row mb-3">
+                                <label class="col-md-4" for="voucherCheck">Invoice QR Code</label>
+                                <div class="col-md-8">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="voucherCheck" v-model="params.invoice_qr_code">
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

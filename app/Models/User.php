@@ -61,7 +61,8 @@ class User extends Authenticatable
             'company_name' => $clientCompany->name ?? '',
             'permission' => $permission,
             'currency_precision' => $clientCompany->currency_precision,
-            'quantity_precision' => $clientCompany->quantity_precision
+            'quantity_precision' => $clientCompany->quantity_precision,
+            'invoice_qr_code' => $clientCompany->invoice_qr_code
         ];
     }
     public static function findUserByToken()

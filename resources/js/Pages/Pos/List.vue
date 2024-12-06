@@ -25,9 +25,23 @@
                                         <span class="btn-icon-start text-info"><i class="fa fa-filter color-white"></i></span>Filter
                                     </button>
                                 </div>
-                                <div class="col-xl-3 mb-3" v-if="Param.ids.length > 0">
-                                    <button class="btn btn-primary" v-if="!loadingFile" @click="downloadPdf"><i class="fa fa-print" aria-hidden="true"></i>&nbsp;Print</button>
-                                    <button class="btn btn-primary" v-if="loadingFile"><i class="fa fa-print" aria-hidden="true"></i>&nbsp;Print...</button>
+                                <div class="col-xl-3 mb-3 d-flex" v-if="Param.ids.length > 0">
+                                    <div class="me-2">
+                                        <button class="btn btn-primary" v-if="!loadingFile" @click="downloadPdf">
+                                            <i class="fa fa-file-pdf-o" aria-hidden="true"></i>
+                                        </button>
+                                        <button class="btn btn-primary" v-if="loadingFile">
+                                            <i class="fa fa-file-pdf-o" aria-hidden="true">...</i>
+                                        </button>
+                                    </div>
+                                    <div class="me-2">
+                                        <button class="btn btn-primary" v-if="!excelLoading" @click="downloadExcel">
+                                            <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                                        </button>
+                                        <button class="btn btn-primary" v-if="excelLoading">
+                                            <i class="fa fa-file-excel-o" aria-hidden="true">...</i>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                             <div class="row mt-4">
@@ -185,9 +199,9 @@
                     Thank you for your visit!
                 </p>
             </section>
-<!--            <section style="margin-top: 10px; text-align: center">-->
-<!--                <qrcode-vue :value="value" :size="100" level="H" render-as="svg"></qrcode-vue>-->
-<!--            </section>-->
+            <section style="margin-top: 10px; text-align: center" v-if="Auth.invoice_qr_code === 1">
+                <qrcode-vue :value="value" :size="50" level="H" render-as="svg"></qrcode-vue>
+            </section>
             <section style="text-align: center">
                 <sub>
                     Powered By : <span>Fuel Matix</span>
@@ -227,6 +241,7 @@ export default {
                 start_date: '',
                 end_date: ''
             },
+            excelLoading: false,
             Loading: false,
             TableLoading: false,
             listData: [],
@@ -399,6 +414,18 @@ export default {
         },
     },
     methods: {
+        downloadExcel() {
+            this.excelLoading = true;
+            ApiService.ClearErrorHandler();
+            ApiService.DOWNLOAD(ApiRoutes.SaleList + '/export/excel', this.Param,'',res => {
+                this.excelLoading = false
+                let blob = new Blob([res], {type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+                const link = document.createElement('a');
+                link.href = window.URL.createObjectURL(blob);
+                link.download = 'Sale List.xlsx';
+                link.click();
+            });
+        },
         downloadPdf: function() {
             this.loadingFile = true
             ApiService.ClearErrorHandler();

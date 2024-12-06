@@ -25,7 +25,7 @@
 </div>
 
 
-<script src="{{ asset('admin/js/app.js?version=1.0') }}"></script>
+<script src="{{ asset('admin/js/app.js?version=1.1') }}"></script>
 <script src="{{ asset('admin/assets/js/bootstrap.bundle.min.js') }}"></script>
 <!--plugins-->
 <script src="{{ asset('admin/assets/js/jquery.min.js') }}"></script>

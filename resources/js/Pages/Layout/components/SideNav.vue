@@ -109,7 +109,7 @@
                     </a>
                     <ul aria-expanded="false" class="bichi">
                         <li v-if="CheckPermission(Section.DAILY_REPORT + '-' + Action.VIEW)">
-                            <router-link :to="{name: 'dailyReport'}" >Daily Report
+                            <router-link :to="{name: 'StockSummary'}" >Daily Report
                             </router-link>
                         </li>
                         <li v-if="CheckPermission(Section.BALANCE_SHEET + '-' + Action.VIEW)">
@@ -147,10 +147,10 @@
                             <router-link :to="{name: 'salesReport'}" >Sales Report
                             </router-link>
                         </li>
-                        <li v-if="CheckPermission(Section.SALES_STOCK + '-' + Action.VIEW)">
-                            <router-link :to="{name: 'StockSummary'}" >Sale Stock & Sale Summary
-                            </router-link>
-                        </li>
+<!--                        <li v-if="CheckPermission(Section.SALES_STOCK + '-' + Action.VIEW)">-->
+<!--                            <router-link :to="{name: 'StockSummary'}" >Sale Stock & Sale Summary-->
+<!--                            </router-link>-->
+<!--                        </li>-->
                         <li v-if="CheckPermission(Section.VENDOR_REPORT + '-' + Action.VIEW)">
                             <router-link :to="{name: 'VendorReport'}" >Vendor Report
                             </router-link>

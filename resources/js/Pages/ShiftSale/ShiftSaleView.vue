@@ -132,6 +132,10 @@
                                                     <td style="font-size: 18px;padding: 0;" class="">{{category.name}}:</td>
                                                     <td style="font-size: 18px;padding: 0;" class="text-end ">{{category.amount}} Tk</td>
                                                 </tr>
+                                                <tr>
+                                                    <th style="font-size: 18px;padding: 0;">Total Company Sale</th>
+                                                    <th style="font-size: 18px;padding: 0;">{{ shiftSale.company_sale }}</th>
+                                                </tr>
                                             </table>
                                         </div>
                                     </div>

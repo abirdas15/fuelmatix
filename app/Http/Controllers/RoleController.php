@@ -2,6 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Common\AccountBookAction;
+use App\Common\AccountBookSection;
+use App\Common\Action;
+use App\Common\Section;
 use App\Helpers\SessionUser;
 use App\Models\Permission;
 use App\Models\Role;
@@ -74,8 +78,48 @@ class RoleController extends Controller
         if ($validator->fails()) {
             return response()->json(['status' => 500, 'errors' => $validator->errors()]);
         }
-        $result = Role::select('id', 'name')->where('id', $requestData['id'])->first();
-        $result['permission'] = Permission::select('name')->where('role_id', $requestData['id'])->get()->pluck('name')->toArray();
+        // Retrieve basic role information
+        $result = Role::select('id', 'name')->where('id', $request['id'])->first();
+
+        // Retrieve permissions associated with the role
+        $permissions = Permission::select('name')->where('role_id', $request['id'])->get()->pluck('name')->toArray();
+
+        // Prepare arrays for sections and actions with initial values
+        $action = Action::getArray();
+        $actionChecked = [];
+        foreach ($action as $name) {
+            $actionChecked[] = [
+                'name' => ucfirst($name),
+                'value' => $name,
+                'checked' => false,
+            ];
+        }
+
+        // Prepare arrays for sections with actions and initial values
+        $section = Section::getArray();
+        $sectionArray = [];
+        foreach ($section as $name) {
+            $sectionArray[] = [
+                'name' => str_replace('-', ' ', ucfirst($name)),
+                'value' => $name,
+                'actions' => $actionChecked
+            ];
+        }
+
+        // Mark actions as checked if they are in the permissions array
+        foreach ($sectionArray as &$section) {
+            foreach ($section['actions'] as &$action) {
+                $sectionName = $section['value'] . '-' . $action['value'];
+                if (in_array($sectionName, $permissions)) {
+                    $action['checked'] = true;
+                }
+            }
+        }
+
+        // Attach sections with actions to the role information
+        $result['sections'] = $sectionArray;
+
+        // Return the complete detailed role information
         return response()->json(['status' => 200, 'data' => $result]);
     }
     /**

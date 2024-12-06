@@ -98,8 +98,10 @@ class CategoryController extends Controller
             ->toArray();
         foreach ($result as &$data) {
             $category = json_decode($data['category_hericy']);
-            $data['name'] = implode(' --> ', $category);
-            unset($data['category_hericy']);
+            if (count($category) > 0) {
+                $data['name'] = implode(' --> ', $category);
+                unset($data['category_hericy']);
+            }
         }
         usort($result, function ($item1, $item2) {
             return $item1['name'] <=> $item2['name'];

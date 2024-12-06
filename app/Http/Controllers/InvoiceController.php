@@ -26,6 +26,9 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class InvoiceController extends Controller
 {
@@ -311,6 +314,82 @@ class InvoiceController extends Controller
         $invoice = self::getSingleInvoice($invoice);
         $pdf = Pdf::loadView('pdf.invoice', ['data' => $invoice]);
         return $pdf->output();
+    }
+    public function downloadExcel(Request $request)
+    {
+        $requestData = $request->all();
+        $validator = Validator::make($requestData, [
+            'id' => 'required'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['status' => 500, 'errors' => $validator->errors()]);
+        }
+
+        $invoice = Invoice::find($requestData['id']);
+        if (!$invoice instanceof Invoice) {
+            return response()->json(['status' => 500, 'error' => 'Cannot find invoice.']);
+        }
+
+        // Generate invoice data
+        $invoiceData = self::getSingleInvoice($invoice);
+
+        // Create a new Spreadsheet instance
+        $spreadsheet = new Spreadsheet();
+        $activeWorksheet = $spreadsheet->getActiveSheet();
+        $activeWorksheet->getColumnDimension('A')->setWidth(30);
+        $activeWorksheet->setCellValue('A1', $invoiceData['company']['name']);
+        $activeWorksheet->setCellValue('A2', $invoiceData['company']['address']);
+        $activeWorksheet->setCellValue('A3', "Phone: " . $invoiceData['company']['phone']);
+        $activeWorksheet->setCellValue('A4', "Email: " . $invoiceData['company']['email']);
+
+        $activeWorksheet->setCellValue('A7', 'Bill To');
+        $activeWorksheet->setCellValue('A8', $invoiceData['customer_company']['name']);
+        $activeWorksheet->setCellValue('A9', $invoiceData['customer_company']['address']);
+        $activeWorksheet->setCellValue('A10', "Phone: " . $invoiceData['customer_company']['phone']);
+        $activeWorksheet->setCellValue('A11', "Email: " . $invoiceData['customer_company']['email']);
+
+        $activeWorksheet->setCellValue('D4', 'Invoice #');
+        $activeWorksheet->getStyle('D4')->getFont()->setBold(true);
+        $activeWorksheet->setCellValue('D5', $invoiceData['invoice_number']);
+        $activeWorksheet->setCellValue('E4', 'Invoice Date');
+        $activeWorksheet->getStyle('E4')->getFont()->setBold(true);
+        $activeWorksheet->setCellValue('E5', $invoiceData['date']);
+
+        $activeWorksheet->mergeCells('D3:E3');
+        $activeWorksheet->getColumnDimension('D')->setWidth(15);
+
+        // Set the value for the merged cell
+        $activeWorksheet->setCellValue('D3', 'Invoice');
+
+        // Optionally, you can style the merged cell (e.g., centering the text)
+        $activeWorksheet->getStyle('D3')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $activeWorksheet->getStyle('D3')->getFont()->setBold(true);
+
+        // Add headers to the Excel sheet
+        $headers = ['Date', 'Product', 'Car Number', 'Voucher No', 'Quantity', 'Unit Price', 'Total'];
+        foreach ($headers as $colIndex => $header) {
+            $column = chr(65 + $colIndex);
+            $activeWorksheet->setCellValue($column . '13', $header);
+            $activeWorksheet->getStyle($column . '13',)->getFont()->setBold(true);
+            $activeWorksheet->getColumnDimension($column)->setWidth(15);
+        }
+
+        // Add data rows
+        $rowIndex = 14;
+        foreach ($invoiceData['invoice_item'] as $item) {
+            $activeWorksheet->setCellValue('A' . $rowIndex, $item['invoice_date']);
+            $activeWorksheet->setCellValue('B' . $rowIndex, $item['product_name']);
+            $activeWorksheet->setCellValue('C' . $rowIndex, $item['car_number']);
+            $activeWorksheet->setCellValue('D' . $rowIndex, $item['voucher_no']);
+            $activeWorksheet->setCellValue('E' . $rowIndex, $item['quantity']);
+            $activeWorksheet->setCellValue('F' . $rowIndex, $item['price']);
+            $activeWorksheet->setCellValue('G' . $rowIndex, $item['subtotal']);
+            $rowIndex++;
+        }
+        // Save and output the file
+        $writer = new Xlsx($spreadsheet);
+        $writer->save('php://output');
     }
 
     /**

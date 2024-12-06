@@ -22,7 +22,10 @@
                 <th>Date</th>
                 <th>Card Name</th>
                 <th>Voucher Number</th>
-                <th>Card Number/Transaction ID</th>
+                <th>
+                    Card Number/<br>
+                    Transaction ID
+                </th>
                 <th>Product Name</th>
                 <th>Quantity</th>
                 <th>Price</th>
