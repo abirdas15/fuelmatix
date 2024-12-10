@@ -23,9 +23,23 @@
                             <button class="btn btn-primary" v-if="!loading" @click="getReport">Filter</button>
                             <button class="btn btn-primary" v-if="loading">Filtering....</button>
                         </div>
-                        <div class="col-sm-2 ms-auto">
-                            <button class="btn btn-primary" v-if="!loadingFile" @click="downloadPdf"><i class="fa fa-print" aria-hidden="true"></i>&nbsp;Print</button>
-                            <button class="btn btn-primary" v-if="loadingFile"><i class="fa fa-print" aria-hidden="true"></i>&nbsp;Print...</button>
+                        <div class="col-sm-2 ms-auto d-flex">
+                            <div class="me-2">
+                                <button class="btn btn-primary" v-if="!loadingFile" @click="downloadPdf">
+                                    <i class="fa fa-file-pdf-o" aria-hidden="true"></i>
+                                </button>
+                                <button class="btn btn-primary" v-if="loadingFile">
+                                    <i class="fa fa-file-pdf-o" aria-hidden="true">...</i>
+                                </button>
+                            </div>
+                            <div class="me-2">
+                                <button class="btn btn-primary" v-if="!excelLoading" @click="downloadExcel">
+                                    <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                                </button>
+                                <button class="btn btn-primary" v-if="excelLoading">
+                                    <i class="fa fa-file-excel-o" aria-hidden="true">...</i>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -347,7 +361,8 @@ export default {
             total: {},
             loadingFile: false,
             loading: false,
-            shifts: []
+            shifts: [],
+            excelLoading: false,
         }
     },
     watch:{
@@ -356,6 +371,18 @@ export default {
         }
     },
     methods: {
+        downloadExcel() {
+            this.excelLoading = true;
+            ApiService.ClearErrorHandler();
+            ApiService.DOWNLOAD(ApiRoutes.Report + '/stockSummary/export/excel', this.param,'',(res) => {
+                this.excelLoading = false
+                let blob = new Blob([res], {type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+                const link = document.createElement('a');
+                link.href = window.URL.createObjectURL(blob);
+                link.download = 'StockSummary.xlsx';
+                link.click();
+            });
+        },
         fetchShift: function() {
             ApiService.POST(ApiRoutes.GetShiftByDate, {date: this.param.date}, (res) => {
                 if (parseInt(res.status) === 200) {

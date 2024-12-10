@@ -60,6 +60,7 @@ class Section
     const DRIVER_REPORT = 'Driver-Report';
     const BILL_SUMMARY = 'Bill-Summary';
     const POS_REPORT = 'Pos-Report';
+    const STAFF_LOAN = 'Staff-Loan';
 
     /**
      * @return array
@@ -123,6 +124,7 @@ class Section
             'DRIVER_REPORT' => self::DRIVER_REPORT,
             'BILL_SUMMARY' => self::BILL_SUMMARY,
             'POS_REPORT' => self::POS_REPORT,
+            'STAFF_LOAN' => self::STAFF_LOAN,
         ];
     }
 }

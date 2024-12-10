@@ -55,6 +55,7 @@ const Section= {
     DRIVER_REPORT: 'Driver-Report',
     BILL_SUMMARY: 'Bill-Summary',
     POS_REPORT: 'Pos-Report',
+    STAFF_LOAN: 'Staff-Loan',
 
 }
 export default Section;

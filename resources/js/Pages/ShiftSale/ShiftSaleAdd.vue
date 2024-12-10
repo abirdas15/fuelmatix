@@ -242,8 +242,7 @@
                                                                             :value="n.end_reading === 0 ? '' : n.end_reading"
                                                                             @click="enableInput('frReading'+nIndex+dIndex)"
                                                                             @input="updateEndReading($event, tankIndex, dIndex, nIndex)"
-                                                                            @keydown="onKeyDown($event, nIndex, dIndex)"
-                                                                            :minFractionDigits="quantityFractionDigit"
+                                                                            @keyup="preventArrowKeyIncrement"
                                                                             :maxFractionDigits="quantityFractionDigit"
                                                                         />
 <!--                                                                        <input-->
@@ -413,8 +412,7 @@
                                                         <InputNumber
                                                             v-model="category.amount"
                                                             :id="'categories.'+index+'.amount'"
-                                                            @input="categoryInput($event, index); preventArrowKeyIncrement"
-                                                            :minFractionDigits="numberFractionDigit"
+                                                            @input="categoryInput($event, index);"
                                                             :maxFractionDigits="numberFractionDigit"
                                                             :name="'categories.'+index+'.amount'"
                                                             placeholder="Amount here"

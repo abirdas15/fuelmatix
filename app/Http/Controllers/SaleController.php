@@ -650,11 +650,9 @@ class SaleController extends Controller
         $sessionUser = SessionUser::getUser();
         $limit = $request['limit'] ?? 10;
         $keyword = $request['keyword'] ?? '';
-        $driverId = Driver::select('un_authorized_bill_id')
-            ->where('client_company_id', $sessionUser['client_company_id'])
-            ->get()
-            ->pluck('un_authorized_bill_id')
-            ->toArray();
+        $unauthorizedCategory = Category::where('client_company_id', $sessionUser['client_company_id'])
+            ->where('slug', strtolower(AccountCategory::UN_AUTHORIZED_BILL))
+            ->first();
         $result = Transaction::select(
             'transactions.id',
             'transactions.created_at',
@@ -664,10 +662,10 @@ class SaleController extends Controller
             'c2.name as company_name',
             'users.name as user_name'
         )
-            ->leftJoin('categories as c1', 'c1.id', '=', 'transactions.linked_id')
+            ->leftJoin('categories as c1', 'c1.id', '=', 'transactions.account_id')
             ->leftJoin('categories as c2', 'c2.id', '=', 'c1.parent_category')
             ->leftJoin('users', 'users.id', '=', 'transactions.user_id')
-            ->whereIn('transactions.account_id', $driverId)
+            ->whereJsonContains('c1.category_ids', $unauthorizedCategory->id)
             ->where('transactions.client_company_id', $sessionUser['client_company_id']);
         if (!empty($keyword)) {
             $result->where(function($q) use ($keyword) {

@@ -299,6 +299,7 @@ Route::group(['middleware' => 'auth:api'], function() {
         Route::group(['prefix' => 'stockSummary'], function() {
             Route::post('/', [ReportController::class, 'stockSummary']);
             Route::post('export/pdf', [ReportController::class, 'stockSummaryExportPDF']);
+            Route::post('export/excel', [ReportController::class, 'stockSummaryExportExcel']);
         });
         Route::group(['prefix' => 'vendor'], function() {
             Route::post('export/pdf', [ReportController::class, 'vendorReportExportPDF']);

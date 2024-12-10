@@ -72,7 +72,7 @@
                         <li v-if="CheckPermission(Section.EMPLOYEE + '-' + Action.VIEW)"><router-link :to="{name: 'employee'}">Employees </router-link></li>
                         <li v-if="CheckPermission(Section.SALARY + '-' + Action.VIEW)"><router-link :to="{name: 'salary'}">Salary </router-link></li>
                         <li v-if="CheckPermission(Section.ATTENDANCE + '-' + Action.VIEW)"><a href="javascript:void(0)">Attendance</a></li>
-                        <li><router-link :to="{name: 'StaffLoanList'}">Loan</router-link></li>
+                        <li v-if="CheckPermission(Section.STAFF_LOAN + '-' + Action.VIEW)"><router-link :to="{name: 'StaffLoanList'}">Loan</router-link></li>
                     </ul>
                 </li>
                 <li><a class="has-arrow " href="javascript:void(0)" aria-expanded="false">

@@ -97,14 +97,16 @@ class CategoryController extends Controller
         $result = $result->get()
             ->toArray();
         foreach ($result as &$data) {
-            $category = json_decode($data['category_hericy']);
+            $category = !empty($data['category_hericy']) ? json_decode($data['category_hericy']) : [];
             if (count($category) > 0) {
                 $data['name'] = implode(' --> ', $category);
                 unset($data['category_hericy']);
             }
         }
         usort($result, function ($item1, $item2) {
-            return $item1['name'] <=> $item2['name'];
+            if (!empty($item1['name']) && !empty($item2['name'])) {
+                return $item1['name'] <=> $item2['name'];
+            }
         });
         return response()->json([
             'status' => 200,

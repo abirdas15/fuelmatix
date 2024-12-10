@@ -22,6 +22,11 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\Style\Color;
+use PhpOffice\PhpSpreadsheet\Style\Font;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
 
 class ReportController extends Controller
 {
@@ -381,6 +386,372 @@ class ReportController extends Controller
             'print_at' => Carbon::now()->format('F j, Y h:i A')
         ]);
         return $pdf->output();
+    }
+    public function stockSummaryExportExcel(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'date' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 500,
+                'errors' => $validator->errors()
+            ]);
+        }
+        $sessionUser = SessionUser::getUser();
+        $company = ClientCompany::where('id', $sessionUser['client_company_id'])->first();
+        $data = ReportRepository::stockSummary($request->input('date'));
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+// Set the header
+        $sheet->setCellValue('A1', 'Stock Summary');
+        $sheet->setCellValue('A2', 'Date: ' . $request->input('date'));
+
+// Apply bold style for headers
+        $headerFont = [
+            'font' => [
+                'bold' => true,
+                'size' => 12,
+            ],
+        ];
+
+// Set header styles
+        $sheet->getStyle('A1')->applyFromArray($headerFont);
+        $sheet->getStyle('A2')->applyFromArray($headerFont);
+
+        $row = 4; // Start from the 4th row
+
+// Iterate through products to display stock details
+        foreach ($data['data'] as $product) {
+            $sheet->setCellValue('A' . $row, $product['product_name']);
+            $sheet->getStyle('A' . $row)->applyFromArray($headerFont);
+            $row++;
+
+            // Table Header
+            $sheet->setCellValue('A' . $row, 'Nozzle');
+            $sheet->setCellValue('B' . $row, 'Current Meter');
+            $sheet->setCellValue('C' . $row, 'Previous Meter');
+            $sheet->setCellValue('D' . $row, 'Sale');
+            $sheet->setCellValue('E' . $row, 'Unit Price');
+            $sheet->setCellValue('F' . $row, 'Amount');
+
+            // Apply background color for the header
+            $sheet->getStyle('A' . $row . ':F' . $row)->applyFromArray([
+                'font' => ['bold' => true],
+                'fill' => [
+                    'fillType' => Fill::FILL_SOLID,
+                    'color' => ['argb' => Color::COLOR_YELLOW],
+                ],
+            ]);
+            $row++;
+
+            foreach ($product['tanks'] as $tank) {
+                foreach ($tank['dispensers'] as $dispenser) {
+                    foreach ($dispenser['nozzle'] as $nozzle) {
+                        $sheet->setCellValue('A' . $row, $nozzle['nozzle_name']);
+                        $sheet->setCellValue('B' . $row, $nozzle['end_reading_format']);
+                        $sheet->setCellValue('C' . $row, $nozzle['start_reading_format']);
+                        $sheet->setCellValue('D' . $row, $nozzle['sale_format']);
+                        $sheet->setCellValue('E' . $row, $nozzle['unit_price_format']);
+                        $sheet->setCellValue('F' . $row, $nozzle['amount_format']);
+                        $row++;
+                    }
+                }
+            }
+
+            // Subtotal
+            $sheet->setCellValue('D' . $row, 'Sub Total:');
+            $sheet->setCellValue('E' . $row, $product['total']);
+            $sheet->setCellValue('F' . $row, $product['subtotal_amount']);
+            $sheet->getStyle('D' . $row)->applyFromArray($headerFont);
+            $row++;
+
+            // Less adjustment
+            $sheet->setCellValue('D' . $row, 'Less: Meter Test');
+            $sheet->setCellValue('E' . $row, $product['adjustment']);
+            $sheet->setCellValue('F' . $row, $product['adjustment_amount']);
+            $sheet->getStyle('D' . $row)->applyFromArray($headerFont);
+            $row++;
+
+            // Total
+            $sheet->setCellValue('D' . $row, 'Total');
+            $sheet->setCellValue('E' . $row, $product['total_sale']);
+            $sheet->setCellValue('F' . $row, $product['total_amount']);
+            $sheet->getStyle('D' . $row)->applyFromArray($headerFont);
+            $row++;
+        }
+
+// Grand Total
+        $sheet->setCellValue('E' . $row, 'Grand Total:');
+        $sheet->setCellValue('F' . $row, $data['total']['grandTotal']);
+        $sheet->getStyle('E' . $row)->applyFromArray($headerFont);
+        $row += 2; // Add some space before the next section
+
+// Received and Under Tank Summary
+        $sheet->setCellValue('A' . $row, 'Received and Under Tank Summary');
+        $sheet->getStyle('A' . $row)->applyFromArray($headerFont);
+        $row++;
+        $sheet->setCellValue('A' . $row, 'U/Tank Name');
+        $sheet->setCellValue('B' . $row, 'Previous Balance');
+        $sheet->setCellValue('C' . $row, 'Receive');
+        $sheet->setCellValue('D' . $row, 'Total');
+        $sheet->setCellValue('E' . $row, 'Gain/Loss Ratio');
+
+// Apply background color for the header
+        $sheet->getStyle('A' . $row . ':E' . $row)->applyFromArray([
+            'font' => ['bold' => true],
+            'fill' => [
+                'fillType' => Fill::FILL_SOLID,
+                'color' => ['argb' => Color::COLOR_YELLOW],
+            ],
+        ]);
+        $row++;
+
+        foreach ($data['data'] as $product) {
+            $sheet->setCellValue('A' . $row, $product['product_name']);
+            $sheet->setCellValue('B' . $row, $product['end_reading']);
+            $sheet->setCellValue('C' . $row, $product['tank_refill']);
+            $sheet->setCellValue('D' . $row, $product['total_by_product']);
+            $sheet->setCellValue('E' . $row, $product['gain_loss_format']);
+            $row++;
+
+            // Under Tank details
+            $sheet->setCellValue('A' . $row, $product['product_name'] . ' Under Tank');
+            $sheet->getStyle('A' . $row)->applyFromArray($headerFont);
+            $row++;
+            $sheet->setCellValue('A' . $row, 'U/Tank Name');
+            $sheet->setCellValue('B' . $row, 'U/Tank as per DIP');
+            $sheet->setCellValue('C' . $row, 'In Tank Lorry');
+            $sheet->setCellValue('D' . $row, 'Closing Balance');
+
+            // Apply background color for the header
+            $sheet->getStyle('A' . $row . ':D' . $row)->applyFromArray([
+                'font' => ['bold' => true],
+                'fill' => [
+                    'fillType' => Fill::FILL_SOLID,
+                    'color' => ['argb' => Color::COLOR_YELLOW],
+                ],
+            ]);
+            $row++;
+
+            foreach ($product['tanks'] as $tank) {
+                $sheet->setCellValue('A' . $row, $tank['tank_name']);
+                $sheet->setCellValue('B' . $row, $tank['end_reading_format']);
+                $sheet->setCellValue('C' . $row, $product['pay_order']);
+                $sheet->setCellValue('D' . $row, $product['closing_balance']);
+                $row++;
+            }
+        }
+
+        // Company Sales
+        $sheet->setCellValue('A' . $row, 'Company Sale');
+        $sheet->getStyle('A' . $row)->applyFromArray($headerFont);
+        $row++;
+        $sheet->setCellValue('A' . $row, 'Company Name');
+        $sheet->setCellValue('B' . $row, 'Product Name');
+        $sheet->setCellValue('C' . $row, 'Quantity');
+        $sheet->setCellValue('D' . $row, 'Amount');
+
+        // Apply background color for the header
+        $sheet->getStyle('A' . $row . ':D' . $row)->applyFromArray([
+            'font' => ['bold' => true],
+            'fill' => [
+                'fillType' => Fill::FILL_SOLID,
+                'color' => ['argb' => Color::COLOR_YELLOW],
+            ],
+        ]);
+        $row++;
+
+        foreach ($data['companySales'] as $companySales) {
+            $sheet->setCellValue('A' . $row, $companySales['name']);
+            $sheet->setCellValue('B' . $row, $companySales['product_name']);
+            $sheet->setCellValue('C' . $row, $companySales['quantity']);
+            $sheet->setCellValue('D' . $row, $companySales['amount_format']);
+            $row++;
+        }
+
+        // Total for Company Sales
+        $sheet->setCellValue('B' . $row, 'Total:');
+        $sheet->setCellValue('C' . $row, $data['total']['quantity']);
+        $sheet->setCellValue('D' . $row, $data['total']['amount']);
+        $sheet->getStyle('B' . $row)->getFont()->setBold(true);
+        $sheet->getStyle('C' . $row)->getFont()->setBold(true);
+        $sheet->getStyle('D' . $row)->getFont()->setBold(true);
+        $row += 2;
+
+        // Company Paid
+        $sheet->setCellValue('A' . $row, 'Company Paid');
+        $sheet->getStyle('A' . $row)->applyFromArray($headerFont);
+        $row++;
+        $sheet->setCellValue('A' . $row, 'Company Name');
+        $sheet->setCellValue('B' . $row, 'Payment Method');
+        $sheet->setCellValue('C' . $row, 'Amount');
+
+        // Apply background color for the header
+        $sheet->getStyle('A' . $row . ':C' . $row)->applyFromArray([
+            'font' => ['bold' => true],
+            'fill' => [
+                'fillType' => Fill::FILL_SOLID,
+                'color' => ['argb' => Color::COLOR_YELLOW],
+            ],
+        ]);
+        $row++;
+
+        foreach ($data['companyPaid'] as $each) {
+            $sheet->setCellValue('A' . $row, $each['name']);
+            $sheet->setCellValue('B' . $row, $each['product_name']);
+            $sheet->setCellValue('C' . $row, $each['paid_amount_format']);
+            $row++;
+        }
+
+        // Total for Company Paid
+        $sheet->setCellValue('B' . $row, 'Total:');
+        $sheet->setCellValue('C' . $row, $data['total']['paid_amount']);
+        $sheet->getStyle('B' . $row)->getFont()->setBold(true);
+        $sheet->getStyle('C' . $row)->getFont()->setBold(true);
+        $row += 2;
+
+        // Credit Company Product Sale
+        $sheet->setCellValue('A' . $row, 'Credit Company Product Sale');
+        $sheet->getStyle('A' . $row)->applyFromArray($headerFont);
+        $row++;
+        $sheet->setCellValue('A' . $row, 'Product Name');
+        $sheet->setCellValue('B' . $row, 'Quantity');
+        $sheet->setCellValue('C' . $row, 'Amount');
+
+        // Apply background color for the header
+        $sheet->getStyle('A' . $row . ':C' . $row)->applyFromArray([
+            'font' => ['bold' => true],
+            'fill' => [
+                'fillType' => Fill::FILL_SOLID,
+                'color' => ['argb' => Color::COLOR_YELLOW],
+            ],
+        ]);
+        $row++;
+
+        foreach ($data['productSales'] as $productSale) {
+            $sheet->setCellValue('A' . $row, $productSale['product_name']);
+            $sheet->setCellValue('B' . $row, $productSale['quantity']);
+            $sheet->setCellValue('C' . $row, $productSale['amount_format']);
+            $row++;
+        }
+
+        // Total for Product Sales
+        $sheet->setCellValue('A' . $row, 'Total:');
+        $sheet->setCellValue('B' . $row, $data['total']['quantity']);
+        $sheet->setCellValue('C' . $row, $data['total']['amount']);
+        $sheet->getStyle('A' . $row)->getFont()->setBold(true);
+        $sheet->getStyle('B' . $row)->getFont()->setBold(true);
+        $sheet->getStyle('C' . $row)->getFont()->setBold(true);
+        $row += 2;
+
+        // Expenses
+        $sheet->setCellValue('A' . $row, 'Expense');
+        $sheet->getStyle('A' . $row)->applyFromArray($headerFont);
+        $row++;
+        $sheet->setCellValue('A' . $row, 'Expense Category');
+        $sheet->setCellValue('B' . $row, 'Payment Type');
+        $sheet->setCellValue('C' . $row, 'Amount');
+
+        // Apply background color for the header
+        $sheet->getStyle('A' . $row . ':C' . $row)->applyFromArray([
+            'font' => ['bold' => true],
+            'fill' => [
+                'fillType' => Fill::FILL_SOLID,
+                'color' => ['argb' => Color::COLOR_YELLOW],
+            ],
+        ]);
+        $row++;
+
+        foreach ($data['expenses'] as $expense) {
+            $sheet->setCellValue('A' . $row, $expense['expense_type']);
+            $sheet->setCellValue('B' . $row, $expense['payment_method']);
+            $sheet->setCellValue('C' . $row, $expense['amount_format']);
+            $row++;
+        }
+
+        // Total for Expenses
+        $sheet->setCellValue('B' . $row, 'Total:');
+        $sheet->setCellValue('C' . $row, $data['total']['expense']);
+        $sheet->getStyle('B' . $row)->getFont()->setBold(true);
+        $sheet->getStyle('C' . $row)->getFont()->setBold(true);
+        $row += 2;
+
+        // POS Sale
+        $sheet->setCellValue('A' . $row, 'Pos Sale');
+        $sheet->getStyle('A' . $row)->applyFromArray($headerFont);
+        $row++;
+        $sheet->setCellValue('A' . $row, 'Name');
+        $sheet->setCellValue('B' . $row, 'Quantity');
+        $sheet->setCellValue('C' . $row, 'Unit Price');
+        $sheet->setCellValue('D' . $row, 'Amount');
+
+        // Apply background color for the header
+        $sheet->getStyle('A' . $row . ':D' . $row)->applyFromArray([
+            'font' => ['bold' => true],
+            'fill' => [
+                'fillType' => Fill::FILL_SOLID,
+                'color' => ['argb' => Color::COLOR_YELLOW],
+            ],
+        ]);
+        $row++;
+
+        foreach ($data['posSales'] as $posSale) {
+            $sheet->setCellValue('A' . $row, $posSale['category_name']);
+            $sheet->setCellValue('B' . $row, $posSale['quantity']);
+            $sheet->setCellValue('C' . $row, $posSale['price']);
+            $sheet->setCellValue('D' . $row, $posSale['amount']);
+            $row++;
+        }
+
+        // Total for POS Sales
+        $sheet->setCellValue('C' . $row, 'Total:');
+        $sheet->setCellValue('D' . $row, $data['total']['posSaleTotalAmount']);
+        $sheet->getStyle('C' . $row)->getFont()->setBold(true);
+        $sheet->getStyle('D' . $row)->getFont()->setBold(true);
+        $row += 2;
+
+        // Asset Transfer
+        $sheet->setCellValue('A' . $row, 'Asset Transfer');
+        $sheet->getStyle('A' . $row)->applyFromArray($headerFont);
+        $row++;
+        $sheet->setCellValue('A' . $row, 'From');
+        $sheet->setCellValue('B' . $row, 'To');
+        $sheet->setCellValue('C' . $row, 'Amount');
+
+        // Apply background color for the header
+        $sheet->getStyle('A' . $row . ':C' . $row)->applyFromArray([
+            'font' => ['bold' => true],
+            'fill' => [
+                'fillType' => Fill::FILL_SOLID,
+                'color' => ['argb' => Color::COLOR_YELLOW],
+            ],
+        ]);
+        $row++;
+
+        foreach ($data['assetTransfer'] as $assetTransfer) {
+            $sheet->setCellValue('A' . $row, $assetTransfer['from_category']);
+            $sheet->setCellValue('B' . $row, $assetTransfer['to_category']);
+            $sheet->setCellValue('C' . $row, $assetTransfer['amount']);
+            $row++;
+        }
+
+        // Total for Asset Transfer
+        $sheet->setCellValue('B' . $row, 'Total:');
+        $sheet->setCellValue('C' . $row, $data['total']['totalTransferAmount']);
+        $sheet->getStyle('B' . $row)->getFont()->setBold(true);
+        $sheet->getStyle('C' . $row)->getFont()->setBold(true);
+
+        $sheet->getColumnDimension('A')->setWidth(20);
+        $sheet->getColumnDimension('B')->setWidth(20);
+        $sheet->getColumnDimension('C')->setWidth(20);
+        $sheet->getColumnDimension('D')->setWidth(20);
+        $sheet->getColumnDimension('E')->setWidth(20);
+        $sheet->getColumnDimension('F')->setWidth(20);
+        $writer = new Xlsx($spreadsheet);
+        $writer->save('php://output');
     }
     public function windfallReportPDF(Request $request)
     {

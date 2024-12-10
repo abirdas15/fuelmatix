@@ -664,13 +664,19 @@ const router = new VueRouter({
                     },
                 },
                 {
-                    path: ROOT_URL + "/staff-loan/list", meta: { title: 'Staff Loan View - FuelMatix' }, name: "StaffLoanList", component: StaffLoanList
+                    path: ROOT_URL + "/staff-loan/list", meta: { title: 'Staff Loan View - FuelMatix' }, name: "StaffLoanList", component: StaffLoanList, beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.STAFF_LOAN + '-' + Action.VIEW)
+                    },
                 },
                 {
-                    path: ROOT_URL + "/staff-loan/add", meta: { title: 'Staff Loan Add - FuelMatix' }, name: "StaffLoanAdd", component: StaffLoanAdd
+                    path: ROOT_URL + "/staff-loan/add", meta: { title: 'Staff Loan Add - FuelMatix' }, name: "StaffLoanAdd", component: StaffLoanAdd, beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.STAFF_LOAN + '-' + Action.CREATE)
+                    },
                 },
                 {
-                    path: ROOT_URL + "/staff-loan/view/:id", meta: { title: 'Staff Loan View - FuelMatix' }, name: "StaffLoanView", component: StaffLoanView
+                    path: ROOT_URL + "/staff-loan/view/:id", meta: { title: 'Staff Loan View - FuelMatix' }, name: "StaffLoanView", component: StaffLoanView, beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.STAFF_LOAN + '-' + Action.VIEW)
+                    },
                 },
             ],
         },

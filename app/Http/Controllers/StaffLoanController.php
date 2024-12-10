@@ -93,7 +93,8 @@ class StaffLoanController extends Controller
         $limit = $request->input('limit', 10);
         $sessionUser = SessionUser::getUser();
         $result = Transaction::select(
-            'transactions.account_id as id',
+            'transactions.account_id',
+            'transactions.id',
             'transactions.date as date',
             DB::raw('SUM(transactions.debit_amount) as loan_amount'),
             'c1.name as staff_name',

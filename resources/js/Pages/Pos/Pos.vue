@@ -371,23 +371,23 @@
             <table class="items">
                 <thead>
                 <tr>
-                    <th class="heading name">Item</th>
-                    <th class="heading qty">Qty</th>
-                    <th class="heading rate">Price</th>
-                    <th class="heading amount">Subtotal</th>
+                    <th style="width: 30%" class="heading name">Item</th>
+                    <th style="width: 25%" class="heading qty">Qty</th>
+                    <th style="width: 25%" class="heading rate">Price</th>
+                    <th style="width: 30%" class="heading amount">Subtotal</th>
                 </tr>
                 </thead>
 
                 <tbody>
                 <tr v-for="p in singleSaleData.products">
                     <td>{{ p?.product_name }}</td>
-                    <td>{{ p.quantity }}</td>
-                    <td class="price">{{ p.price }}</td>
-                    <td class="price">{{ p.subtotal }}</td>
+                    <td style="text-align: center">{{ p.quantity }}</td>
+                    <td class="price" style="text-align: center">{{ p.price }}</td>
+                    <td class="price" style="text-align: center">{{ p.subtotal }}</td>
                 </tr>
                 <tr>
                     <th colspan="3" class="total text">Total</th>
-                    <th class="total price">{{singleSaleData.total_amount}}</th>
+                    <th class="total price" style="text-align: center">{{singleSaleData.total_amount}}</th>
                 </tr>
                 </tbody>
             </table>
@@ -477,7 +477,7 @@ export default {
 
         /* Ensure tables take full width without gaps */
         table {
-            width: 100%;
+            width: 95%;
             border-collapse: collapse; /* Remove space between table cells */
             margin: 0; /* Ensure no margin around tables */
         }
@@ -547,7 +547,6 @@ export default {
 
     .items thead tr th:first-child,
     .items tbody tr td:first-child {
-        width: 47%;
         word-break: break-all;
         text-align: left;
     }
@@ -573,7 +572,7 @@ export default {
     }
 
     .total.text, .total.price {
-        text-align: right;
+        text-align: center;
     }
 
     .total.price::before {

@@ -5,7 +5,7 @@
                 <ol class="breadcrumb align-items-center ">
                     <li class="breadcrumb-item active"><router-link :to="{name: 'Dashboard'}">Home</router-link></li>
                     <li class="breadcrumb-item"><a href="javascript:void(0)">Staff Loan List</a></li>
-                    <li style="margin-left: auto;"><router-link :to="{name: 'StaffLoanAdd'}"><i class="fa-solid fa-plus"></i> Add New Staff Loan</router-link></li>
+                    <li v-if="CheckPermission(Section.STAFF_LOAN + '-' + Action.VIEW)" style="margin-left: auto;"><router-link :to="{name: 'StaffLoanAdd'}"><i class="fa-solid fa-plus"></i> Add New Staff Loan</router-link></li>
                 </ol>
             </div>
             <div class="row">
@@ -55,7 +55,7 @@
                                                         <a v-if="f.due_amount > 0" class="btn btn-sm btn-primary me-2" @click="paymentModal(f)">
                                                             <i class="fa fa-money"></i>
                                                         </a>
-                                                        <router-link :to="{name: 'StaffLoanView', params: {id: f.id}}"  class="btn btn-info shadow btn-sm sharp">
+                                                        <router-link :to="{name: 'StaffLoanView', params: {id: f.account_id}}"  class="btn btn-info shadow btn-sm sharp">
                                                             <i class="fa fa-eye"></i>
                                                         </router-link>
                                                     </div>
@@ -123,6 +123,8 @@ import Swal from 'sweetalert2/dist/sweetalert2.js'
 import ApiService from "../../Services/ApiService";
 import ApiRoutes from "../../Services/ApiRoutes";
 import Pagination from "../../Helpers/Pagination";
+import Section from "../../Helpers/Section";
+import Action from "../../Helpers/Action";
 export default {
     components: {
         Pagination,
@@ -160,6 +162,12 @@ export default {
         this.getCategory();
     },
     computed: {
+        Action() {
+            return Action
+        },
+        Section() {
+            return Section
+        },
         Auth: function () {
             return this.$store.getters.GetAuth;
         },
