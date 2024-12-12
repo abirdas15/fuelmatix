@@ -265,7 +265,8 @@ const ApiRoutes = {
     ShiftName: ApiVersion + '/shift/sale/shiftName/list',
     Profile: ApiVersion + '/profile/me',
     LoanStaffList: ApiVersion + '/loan/staff/list',
-    StaffLoan: ApiVersion + '/staff/loan'
+    StaffLoan: ApiVersion + '/staff/loan',
+    Challan: ApiVersion + '/challan'
 }
 
 export default ApiRoutes;

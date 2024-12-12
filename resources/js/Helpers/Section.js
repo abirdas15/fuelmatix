@@ -56,6 +56,7 @@ const Section= {
     BILL_SUMMARY: 'Bill-Summary',
     POS_REPORT: 'Pos-Report',
     STAFF_LOAN: 'Staff-Loan',
+    CHALLAN: 'Challan'
 
 }
 export default Section;

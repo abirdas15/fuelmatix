@@ -98,11 +98,8 @@ class StaffLoanController extends Controller
             'transactions.date as date',
             DB::raw('SUM(transactions.debit_amount) as loan_amount'),
             'c1.name as staff_name',
-            'c2.name as payment_method'
         )
             ->join('categories as c1', 'c1.id', '=', 'transactions.account_id')
-            ->join('transactions as t1', 't1.linked_id', '=', 'transactions.id')
-            ->join('categories as c2', 'c2.id', '=', 't1.account_id')
             ->with('staff_loan_payment')
             ->where('transactions.module', Module::STAFF_LOAN_RECEIVABLE)
             ->where('transactions.client_company_id', $sessionUser->client_company_id)

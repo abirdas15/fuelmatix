@@ -61,6 +61,7 @@
                         <li v-if="CheckPermission(Section.INVOICE_PAYMENT + '-' + Action.VIEW)"><router-link :to="{name: 'InvoicePayment'}">Invoice Payment </router-link></li>
                         <li v-if="CheckPermission(Section.COMPANY_BILL + '-' + Action.VIEW)"><router-link :to="{name: 'CompanyBills'}">Company Bills </router-link></li>
                         <li v-if="CheckPermission(Section.PURCHASE + '-' + Action.VIEW)"><router-link :to="{name: 'purchase'}">Purchase</router-link></li>
+                        <li v-if="CheckPermission(Section.CHALLAN + '-' + Action.VIEW)"><router-link :to="{name: 'challanList'}">Challan</router-link></li>
                     </ul>
 
                 </li>

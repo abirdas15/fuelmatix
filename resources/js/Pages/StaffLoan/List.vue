@@ -5,7 +5,7 @@
                 <ol class="breadcrumb align-items-center ">
                     <li class="breadcrumb-item active"><router-link :to="{name: 'Dashboard'}">Home</router-link></li>
                     <li class="breadcrumb-item"><a href="javascript:void(0)">Staff Loan List</a></li>
-                    <li v-if="CheckPermission(Section.STAFF_LOAN + '-' + Action.VIEW)" style="margin-left: auto;"><router-link :to="{name: 'StaffLoanAdd'}"><i class="fa-solid fa-plus"></i> Add New Staff Loan</router-link></li>
+                    <li v-if="CheckPermission(Section.STAFF_LOAN + '-' + Action.CREATE)" style="margin-left: auto;"><router-link :to="{name: 'StaffLoanAdd'}"><i class="fa-solid fa-plus"></i> Add New Staff Loan</router-link></li>
                 </ol>
             </div>
             <div class="row">

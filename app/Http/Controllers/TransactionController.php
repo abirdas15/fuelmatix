@@ -16,6 +16,7 @@ use App\Repository\TransactionRepository;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -183,9 +184,29 @@ class TransactionController extends Controller
                 $data['balance'] = $result[$key - 1]['balance'] + $balance;
             }
         }
+        // Paginate the result array.
+        // Paginate the result array.
+        $currentPage = LengthAwarePaginator::resolveCurrentPage(); // Get the current page
+        $perPage = 20; // Number of items per page
+        $offset = ($currentPage - 1) * $perPage; // Offset for slicing
 
-        // Return the result with a 200 status.
-        return response()->json(['status' => 200, 'data' => $result]);
+        // Reverse the result array to get last to first order.
+        $resultReversed = array_reverse($result);
+
+        // Slice the reversed array for the current page.
+        $currentPageItems = array_slice($resultReversed, $offset, $perPage);
+
+        // Create a paginator instance.
+        $paginator = new LengthAwarePaginator(
+            $currentPageItems, // The items for the current page
+            count($resultReversed), // Total items
+            $perPage, // Items per page
+            $currentPage, // Current page
+            ['path' => LengthAwarePaginator::resolveCurrentPath()] // Base URL for links
+        );
+
+        // Return the paginated results
+        return response()->json(['status' => 200, 'data' => $paginator]);
     }
 
     public static function updateTransaction($inputData)

@@ -9,21 +9,21 @@
                 <button class="btn btn-success" v-if="!loading" type="button" @click="saveTransaction">Save</button>
                 <button class="btn btn-success" v-if="loading" type="button">Saving...</button>
             </div>
-            <div class="table-height d-flex flex-column-reverse" id="table-scroll">
+            <div class="table-height d-flex" id="table-scroll" @scroll="handleScroll" ref="tableScroll" style="max-height: 400px; overflow-y: auto;">
                 <table class="table table-sm table-transaction table-responsive">
                     <thead>
                     <tr>
-                        <th style="width: 10%" class="text-start">Date</th>
-                        <th style="width: 30%" class="text-start">Description</th>
+                        <th style="width: 15%" class="text-start">Date</th>
+                        <th style="width: 25%" class="text-start">Description</th>
                         <th style="width: 20%" class="text-start">Transfer</th>
-                        <th style="width: 10%">{{getNameDr()}}</th>
-                        <th style="width: 10%">{{getNameCr()}}</th>
+                        <th style="width: 10%">{{ getNameDr() }}</th>
+                        <th style="width: 10%">{{ getNameCr() }}</th>
                         <th style="width: 15%">Balance</th>
                         <th style="width: 5%">Action</th>
                     </tr>
                     </thead>
                     <tbody v-if="!getLoading">
-                    <tr v-for="transaction of transactionParam.transaction">
+                    <tr v-for="transaction of transactionParam.transaction" :key="transaction.id">
                         <td class="text-start">{{ transaction.date }}</td>
                         <td class="text-start">{{ transaction.description }}</td>
                         <td class="text-start">{{ categoryName(transaction.linked_id) }}</td>
@@ -41,8 +41,10 @@
                     </tbody>
                     <tbody v-if="getLoading">
                     <tr>
-                        <td colspan="20">
-                            <div class="d-flex align-items-center justify-content-center" style="height: 300px"><i class="fas fa-spinner fa-5x fa-spin"></i></div>
+                        <td colspan="7">
+                            <div class="d-flex align-items-center justify-content-center" style="height: 300px">
+                                <i class="fas fa-spinner fa-5x fa-spin"></i>
+                            </div>
                         </td>
                     </tr>
                     </tbody>
@@ -109,41 +111,78 @@ export default {
             parent_category_id: '',
             singleCategory: {},
             loading: false,
-            getLoading: false
+            getLoading: false,
+            currentPage: 1
         }
     },
     methods: {
+        loadMoreTransactions() {
+            this.getLoading = true;
+
+            // Store current scroll positio
+            let tableScroll = document.getElementById('table-scroll');
+
+            ApiService.POST(ApiRoutes.TransactionSingle, {
+                id: this.parent_category_id,
+                page: this.currentPage // Send the current page number
+            }, res => {
+                this.getLoading = false;
+
+                if (parseInt(res.status) === 200) {
+                    if (res.data.data.length > 0) {
+                        // Reverse the new transactions and add them to the start of the array
+                        const newTransactions = res.data.data.reverse();
+                        this.transactionParam.transaction.unshift(...newTransactions);
+                        this.currentPage++;
+
+                        setTimeout(() => {
+                            tableScroll.scrollTop = 200;
+                        }, 100);
+                    } else {
+                        console.log("No more transactions to load.");
+                    }
+                } else {
+                    console.error("Error loading more transactions:", res.status);
+                }
+            });
+        },
+        handleScroll(event) {
+            const scrollTop = event.target.scrollTop;
+            if (scrollTop === 0 && !this.getLoading) {
+                this.loadMoreTransactions();
+            }
+        },
         getNameDr: function () {
-            if (this.singleCategory.type == 'assets') {
+            if (this.singleCategory.type === 'assets') {
                 return 'Increase'
             }
-            if (this.singleCategory.type == 'equity') {
+            if (this.singleCategory.type === 'equity') {
                 return 'Decrease'
             }
-            if (this.singleCategory.type == 'expenses') {
+            if (this.singleCategory.type === 'expenses') {
                 return 'Expense'
             }
-            if (this.singleCategory.type == 'income') {
+            if (this.singleCategory.type === 'income') {
                 return 'Charge'
             }
-            if (this.singleCategory.type == 'liabilities') {
+            if (this.singleCategory.type === 'liabilities') {
                 return 'Decrease'
             }
         },
         getNameCr: function () {
-            if (this.singleCategory.type == 'assets') {
+            if (this.singleCategory.type === 'assets') {
                 return 'Decrease'
             }
-            if (this.singleCategory.type == 'equity') {
+            if (this.singleCategory.type === 'equity') {
                 return 'Increase'
             }
-            if (this.singleCategory.type == 'expenses') {
+            if (this.singleCategory.type === 'expenses') {
                 return 'Rebate'
             }
-            if (this.singleCategory.type == 'income') {
+            if (this.singleCategory.type === 'income') {
                 return 'Income'
             }
-            if (this.singleCategory.type == 'liabilities') {
+            if (this.singleCategory.type === 'liabilities') {
                 return 'Increase'
             }
         },
@@ -154,7 +193,7 @@ export default {
                 linked_id: this.parent_category_id
             }
             this.transactionParam.transaction.map(v => {
-                if (v.id == undefined) {
+                if (v.id === undefined) {
                     transaction.transaction.push(v)
                 }
             })
@@ -166,18 +205,29 @@ export default {
             });
         },
         singleTransaction: function () {
-            this.getLoading = true
-            ApiService.POST(ApiRoutes.TransactionSingle, {id: this.parent_category_id}, res => {
-                this.getLoading = false
+            this.getLoading = true;
+            ApiService.POST(ApiRoutes.TransactionSingle, { id: this.parent_category_id }, res => {
+                this.getLoading = false;
                 if (parseInt(res.status) === 200) {
-                    this.transactionParam.transaction = res.data
+                    // Clear the existing transactions if needed
+                    this.transactionParam.transaction = []; // Optional: Clear existing data
+
+                    // Iterate in reverse order and push to the array
+                    for (let i = res.data.data.length - 1; i >= 0; i--) {
+                        this.transactionParam.transaction.push(res.data.data[i]);
+                    }
+                    this.currentPage++;
+                    this.$nextTick(() => {
+                        const tableScroll = this.$refs.tableScroll;
+                        tableScroll.scrollTop = tableScroll.scrollHeight;
+                    });
                 }
             });
         },
         categoryName: function (id) {
             let rv = ''
             this.parentCategory.map(v => {
-                if (v.id == id) {
+                if (v.id === id) {
                     rv = v.name
                 }
             })
@@ -188,7 +238,7 @@ export default {
             return dateArr[2] + '/' + dateArr[1] + '/' + dateArr[0]
         },
         addTransaction: function () {
-            if (this.param.account_id != '' && (this.param.credit_amount != '' || this.param.debit_amount != '')) {
+            if (this.param.account_id !== '' && (this.param.credit_amount != '' || this.param.debit_amount != '')) {
                 if (this.param.credit_amount != '' && this.param.debit_amount != '') {
                     if (Number(this.param.debit_amount) > Number(this.param.credit_amount)) {
                         this.param.debit_amount = this.param.debit_amount - this.param.credit_amount
