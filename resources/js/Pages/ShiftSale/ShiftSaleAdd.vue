@@ -121,7 +121,10 @@
                                                                                 @input="onTankInput($event, 'end_reading', tankIndex, tank.id)"
                                                                                 inputId="locale-user"
                                                                                 :minFractionDigits="quantityFractionDigit"
-                                                                                :maxFractionDigits="quantityFractionDigit"/>
+                                                                                :maxFractionDigits="quantityFractionDigit"
+                                                                                :step="0"
+                                                                                @keydown.up.prevent
+                                                                                @keydown.down.prevent/>
 
                                                                             <div class="input-group-append">
                                                                                 <span class="input-group-text" >mm</span>
@@ -133,7 +136,8 @@
                                                                     <div class="mb-3 col-md-2"></div>
                                                                     <div class="mb-3 col-md-2 offset-2">
                                                                         <div class="input-group">
-                                                                            <InputNumber disabled id="prReading"  v-model="tank.start_reading" inputId="locale-user" :minFractionDigits="quantityFractionDigit" :maxFractionDigits="quantityFractionDigit"/>
+                                                                            <InputNumber disabled id="prReading"  v-model="tank.start_reading" inputId="locale-user" :minFractionDigits="quantityFractionDigit" :maxFractionDigits="quantityFractionDigit"  :step="0"  @keydown.up.prevent
+                                                                                         @keydown.down.prevent/>
 <!--                                                                            <input disabled id="prReading"-->
 <!--                                                                                   type="text" class="form-control"-->
 <!--                                                                                   v-model="tank.start_reading">-->
@@ -144,7 +148,8 @@
                                                                     </div>
                                                                     <div class="mb-3 col-md-2" v-if="listDispenser.status === 'end'">
                                                                         <div class="input-group">
-                                                                            <InputNumber disabled v-model="tank.tank_refill" inputId="locale-user" :minFractionDigits="quantityFractionDigit" :maxFractionDigits="quantityFractionDigit"/>
+                                                                            <InputNumber disabled v-model="tank.tank_refill" inputId="locale-user" :minFractionDigits="quantityFractionDigit" :maxFractionDigits="quantityFractionDigit"  :step="0"  @keydown.up.prevent
+                                                                                         @keydown.down.prevent/>
 <!--                                                                            <input type="text" class="form-control"  disabled-->
 <!--                                                                                   v-model="tank.tank_refill">-->
                                                                             <div class="input-group-append">
@@ -168,7 +173,8 @@
                                                                     </div>
                                                                     <div class="mb-3 col-md-2" v-if="listDispenser.status === 'end'">
                                                                         <div class="input-group">
-                                                                            <InputNumber v-if="listDispenser.status === 'end'" id="frReading" @blur="disableInput('frReading')" @input="calculateAmount(tankIndex)"  v-model="tank.adjustment" inputId="locale-user" :minFractionDigits="quantityFractionDigit" :maxFractionDigits="quantityFractionDigit"/>
+                                                                            <InputNumber v-if="listDispenser.status === 'end'" id="frReading" @blur="disableInput('frReading')" @input="calculateAmount(tankIndex)"  v-model="tank.adjustment" inputId="locale-user" :minFractionDigits="quantityFractionDigit" :maxFractionDigits="quantityFractionDigit"  :step="0"  @keydown.up.prevent
+                                                                                         @keydown.down.prevent/>
 <!--                                                                            <input id="frReading" @blur="disableInput('frReading')" v-if="listDispenser.status === 'end'"-->
 <!--                                                                                   type="text" class="form-control" disabled-->
 <!--                                                                                   v-model="tank.adjustment"-->
@@ -222,7 +228,10 @@
                                                                                 v-model="n.start_reading"
                                                                                 inputId="locale-user"
                                                                                 :minFractionDigits="quantityFractionDigit"
-                                                                                :maxFractionDigits="quantityFractionDigit"/>
+                                                                                :maxFractionDigits="quantityFractionDigit"
+                                                                                :step="0"
+                                                                                @keydown.up.prevent
+                                                                                @keydown.down.prevent/>
                                                                             <!--                                                                        <input type="text" class="form-control" disabled-->
                                                                             <!--                                                                               v-model="n.start_reading">-->
                                                                             <div class="input-group-append">
@@ -244,6 +253,9 @@
                                                                             @input="updateEndReading($event, tankIndex, dIndex, nIndex)"
                                                                             @keyup="preventArrowKeyIncrement"
                                                                             :maxFractionDigits="quantityFractionDigit"
+                                                                            :step="0"
+                                                                            @keydown.up.prevent
+                                                                            @keydown.down.prevent
                                                                         />
 <!--                                                                        <input-->
 <!--                                                                            type="text"-->
@@ -282,6 +294,9 @@
                                                                             @click="enableInput('frReading'+nIndex+dIndex)"
                                                                             :minFractionDigits="quantityFractionDigit"
                                                                             :maxFractionDigits="quantityFractionDigit"
+                                                                            :step="0"
+                                                                            @keydown.up.prevent
+                                                                            @keydown.down.prevent
                                                                         />
 <!--                                                                        <input type="text" class="form-control text-end" @blur="disableInput('frReading'+nIndex+dIndex)"-->
 <!--                                                                               v-if="listDispenser.status === 'end'"-->
@@ -306,6 +321,9 @@
                                                                             disabled="disabled"
                                                                             :minFractionDigits="quantityFractionDigit"
                                                                             :maxFractionDigits="quantityFractionDigit"
+                                                                            :step="0"
+                                                                            @keydown.up.prevent
+                                                                            @keydown.down.prevent
                                                                         />
 <!--                                                                        <input type="text" disabled class="form-control"-->
 <!--                                                                               v-model="n.consumption">-->
@@ -402,6 +420,9 @@
                                                                 :minFractionDigits="quantityFractionDigit"
                                                                 :maxFractionDigits="quantityFractionDigit"
                                                                 class="w-100"
+                                                                :step="0"
+                                                                @keydown.up.prevent
+                                                                @keydown.down.prevent
                                                             />
                                                             <div class="input-group-append">
                                                                 <span class="input-group-text" >{{ listDispenser.unit }}</span>
@@ -417,6 +438,9 @@
                                                             :name="'categories.'+index+'.amount'"
                                                             placeholder="Amount here"
                                                             class="border-right w-100"
+                                                            :step="0"
+                                                            @keydown.up.prevent
+                                                            @keydown.down.prevent
                                                         />
                                                         <div class="invalid-feedback"></div>
                                                     </div>
