@@ -381,13 +381,13 @@
                 <tbody>
                 <tr v-for="p in singleSaleData.products">
                     <td>{{ p?.product_name }}</td>
-                    <td style="text-align: center">{{ p.quantity }}</td>
+                    <td style="text-align: center">{{ p.quantity_format }}</td>
                     <td class="price" style="text-align: center">{{ p.price }}</td>
-                    <td class="price" style="text-align: center">{{ p.subtotal }}</td>
+                    <td class="price" style="text-align: center">{{ p.subtotal_format }}</td>
                 </tr>
                 <tr>
                     <th colspan="3" class="total text">Total</th>
-                    <th class="total price" style="text-align: center">{{singleSaleData.total_amount}}</th>
+                    <th class="total price" style="text-align: center">{{singleSaleData.total_amount_format}}</th>
                 </tr>
                 </tbody>
             </table>
