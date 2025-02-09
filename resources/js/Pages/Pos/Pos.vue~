@@ -116,9 +116,7 @@
                                                             :minFractionDigits="numberFractionDigit"
                                                             :maxFractionDigits="numberFractionDigit"
                                                             class="border-right"
-                                                            :step="0"
-                                                            @keydown.up.prevent
-                                                            @keydown.down.prevent
+                                                            step="0"
                                                         />
                                                     </td>
                                                     <td class="text-end">
