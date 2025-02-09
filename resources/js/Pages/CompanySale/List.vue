@@ -454,6 +454,12 @@ export default {
                 mode: 'range',
                 onChange: (date, dateStr) => {
                     let dateArr = dateStr.split('to')
+                    if (dateArr.length === 1) {
+                        this.Param.start_date = dateArr[0]
+                        this.Param.end_date = dateArr[0]
+                        this.list();
+                        return;
+                    }
                     if (dateArr.length === 2) {
                         this.Param.start_date = dateArr[0]
                         this.Param.end_date = dateArr[1]
