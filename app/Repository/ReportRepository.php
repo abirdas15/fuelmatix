@@ -1393,6 +1393,7 @@ class ReportRepository
             'sale.date',
             'sale.card_number',
             'sale.voucher_number',
+            'sale.invoice_number',
             'sale_data.quantity',
             'sale_data.price',
             'sale_data.subtotal',

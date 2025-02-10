@@ -46,6 +46,7 @@
                                                 <th>Card Name</th>
                                                 <th>Voucher Number</th>
                                                 <th>Card Number/Transaction ID</th>
+                                                <th>Invoice Number</th>
                                                 <th>Product Name</th>
                                                 <th>Quantity</th>
                                                 <th>Price</th>
@@ -58,6 +59,7 @@
                                                 <td v-text="each.category_name"></td>
                                                 <td v-text="each.voucher_number"></td>
                                                 <td v-text="each.card_number"></td>
+                                                <td v-text="each.invoice_number"></td>
                                                 <td v-text="each.product_name"></td>
                                                 <td v-text="each.quantity"></td>
                                                 <td v-text="each.price"></td>
