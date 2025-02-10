@@ -9,7 +9,6 @@ use App\Helpers\Helpers;
 use App\Helpers\SessionUser;
 use App\Models\Category;
 use App\Models\Transaction;
-use App\Models\User;
 use App\Repository\TransactionRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -33,7 +32,7 @@ class StaffLoanController extends Controller
             'id',
             'name'
         )
-            ->where('parent_category', $staffLoanReceivable->id)
+            ->where('parent_category', $staffLoanReceivable->id ?? 0)
             ->get()
             ->toArray();
         return response()->json([

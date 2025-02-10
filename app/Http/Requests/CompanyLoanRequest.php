@@ -7,7 +7,7 @@ use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
 
-class LoanEntityRequest extends FormRequest
+class CompanyLoanRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,13 +24,23 @@ class LoanEntityRequest extends FormRequest
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
-            'name' => 'required|string',
-            'opening_balance' => 'nullable|numeric',
+            'date' => 'required|date',
+            'from_category_id' => 'required|integer|exists:categories,id',
+            'to_category_id' => 'required|integer|exists:categories,id',
+            'amount' => 'required|numeric|min:0',
         ];
     }
+    public function messages(): array
+    {
+        return [
+            'form_category_id.required' => 'Entity field is required.',
+            'to_category_id.required' => 'Bank or Cash field is required.',
+        ];
+    }
+
     /**
      * Handle a failed validation attempt.
      *
