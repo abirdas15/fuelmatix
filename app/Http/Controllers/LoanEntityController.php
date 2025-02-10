@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\LoanEntityRequest;
-use App\Models\Category;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use App\Services\LoanEntityService;

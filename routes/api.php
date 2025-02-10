@@ -47,6 +47,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StaffLoanController;
 use App\Http\Controllers\ChallanController;
 use App\Http\Controllers\LoanEntityController;
+use App\Http\Controllers\CompanyLoanController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -407,6 +408,9 @@ Route::group(['middleware' => 'auth:api'], function() {
     });
     Route::group(['prefix' => 'loan-entity'], function() {
         Route::post('save', [LoanEntityController::class, 'save']);
+    });
+    Route::group(['prefix' => 'company-entity'], function() {
+        Route::post('save', [CompanyLoanController::class, 'save']);
     });
 });
 
