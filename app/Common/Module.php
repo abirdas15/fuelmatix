@@ -35,5 +35,6 @@ class Module
     const BULK_SALE = 'bulk sale';
     const STAFF_LOAN_RECEIVABLE = 'staff loan receivable';
     const STAFF_LOAN_PAYMENT = 'staff loan payment';
+    const LOAN_LIABILITY = 'loans liability';
 
 }

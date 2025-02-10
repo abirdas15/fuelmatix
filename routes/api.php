@@ -46,6 +46,7 @@ use App\Http\Controllers\DummySaleController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StaffLoanController;
 use App\Http\Controllers\ChallanController;
+use App\Http\Controllers\LoanEntityController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -403,6 +404,9 @@ Route::group(['middleware' => 'auth:api'], function() {
         Route::post('save', [ChallanController::class, 'save']);
         Route::post('list', [ChallanController::class, 'list']);
         Route::post('export/pdf', [ChallanController::class, 'exportPdf']);
+    });
+    Route::group(['prefix' => 'loan-entity'], function() {
+        Route::post('save', [LoanEntityController::class, 'save']);
     });
 });
 

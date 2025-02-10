@@ -121,6 +121,8 @@ import StaffLoanAdd from "../Pages/StaffLoan/Add.vue";
 import StaffLoanView from "../Pages/StaffLoan/View.vue";
 import ChallanList from "../Pages/Challan/List.vue";
 import ChallanAdd from "../Pages/Challan/Add.vue";
+import CompanyLoanAdd from "../Pages/CompanyLoan/Add.vue";
+import LoanEntityAdd from "../Pages/LoanEntity/Add.vue";
 
 const ROOT_URL = "";
 const router = new VueRouter({
@@ -688,6 +690,16 @@ const router = new VueRouter({
                 {
                     path: ROOT_URL + "/challan/add", meta: { title: 'Challan - FuelMatix' }, name: "challanAdd", component: ChallanAdd, beforeEnter: (to, from, next) => {
                         CheckPermission(to, from, next, Section.CHALLAN + '-' + Action.CREATE)
+                    },
+                },
+                {
+                    path: ROOT_URL + "/company-loan/add", meta: { title: 'Company Loan Add - FuelMatix' }, name: "CompanyLoanAdd", component: CompanyLoanAdd, beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.STAFF_LOAN + '-' + Action.CREATE)
+                    },
+                },
+                {
+                    path: ROOT_URL + "/loan-entity/add", meta: { title: 'Entity Add - FuelMatix' }, name: "CompanyLoanAdd", component: LoanEntityAdd, beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.STAFF_LOAN + '-' + Action.CREATE)
                     },
                 },
             ],
