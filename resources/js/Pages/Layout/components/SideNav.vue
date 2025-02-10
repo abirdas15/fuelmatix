@@ -103,6 +103,14 @@
                         <span class="nav-text">Accounting</span>
                     </router-link>
                 </li>
+                <li><a class="has-arrow " href="javascript:void(0)" aria-expanded="false">
+                    <i class="fas fa-users"></i>
+                    <span class="nav-text">Loan</span>
+                </a>
+                    <ul aria-expanded="false" class="bichi">
+                        <li><router-link :to="{name: 'LoanEntityList'}">Entity</router-link></li>
+                    </ul>
+                </li>
                 <li>
                     <a class="has-arrow " href="javascript:void(0)" aria-expanded="false">
                         <i class="fa-solid fa-chart-line"></i>

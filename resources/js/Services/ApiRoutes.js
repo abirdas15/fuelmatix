@@ -111,6 +111,12 @@ const ApiRoutes = {
     BankDelete: ApiVersion + '/bank/delete',
     BankList: ApiVersion + '/bank/list',
     BankSingle: ApiVersion + '/bank/single',
+    //Entity
+    EntityAdd: ApiVersion + '/loan-entity/save',
+    EntityEdit: ApiVersion + '/loan-entity/update',
+    EntityDelete: ApiVersion + '/loan-entity/delete',
+    EntityList: ApiVersion + '/loan-entity/list',
+    EntitySingle: ApiVersion + '/loan-entity/single',
     //Vendor
     VendorAdd: ApiVersion + '/vendor/save',
     VendorEdit: ApiVersion + '/vendor/update',
@@ -266,7 +272,8 @@ const ApiRoutes = {
     Profile: ApiVersion + '/profile/me',
     LoanStaffList: ApiVersion + '/loan/staff/list',
     StaffLoan: ApiVersion + '/staff/loan',
-    Challan: ApiVersion + '/challan'
+    Challan: ApiVersion + '/challan',
+    LoanEntity: ApiVersion + '/loan-entity'
 }
 
 export default ApiRoutes;

@@ -39,4 +39,5 @@ class AccountCategory
     const ADVANCE_PAYABLE = 'Advance Payable';
     const RETAIN_EARNING = 'Retained earnings';
     const STAFF_LOAN_RECEIVABLES = 'Staff Loan Receivables';
+    const LOAN_LIABILITIES = 'Loan Liabilities';
 }
