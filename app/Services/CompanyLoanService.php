@@ -8,7 +8,6 @@ use App\Helpers\Helpers;
 use App\Helpers\SessionUser;
 use App\Models\Transaction;
 use App\Repository\TransactionRepository;
-use Illuminate\Http\JsonResponse;
 use Exception;
 use Illuminate\Support\Facades\DB;
 
@@ -33,7 +32,7 @@ class CompanyLoanService
 
     /**
      * @param int $limit
-     * @return JsonResponse
+     * @return mixed
      */
     public function list(int $limit)
     {
@@ -47,7 +46,7 @@ class CompanyLoanService
         )
             ->join('categories as c1', 'c1.id', '=', 'transactions.account_id')
             ->with('company_loan_payment')
-            ->whereIn('transactions.module', [Module::COMPANY_LOAN, Module::ACCOUNTING])
+            ->whereIn('transactions.module', [Module::COMPANY_LOAN])
             ->where('transactions.client_company_id', $sessionUser->client_company_id)
             ->groupBy('transactions.account_id')
             ->havingRaw('SUM(transactions.credit_amount) > 0')
@@ -57,7 +56,7 @@ class CompanyLoanService
         foreach ($result as &$data) {
             $totalPayment = 0;
             foreach ($data['company_loan_payment'] as $paymentData) {
-                $totalPayment += $paymentData['debit_amount'];
+                $totalPayment += $paymentData['credit_amount'];
             }
             $data['payment_amount'] = $totalPayment;
             $data['due_amount'] = $data['loan_amount'] - $data['payment_amount'];
