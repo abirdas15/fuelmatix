@@ -107,8 +107,8 @@
                     <span class="nav-text">Loan</span>
                 </a>
                     <ul aria-expanded="false" class="bichi">
-                        <li v-if="CheckPermission(Section.STAFF_LOAN + '-' + Action.VIEW)"><router-link :to="{name: 'LoanEntityList'}">Entity</router-link></li>
-                        <li v-if="CheckPermission(Section.STAFF_LOAN + '-' + Action.VIEW)"><router-link :to="{name: 'CompanyLoanList'}">Company Loan</router-link></li>
+                        <li v-if="CheckPermission(Section.LOAN_ENTITY + '-' + Action.VIEW)"><router-link :to="{name: 'LoanEntityList'}">Entity</router-link></li>
+                        <li v-if="CheckPermission(Section.COMPANY_LOAN + '-' + Action.VIEW)"><router-link :to="{name: 'CompanyLoanList'}">Company Loan</router-link></li>
                         <li v-if="CheckPermission(Section.STAFF_LOAN + '-' + Action.VIEW)"><router-link :to="{name: 'StaffLoanList'}">Staff Loan</router-link></li>
                     </ul>
                 </li>

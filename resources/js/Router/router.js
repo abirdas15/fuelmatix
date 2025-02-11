@@ -698,32 +698,32 @@ const router = new VueRouter({
                 },
                 {
                     path: ROOT_URL + "/loan-entity/list", meta: { title: 'Entity List - FuelMatix' }, name: "LoanEntityList", component: LoanEntityList, beforeEnter: (to, from, next) => {
-                        CheckPermission(to, from, next, Section.STAFF_LOAN + '-' + Action.CREATE)
+                        CheckPermission(to, from, next, Section.LOAN_ENTITY + '-' + Action.CREATE)
                     },
                 },
                 {
                     path: ROOT_URL + "/loan-entity/add", meta: { title: 'Entity Add - FuelMatix' }, name: "LoanEntityAdd", component: LoanEntityAdd, beforeEnter: (to, from, next) => {
-                        CheckPermission(to, from, next, Section.STAFF_LOAN + '-' + Action.CREATE)
+                        CheckPermission(to, from, next, Section.LOAN_ENTITY + '-' + Action.CREATE)
                     },
                 },
                 {
                     path: ROOT_URL + "/loan-entity/edit/:id", meta: { title: 'Entity Edit - FuelMatix' }, name: "LoanEntityEdit", component: LoanEntityEdit, beforeEnter: (to, from, next) => {
-                        CheckPermission(to, from, next, Section.STAFF_LOAN + '-' + Action.CREATE)
+                        CheckPermission(to, from, next, Section.LOAN_ENTITY + '-' + Action.CREATE)
                     },
                 },
                 {
                     path: ROOT_URL + "/company-loan/list", meta: { title: 'Company Loan List - FuelMatix' }, name: "CompanyLoanList", component: CompanyLoanList, beforeEnter: (to, from, next) => {
-                        CheckPermission(to, from, next, Section.STAFF_LOAN + '-' + Action.CREATE)
+                        CheckPermission(to, from, next, Section.COMPANY_LOAN + '-' + Action.CREATE)
                     },
                 },
                 {
                     path: ROOT_URL + "/company-loan/add", meta: { title: 'Company Loan Add - FuelMatix' }, name: "CompanyLoanAdd", component: CompanyLoanAdd, beforeEnter: (to, from, next) => {
-                        CheckPermission(to, from, next, Section.STAFF_LOAN + '-' + Action.CREATE)
+                        CheckPermission(to, from, next, Section.COMPANY_LOAN + '-' + Action.CREATE)
                     },
                 },
                 {
                     path: ROOT_URL + "/company-loan/view/:id", meta: { title: 'Company Loan View - FuelMatix' }, name: "CompanyLoanView", component: CompanyLoanView, beforeEnter: (to, from, next) => {
-                        CheckPermission(to, from, next, Section.STAFF_LOAN + '-' + Action.CREATE)
+                        CheckPermission(to, from, next, Section.COMPANY_LOAN + '-' + Action.CREATE)
                     },
                 },
             ],

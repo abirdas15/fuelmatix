@@ -46,7 +46,7 @@
                                             </thead>
                                             <tbody v-if="listData.length > 0 && TableLoading === false">
                                             <tr v-for="f in listData">
-                                                <td >{{f.staff_name}}</td>
+                                                <td >{{f.company_name}}</td>
                                                 <td >{{f.loan_amount_format}}</td>
                                                 <td >{{f.payment_amount_format}}</td>
                                                 <td >{{f.due_amount_format}}</td>

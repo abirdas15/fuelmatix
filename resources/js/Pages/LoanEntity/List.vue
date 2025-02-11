@@ -5,7 +5,7 @@
                 <ol class="breadcrumb align-items-center ">
                     <li class="breadcrumb-item active"><router-link :to="{name: 'Dashboard'}">Home</router-link></li>
                     <li class="breadcrumb-item"><a href="javascript:void(0)">Entity List</a></li>
-                    <li v-if="CheckPermission(Section.STAFF_LOAN + '-' + Action.CREATE)" style="margin-left: auto;"><router-link :to="{name: 'LoanEntityAdd'}"><i class="fa-solid fa-plus"></i> Add New Entity</router-link></li>
+                    <li v-if="CheckPermission(Section.LOAN_ENTITY + '-' + Action.CREATE)" style="margin-left: auto;"><router-link :to="{name: 'LoanEntityAdd'}"><i class="fa-solid fa-plus"></i> Add New Entity</router-link></li>
                 </ol>
             </div>
             <div class="row">
@@ -48,10 +48,10 @@
                                                 <td >{{ f.opening_balance != null ? f.opening_balance.toLocaleString() : ''}}</td>
                                                 <td>
                                                     <div class="d-flex">
-                                                        <router-link v-if="CheckPermission(Section.STAFF_LOAN + '-' + Action.EDIT)" :to="{name: 'LoanEntityEdit', params: { id: f.id }}" class=" btn btn-primary shadow btn-xs sharp me-1">
+                                                        <router-link v-if="CheckPermission(Section.LOAN_ENTITY + '-' + Action.EDIT)" :to="{name: 'LoanEntityEdit', params: { id: f.id }}" class=" btn btn-primary shadow btn-xs sharp me-1">
                                                             <i class="fas fa-pencil-alt"></i>
                                                         </router-link>
-                                                        <a v-if="CheckPermission(Section.STAFF_LOAN + '-' + Action.DELETE)" href="javascript:void(0)"  @click="openModalDelete(f)" class="btn btn-danger shadow btn-xs sharp">
+                                                        <a v-if="CheckPermission(Section.LOAN_ENTITY + '-' + Action.DELETE)" href="javascript:void(0)"  @click="openModalDelete(f)" class="btn btn-danger shadow btn-xs sharp">
                                                             <i class="fa fa-trash"></i>
                                                         </a>
                                                     </div>

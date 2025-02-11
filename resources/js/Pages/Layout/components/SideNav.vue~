@@ -73,7 +73,6 @@
                         <li v-if="CheckPermission(Section.EMPLOYEE + '-' + Action.VIEW)"><router-link :to="{name: 'employee'}">Employees </router-link></li>
                         <li v-if="CheckPermission(Section.SALARY + '-' + Action.VIEW)"><router-link :to="{name: 'salary'}">Salary </router-link></li>
                         <li v-if="CheckPermission(Section.ATTENDANCE + '-' + Action.VIEW)"><a href="javascript:void(0)">Attendance</a></li>
-                        <li v-if="CheckPermission(Section.STAFF_LOAN + '-' + Action.VIEW)"><router-link :to="{name: 'StaffLoanList'}">Loan</router-link></li>
                     </ul>
                 </li>
                 <li><a class="has-arrow " href="javascript:void(0)" aria-expanded="false">
@@ -108,7 +107,9 @@
                     <span class="nav-text">Loan</span>
                 </a>
                     <ul aria-expanded="false" class="bichi">
-                        <li><router-link :to="{name: 'LoanEntityList'}">Entity</router-link></li>
+                        <li v-if="CheckPermission(Section.STAFF_LOAN + '-' + Action.VIEW)"><router-link :to="{name: 'LoanEntityList'}">Entity</router-link></li>
+                        <li v-if="CheckPermission(Section.STAFF_LOAN + '-' + Action.VIEW)"><router-link :to="{name: 'CompanyLoanList'}">Company Loan</router-link></li>
+                        <li v-if="CheckPermission(Section.STAFF_LOAN + '-' + Action.VIEW)"><router-link :to="{name: 'StaffLoanList'}">Staff Loan</router-link></li>
                     </ul>
                 </li>
                 <li>
