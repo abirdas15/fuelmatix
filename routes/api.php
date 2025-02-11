@@ -413,7 +413,7 @@ Route::group(['middleware' => 'auth:api'], function() {
         Route::post('update', [LoanEntityController::class, 'update']);
         Route::post('delete', [LoanEntityController::class, 'delete']);
     });
-    Route::group(['prefix' => 'company-entity'], function() {
+    Route::group(['prefix' => 'company-loan'], function() {
         Route::post('save', [CompanyLoanController::class, 'save']);
     });
 });
