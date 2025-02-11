@@ -24,11 +24,6 @@
                                         <input type="text" class="form-control" name="name" v-model="param.name">
                                         <div class="invalid-feedback"></div>
                                     </div>
-                                    <div class="mb-3 form-group col-md-4">
-                                        <label class="form-label">Opening Balance:</label>
-                                        <input type="text" class="form-control" name="opening_balance" v-model="param.opening_balance">
-                                        <div class="invalid-feedback"></div>
-                                    </div>
                                 </div>
                                 <div class="row" style="text-align: left;">
                                     <div class="mb-3">
@@ -54,7 +49,6 @@ export default {
         return {
             param: {
                 name: '',
-                opening_balance: ''
             },
             listParam: {
                 limit: 5000,

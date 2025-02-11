@@ -30,7 +30,6 @@ class LoanEntityService
         if (!$category instanceof Category) {
             throw new Exception('Cannot save loan entity');
         }
-        $category->addOpeningBalance();
         return $category;
     }
 
