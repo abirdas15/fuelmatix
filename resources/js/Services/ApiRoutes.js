@@ -273,7 +273,8 @@ const ApiRoutes = {
     LoanStaffList: ApiVersion + '/loan/staff/list',
     StaffLoan: ApiVersion + '/staff/loan',
     Challan: ApiVersion + '/challan',
-    LoanEntity: ApiVersion + '/loan-entity'
+    LoanEntity: ApiVersion + '/loan-entity',
+    CompanyLoan: ApiVersion + '/company-loan'
 }
 
 export default ApiRoutes;

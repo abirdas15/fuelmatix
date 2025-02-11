@@ -35272,7 +35272,7 @@ var app = new vue__WEBPACK_IMPORTED_MODULE_1___default.a({
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! C:\laragon\www\fuelmatix\resources\js\admin\app.js */"./resources/js/admin/app.js");
+module.exports = __webpack_require__(/*! D:\laragon\www\fuelmatix\resources\js\admin\app.js */"./resources/js/admin/app.js");
 
 
 /***/ })

@@ -30,21 +30,21 @@
                                             name="from_category_id"
                                             placeholder="Choose Cash/Bank"
                                             label="name"
-                                            v-model="param.from_category_id"
+                                            v-model="param.to_category_id"
                                             :reduce="(option) => option.id"
                                             :searchable="true"
                                         ></v-select>
                                         <div class="invalid-feedback"></div>
                                     </div>
                                     <div class="mb-3 form-group col-md-6">
-                                        <label class="form-label">Staff:</label>
+                                        <label class="form-label">Entity:</label>
                                         <v-select
                                             class="form-control form-control-sm"
-                                            :options="staffs"
+                                            :options="entities"
                                             placeholder="Choose Staff"
                                             name="to_category_id"
                                             label="name"
-                                            v-model="param.to_category_id"
+                                            v-model="param.from_category_id"
                                             :reduce="(option) => option.id"
                                             :searchable="true"
                                         ></v-select>
@@ -97,20 +97,20 @@ export default {
             },
             loading: false,
             categories: [],
-            staffs: []
+            entities: []
         }
     },
     methods: {
         save: function () {
             ApiService.ClearErrorHandler();
             this.loading = true
-            ApiService.POST(ApiRoutes.StaffLoan + '/save', this.param,res => {
+            ApiService.POST(ApiRoutes.CompanyLoan + '/save', this.param,res => {
                 this.loading = false
                 if (parseInt(res.status) === 200) {
                     this.$toast.success(res.message);
                     this.$router.push({
-                        name: 'StaffLoanList'
-                    })
+                        name: 'CompanyLoanList'
+                    });
                 } else if (parseInt(res.status) === 300) {
                     Swal.fire({
                         icon: "error",
@@ -133,9 +133,9 @@ export default {
             });
         },
         getStaffList() {
-            ApiService.POST(ApiRoutes.LoanStaffList, {}, (res) => {
+            ApiService.POST(ApiRoutes.LoanEntity + '/list', {limit: 100}, (res) => {
                 if (parseInt(res.status) === 200) {
-                    this.staffs = res.data;
+                    this.entities = res.data.data;
                 }
             });
         },
