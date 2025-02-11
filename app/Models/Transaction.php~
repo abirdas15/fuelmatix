@@ -31,6 +31,6 @@ class Transaction extends Model
     {
         return $this->hasMany(Transaction::class, 'module_id', 'id')
             ->where('module', Module::COMPANY_LOAN)
-            ->havingRaw('credit_amount > 0');
+            ->havingRaw('debit_amount > 0');
     }
 }

@@ -415,6 +415,7 @@ Route::group(['middleware' => 'auth:api'], function() {
     });
     Route::group(['prefix' => 'company-loan'], function() {
         Route::post('save', [CompanyLoanController::class, 'save']);
+        Route::post('list', [CompanyLoanController::class, 'list']);
     });
 });
 

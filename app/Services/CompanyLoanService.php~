@@ -42,8 +42,8 @@ class CompanyLoanService
             'transactions.account_id',
             'transactions.id',
             'transactions.date as date',
-            DB::raw('SUM(transactions.credit_amount) as loan_amount'),
-            'c1.name as company_name',
+            DB::raw('SUM(transactions.debit_amount) as loan_amount'),
+            'c1.name as staff_name',
         )
             ->join('categories as c1', 'c1.id', '=', 'transactions.account_id')
             ->with('company_loan_payment')
@@ -57,7 +57,7 @@ class CompanyLoanService
         foreach ($result as &$data) {
             $totalPayment = 0;
             foreach ($data['company_loan_payment'] as $paymentData) {
-                $totalPayment += $paymentData['debit_amount'];
+                $totalPayment += $paymentData['credit_amount'];
             }
             $data['payment_amount'] = $totalPayment;
             $data['due_amount'] = $data['loan_amount'] - $data['payment_amount'];

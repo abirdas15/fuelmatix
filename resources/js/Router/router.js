@@ -122,6 +122,8 @@ import StaffLoanView from "../Pages/StaffLoan/View.vue";
 import ChallanList from "../Pages/Challan/List.vue";
 import ChallanAdd from "../Pages/Challan/Add.vue";
 import CompanyLoanAdd from "../Pages/CompanyLoan/Add.vue";
+import CompanyLoanList from "../Pages/CompanyLoan/List.vue";
+import CompanyLoanView from "../Pages/CompanyLoan/View.vue";
 import LoanEntityAdd from "../Pages/LoanEntity/Add.vue";
 import LoanEntityList from "../Pages/LoanEntity/List.vue";
 import LoanEntityEdit from "../Pages/LoanEntity/Edit.vue";
@@ -695,11 +697,6 @@ const router = new VueRouter({
                     },
                 },
                 {
-                    path: ROOT_URL + "/company-loan/add", meta: { title: 'Company Loan Add - FuelMatix' }, name: "CompanyLoanAdd", component: CompanyLoanAdd, beforeEnter: (to, from, next) => {
-                        CheckPermission(to, from, next, Section.STAFF_LOAN + '-' + Action.CREATE)
-                    },
-                },
-                {
                     path: ROOT_URL + "/loan-entity/list", meta: { title: 'Entity List - FuelMatix' }, name: "LoanEntityList", component: LoanEntityList, beforeEnter: (to, from, next) => {
                         CheckPermission(to, from, next, Section.STAFF_LOAN + '-' + Action.CREATE)
                     },
@@ -711,6 +708,11 @@ const router = new VueRouter({
                 },
                 {
                     path: ROOT_URL + "/loan-entity/edit", meta: { title: 'Entity Edit - FuelMatix' }, name: "LoanEntityEdit", component: LoanEntityEdit, beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.STAFF_LOAN + '-' + Action.CREATE)
+                    },
+                },
+                {
+                    path: ROOT_URL + "/company-loan/list", meta: { title: 'Company Loan List - FuelMatix' }, name: "CompanyLoanList", component: CompanyLoanList, beforeEnter: (to, from, next) => {
                         CheckPermission(to, from, next, Section.STAFF_LOAN + '-' + Action.CREATE)
                     },
                 },

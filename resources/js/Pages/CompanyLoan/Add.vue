@@ -4,7 +4,7 @@
             <div class="row page-titles">
                 <ol class="breadcrumb align-items-center ">
                     <li class="breadcrumb-item active"><router-link :to="{name: 'Dashboard'}">Home</router-link></li>
-                    <li class="breadcrumb-item"><a href="javascript:void(0)">Staff Loan</a></li>
+                    <li class="breadcrumb-item"><a href="javascript:void(0)">Company Loan</a></li>
 
                 </ol>
             </div>
@@ -12,7 +12,7 @@
             <div class="col-xl-12 col-lg-12">
                 <div class="card">
                     <div class="card-header">
-                        <h4 class="card-title">Staff Loan</h4>
+                        <h4 class="card-title">Company Loan</h4>
                     </div>
                     <div class="card-body">
                         <div class="basic-form">
@@ -41,7 +41,7 @@
                                         <v-select
                                             class="form-control form-control-sm"
                                             :options="entities"
-                                            placeholder="Choose Staff"
+                                            placeholder="Choose Company"
                                             name="to_category_id"
                                             label="name"
                                             v-model="param.from_category_id"
@@ -132,7 +132,7 @@ export default {
                 }
             });
         },
-        getStaffList() {
+        getCompanyList() {
             ApiService.POST(ApiRoutes.LoanEntity + '/list', {limit: 100}, (res) => {
                 if (parseInt(res.status) === 200) {
                     this.entities = res.data.data;
@@ -142,10 +142,10 @@ export default {
     },
     created() {
         this.getParentCategory();
-        this.getStaffList();
+        this.getCompanyList();
     },
     mounted() {
-        $('#dashboard_bar').text('Staff Loan');
+        $('#dashboard_bar').text('Company Loan');
         setTimeout(() => {
             $('.date').flatpickr({
                 altInput: true,
