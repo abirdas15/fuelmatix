@@ -9,7 +9,7 @@ use App\Helpers\SessionUser;
 use App\Models\Transaction;
 use App\Repository\TransactionRepository;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
+use Exception;
 use Illuminate\Support\Facades\DB;
 
 class CompanyLoanService
@@ -47,7 +47,7 @@ class CompanyLoanService
         )
             ->join('categories as c1', 'c1.id', '=', 'transactions.account_id')
             ->with('company_loan_payment')
-            ->where('transactions.module', Module::COMPANY_LOAN)
+            ->whereIn('transactions.module', [Module::COMPANY_LOAN, Module::ACCOUNTING])
             ->where('transactions.client_company_id', $sessionUser->client_company_id)
             ->groupBy('transactions.account_id')
             ->havingRaw('SUM(transactions.credit_amount) > 0')
@@ -67,5 +67,25 @@ class CompanyLoanService
             $data['due_amount_format'] = !empty($data['due_amount']) ? number_format($data['due_amount'], $sessionUser['currency_precision']) : '';
         }
         return $result;
+    }
+     /**
+      * @param array $data
+     * @return bool
+     * @throws Exception
+     */
+    public function payment(array $data): bool
+    {
+        $transaction = Transaction::where('id', $data['id'])->first();
+        if (! $transaction instanceof Transaction) {
+            throw new Exception('Transaction is not exist');
+        }
+        DB::transaction((function () use ($data, $transaction) {
+            $transactionData = [
+                ['date' => date('Y-m-d'), 'account_id' => $transaction->account_id, 'debit_amount' => $data['amount'], 'credit_amount' => 0, 'module' => Module::COMPANY_LOAN_PAYMENT, 'module_id' => $transaction->id],
+                ['date' => date('Y-m-d'), 'account_id' => $data['payment_id'], 'debit_amount' => 0, 'credit_amount' => $data['amount'], 'module' => Module::COMPANY_LOAN_PAYMENT, 'module_id' => $transaction->id],
+            ];
+            TransactionRepository::saveTransaction($transactionData);
+        }));
+        return true;
     }
 }
