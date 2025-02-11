@@ -62,6 +62,8 @@ class Section
     const POS_REPORT = 'Pos-Report';
     const STAFF_LOAN = 'Staff-Loan';
     const CHALLAN = 'Challan';
+    const COMPANY_LOAN = 'Company-Loan';
+    const LOAN_ENTITY = 'Loan-Entity';
 
     /**
      * @return array
@@ -127,6 +129,8 @@ class Section
             'POS_REPORT' => self::POS_REPORT,
             'STAFF_LOAN' => self::STAFF_LOAN,
             'CHALLAN' => self::CHALLAN,
+            'COMPANY_LOAN' => self::COMPANY_LOAN,
+            'LOAN_ENTITY' => self::LOAN_ENTITY,
         ];
     }
 }

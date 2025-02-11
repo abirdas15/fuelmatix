@@ -102,8 +102,8 @@ class CompanyLoanService
             'transactions.linked_id',
             'c1.name as payment_method'
         )
-            ->join('transactions as t1', 't1.account_id', '=', 'transactions.id')
-            ->join('categories as c1', 'c1.id', '=', 't1.account_id')
+            ->leftJoin('transactions as t1', 't1.linked_id', '=', 'transactions.id')
+            ->leftJoin('categories as c1', 'c1.id', '=', 't1.account_id')
             ->where('transactions.account_id', $id)
             ->get()
             ->toArray();
