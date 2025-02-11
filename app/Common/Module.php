@@ -36,4 +36,5 @@ class Module
     const STAFF_LOAN_RECEIVABLE = 'staff loan receivable';
     const STAFF_LOAN_PAYMENT = 'staff loan payment';
     const COMPANY_LOAN = 'company loan';
+    const COMPANY_LOAN_PAYMENT = 'company loan payment';
 }
