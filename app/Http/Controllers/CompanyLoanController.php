@@ -9,6 +9,7 @@ use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class CompanyLoanController extends Controller
 {
@@ -76,6 +77,34 @@ class CompanyLoanController extends Controller
                 'status' => 200,
                 'data' => $response
             ]);
+        } catch (Exception $exception) {
+            Log::error('Company Loan Save Error');
+            Log::error($exception->getMessage());
+            return response()->json([
+                'status' => 500,
+                'message' => $exception->getMessage()
+            ]);
+        }
+    }
+
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function single(Request $request): JsonResponse
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'id' => 'required'
+            ]);
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => 500,
+                    'errors'=> $validator->errors()
+                ]);
+            }
+            $response = $this->companyLoanService->single($request->id);
+            return response()->json($response);
         } catch (Exception $exception) {
             Log::error('Company Loan Save Error');
             Log::error($exception->getMessage());

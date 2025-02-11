@@ -721,6 +721,11 @@ const router = new VueRouter({
                         CheckPermission(to, from, next, Section.STAFF_LOAN + '-' + Action.CREATE)
                     },
                 },
+                {
+                    path: ROOT_URL + "/company-loan/view", meta: { title: 'Company Loan View - FuelMatix' }, name: "CompanyLoanView", component: CompanyLoanView, beforeEnter: (to, from, next) => {
+                        CheckPermission(to, from, next, Section.STAFF_LOAN + '-' + Action.CREATE)
+                    },
+                },
             ],
         },
     ],

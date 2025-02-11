@@ -4,14 +4,14 @@
             <div class="row page-titles">
                 <ol class="breadcrumb align-items-center ">
                     <li class="breadcrumb-item active"><router-link :to="{name: 'Dashboard'}">Home</router-link></li>
-                    <li class="breadcrumb-item"><a href="javascript:void(0)">Staff Loan View</a></li>
+                    <li class="breadcrumb-item"><a href="javascript:void(0)">Company Loan View</a></li>
                 </ol>
             </div>
             <div class="row">
                 <div class="col-12">
                     <div class="card">
                         <div class="card-header bg-secondary">
-                            <h4 class="card-title">Staff Loan View</h4>
+                            <h4 class="card-title">Company Loan View</h4>
                         </div>
                         <div class="card-body">
                             <div class="row mt-4">
@@ -29,15 +29,15 @@
                                             <tr v-for="each in loans">
                                                 <td v-text="each.date"></td>
                                                 <td v-text="each.payment_method"></td>
-                                                <td class="text-end" v-text="each.debit_amount"></td>
                                                 <td class="text-end" v-text="each.credit_amount"></td>
+                                                <td class="text-end" v-text="each.debit_amount"></td>
                                             </tr>
                                         </tbody>
                                         <tfoot>
                                             <tr>
                                                 <th colspan="2">Total</th>
-                                                <th class="text-end" v-text="total.debit_amount"></th>
                                                 <th class="text-end" v-text="total.credit_amount"></th>
+                                                <th class="text-end" v-text="total.debit_amount"></th>
                                             </tr>
                                             <tr>
                                                 <th colspan="3">Due</th>
@@ -76,7 +76,7 @@ export default {
 
     },
     created() {
-        this.fetchStaffLoanDetails();
+        this.fetchCompanyLoanDetails();
     },
     computed: {
         Auth: function () {
@@ -84,8 +84,8 @@ export default {
         },
     },
     methods: {
-        fetchStaffLoanDetails() {
-            ApiService.POST(ApiRoutes.StaffLoan + '/single', {id: this.$route.params.id}, (res) => {
+        fetchCompanyLoanDetails() {
+            ApiService.POST(ApiRoutes.CompanyLoan + '/single', {id: this.$route.params.id}, (res) => {
                 if (parseInt(res.status) === 200) {
                     this.loans = res.data;
                     this.total = res.total;
@@ -94,7 +94,7 @@ export default {
         }
     },
     mounted() {
-        $('#dashboard_bar').text('Staff Loan')
+        $('#dashboard_bar').text('Company Loan')
     }
 }
 </script>

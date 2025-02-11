@@ -417,6 +417,7 @@ Route::group(['middleware' => 'auth:api'], function() {
         Route::post('save', [CompanyLoanController::class, 'save']);
         Route::post('list', [CompanyLoanController::class, 'list']);
         Route::post('payment', [CompanyLoanController::class, 'payment']);
+        Route::post('single', [CompanyLoanController::class, 'single']);
     });
 });
 

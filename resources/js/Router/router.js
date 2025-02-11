@@ -707,7 +707,7 @@ const router = new VueRouter({
                     },
                 },
                 {
-                    path: ROOT_URL + "/loan-entity/edit", meta: { title: 'Entity Edit - FuelMatix' }, name: "LoanEntityEdit", component: LoanEntityEdit, beforeEnter: (to, from, next) => {
+                    path: ROOT_URL + "/loan-entity/edit/:id", meta: { title: 'Entity Edit - FuelMatix' }, name: "LoanEntityEdit", component: LoanEntityEdit, beforeEnter: (to, from, next) => {
                         CheckPermission(to, from, next, Section.STAFF_LOAN + '-' + Action.CREATE)
                     },
                 },
@@ -722,7 +722,7 @@ const router = new VueRouter({
                     },
                 },
                 {
-                    path: ROOT_URL + "/company-loan/view", meta: { title: 'Company Loan View - FuelMatix' }, name: "CompanyLoanView", component: CompanyLoanView, beforeEnter: (to, from, next) => {
+                    path: ROOT_URL + "/company-loan/view/:id", meta: { title: 'Company Loan View - FuelMatix' }, name: "CompanyLoanView", component: CompanyLoanView, beforeEnter: (to, from, next) => {
                         CheckPermission(to, from, next, Section.STAFF_LOAN + '-' + Action.CREATE)
                     },
                 },
