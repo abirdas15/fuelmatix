@@ -4,7 +4,7 @@
             <div class="row page-titles">
                 <ol class="breadcrumb align-items-center ">
                     <li class="breadcrumb-item active"><router-link :to="{name: 'Dashboard'}">Home</router-link></li>
-                    <li class="breadcrumb-item active"><router-link :to="{name: 'Bank'}">Bank</router-link></li>
+                    <li class="breadcrumb-item active"><router-link :to="{name: 'Bank'}">Entity</router-link></li>
                     <li class="breadcrumb-item"><a href="javascript:void(0)">Edit</a></li>
 
                 </ol>
@@ -13,14 +13,14 @@
             <div class="col-xl-12 col-lg-12">
                 <div class="card">
                     <div class="card-header">
-                        <h4 class="card-title">Bank</h4>
+                        <h4 class="card-title">Entity</h4>
                     </div>
                     <div class="card-body">
                         <div class="basic-form">
                             <form @submit.prevent="save">
                                 <div class="row">
                                     <div class="mb-3 form-group col-md-4">
-                                        <label class="form-label">Bank Name:</label>
+                                        <label class="form-label">Entity Name:</label>
                                         <input type="text" class="form-control" name="name" v-model="param.name">
                                         <div class="invalid-feedback"></div>
                                     </div>
@@ -73,7 +73,7 @@ export default {
                 this.loading = false
                 if (parseInt(res.status) === 200) {
                     this.$router.push({
-                        name: 'Bank'
+                        name: 'LoanEntityList'
                     })
                 } else {
                     ApiService.ErrorHandler(res.errors);
@@ -86,7 +86,7 @@ export default {
         this.getSingle()
     },
     mounted() {
-        $('#dashboard_bar').text('Bank Edit')
+        $('#dashboard_bar').text('Entity Edit')
     }
 }
 </script>

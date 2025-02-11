@@ -13,14 +13,14 @@
             <div class="col-xl-12 col-lg-12">
                 <div class="card">
                     <div class="card-header">
-                        <h4 class="card-title">Bank</h4>
+                        <h4 class="card-title">Entity</h4>
                     </div>
                     <div class="card-body">
                         <div class="basic-form">
                             <form @submit.prevent="save">
                                 <div class="row">
                                     <div class="mb-3 form-group col-md-4">
-                                        <label class="form-label">Bank Name:</label>
+                                        <label class="form-label">Entity Name:</label>
                                         <input type="text" class="form-control" name="name" v-model="param.name">
                                         <div class="invalid-feedback"></div>
                                     </div>
@@ -60,7 +60,7 @@ export default {
     },
     methods: {
         getSingle: function () {
-            ApiService.POST(ApiRoutes.BankSingle, {id: this.id},res => {
+            ApiService.POST(ApiRoutes.EntitySingle, {id: this.id},res => {
                 if (parseInt(res.status) === 200) {
                     this.param = res.data
                 }
@@ -69,11 +69,11 @@ export default {
         save: function () {
             ApiService.ClearErrorHandler();
             this.loading = true
-            ApiService.POST(ApiRoutes.BankEdit, this.param,res => {
+            ApiService.POST(ApiRoutes.EntityEdit, this.param,res => {
                 this.loading = false
                 if (parseInt(res.status) === 200) {
                     this.$router.push({
-                        name: 'Bank'
+                        name: 'LoanEntityList'
                     })
                 } else {
                     ApiService.ErrorHandler(res.errors);
@@ -86,7 +86,7 @@ export default {
         this.getSingle()
     },
     mounted() {
-        $('#dashboard_bar').text('Bank Edit')
+        $('#dashboard_bar').text('Entity Edit')
     }
 }
 </script>
