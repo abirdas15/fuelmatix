@@ -25,12 +25,14 @@ class Transaction extends Model
     {
         return $this->hasMany(Transaction::class, 'module_id', 'id')
             ->where('module', Module::STAFF_LOAN_PAYMENT)
-            ->havingRaw('credit_amount > 0');
+            ->havingRaw('credit_amount > 0')
+            ->select('id', 'credit_amount', 'module_id');
     }
     public function company_loan_payment()
     {
         return $this->hasMany(Transaction::class, 'module_id', 'id')
-            ->where('module', Module::COMPANY_LOAN)
-            ->havingRaw('credit_amount > 0');
+            ->where('module', Module::COMPANY_LOAN_PAYMENT)
+            ->havingRaw('credit_amount > 0')
+            ->select('id', 'credit_amount', 'module_id');
     }
 }
