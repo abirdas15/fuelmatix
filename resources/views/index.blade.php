@@ -43,7 +43,7 @@
     <app></app>
 </div>
 
-<script src="{{asset('js/app.js?version=3.4')}}"></script>
+<script src="{{asset('js/app.js?version=3.5')}}"></script>
 
 <script src="{{ asset('vendor/global/global.min.js') }}"></script>
 <script src="{{ asset('vendor/chart.js/Chart.bundle.min.js') }}"></script>
