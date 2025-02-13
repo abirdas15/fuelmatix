@@ -9,9 +9,7 @@ use App\Helpers\SessionUser;
 use App\Models\Transaction;
 use App\Repository\TransactionRepository;
 use Exception;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
 
 class CompanyLoanService
 {
@@ -90,7 +88,7 @@ class CompanyLoanService
         return true;
     }
 
-    public function single(int $id)
+    public function single(int $id): array
     {
         $sessionUser = SessionUser::getUser();
         $result = Transaction::select(
