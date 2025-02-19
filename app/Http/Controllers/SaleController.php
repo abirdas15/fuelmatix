@@ -121,18 +121,26 @@ class SaleController extends Controller
                     return response()->json(['status' => 500, 'errors' => ['voucher_number' => ['The voucher number date is expired.']]]);
                 }
                 if ($voucher->status == FuelMatixStatus::DONE && !$requestData['voucher_check']) {
-                    return response()->json(['status' => 402, 'message' => 'The voucher number is already used.']);
+                    $sale = Sale::select('invoice_number', 'date as invoice_date')
+                        ->where('voucher_number', $voucher->voucher_number)
+                        ->where('payment_category_id', $requestData['company_id'])
+                        ->first();
+                    $message = 'The voucher number is already used.';
+                    if ($sale instanceof Sale) {
+                        $message = "The voucher has already been used on ".Carbon::parse($sale['invoice_date'])->format('d/m/Y')." with invoice number ".$sale->invoice_number.'.';
+                    }
+                    return response()->json(['status' => 402, 'message' => $message]);
                 }
                 $voucherNo = $voucher->voucher_number;
 
                 // Check if prefix exists and concatenate it with the voucher number
-                if (!empty($voucher->prefix) && !empty($voucher->suffix)) {
-                    $voucherNo = $voucher->prefix . '-' . $voucherNo . '-' . $voucher->suffix;
-                } elseif (!empty($voucher->prefix)) {
-                    $voucherNo = $voucher->prefix . '-' . $voucherNo;
-                } elseif (!empty($voucher->suffix)) {
-                    $voucherNo = $voucherNo . '-' . $voucher->suffix;
-                }
+//                if (!empty($voucher->prefix) && !empty($voucher->suffix)) {
+//                    $voucherNo = $voucher->prefix . '-' . $voucherNo . '-' . $voucher->suffix;
+//                } elseif (!empty($voucher->prefix)) {
+//                    $voucherNo = $voucher->prefix . '-' . $voucherNo;
+//                } elseif (!empty($voucher->suffix)) {
+//                    $voucherNo = $voucherNo . '-' . $voucher->suffix;
+//                }
             }
             if (!empty($request['car_number'])) {
                 $car = Car::where('car_number', $request['car_number'])
@@ -524,6 +532,7 @@ class SaleController extends Controller
             $payment_category_id = $category['id'];
         }
         $voucherNo = null;
+        $voucher = null;
         if ($request['payment_method'] == PaymentMethod::COMPANY) {
             $voucher = Voucher::where('company_id', $request['company_id'])
                 ->where('voucher_number', $request['voucher_number'])
@@ -534,12 +543,17 @@ class SaleController extends Controller
             $voucherNo = $voucher->voucher_number;
 
             // Check if prefix exists and concatenate it with the voucher number
-            if (!empty($voucher->prefix) && !empty($voucher->suffix)) {
-                $voucherNo = $voucher->prefix . '-' . $voucherNo . '-' . $voucher->suffix;
-            } elseif (!empty($voucher->prefix)) {
-                $voucherNo = $voucher->prefix . '-' . $voucherNo;
-            } elseif (!empty($voucher->suffix)) {
-                $voucherNo = $voucherNo . '-' . $voucher->suffix;
+//            if (!empty($voucher->prefix) && !empty($voucher->suffix)) {
+//                $voucherNo = $voucher->prefix . '-' . $voucherNo . '-' . $voucher->suffix;
+//            } elseif (!empty($voucher->prefix)) {
+//                $voucherNo = $voucher->prefix . '-' . $voucherNo;
+//            } elseif (!empty($voucher->suffix)) {
+//                $voucherNo = $voucherNo . '-' . $voucher->suffix;
+//            }
+            if ($sale->voucher_number != $voucherNo) {
+                Voucher::where('voucher_number', $sale->voucher_number)
+                    ->where('company_id', $request['company_id'])
+                    ->update(['status' => 'pending']);
             }
         }
         $driverId = $request['driver_sale']['driver_id'] ?? null;
@@ -563,6 +577,10 @@ class SaleController extends Controller
                 $saleData->subtotal = $product['subtotal'];
                 $saleData->shift_sale_id = $shiftTotal->id;
                 $saleData->save();
+            }
+            if ($voucher instanceof Voucher) {
+                $voucher->status = 'done';
+                $voucher->save();
             }
             return response()->json(['status' => 200, 'message' => 'Successfully updated sale.']);
         }
